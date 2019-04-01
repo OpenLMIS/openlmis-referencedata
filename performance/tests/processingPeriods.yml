@@ -1,0 +1,181 @@
+execution:
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: create-processing-period
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: get-processing-period
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: get-all-processing-periods
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: processing-periods-search
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: get-page-of-ten-processing-periods
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: put-processing-period
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: get-processing-period-duration
+- concurrency: ${__P(scenario-concurrency,1)}
+  hold-for: ${__P(scenario-duration,60)}
+  scenario: get-processing-period-audit-log
+
+scenarios:
+  processing-schedule-get-single:
+    requests:
+    - if: '${__javaScript(vars.get("processing_schedule") == null)}'
+      then:
+      - url: ${__P(base-uri)}/api/processingSchedules/057921bd-1841-4748-8523-dbe5ebb58368
+        method: GET
+        label: GetSingleProcessingSchedule
+        headers:
+          Authorization: Bearer ${access_token}
+          Content-Type: application/json
+        jsr223:
+          script-text: |
+            import groovy.json.JsonSlurper
+            import groovy.json.JsonOutput
+
+            def response = prev.getResponseDataAsString()
+            def jsonSlurper = new JsonSlurper()
+            def processingSchedule = jsonSlurper.parseText(response)
+
+            vars.put("processing_schedule", JsonOutput.toJson(processingSchedule))
+
+  create-processing-period:
+    requests:
+    - include-scenario: get-user-token
+    - include-scenario: processing-schedule-get-single
+    - url: ${__P(base-uri)}/api/processingPeriods
+      method: POST
+      label: CreateProcessingPeriod
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+      jsr223:
+        execute: before
+        script-text: |
+          import groovy.json.JsonSlurper
+          import groovy.json.JsonOutput
+
+          def jsonSlurper = new JsonSlurper()
+
+          def period = [
+            name: "2026Q1",
+            startDate: "2026-01-01",
+            endDate: "2026-03-31",
+            processingSchedule: jsonSlurper.parseText(vars.get("processing_schedule"))
+          ]
+
+          vars.put("processing_period", JsonOutput.toJson(period))
+      body: ${processing_period}
+      extract-jsonpath:
+        processing_period_id: $.id
+
+  get-processing-period:
+    variables:
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}
+      method: GET
+      label: GetProcessingPeriod
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+  get-all-processing-periods:
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods
+      method: GET
+      label: GetAllProcessingPeriods
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+  processing-periods-search:
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods?program=dce17f2e-af3e-40ad-8e00-3496adef44c3&facility=7938919f-6f61-4d1a-a4dc-923c31e9cd45&startDate=2019-01-01&endDate=2019-08-01&page=0&size=10
+      method: GET
+      label: ProcessingPeriodsSearch
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+  get-page-of-ten-processing-periods:
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods?page=0&size=10
+      method: GET
+      label: GetPageOfTenProcessingPeriods
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+  put-processing-period:
+    variables:
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}
+      method: PUT
+      label: PutProcessingPeriod
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+      jsr223:
+        execute: before
+        script-text: |
+          import groovy.json.JsonSlurper
+          import groovy.json.JsonOutput
+
+          def response = prev.getResponseDataAsString()
+          def jsonSlurper = new JsonSlurper()
+
+          def processingPeriod = jsonSlurper.parseText(response)
+          processingPeriod.description = "OpenLMIS"
+
+          vars.put("processing_period", JsonOutput.toJson(processingPeriod))
+      body: ${processing_period}
+
+  get-processing-period-duration:
+    variables:
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}/duration
+      method: GET
+      label: GetProcessingPeriodDuration
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+  get-processing-period-audit-log:
+    variables:
+      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
+    requests:
+    - include-scenario: get-user-token
+    - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}/auditLog
+      method: GET
+      label: GetProcessingPeriodAuditLog
+      headers:
+        Authorization: Bearer ${access_token}
+        Content-Type: application/json
+
+reporting:
+- module: passfail
+  criteria:
+    Create Processing Period too slow: p90 of CreateProcessingPeriod>150ms
+    Get Processing Period too slow: p90 of GetProcessingPeriod>150ms
+    Get All Processing Periods too slow: p90 of GetAllProcessingPeriods>500ms
+    Processing Periods Search too slow: p90 of GetAllProcessingPeriods>150ms
+    Get Page of Ten Processing Periods too slow: p90 of GetPageOfTenProcessingPeriods>150ms
+    Put Processing Period too slow: p90 of PutProcessingPeriod>150ms
+    Get Processing Period Duration too slow: p90 of GetProcessingPeriodDuration>150ms
+    Get Processing Period Audit Log too slow: p90 of GetProcessingPeriodAuditLog>150ms
