@@ -16,11 +16,12 @@
 package org.openlmis.referencedata.repository.custom;
 
 import java.util.List;
-import java.util.UUID;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 
 public interface RequisitionGroupProgramScheduleRepositoryCustom {
 
-  List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(UUID programId,
-                                                                              UUID facilityId);
+  List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(Program program,
+                                                                              Facility facility);
 }

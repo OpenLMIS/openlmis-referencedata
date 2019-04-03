@@ -20,8 +20,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -68,9 +70,9 @@ public class ProcessingPeriodService {
                                               Pageable pageable) {
     params.validate();
 
-    Boolean programExists = existsById(programRepository, params.getProgramId(),
+    Program program = getById(programRepository, params.getProgramId(),
         ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-    Boolean facilityExists = existsById(facilityRepository, params.getFacilityId(),
+    Facility facility = getById(facilityRepository, params.getFacilityId(),
         FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID);
 
     ProcessingSchedule schedule;
@@ -78,36 +80,34 @@ public class ProcessingPeriodService {
     LocalDate endDate = params.getEndDate();
     Collection<UUID> ids = params.getIds();
 
-    if (programExists) {
+    if (null != program) {
       List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
-          .searchRequisitionGroupProgramSchedules(params.getProgramId(), params.getFacilityId());
+          .searchRequisitionGroupProgramSchedules(program, facility);
       if (schedules.isEmpty()) {
-        if (!facilityExists) {
+        if (facility == null) {
           LOGGER.warn("Cannot find Requisition Group Program Schedule for program {}",
-                  params.getProgramId());
+                  program.getId());
         } else {
           LOGGER.warn("Cannot find Requisition Group Program Schedule for"
-                  + "program {} and facility {}", params.getProgramId(), params.getFacilityId());
+                  + "program {} and facility {}", program.getId(), facility.getId());
         }
         return Pagination.getPage(Collections.emptyList(), pageable, 0);
       } else {
         schedule = schedules.get(0).getProcessingSchedule();
       }
     } else {
-      Boolean scheduleExists = existsById(processingScheduleRepository,
-          params.getProcessingScheduleId(), ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-      schedule = scheduleExists
-          ? processingScheduleRepository.findOne(params.getProcessingScheduleId()) : null;
+      schedule = getById(processingScheduleRepository, params.getProcessingScheduleId(),
+          ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
     }
 
     return periodRepository.search(schedule, startDate, endDate, ids, pageable);
   }
 
-  private <T> Boolean existsById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
-    Boolean exists = repository.exists(id);
-    if (null != id && !exists) {
+  private <T> T getById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
+    T object = null == id ? null : repository.findOne(id);
+    if (null != id && null == object) {
       throw new NotFoundException(new Message(errorKey, id));
     }
-    return exists;
+    return object;
   }
 }

@@ -181,11 +181,10 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
 
-    given(facilityRepository.exists(facilityId)).willReturn(true);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(facilityRepository.findOne(facilityId)).willReturn(facility);
+    given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        programId, facilityId)).willReturn(
-            singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     ProcessingSchedule[] response = restAssured
         .given()
@@ -209,7 +208,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(facility);
     given(programRepository.findOne(programId)).willReturn(null);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        programId, facilityId)).willReturn(singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()
@@ -231,7 +230,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     given(facilityRepository.findOne(facilityId)).willReturn(null);
     given(programRepository.findOne(programId)).willReturn(program);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-        programId, facilityId)).willReturn(singletonList(requisitionGroupProgramSchedule));
+        program, facility)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
     restAssured
         .given()

@@ -19,7 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
@@ -146,14 +148,18 @@ public class ProcessingScheduleController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("FIND_PROGRAM_IN_DB");
-    if (!programRepository.exists(programId)) {
+    Program program = programRepository.findOne(programId);
+
+    profiler.start("FIND_FACILITY_IN_DB");
+    Facility facility = facilityRepository.findOne(facilityId);
+
+    if (program == null) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
-    profiler.start("FIND_FACILITY_IN_DB");
-    if (!facilityRepository.exists(facilityId)) {
+    if (facility == null) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
@@ -162,7 +168,7 @@ public class ProcessingScheduleController extends BaseController {
     profiler.start("FIND_REQUISITION_GROUP_IN_DB");
     List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedules =
         requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
-            programId, facilityId);
+            program, facility);
 
     List<ProcessingScheduleDto> schedules = new ArrayList<>();
     if (!requisitionGroupProgramSchedules.isEmpty()) {
