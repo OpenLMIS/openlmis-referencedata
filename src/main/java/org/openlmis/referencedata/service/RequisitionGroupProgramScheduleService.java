@@ -16,8 +16,7 @@
 package org.openlmis.referencedata.service;
 
 import java.util.List;
-import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
+import java.util.UUID;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class RequisitionGroupProgramScheduleService {
   private RequisitionGroupProgramScheduleRepository repository;
 
   public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(
-        Program program, Facility facility) {
-    return repository.searchRequisitionGroupProgramSchedules(program, facility);
+        UUID programId, UUID facilityId) {
+    return repository.searchRequisitionGroupProgramSchedules(programId, facilityId);
   }
 }

@@ -149,7 +149,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   @Test
   public void shouldReturnNullIfRequisitionGroupProgramScheduleIsNotFound() {
     List<RequisitionGroupProgramSchedule> requisitionGroupProgramSchedule =
-          repository.searchRequisitionGroupProgramSchedules(program, facility);
+          repository.searchRequisitionGroupProgramSchedules(program.getId(), facility.getId());
 
     assertEquals(requisitionGroupProgramSchedule.size(), 0);
   }
@@ -164,7 +164,7 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
     requisitionGroupRepository.save(requisitionGroup);
 
     List<RequisitionGroupProgramSchedule> found = repository
-        .searchRequisitionGroupProgramSchedules(program, facility);
+        .searchRequisitionGroupProgramSchedules(program.getId(), facility.getId());
 
     assertThat(found.get(0), is(entity));
   }
