@@ -66,32 +66,6 @@ scenarios:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
 
-  put-processing-period:
-    variables:
-      processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
-    requests:
-      - include-scenario: get-processing-period
-      - url: ${__P(base-uri)}/api/processingPeriods/${processing_period_id}
-        method: PUT
-        label: PutProcessingPeriod
-        headers:
-          Authorization: Bearer ${access_token}
-          Content-Type: application/json
-        jsr223:
-          execute: before
-          script-text: |
-            import groovy.json.JsonSlurper
-            import groovy.json.JsonOutput
-
-            def response = prev.getResponseDataAsString()
-            def jsonSlurper = new JsonSlurper()
-
-            def processingPeriod = jsonSlurper.parseText(response)
-            processingPeriod.description = "OpenLMIS"
-
-            vars.put("processing_period", JsonOutput.toJson(processingPeriod))
-        body: ${processing_period}
-
   get-processing-period-duration:
     variables:
       processing_period_id: 516ac930-0d28-49f5-a178-64764e22b236
