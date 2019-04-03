@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import java.util.List;
+import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -24,7 +25,6 @@ import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.repository.custom.RequisitionGroupProgramScheduleRepositoryCustom;
@@ -40,12 +40,12 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
    * Retrieves requisition group program schedule list from reference data service
    * by program and facility. Both parameters are optional.
    *
-   * @param program  Program of searched RequisitionGroupProgramSchedule
-   * @param facility Facility of searched RequisitionGroupProgramSchedule
+   * @param programId  UUID of program of searched RequisitionGroupProgramSchedule
+   * @param facilityId UUID of facility of searched RequisitionGroupProgramSchedule
    * @return Requisition Group Program Schedule list matching search criteria
    */
   public List<RequisitionGroupProgramSchedule> searchRequisitionGroupProgramSchedules(
-      Program program, Facility facility) {
+      UUID programId, UUID facilityId) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<RequisitionGroupProgramSchedule> query = builder.createQuery(
@@ -58,11 +58,12 @@ public class RequisitionGroupProgramScheduleRepositoryImpl implements
     Join<RequisitionGroup, Facility> ft = rg.join("memberFacilities");
 
     Predicate conjunction = builder.conjunction();
-    if (facility != null) {
-      conjunction = builder.and(conjunction, builder.equal(ft.get("id"), facility.getId()));
+    if (facilityId != null) {
+      conjunction = builder.and(conjunction, builder.equal(ft.get("id"), facilityId));
     }
-    if (program != null) {
-      conjunction = builder.and(conjunction, builder.equal(rgps.get("program"), program));
+    if (programId != null) {
+      conjunction = builder.and(conjunction, builder.equal(rgps.get("program").get("id"),
+          programId));
     }
 
     query.select(rgps);

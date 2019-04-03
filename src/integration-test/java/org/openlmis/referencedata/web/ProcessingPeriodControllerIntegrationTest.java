@@ -212,13 +212,12 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     final UUID id1 = UUID.randomUUID();
     final UUID id2 = UUID.randomUUID();
 
-    given(programRepository.findOne(programId))
-        .willReturn(requisitionGroupProgramSchedule.getProgram());
-    given(facilityRepository.findOne(facilityId))
-        .willReturn(requisitionGroupProgramSchedule.getDropOffFacility());
+    given(programRepository.exists(programId))
+        .willReturn(true);
+    given(facilityRepository.exists(facilityId))
+        .willReturn(true);
     given(requisitionGroupProgramScheduleRepository
-        .searchRequisitionGroupProgramSchedules(requisitionGroupProgramSchedule.getProgram(),
-            requisitionGroupProgramSchedule.getDropOffFacility()))
+        .searchRequisitionGroupProgramSchedules(programId, facilityId))
         .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
     given(periodRepository
