@@ -36,6 +36,7 @@ import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,10 +67,16 @@ public class ProcessingPeriodService {
    */
   public Page<ProcessingPeriod> searchPeriods(ProcessingPeriodSearchParams params,
                                               Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_PERIODS_BY_PARAMS");
+    profiler.setLogger(LOGGER);
+
     params.validate();
 
+    profiler.start("CHECK_IF_PROGRAM_EXISTS");
     Boolean programExists = existsById(programRepository, params.getProgramId(),
         ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+
+    profiler.start("CHECK_IF_FACILITY_EXISTS");
     Boolean facilityExists = existsById(facilityRepository, params.getFacilityId(),
         FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID);
 
@@ -79,6 +86,7 @@ public class ProcessingPeriodService {
     Collection<UUID> ids = params.getIds();
 
     if (programExists) {
+      profiler.start("SEARCH_FOR_REQUISITION_GROUP_PROGRAM_SCHEDULE");
       List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
           .searchRequisitionGroupProgramSchedules(params.getProgramId(), params.getFacilityId());
       if (schedules.isEmpty()) {
@@ -94,13 +102,21 @@ public class ProcessingPeriodService {
         schedule = schedules.get(0).getProcessingSchedule();
       }
     } else {
+      profiler.start("CHECK_IF_SCHEDULE_EXISTS");
       Boolean scheduleExists = existsById(processingScheduleRepository,
           params.getProcessingScheduleId(), ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+
+      profiler.start("FIND_SCHEDULE_IN_DB");
       schedule = scheduleExists
           ? processingScheduleRepository.findOne(params.getProcessingScheduleId()) : null;
     }
 
-    return periodRepository.search(schedule, startDate, endDate, ids, pageable);
+    profiler.start("SEARCH_FOR_PERIODS");
+    Page<ProcessingPeriod> periods =
+        periodRepository.search(schedule, startDate, endDate, ids, pageable);
+
+    profiler.stop().log();
+    return periods;
   }
 
   private <T> Boolean existsById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
