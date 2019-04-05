@@ -1,3 +1,8 @@
+13.0.0 / 2019-04-05
+
+Improvements:
+* [OLMIS-6128](https://openlmis.atlassian.net/browse/OLMIS-6128): Changed dev image version to 5.2 with fix for syncing with transifex.
+
 12.0.0 / 2018-12-12
 ===================
 
