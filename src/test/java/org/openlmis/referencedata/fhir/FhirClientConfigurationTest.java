@@ -40,7 +40,7 @@ public class FhirClientConfigurationTest {
   private static final String API_KEY_PREFIX = "auth.server.clientId.apiKey.prefix";
 
   private static final FhirVersionEnum VERSION_2 = FhirVersionEnum.DSTU2;
-  private static final FhirVersionEnum VERSION_3 = FhirVersionEnum.DSTU3;
+  private static final FhirVersionEnum VERSION_R4 = FhirVersionEnum.R4;
 
   @Mock
   private AuthService authService;
@@ -67,7 +67,7 @@ public class FhirClientConfigurationTest {
     when(context.getVersion()).thenReturn(fhirVersion);
     when(context.newRestfulGenericClient(FHIR_SERVER_URL)).thenReturn(client);
 
-    when(fhirVersion.getVersion()).thenReturn(VERSION_3);
+    when(fhirVersion.getVersion()).thenReturn(VERSION_R4);
 
     when(configuration.fhirContext()).thenReturn(context);
   }
@@ -75,7 +75,7 @@ public class FhirClientConfigurationTest {
   @Test
   public void shouldCreateLocationSynchronizer() {
     assertThat(configuration.locationSynchronizer())
-        .isInstanceOf(Dstu3LocationSynchronizer.class)
+        .isInstanceOf(R4LocationSynchronizer.class)
         .hasNoNullFieldsOrProperties();
   }
 
@@ -91,7 +91,7 @@ public class FhirClientConfigurationTest {
   @Test
   public void shouldCreateLocationConverterStrategy() {
     assertThat(configuration.converterStrategy())
-        .isInstanceOf(Dstu3LocationConverterStrategy.class)
+        .isInstanceOf(R4LocationConverterStrategy.class)
         .hasNoNullFieldsOrProperties();
   }
 

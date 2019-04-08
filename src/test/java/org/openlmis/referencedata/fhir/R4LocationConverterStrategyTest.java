@@ -28,11 +28,11 @@ import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.gclient.IUntypedQuery;
 import java.util.UUID;
 import org.assertj.core.api.Condition;
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.dstu3.model.Identifier;
-import org.hl7.fhir.dstu3.model.Location;
-import org.hl7.fhir.dstu3.model.StringType;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Location;
+import org.hl7.fhir.r4.model.StringType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ import org.openlmis.referencedata.util.messagekeys.FhirMessageKeys;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
-public class Dstu3LocationConverterStrategyTest {
+public class R4LocationConverterStrategyTest {
 
   private static final String SERVICE_URL = "http://localhost";
   private static final String FULL_URL = "http://localhost/fhir/Location/345345/_history/1";
@@ -78,14 +78,14 @@ public class Dstu3LocationConverterStrategyTest {
   @Mock
   private IQuery query;
 
-  private Dstu3LocationConverterStrategy strategy;
+  private R4LocationConverterStrategy strategy;
 
   private Bundle emptyBundle;
   private Bundle bundle;
 
   @Before
   public void setUp() {
-    strategy = new Dstu3LocationConverterStrategy(client, cacheControlDirective, criterionBuilder);
+    strategy = new R4LocationConverterStrategy(client, cacheControlDirective, criterionBuilder);
 
     emptyBundle = new Bundle();
 

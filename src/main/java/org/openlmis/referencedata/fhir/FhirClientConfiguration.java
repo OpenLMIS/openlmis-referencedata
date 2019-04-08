@@ -51,7 +51,7 @@ public class FhirClientConfiguration {
 
   @Bean
   public FhirContext fhirContext() {
-    return FhirContext.forDstu3();
+    return FhirContext.forR4();
   }
 
   /**
@@ -92,8 +92,8 @@ public class FhirClientConfiguration {
     FhirVersionEnum version = fhirContext().getVersion().getVersion();
     LocationSynchronizer synchronizer = null;
 
-    if (version == FhirVersionEnum.DSTU3) {
-      synchronizer = new Dstu3LocationSynchronizer();
+    if (version == FhirVersionEnum.R4) {
+      synchronizer = new R4LocationSynchronizer();
     }
 
     if (null == synchronizer) {
@@ -115,8 +115,8 @@ public class FhirClientConfiguration {
     FhirVersionEnum version = fhirContext().getVersion().getVersion();
     LocationConverterStrategy strategy = null;
 
-    if (version == FhirVersionEnum.DSTU3) {
-      strategy = new Dstu3LocationConverterStrategy(
+    if (version == FhirVersionEnum.R4) {
+      strategy = new R4LocationConverterStrategy(
           client(), cacheControlDirective(), criterionBuilder());
     }
 

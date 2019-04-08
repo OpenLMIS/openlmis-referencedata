@@ -15,36 +15,22 @@
 
 package org.openlmis.referencedata.fhir;
 
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.hl7.fhir.dstu3.model.Bundle.BundleEntryComponent;
-import org.hl7.fhir.dstu3.model.Location;
+import java.util.List;
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent;
+import org.hl7.fhir.r4.model.Location;
+import org.springframework.util.CollectionUtils;
 
-public class Dstu3LocationSynchronizerTest extends LocationSynchronizerTest<Location, Bundle> {
+class R4LocationSynchronizer extends LocationSynchronizer<Location, Bundle> {
 
-  @Override
-  LocationSynchronizer<Location, Bundle> getSynchronizer() {
-    return new Dstu3LocationSynchronizer();
+  R4LocationSynchronizer() {
+    super(Location.class, Bundle.class, true);
   }
 
   @Override
-  Location getFhirLocation() {
-    return new Location();
-  }
-
-  @Override
-  Bundle getEmptyBundle() {
-    return new Bundle();
-  }
-
-  @Override
-  Bundle getBundle(Location resource) {
-    BundleEntryComponent entryComponent = new BundleEntryComponent();
-    entryComponent.setResource(resource);
-
-    Bundle bundle = new Bundle();
-    bundle.addEntry(entryComponent);
-
-    return bundle;
+  Location getEntry(Bundle bundle) {
+    List<BundleEntryComponent> entries = bundle.getEntry();
+    return CollectionUtils.isEmpty(entries) ? null : (Location) entries.get(0).getResource();
   }
 
 }
