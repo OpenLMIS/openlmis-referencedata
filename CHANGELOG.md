@@ -25,6 +25,7 @@ Improvements:
 
 Bug fixes:
 * [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing and when requisition group is changed to another.
+* [OLMIS-6172](https://openlmis.atlassian.net/browse/OLMIS-6172): Fixed PUT /processingPeriods/id not to throw ClassCastException
 
 12.0.0 / 2018-12-12
 ===================
