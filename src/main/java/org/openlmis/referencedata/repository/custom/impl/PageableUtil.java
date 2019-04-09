@@ -15,11 +15,19 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 class PageableUtil {
+
+  private static final String ASC = "ASC";
+  private static final String DESC = "DESC";
 
   /**
    * get {@link javax.persistence.Query}'s {@link javax.persistence.Query#setMaxResults(int)} and
@@ -34,5 +42,28 @@ class PageableUtil {
     int pageSize = null != pageable ? pageable.getPageSize() : 0;
     int firstResult = null != pageable ? pageable.getPageNumber() * pageSize : 0;
     return new ImmutablePair<>(pageSize, firstResult);
+  }
+
+  static String getOrderPredicate(Pageable pageable, String alias, String defaultSort) {
+    if (pageable.getSort() != null) {
+      List<String> orderPredicate = new ArrayList<>();
+      List<String> sql = new ArrayList<>();
+      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+      Sort.Order order;
+      Sort.Direction sortDirection = Sort.Direction.ASC;
+
+      while (iterator.hasNext()) {
+        order = iterator.next();
+        orderPredicate.add(alias.concat(order.getProperty()));
+        sortDirection = order.getDirection();
+      }
+
+      sql.add(Joiner.on(",").join(orderPredicate));
+      sql.add(sortDirection.isAscending() ? ASC : DESC);
+
+      return Joiner.on(' ').join(sql);
+    }
+
+    return defaultSort;
   }
 }

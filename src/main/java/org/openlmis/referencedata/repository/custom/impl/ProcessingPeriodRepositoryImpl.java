@@ -22,10 +22,8 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,14 +37,13 @@ import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCu
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositoryCustom {
 
   private static final String SELECT_PERIODS = "SELECT DISTINCT pp"
       + " FROM ProcessingPeriod AS pp";
 
-  private static final String COUNT_PERIODS = "SELECT pp.id AS ID"
+  private static final String COUNT_PERIODS = "SELECT DISTINCT pp.id AS ID"
       + " FROM referencedata.processing_periods AS pp";
 
   private static final String SELECT_SCHEDULES = "pp.processingscheduleid IN (SELECT ps.id"
@@ -60,8 +57,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
   private static final String WHERE = "WHERE";
   private static final String AND = " AND ";
   private static final String DEFAULT_SORT = "pp.startDate ASC";
-  private static final String ASC = "ASC";
-  private static final String DESC = "DESC";
+
   private static final String ORDER_BY = "ORDER BY";
 
   private static final String WITH_SCHEDULE_ID = "pp.processingscheduleid IN (:scheduleId)";
@@ -80,6 +76,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
    * This method is supposed to retrieve all Processing Periods with matched parameters.
    * Method is searching
    *
+   * @param scheduleId  UUID of processing schedule
    * @param programId  UUID of program
    * @param facilityId  UUID of facility
    * @param startDate Processing Period Start Date
@@ -107,7 +104,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
     }
 
     String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(SELECT_PERIODS, WHERE, WITH_IDS,
-        ORDER_BY, getOrderPredicate(pageable)));
+        ORDER_BY, PageableUtil.getOrderPredicate(pageable, "pp.", DEFAULT_SORT)));
 
     List<ProcessingPeriod> periods = entityManager
         .createQuery(hqlWithSort, ProcessingPeriod.class)
@@ -163,28 +160,5 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
     }
 
     return Joiner.on(' ').join(sql);
-  }
-
-  private String getOrderPredicate(Pageable pageable) {
-    if (pageable.getSort() != null) {
-      List<String> orderPredicate = new ArrayList<>();
-      List<String> sql = new ArrayList<>();
-      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-      Sort.Order order;
-      Sort.Direction sortDirection = Sort.Direction.ASC;
-
-      while (iterator.hasNext()) {
-        order = iterator.next();
-        orderPredicate.add("pp.".concat(order.getProperty()));
-        sortDirection = order.getDirection();
-      }
-
-      sql.add(Joiner.on(",").join(orderPredicate));
-      sql.add(sortDirection.isAscending() ? ASC : DESC);
-
-      return Joiner.on(' ').join(sql);
-    }
-
-    return DEFAULT_SORT;
   }
 }

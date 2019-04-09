@@ -22,9 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +37,6 @@ import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
 
@@ -61,8 +58,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   private static final String WHERE = "WHERE";
   private static final String AND = " AND ";
   private static final String DEFAULT_SORT = "f.name ASC";
-  private static final String ASC = "ASC";
-  private static final String DESC = "DESC";
   private static final String ORDER_BY = "ORDER BY";
 
   private static final String WITH_CODE = "UPPER(f.code) LIKE :code";
@@ -115,7 +110,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     }
 
     String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(HQL_SELECT, WHERE, WITH_IDS,
-        ORDER_BY, getOrderPredicate(pageable)));
+        ORDER_BY, PageableUtil.getOrderPredicate(pageable, "f.", DEFAULT_SORT)));
 
     List<Facility> facilities =  entityManager
         .createQuery(hqlWithSort, Facility.class)
@@ -143,7 +138,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     params = Maps.newHashMap();
     String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(
         prepareQuery(HQL_SELECT, searchParams, geographicZoneIds, null, params),
-        ORDER_BY, getOrderPredicate(pageable)));
+        ORDER_BY, PageableUtil.getOrderPredicate(pageable, "f.", DEFAULT_SORT)));
 
     Query searchQuery = entityManager.createQuery(hqlWithSort, Facility.class);
     params.forEach(searchQuery::setParameter);
@@ -153,29 +148,6 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
         .getResultList();
 
     return Pagination.getPage(facilities, pageable, count);
-  }
-
-  private String getOrderPredicate(Pageable pageable) {
-    if (pageable.getSort() != null) {
-      List<String> orderPredicate = new ArrayList<>();
-      List<String> sql = new ArrayList<>();
-      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-      Sort.Order order;
-      Sort.Direction sortDirection = Sort.Direction.ASC;
-
-      while (iterator.hasNext()) {
-        order = iterator.next();
-        orderPredicate.add("f.".concat(order.getProperty()));
-        sortDirection = order.getDirection();
-      }
-
-      sql.add(Joiner.on(",").join(orderPredicate));
-      sql.add(sortDirection.isAscending() ? ASC : DESC);
-
-      return Joiner.on(' ').join(sql);
-    }
-
-    return DEFAULT_SORT;
   }
 
   private String prepareQuery(String baseSql, FacilityRepositoryCustom.SearchParams searchParams,
