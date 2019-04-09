@@ -16,24 +16,25 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import org.apache.commons.lang3.tuple.Pair;
+import javax.persistence.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
@@ -42,10 +43,35 @@ import org.springframework.data.domain.Sort;
 
 public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositoryCustom {
 
-  private static final String PROCESSING_SCHEDULE = "processingSchedule";
-  private static final String START_DATE = "startDate";
-  private static final String END_DATE = "endDate";
-  private static final String ID = "id";
+  private static final String SELECT_PERIODS = "SELECT DISTINCT pp"
+      + " FROM ProcessingPeriod AS pp";
+
+  private static final String COUNT_PERIODS = "SELECT pp.id AS ID"
+      + " FROM referencedata.processing_periods AS pp";
+
+  private static final String SELECT_SCHEDULES = "pp.processingscheduleid IN (SELECT ps.id"
+      + " FROM referencedata.processing_schedules AS ps"
+      + " JOIN referencedata.requisition_group_program_schedules"
+      + " ON referencedata.requisition_group_program_schedules.processingscheduleid = ps.id"
+      + " JOIN referencedata.requisition_group_members"
+      + " ON referencedata.requisition_group_members.requisitiongroupid"
+      + " = referencedata.requisition_group_program_schedules.requisitiongroupid";
+
+  private static final String WHERE = "WHERE";
+  private static final String AND = " AND ";
+  private static final String DEFAULT_SORT = "pp.startDate ASC";
+  private static final String ASC = "ASC";
+  private static final String DESC = "DESC";
+  private static final String ORDER_BY = "ORDER BY";
+
+  private static final String WITH_SCHEDULE_ID = "pp.processingscheduleid IN (:scheduleId)";
+  private static final String WITH_START_DATE = "pp.startdate <= :endDate";
+  private static final String WITH_END_DATE = "pp.enddate >= :startDate";
+  private static final String WITH_IDS = "pp.id IN (:ids)";
+  private static final String WITH_FACILITY =
+      "referencedata.requisition_group_members.facilityid = :facilityId";
+  private static final String WITH_PROGRAM =
+      "referencedata.requisition_group_program_schedules.programid = :programId)";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -54,91 +80,111 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
    * This method is supposed to retrieve all Processing Periods with matched parameters.
    * Method is searching
    *
-   * @param schedule  Processing Schedule associated to Processing Period
+   * @param programId  UUID of program
+   * @param facilityId  UUID of facility
    * @param startDate Processing Period Start Date
    * @param endDate   Processing Period End Date
    * @param pageable  pagination and sorting parameters
    * @return Page of Processing Periods matching the parameters.
    */
-  public Page<ProcessingPeriod> search(ProcessingSchedule schedule, LocalDate startDate,
-      LocalDate endDate, Collection<UUID> ids, Pageable pageable) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+  public Page<ProcessingPeriod> search(UUID scheduleId, UUID programId, UUID facilityId,
+      LocalDate startDate, LocalDate endDate, Collection<UUID> ids, Pageable pageable) {
 
-    CriteriaQuery<ProcessingPeriod> periodQuery = builder.createQuery(ProcessingPeriod.class);
-    periodQuery =
-        prepareQuery(periodQuery, schedule, startDate, endDate, ids, false, builder, pageable);
+    Map<String, Object> params = Maps.newHashMap();
+    Query nativeQuery = entityManager.createNativeQuery(prepareQuery(
+        scheduleId, programId, facilityId, startDate, endDate, ids, params));
+    params.forEach(nativeQuery::setParameter);
 
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery =
-        prepareQuery(countQuery, schedule, startDate, endDate, ids, true, builder, pageable);
+    SQLQuery countQuery = nativeQuery.unwrap(SQLQuery.class);
+    countQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
 
-    Long count = entityManager.createQuery(countQuery).getSingleResult();
+    // appropriate scalar is added to native query
+    @SuppressWarnings("unchecked")
+    List<UUID> periodIds = nativeQuery.getResultList();
 
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-
-    List<ProcessingPeriod> processingPeriods = entityManager.createQuery(periodQuery)
-        .setMaxResults(maxAndFirst.getLeft())
-        .setFirstResult(maxAndFirst.getRight())
-        .getResultList();
-    return Pagination.getPage(processingPeriods, pageable, count);
-  }
-
-  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, ProcessingSchedule schedule,
-      LocalDate startDate, LocalDate endDate, Collection<UUID> ids, boolean count,
-      CriteriaBuilder builder, Pageable pageable) {
-    Root<ProcessingPeriod> root = query.from(ProcessingPeriod.class);
-
-    if (count) {
-      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
-      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    if (isEmpty(periodIds)) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    Predicate predicate = builder.conjunction();
+    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(SELECT_PERIODS, WHERE, WITH_IDS,
+        ORDER_BY, getOrderPredicate(pageable)));
 
-    if (null != schedule) {
-      predicate = builder.and(predicate, builder.equal(root.get(PROCESSING_SCHEDULE), schedule));
+    List<ProcessingPeriod> periods = entityManager
+        .createQuery(hqlWithSort, ProcessingPeriod.class)
+        .setParameter("ids", periodIds)
+        .setMaxResults(pageable.getPageSize())
+        .setFirstResult(pageable.getOffset())
+        .getResultList();
+
+    return Pagination.getPage(periods, pageable, periodIds.size());
+  }
+
+  private String prepareQuery(UUID scheduleId, UUID programId, UUID facilityId,
+      LocalDate startDate, LocalDate endDate, Collection<UUID> ids, Map<String, Object> params) {
+
+    List<String> sql = Lists.newArrayList(COUNT_PERIODS);
+    List<String> where = Lists.newArrayList();
+
+    if (null != endDate) {
+      where.add(WITH_START_DATE);
+      params.put("endDate", endDate);
     }
 
     if (null != startDate) {
-      predicate = builder.and(predicate, builder
-          .greaterThanOrEqualTo(root.get(END_DATE), startDate));
+      where.add(WITH_END_DATE);
+      params.put("startDate", startDate);
     }
 
-    if (null != endDate) {
-      predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(START_DATE), endDate));
+    if (isNotEmpty(ids)) {
+      where.add(WITH_IDS);
+      params.put("ids", ids);
     }
 
-    if (!isEmpty(ids)) {
-      predicate = builder.and(predicate, root.get(ID).in(ids));
+    if (null == programId && null != scheduleId) {
+      where.add(WITH_SCHEDULE_ID);
+      params.put("scheduleId", scheduleId);
     }
 
-    query.where(predicate);
+    if (null != programId && null == scheduleId) {
+      where.add(SELECT_SCHEDULES);
 
-    if (!count && pageable != null && pageable.getSort() != null) {
-      query = addSortProperties(query, root, builder, pageable);
+      if (null != facilityId) {
+        where.add(WITH_FACILITY);
+        params.put("facilityId", facilityId);
+      }
+
+      where.add(WITH_PROGRAM);
+      params.put("programId", programId);
     }
 
-    return query;
+    if (!where.isEmpty()) {
+      sql.add(WHERE);
+      sql.add(Joiner.on(AND).join(where));
+    }
+
+    return Joiner.on(' ').join(sql);
   }
 
-  private <T> CriteriaQuery<T> addSortProperties(CriteriaQuery<T> query,
-      Root<ProcessingPeriod> root, CriteriaBuilder builder, Pageable pageable) {
-    List<Order> orders = new ArrayList<>();
-    Iterator<Sort.Order> iterator = pageable.getSort().iterator();
-    Sort.Order order;
+  private String getOrderPredicate(Pageable pageable) {
+    if (pageable.getSort() != null) {
+      List<String> orderPredicate = new ArrayList<>();
+      List<String> sql = new ArrayList<>();
+      Iterator<Sort.Order> iterator = pageable.getSort().iterator();
+      Sort.Order order;
+      Sort.Direction sortDirection = Sort.Direction.ASC;
 
-    while (iterator.hasNext()) {
-      order = iterator.next();
-      String property = order.getProperty();
-      Path path = root.get(property);
-
-      if (order.isAscending()) {
-        orders.add(builder.asc(path));
-      } else {
-        orders.add(builder.desc(path));
+      while (iterator.hasNext()) {
+        order = iterator.next();
+        orderPredicate.add("pp.".concat(order.getProperty()));
+        sortDirection = order.getDirection();
       }
+
+      sql.add(Joiner.on(",").join(orderPredicate));
+      sql.add(sortDirection.isAscending() ? ASC : DESC);
+
+      return Joiner.on(' ').join(sql);
     }
 
-    return query.orderBy(orders);
+    return DEFAULT_SORT;
   }
 }

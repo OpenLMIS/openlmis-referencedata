@@ -28,10 +28,25 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +62,34 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Autowired
   private ProcessingScheduleRepository scheduleRepository;
 
+  @Autowired
+  private RequisitionGroupProgramScheduleRepository programScheduleRepository;
+
+  @Autowired
+  private ProgramRepository programRepository;
+
+  @Autowired
+  private FacilityRepository facilityRepository;
+
+  @Autowired
+  private FacilityTypeRepository facilityTypeRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
+
+  private Program program;
   private ProcessingSchedule schedule;
+  private Facility facility;
+
   private PageRequest pageable = new PageRequest(0, 10);
 
   private ProcessingPeriod period1;
@@ -68,12 +110,15 @@ public class ProcessingPeriodRepositoryIntegrationTest
         generateInstance(period1.getStartDate().plusMonths(1), period1.getEndDate().plusMonths(1)));
     period3 = periodRepository.save(
         generateInstance(period2.getStartDate().plusMonths(1), period2.getEndDate().plusMonths(1)));
+
+    RequisitionGroupProgramSchedule entity = generateRequisitionGroupProgramSchedule();
+    programScheduleRepository.save(entity);
   }
 
   @Test
   public void shouldFindPeriodsStartDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, period2.getEndDate(), null, null, pageable);
+        .search(null, null, null, period2.getEndDate(), null, null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period2, period3));
@@ -82,7 +127,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsByEndDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, null, period2.getStartDate(), null, pageable);
+        .search(null, null, null, null, period2.getStartDate(), null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period1, period2));
@@ -91,7 +136,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsByStartDateAndEndDate() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, period1.getEndDate(), period2.getStartDate(), null, pageable);
+        .search(null, null, null, period1.getEndDate(), period2.getStartDate(), null, pageable);
 
     assertEquals(2, periods.getTotalElements());
     assertThat(periods.getContent(), hasItems(period1, period2));
@@ -100,7 +145,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   @Test
   public void shouldFindPeriodsByIds() {
     Page<ProcessingPeriod> periods = periodRepository
-        .search(schedule, null, null,
+        .search(schedule.getId(), null, null, null, null,
             asSet(period1.getId(), period2.getId(), period3.getId()), pageable);
 
     assertEquals(3, periods.getTotalElements());
@@ -113,13 +158,15 @@ public class ProcessingPeriodRepositoryIntegrationTest
     scheduleRepository.save(schedule2);
     periodRepository.save(generateInstance(schedule2));
 
-    Page<ProcessingPeriod> periods = periodRepository.search(schedule, null, null, null, pageable);
+    Page<ProcessingPeriod> periods = periodRepository.search(schedule.getId(), null, null,
+        null, null, null, pageable);
     assertEquals(3, periods.getTotalElements());
     assertEquals(schedule, periods.getContent().get(0).getProcessingSchedule());
     assertEquals(schedule, periods.getContent().get(1).getProcessingSchedule());
     assertEquals(schedule, periods.getContent().get(2).getProcessingSchedule());
 
-    periods = periodRepository.search(schedule2, null, null, null, pageable);
+    periods = periodRepository.search(schedule2.getId(), null, null,
+        null, null, null, pageable);
     assertEquals(1, periods.getTotalElements());
     assertEquals(schedule2, periods.getContent().get(0).getProcessingSchedule());
   }
@@ -136,7 +183,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
         period2.getStartDate().plusMonths(1), period2.getEndDate().plusMonths(1)));
 
     Page<ProcessingPeriod> periods = periodRepository
-        .search(newSchedule, period4.getEndDate(), period5.getStartDate(),
+        .search(newSchedule.getId(), null, null, period4.getEndDate(), period5.getStartDate(),
             asSet(period1.getId(), period2.getId(), period4.getId(), period5.getId()),
             pageable);
 
@@ -148,7 +195,8 @@ public class ProcessingPeriodRepositoryIntegrationTest
   public void shouldSortByStartDateDesc() {
     pageable = new PageRequest(0, 10, Direction.DESC, "startDate");
 
-    Page<ProcessingPeriod> page = periodRepository.search(schedule, null, null, null, pageable);
+    Page<ProcessingPeriod> page = periodRepository.search(schedule.getId(), null, null, null,
+        null, null, pageable);
     List<ProcessingPeriod> content = page.getContent();
 
     assertThat(content, hasSize(3));
@@ -186,6 +234,32 @@ public class ProcessingPeriodRepositoryIntegrationTest
     assertEquals(period1, result.get());
   }
 
+  @Test
+  public void shouldFindPeriodsByProgramAndFacility() {
+    ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
+    scheduleRepository.save(schedule2);
+    periodRepository.save(generateInstance(schedule2));
+
+    Page<ProcessingPeriod> periods = periodRepository
+        .search(null, program.getId(), facility.getId(), null, null, null, pageable);
+
+    assertEquals(3, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period1, period2, period3));
+  }
+
+  @Test
+  public void shouldFindPeriodsByProgram() {
+    ProcessingSchedule schedule2 = new ProcessingScheduleDataBuilder().buildWithoutId();
+    scheduleRepository.save(schedule2);
+    periodRepository.save(generateInstance(schedule2));
+
+    Page<ProcessingPeriod> periods = periodRepository
+        .search(null, program.getId(), null, null, null, null, pageable);
+
+    assertEquals(3, periods.getTotalElements());
+    assertThat(periods.getContent(), hasItems(period1, period2, period3));
+  }
+
   ProcessingPeriod generateInstance() {
     return new ProcessingPeriodDataBuilder()
         .withSchedule(schedule)
@@ -213,5 +287,43 @@ public class ProcessingPeriodRepositoryIntegrationTest
         .withStartDate(null != startDate ? startDate : LocalDate.now())
         .withEndDate(null != endDate ? endDate : LocalDate.now().plusMonths(1))
         .buildAsNew();
+  }
+
+  RequisitionGroupProgramSchedule generateRequisitionGroupProgramSchedule() {
+    program = new ProgramDataBuilder().build();
+    programRepository.save(program);
+
+    FacilityType facilityType = new FacilityTypeDataBuilder().build();
+    facilityTypeRepository.save(facilityType);
+
+    GeographicLevel level = new GeographicLevelDataBuilder().build();
+    geographicLevelRepository.save(level);
+
+    GeographicZone geographicZone = new GeographicZoneDataBuilder().withLevel(level).buildAsNew();
+    geographicZoneRepository.save(geographicZone);
+
+    facility = new FacilityDataBuilder()
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .withType(facilityType)
+        .buildAsNew();
+    facilityRepository.save(facility);
+
+    SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
+    supervisoryNodeRepository.save(supervisoryNode);
+
+    RequisitionGroup requisitionGroup = new RequisitionGroupDataBuilder()
+        .withMemberFacility(facility)
+        .withSupervisoryNode(supervisoryNode)
+        .build();
+    requisitionGroupRepository.save(requisitionGroup);
+
+    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
+        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
+            requisitionGroup, program, schedule, false);
+    requisitionGroupProgramSchedule.setDropOffFacility(facility);
+    return requisitionGroupProgramSchedule;
   }
 }

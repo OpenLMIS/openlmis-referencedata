@@ -34,7 +34,6 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.Before;
@@ -216,13 +215,10 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         .willReturn(true);
     given(facilityRepository.exists(facilityId))
         .willReturn(true);
-    given(requisitionGroupProgramScheduleRepository
-        .searchRequisitionGroupProgramSchedules(programId, facilityId))
-        .willReturn(Collections.singletonList(requisitionGroupProgramSchedule));
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
     given(periodRepository
-        .search(schedule, firstPeriod.getStartDate(), firstPeriod.getEndDate(),
-            asSet(id1, id2), pageable))
+        .search(null, programId, facilityId, firstPeriod.getStartDate(),
+            firstPeriod.getEndDate(), asSet(id1, id2), pageable))
         .willReturn(Pagination.getPage(Arrays.asList(firstPeriod, secondPeriod), pageable, 2));
 
     restAssured.given()
@@ -292,7 +288,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         firstPeriod, secondPeriod, thirdPeriod
     );
     PageRequest pageable = new PageRequest(0, 10, new Sort(END_DATE));
-    given(periodRepository.search(null, null, null, emptySet(), pageable))
+    given(periodRepository.search(null,null, null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()
@@ -319,7 +315,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
         firstPeriod, secondPeriod, thirdPeriod
     );
     PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
-    given(periodRepository.search(null, null, null, emptySet(), pageable))
+    given(periodRepository.search(null,null, null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
     restAssured.given()

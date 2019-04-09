@@ -17,20 +17,14 @@ package org.openlmis.referencedata.service;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
-import org.openlmis.referencedata.domain.ProcessingSchedule;
-import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
@@ -59,9 +53,6 @@ public class ProcessingPeriodService {
   @Autowired
   private ProcessingScheduleRepository processingScheduleRepository;
 
-  @Autowired
-  private RequisitionGroupProgramScheduleRepository requisitionGroupProgramScheduleRepository;
-
   /**
    * Finds all ProcessingPeriods matching all of provided parameters.
    */
@@ -73,57 +64,34 @@ public class ProcessingPeriodService {
     params.validate();
 
     profiler.start("CHECK_IF_PROGRAM_EXISTS");
-    Boolean programExists = existsById(programRepository, params.getProgramId(),
+    existsById(programRepository, params.getProgramId(),
         ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID);
 
     profiler.start("CHECK_IF_FACILITY_EXISTS");
-    Boolean facilityExists = existsById(facilityRepository, params.getFacilityId(),
+    existsById(facilityRepository, params.getFacilityId(),
         FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID);
 
-    ProcessingSchedule schedule;
+    profiler.start("CHECK_IF_SCHEDULE_EXISTS");
+    existsById(processingScheduleRepository,
+        params.getProcessingScheduleId(), ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+
     LocalDate startDate = params.getStartDate();
     LocalDate endDate = params.getEndDate();
     Collection<UUID> ids = params.getIds();
 
-    if (programExists) {
-      profiler.start("SEARCH_FOR_REQUISITION_GROUP_PROGRAM_SCHEDULE");
-      List<RequisitionGroupProgramSchedule> schedules = requisitionGroupProgramScheduleRepository
-          .searchRequisitionGroupProgramSchedules(params.getProgramId(), params.getFacilityId());
-      if (schedules.isEmpty()) {
-        if (!facilityExists) {
-          LOGGER.warn("Cannot find Requisition Group Program Schedule for program {}",
-                  params.getProgramId());
-        } else {
-          LOGGER.warn("Cannot find Requisition Group Program Schedule for"
-                  + "program {} and facility {}", params.getProgramId(), params.getFacilityId());
-        }
-        return Pagination.getPage(Collections.emptyList(), pageable, 0);
-      } else {
-        schedule = schedules.get(0).getProcessingSchedule();
-      }
-    } else {
-      profiler.start("CHECK_IF_SCHEDULE_EXISTS");
-      Boolean scheduleExists = existsById(processingScheduleRepository,
-          params.getProcessingScheduleId(), ProcessingScheduleMessageKeys.ERROR_NOT_FOUND_WITH_ID);
-
-      profiler.start("FIND_SCHEDULE_IN_DB");
-      schedule = scheduleExists
-          ? processingScheduleRepository.findOne(params.getProcessingScheduleId()) : null;
-    }
-
     profiler.start("SEARCH_FOR_PERIODS");
     Page<ProcessingPeriod> periods =
-        periodRepository.search(schedule, startDate, endDate, ids, pageable);
+        periodRepository.search(params.getProcessingScheduleId(), params.getProgramId(),
+            params.getFacilityId(), startDate, endDate, ids, pageable);
 
     profiler.stop().log();
     return periods;
   }
 
-  private <T> Boolean existsById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
-    Boolean exists = id != null && repository.exists(id);
+  private <T> void existsById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
+    boolean exists = id != null && repository.exists(id);
     if (null != id && !exists) {
       throw new NotFoundException(new Message(errorKey, id));
     }
-    return exists;
   }
 }
