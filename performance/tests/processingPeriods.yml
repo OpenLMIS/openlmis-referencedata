@@ -95,7 +95,7 @@ reporting:
   criteria:
     Get Processing Period too slow: p90 of GetProcessingPeriod>50ms
     Get All Processing Periods too slow: p90 of GetAllProcessingPeriods>50ms
-    Processing Periods Search too slow: p90 of ProcessingPeriodsSearch>20000ms
+    Processing Periods Search too slow: p90 of ProcessingPeriodsSearch>50ms
     Get Page of Ten Processing Periods too slow: p90 of GetPageOfTenProcessingPeriods>50ms
     Get Processing Period Duration too slow: p90 of GetProcessingPeriodDuration>50ms
     Get Processing Period Audit Log too slow: p90 of GetProcessingPeriodAuditLog>50ms
