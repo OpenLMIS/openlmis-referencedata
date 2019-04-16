@@ -117,67 +117,6 @@ pipeline {
                 }
             }
         }
-        stage('Parallel: Sonar analysis and contract tests') {
-            parallel {
-                stage('Sonar analysis') {
-                    agent any
-                    environment {
-                        PATH = "/usr/local/bin/:$PATH"
-                    }
-                    steps {
-                        withSonarQubeEnv('Sonar OpenLMIS') {
-                            withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
-                                sh(script: "./ci-sonarAnalysis.sh")
-
-                                // workaround: Sonar plugin retrieves the path directly from the output
-                                sh 'echo "Working dir: ${WORKSPACE}/build/sonar"'
-                            }
-                        }
-                        timeout(time: 1, unit: 'HOURS') {
-                            script {
-                                def gate = waitForQualityGate()
-                                if (gate.status != 'OK') {
-                                    error 'Quality Gate FAILED'
-                                }
-                            }
-                        }
-                    }
-                    post {
-                        failure {
-                            script {
-                                notifyAfterFailure()
-                            }
-                        }
-                    }
-                }
-                stage('Contract tests') {
-                    steps {
-                        build job: "OpenLMIS-contract-tests-pipeline/${params.contractTestsBranch}", propagate: true, wait: true,
-                        parameters: [
-                            string(name: 'serviceName', value: 'referencedata'),
-                            text(name: 'customEnv', value: "OL_REFERENCEDATA_VERSION=${STAGING_VERSION}")
-                        ]
-                        build job: "OpenLMIS-contract-tests-pipeline/${params.contractTestsBranch}", propagate: true, wait: true,
-                        parameters: [
-                            string(name: 'serviceName', value: 'fulfillment'),
-                            text(name: 'customEnv', value: "OL_REFERENCEDATA_VERSION=${STAGING_VERSION}")
-                        ]
-                        build job: "OpenLMIS-contract-tests-pipeline/${params.contractTestsBranch}", propagate: true, wait: true,
-                        parameters: [
-                            string(name: 'serviceName', value: 'hapifhir'),
-                            text(name: 'customEnv', value: "OL_REFERENCEDATA_VERSION=${STAGING_VERSION}")
-                        ]
-                    }
-                    post {
-                        failure {
-                            script {
-                                notifyAfterFailure()
-                            }
-                        }
-                    }
-                }
-            }
-        }
         stage('ERD generation') {
             agent {
                 node {
