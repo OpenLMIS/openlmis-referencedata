@@ -21,9 +21,8 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
+import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
@@ -40,13 +39,8 @@ public class OrderableDisplayCategoryRepositoryIntegrationTest extends
   }
 
   OrderableDisplayCategory generateInstance() {
-    Integer instanceNumber = this.getNextInstanceNumber();
-    OrderedDisplayValue displayValue = new OrderedDisplayValue(
-        "orderableDisplayCategoryName" + instanceNumber,
-        instanceNumber);
-    OrderableDisplayCategory orderableDisplayCategory = OrderableDisplayCategory.createNew(
-        Code.code("orderableDisplayCategoryCode" + instanceNumber),
-        displayValue);
+    OrderableDisplayCategory orderableDisplayCategory =
+        new OrderableDisplayCategoryDataBuilder().buildAsNew();
     return orderableDisplayCategory;
   }
 

@@ -39,6 +39,13 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -79,6 +86,7 @@ public class RequisitionGroupRepositoryIntegrationTest
 
   private SupervisoryNode supervisoryNode;
   private Facility facility;
+  private Program program;
 
   RequisitionGroupRepository getRepository() {
     return repository;
@@ -99,25 +107,25 @@ public class RequisitionGroupRepositoryIntegrationTest
 
   @Before
   public void setUp() {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode(CODE);
-    geographicLevel.setLevelNumber(1);
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
     geographicLevelRepository.save(geographicLevel);
 
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode(CODE);
-    geographicZone.setLevel(geographicLevel);
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
 
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode(CODE);
+    FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
     facilityTypeRepository.save(facilityType);
 
-    facility = new Facility(CODE);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setActive(true);
-    facility.setEnabled(true);
+    facility = new FacilityDataBuilder()
+        .withCode(CODE)
+        .withType(facilityType)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
     facilityRepository.save(facility);
 
     supervisoryNode = new SupervisoryNodeDataBuilder()
@@ -127,7 +135,10 @@ public class RequisitionGroupRepositoryIntegrationTest
         .build();
     supervisoryNodeRepository.save(supervisoryNode);
 
-    ProcessingSchedule schedule = new ProcessingSchedule(Code.code("SCH-1"), "Monthly Schedule");
+    ProcessingSchedule schedule = new ProcessingScheduleDataBuilder()
+        .withCode("SCH-1")
+        .withName("Monthly Schedule")
+        .buildWithoutId();
     processingScheduleRepository.save(schedule);
   }
 
@@ -474,17 +485,20 @@ public class RequisitionGroupRepositoryIntegrationTest
       group = repository.save(generateInstance());
     }
 
-    Program program = programRepository.findByCode(Code.code(programCode));
+    program = programRepository.findByCode(Code.code(programCode));
     if (program == null) {
-      program = new Program(programCode);
+      program = new ProgramDataBuilder().withCode(programCode).build();
       program = programRepository.save(program);
     }
 
     ProcessingSchedule schedule = processingScheduleRepository.findAll().iterator().next();
 
-    RequisitionGroupProgramSchedule rgps =
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(group,
-            program, schedule, true);
+    RequisitionGroupProgramSchedule rgps = new RequisitionGroupProgramScheduleDataBuilder()
+        .withProgram(program)
+        .withRequisitionGroup(group)
+        .withSchedule(schedule)
+        .withDropOffFacility(facility)
+        .buildAsNew();
 
     List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
     schedules.add(rgps);

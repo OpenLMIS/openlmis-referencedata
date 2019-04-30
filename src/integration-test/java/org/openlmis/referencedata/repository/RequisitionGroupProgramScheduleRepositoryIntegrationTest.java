@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -38,6 +37,14 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Commit;
@@ -88,44 +95,40 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
   }
 
   RequisitionGroupProgramSchedule generateInstance() {
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule = 
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
-            requisitionGroup, program, schedule, false);
-    requisitionGroupProgramSchedule.setDropOffFacility(facility);
-    return requisitionGroupProgramSchedule;
+    return new RequisitionGroupProgramScheduleDataBuilder()
+        .withProgram(program)
+        .withRequisitionGroup(requisitionGroup)
+        .withSchedule(schedule)
+        .withDropOffFacility(facility)
+        .buildAsNew();
   }
 
   @Before
   public void setUp() {
-    final String code = "RequisitionGroup";
-
-    program = new Program(code);
+    program = new ProgramDataBuilder().build();
     programRepository.save(program);
 
-    schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code(code));
-    schedule.setName(code);
+    schedule = new ProcessingScheduleDataBuilder().buildWithoutId();
     scheduleRepository.save(schedule);
 
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("FT");
-    facilityTypeRepository.save(facilityType);
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
+    geographicLevelRepository.save(geographicLevel);
 
-    GeographicLevel level = new GeographicLevel();
-    level.setCode("GL");
-    level.setLevelNumber(1);
-    geographicLevelRepository.save(level);
-
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setLevel(level);
-    geographicZone.setCode("GZ");
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
 
-    facility = new Facility("F");
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setActive(true);
-    facility.setEnabled(true);
+    FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
+    facilityTypeRepository.save(facilityType);
+
+    facility = new FacilityDataBuilder()
+        .withType(facilityType)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
     facilityRepository.save(facility);
 
     SupervisoryNode supervisoryNode = new SupervisoryNodeDataBuilder()
@@ -133,7 +136,9 @@ public class RequisitionGroupProgramScheduleRepositoryIntegrationTest
         .build();
     supervisoryNodeRepository.save(supervisoryNode);
 
-    requisitionGroup = new RequisitionGroup(code, code, supervisoryNode);
+    requisitionGroup = new RequisitionGroupDataBuilder()
+        .withSupervisoryNode(supervisoryNode)
+        .build();
     requisitionGroupRepository.save(requisitionGroup);
   }
 

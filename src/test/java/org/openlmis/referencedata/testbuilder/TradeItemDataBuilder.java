@@ -24,9 +24,19 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.domain.TradeItemClassification;
 
 public class TradeItemDataBuilder {
-  private UUID id = UUID.randomUUID();
-  private String manufacturerOfTradeItem = RandomStringUtils.randomAlphanumeric(5);
-  private List<TradeItemClassification> classifications = Lists.newArrayList();
+
+  private UUID id;
+  private String manufacturerOfTradeItem;
+  private List<TradeItemClassification> classifications;
+
+  /**
+   * Builds instance of {@link TradeItemDataBuilder} with sample data.
+   */
+  public TradeItemDataBuilder() {
+    id = UUID.randomUUID();
+    manufacturerOfTradeItem = RandomStringUtils.randomAlphanumeric(5);
+    classifications = Lists.newArrayList();
+  }
 
   /**
    * Add classification based on data from {@link CommodityType}.
@@ -37,6 +47,14 @@ public class TradeItemDataBuilder {
     classification.setClassificationId(type.getClassificationId());
 
     classifications.add(classification);
+    return this;
+  }
+
+  /**
+   * Adds manufacturerOfTradeItem based on the provided data.
+   */
+  public TradeItemDataBuilder withManufacturerOfTradeItem(String manufacturerOfTradeItem) {
+    this.manufacturerOfTradeItem = manufacturerOfTradeItem;
     return this;
   }
 

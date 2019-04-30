@@ -91,6 +91,20 @@ public class OrderableDataBuilder {
   }
 
   /**
+   * Sets the value of programOrderables for new {@link Orderable}.
+   */
+  public OrderableDataBuilder withProgramOrderables(List<ProgramOrderable> programOrderables) {
+    Orderable orderable = build();
+    this.programOrderables = programOrderables;
+    this.id = orderable.getId();
+
+    programOrderables.forEach(programOrderable -> {
+      programOrderable.setProduct(orderable);
+    });
+    return this;
+  }
+
+  /**
    * Builds instance of {@link Orderable}.
    */
   public Orderable build() {

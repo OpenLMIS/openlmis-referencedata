@@ -37,6 +37,7 @@ import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
@@ -326,11 +327,12 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     FacilityType facilityType = new FacilityType("FT1");
     facilityTypeRepository.save(facilityType);
 
-    Facility facility = new Facility("F1");
-    facility.setActive(true);
-    facility.setEnabled(true);
-    facility.setGeographicZone(geographicZone);
-    facility.setType(facilityType);
+    Facility facility = new FacilityDataBuilder()
+        .withType(facilityType)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
+
     if (program != null) {
       SupportedProgram supportedProgram = new SupportedProgramDataBuilder()
           .withFacility(facility)

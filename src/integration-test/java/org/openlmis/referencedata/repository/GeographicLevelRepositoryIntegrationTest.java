@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.openlmis.referencedata.domain.GeographicLevel;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GeographicLevelRepositoryIntegrationTest
@@ -33,11 +34,7 @@ public class GeographicLevelRepositoryIntegrationTest
   }
 
   GeographicLevel generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    GeographicLevel level = new GeographicLevel();
-    level.setCode(String.valueOf(instanceNumber));
-    level.setLevelNumber(instanceNumber);
-    return level;
+    return new GeographicLevelDataBuilder().buildAsNew();
   }
 
   @Test

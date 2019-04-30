@@ -64,4 +64,9 @@ public class FacilityTypeDataBuilder {
     this.active = false;
     return this;
   }
+
+  public FacilityTypeDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
 }

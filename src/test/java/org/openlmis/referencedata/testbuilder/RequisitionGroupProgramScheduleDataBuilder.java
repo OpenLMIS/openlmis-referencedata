@@ -36,6 +36,22 @@ public class RequisitionGroupProgramScheduleDataBuilder {
     return this;
   }
 
+  public RequisitionGroupProgramScheduleDataBuilder withSchedule(ProcessingSchedule schedule) {
+    this.processingSchedule = schedule;
+    return this;
+  }
+
+  public RequisitionGroupProgramScheduleDataBuilder withRequisitionGroup(
+      RequisitionGroup requisitionGroup) {
+    this.requisitionGroup = requisitionGroup;
+    return this;
+  }
+
+  public RequisitionGroupProgramScheduleDataBuilder withDropOffFacility(Facility facility) {
+    this.dropOffFacility = facility;
+    return this;
+  }
+
   /**
    * Builds new instance of {@link RequisitionGroupProgramSchedule} based on data from the builder.
    */

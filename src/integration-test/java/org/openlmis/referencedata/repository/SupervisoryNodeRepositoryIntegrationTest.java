@@ -39,8 +39,11 @@ import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.web.SupervisoryNodeSearchParams;
@@ -93,27 +96,24 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
   @Before
   public void setUp() {
-    String code = "code";
-
-    geographicLevel = new GeographicLevel();
-    geographicLevel.setCode(code);
-    geographicLevel.setLevelNumber(1);
+    geographicLevel = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
     geographicLevelRepository.save(geographicLevel);
 
-    geographicZone = new GeographicZone();
-    geographicZone.setCode(code);
-    geographicZone.setLevel(geographicLevel);
+    geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
 
-    facilityType = new FacilityType();
-    facilityType.setCode(code);
+    facilityType = new FacilityTypeDataBuilder().buildAsNew();
     facilityTypeRepository.save(facilityType);
 
-    facility = new Facility(code);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setActive(true);
-    facility.setEnabled(true);
+    facility = new FacilityDataBuilder()
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .withType(facilityType)
+        .buildAsNew();
     facilityRepository.save(facility);
   }
 
@@ -367,7 +367,8 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     supervisoryNodeRepository.save(generateInstance());
     supervisoryNodeRepository.save(generateInstance());
 
-    Program program = programRepository.save(new Program("program-code"));
+    Program program = programRepository.save(new ProgramDataBuilder()
+        .withCode("program-code").build());
 
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null,
         null, null, program.getId(), null, null);

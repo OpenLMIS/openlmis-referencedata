@@ -22,6 +22,8 @@ import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.StockAdjustmentReason;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.StockAdjustmentReasonDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class StockAdjustmentReasonRepositoryIntegrationTest
@@ -38,12 +40,12 @@ public class StockAdjustmentReasonRepositoryIntegrationTest
   }
 
   StockAdjustmentReason generateInstance() {
-    Program program = new Program("code");
+    Program program = new ProgramDataBuilder().withCode("code").build();
     programRepository.save(program);
-    StockAdjustmentReason stockAdjustmentReason = new StockAdjustmentReason();
-    stockAdjustmentReason.setName("StockAdjustmentReason");
-    stockAdjustmentReason.setProgram(program);
-    return stockAdjustmentReason;
+    return new StockAdjustmentReasonDataBuilder()
+        .withName("StockAdjustmentReason")
+        .withProgram(program)
+        .buildAsNew();
   }
 
   @Test

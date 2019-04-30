@@ -28,13 +28,17 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.NamedResource;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightAssignmentDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,6 +75,8 @@ public class RightAssignmentRepositoryIntegrationTest
 
   private User user1;
   private UUID userId;
+  private Facility facility;
+  private Program program;
 
   @Override
   RightAssignmentRepository getRepository() {
@@ -79,7 +85,10 @@ public class RightAssignmentRepositoryIntegrationTest
 
   @Override
   RightAssignment generateInstance() {
-    return new RightAssignment(user1, RIGHT_NAME);
+    return new RightAssignmentDataBuilder()
+        .withUser(user1)
+        .withRightName(RIGHT_NAME)
+        .buildAsNew();
   }
   
   private User persistUser(UUID userId) {
@@ -91,11 +100,35 @@ public class RightAssignmentRepositoryIntegrationTest
 
   @Before
   public void setUp() {
-    rightRepository.save(Right.newRight(RIGHT_NAME, RightType.GENERAL_ADMIN));
-    
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
+    geographicLevelRepository.save(geographicLevel);
+
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
+    geographicZoneRepository.save(geographicZone);
+
+    FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
+    facilityTypeRepository.save(facilityType);
+
+    facility = new FacilityDataBuilder()
+        .withGeographicZone(geographicZone)
+        .withType(facilityType)
+        .withoutOperator()
+        .buildAsNew();
+    facilityRepository.save(facility);
+
+    program = new ProgramDataBuilder().build();
+    programRepository.save(program);
+
+    rightRepository.save(new RightDataBuilder()
+        .withName(RIGHT_NAME)
+        .withType(RightType.GENERAL_ADMIN)
+        .buildAsNew());
+
     userId = UUID.randomUUID();
     user1 = persistUser(userId);
-    
+
     RightAssignment rightAssignment = this.generateInstance();
     repository.save(rightAssignment);
   }
@@ -103,9 +136,15 @@ public class RightAssignmentRepositoryIntegrationTest
   @Test
   public void findByUserShouldFindPermissionStrings() {
     // given
-    rightRepository.save(Right.newRight(ANOTHER_RIGHT_NAME, RightType.GENERAL_ADMIN));
+    rightRepository.save(new RightDataBuilder()
+        .withName(ANOTHER_RIGHT_NAME)
+        .withType(RightType.GENERAL_ADMIN)
+        .buildAsNew());
     User user2 = persistUser(UUID.randomUUID());
-    repository.save(new RightAssignment(user2, ANOTHER_RIGHT_NAME));
+    repository.save(new RightAssignmentDataBuilder()
+        .withUser(user2)
+        .withRightName(ANOTHER_RIGHT_NAME)
+        .buildAsNew());
 
     // when
     Set<String> foundPermissionStrings = repository.findByUser(userId);
@@ -117,13 +156,16 @@ public class RightAssignmentRepositoryIntegrationTest
 
   @Test
   public void findSupervisionProgramsByUserShouldFindPrograms() {
-    // given
-    Program program = persistProgram();
-    Facility facility = persistFacility();
-    
-    rightRepository.save(Right.newRight(SUPERVISION_RIGHT_NAME, RightType.SUPERVISION));
-    repository.save(new RightAssignment(
-        user1, SUPERVISION_RIGHT_NAME, facility.getId(), program.getId()));
+    rightRepository.save(new RightDataBuilder()
+        .withName(SUPERVISION_RIGHT_NAME)
+        .withType(RightType.SUPERVISION)
+        .buildAsNew());
+    repository.save(new RightAssignmentDataBuilder()
+        .withUser(user1)
+        .withRightName(SUPERVISION_RIGHT_NAME)
+        .withFacility(facility.getId())
+        .withProgram(program.getId())
+        .buildAsNew());
 
     // when
     Set<Program> foundPrograms = programRepository.findSupervisionProgramsByUser(userId);
@@ -135,13 +177,16 @@ public class RightAssignmentRepositoryIntegrationTest
   
   @Test
   public void findSupervisionFacilitiesByUserShouldFindFacilities() {
-    // given
-    Program program = persistProgram();
-    Facility facility = persistFacility();
-
-    rightRepository.save(Right.newRight(SUPERVISION_RIGHT_NAME, RightType.SUPERVISION));
-    repository.save(new RightAssignment(
-        user1, SUPERVISION_RIGHT_NAME, facility.getId(), program.getId()));
+    rightRepository.save(new RightDataBuilder()
+        .withName(SUPERVISION_RIGHT_NAME)
+        .withType(RightType.SUPERVISION)
+        .buildAsNew());
+    repository.save(new RightAssignmentDataBuilder()
+        .withUser(user1)
+        .withRightName(SUPERVISION_RIGHT_NAME)
+        .withFacility(facility.getId())
+        .withProgram(program.getId())
+        .buildAsNew());
 
     // when
     Set<NamedResource> foundFacilities = facilityRepository.findSupervisionFacilitiesByUser(userId);
@@ -169,33 +214,5 @@ public class RightAssignmentRepositoryIntegrationTest
 
     // then
     assertFalse(userHasRight);
-  }
-
-  private Program persistProgram() {
-    Program program = new Program("P1");
-    program.setPeriodsSkippable(true);
-    programRepository.save(program);
-    return program;
-  }
-  
-  private Facility persistFacility() {
-    GeographicLevel geographicLevel = new GeographicLevelDataBuilder().buildAsNew();
-    geographicLevelRepository.save(geographicLevel);
-    
-    GeographicZone geographicZone = new GeographicZoneDataBuilder()
-        .withLevel(geographicLevel)
-        .buildAsNew();
-    geographicZoneRepository.save(geographicZone);
-    
-    FacilityType facilityType = new FacilityType("FT1");
-    facilityTypeRepository.save(facilityType);
-
-    Facility facility = new Facility("F1");
-    facility.setActive(true);
-    facility.setEnabled(true);
-    facility.setGeographicZone(geographicZone);
-    facility.setType(facilityType);
-    facilityRepository.save(facility);
-    return facility;
   }
 }

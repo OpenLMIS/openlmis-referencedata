@@ -37,8 +37,6 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,8 +54,14 @@ import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramOrderableDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -75,7 +79,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   private static final String FACILITY_TYPE_CODE = "facilityType";
   private static final String FACILITY_TYPE2_CODE = "facilityType2";
   private static final String PROGRAM_CODE = "programCode";
-  private static final String CURRENCY_CODE = "USD";
+  private static final String EACH = "each";
 
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
@@ -123,15 +127,13 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
   @Before
   public void setUp() {
-    facilityType1 = new FacilityType();
-    facilityType1.setCode(FACILITY_TYPE_CODE);
+    facilityType1 = new FacilityTypeDataBuilder().withCode(FACILITY_TYPE_CODE).buildAsNew();
     facilityTypeRepository.save(facilityType1);
-    facilityType2 = new FacilityType();
-    facilityType2.setCode(FACILITY_TYPE2_CODE);
+    facilityType2 = new FacilityTypeDataBuilder().withCode(FACILITY_TYPE2_CODE).buildAsNew();
     facilityTypeRepository.save(facilityType2);
-    program = new Program(PROGRAM_CODE);
+    program = new ProgramDataBuilder().withCode(PROGRAM_CODE).build();
     programRepository.save(program);
-    program2 = new Program("programCode2");
+    program2 = new ProgramDataBuilder().withCode("programCode2").build();
     programRepository.save(program2);
 
     OrderableDisplayCategory orderableDisplayCategory =
@@ -139,59 +141,74 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
             new OrderedDisplayValue("orderableDisplayCategoryName", 1));
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
-    CurrencyUnit currencyUnit = CurrencyUnit.of(CURRENCY_CODE);
+    ProgramOrderable programOrderableFullSupply = new ProgramOrderableDataBuilder()
+        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withProgram(program)
+        .withoutProduct()
+        .buildAsNew();
 
-    ProgramOrderable programOrderableFullSupply = ProgramOrderable
-        .createNew(program, orderableDisplayCategory, null, currencyUnit);
-    orderableFullSupply = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"),
-        10, 5, false, UUID.randomUUID(), 1L);
-    orderableFullSupply.setProgramOrderables(Collections.singletonList(programOrderableFullSupply));
-    programOrderableFullSupply.setProduct(orderableFullSupply);
+    orderableFullSupply = new OrderableDataBuilder()
+        .withProductCode(Code.code("ibuprofen"))
+        .withDispensable(Dispensable.createNew(EACH))
+        .withProgramOrderables(Collections.singletonList(programOrderableFullSupply))
+        .build();
     orderableRepository.saveAndFlush(orderableFullSupply);
 
-    ProgramOrderable programOrderable1 = ProgramOrderable
-        .createNew(program2, orderableDisplayCategory, null, currencyUnit);
-    orderable1 = new Orderable(Code.code("levora"), Dispensable.createNew("each"),
-        10, 5, false, UUID.randomUUID(), 1L);
-    orderable1.setProgramOrderables(Collections.singletonList(programOrderable1));
-    programOrderable1.setProduct(orderable1);
+    ProgramOrderable programOrderable1 = new ProgramOrderableDataBuilder()
+        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withProgram(program2)
+        .withoutProduct()
+        .buildAsNew();
+
+    orderable1 = new OrderableDataBuilder()
+        .withProductCode(Code.code("levora"))
+        .withDispensable(Dispensable.createNew(EACH))
+        .withProgramOrderables(Collections.singletonList(programOrderable1))
+        .build();
     orderableRepository.save(orderable1);
 
-    ProgramOrderable programOrderable2 = ProgramOrderable
-        .createNew(program2, orderableDisplayCategory, null, currencyUnit);
-    orderable2 = new Orderable(Code.code("glibenclamide"), Dispensable.createNew("each"),
-        10, 5, false, UUID.randomUUID(), 1L);
-    orderable2.setProgramOrderables(Collections.singletonList(programOrderable2));
-    programOrderable2.setProduct(orderable2);
+    ProgramOrderable programOrderable2 = new ProgramOrderableDataBuilder()
+        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withProgram(program2)
+        .withoutProduct()
+        .buildAsNew();
+
+    orderable2 = new OrderableDataBuilder()
+        .withProductCode(Code.code("glibenclamide"))
+        .withDispensable(Dispensable.createNew(EACH))
+        .withProgramOrderables(Collections.singletonList(programOrderable2))
+        .build();
     orderableRepository.save(orderable2);
 
-    ProgramOrderable programOrderableNonFullSupply =
-        ProgramOrderable.createNew(program, orderableDisplayCategory, null, 0, true, false, 0,
-            Money.of(currencyUnit, 0), currencyUnit);
-    orderableNonFullSupply = new Orderable(Code.code("gloves"), Dispensable.createNew("pair"),
-        6, 3, false, UUID.randomUUID(), 1L);
-    orderableNonFullSupply.setProgramOrderables(
-        Collections.singletonList(programOrderableNonFullSupply));
-    programOrderableNonFullSupply.setProduct(orderableNonFullSupply);
+    ProgramOrderable programOrderableNonFullSupply = new ProgramOrderableDataBuilder()
+        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withProgram(program)
+        .withoutProduct()
+        .asNonFullSupply()
+        .buildAsNew();
+
+    orderableNonFullSupply = new OrderableDataBuilder()
+        .withProductCode(Code.code("gloves"))
+        .withDispensable(Dispensable.createNew("pair"))
+        .withProgramOrderables(Collections.singletonList(programOrderableNonFullSupply))
+        .build();
     orderableRepository.saveAndFlush(orderableNonFullSupply);
 
-    GeographicLevel level = new GeographicLevel();
-    level.setCode("FacilityRepositoryIntegrationTest");
-    level.setLevelNumber(1);
+    GeographicLevel level = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
     geographicLevelRepository.save(level);
 
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("FacilityRepositoryIntegrationTest");
-    geographicZone.setLevel(level);
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(level)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
 
-    facility = new Facility("TF1");
-    facility.setType(facilityType1);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("Facility #1");
-    facility.setDescription("Test facility");
-    facility.setActive(true);
-    facility.setEnabled(true);
+    facility = new FacilityDataBuilder()
+        .withType(facilityType1)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
     facilityRepository.save(facility);
 
     pageable = new PageRequest(0, 10);

@@ -66,4 +66,9 @@ public class RightDataBuilder {
     this.name = name;
     return this;
   }
+
+  public RightDataBuilder withType(RightType type) {
+    this.type = type;
+    return this;
+  }
 }

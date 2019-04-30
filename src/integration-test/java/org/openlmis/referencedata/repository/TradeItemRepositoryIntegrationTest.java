@@ -22,11 +22,11 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.repository.CrudRepository;
@@ -48,7 +48,9 @@ public class TradeItemRepositoryIntegrationTest extends
 
   @Override
   TradeItem generateInstance() {
-    TradeItem tradeItem = new TradeItem("advil", new ArrayList<>());
+    TradeItem tradeItem = new TradeItemDataBuilder()
+        .withManufacturerOfTradeItem("advil")
+        .buildAsNew();
 
     tradeItem.assignCommodityType("classSys1", "MDV1");
     tradeItem.assignCommodityType("classSys2", "MDV2");

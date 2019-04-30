@@ -21,14 +21,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -37,6 +34,14 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.IdealStockAmount;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
+import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.IdealStockAmountDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -72,12 +77,10 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   private Facility facility;
   private ProcessingPeriod period;
   private ProcessingPeriod period2;
-  private ProcessingSchedule schedule;
   private CommodityType commodityType;
   private UUID facilityId;
   private UUID commodityTypeId;
   private UUID processingPeriodId;
-  private Integer amount;
 
   IdealStockAmountRepository getRepository() {
     return this.isaRepository;
@@ -85,59 +88,53 @@ public class IdealStockAmountRepositoryIntegrationTest extends
 
   @Before
   public void setUp() {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("geographic-level");
-    geographicLevel.setLevelNumber(1);
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
     geographicLevelRepository.save(geographicLevel);
 
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("geographic-zone");
-    geographicZone.setLevel(geographicLevel);
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
 
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode("facility-type");
+    FacilityType facilityType = new FacilityTypeDataBuilder().buildAsNew();
     facilityTypeRepository.save(facilityType);
 
-    facility = new Facility("facility-code");
-    facility.setGeographicZone(geographicZone);
-    facility.setActive(true);
-    facility.setEnabled(true);
-    facility.setType(facilityType);
-    facility.setName("Facility");
-    facility.setDescription("facility description");
+    facility = new FacilityDataBuilder()
+        .withType(facilityType)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
     facilityId = facilityRepository.save(facility).getId();
 
-    commodityType = new CommodityType("Name", "cSys", "cId", null, new ArrayList<>());
+    commodityType = new CommodityTypeDataBuilder().buildAsNew();
     commodityTypeId = commodityTypeRepository.save(commodityType).getId();
 
-    schedule = new ProcessingSchedule();
-    schedule.setCode(Code.code("schedule-code"));
-    schedule.setDescription("desc");
-    schedule.setId(UUID.randomUUID());
-    schedule.setModifiedDate(ZonedDateTime.now());
-    schedule.setName("schedule");
+    ProcessingSchedule schedule = new ProcessingScheduleDataBuilder().buildWithoutId();
     processingScheduleRepository.save(schedule);
 
-    period = new ProcessingPeriod();
-    period.setProcessingSchedule(schedule);
-    period.setName("period");
-    period.setStartDate(LocalDate.of(2017, 8, 25));
-    period.setEndDate(LocalDate.of(2017, 9, 25));
+    period = new ProcessingPeriodDataBuilder()
+        .withStartDate(LocalDate.of(2017, 8, 25))
+        .withEndDate(LocalDate.of(2017, 9, 25))
+        .withSchedule(schedule)
+        .buildAsNew();
     processingPeriodId = processingPeriodRepository.save(period).getId();
 
-    period2 = new ProcessingPeriod();
-    period2.setProcessingSchedule(schedule);
-    period2.setName("period2");
-    period2.setStartDate(LocalDate.of(2017, 9, 26));
-    period2.setEndDate(LocalDate.of(2017, 10, 25));
+    period2 = new ProcessingPeriodDataBuilder()
+        .withStartDate(LocalDate.of(2017, 9, 26))
+        .withEndDate(LocalDate.of(2017, 10, 25))
+        .withSchedule(schedule)
+        .buildAsNew();
     processingPeriodRepository.save(period2);
-
-    amount = 1000;
   }
 
   IdealStockAmount generateInstance() {
-    return new IdealStockAmount(facility, commodityType, period, amount);
+    return new IdealStockAmountDataBuilder()
+        .withFacility(facility)
+        .withCommodityType(commodityType)
+        .withProcessingPeriod(period)
+        .buildAsNew();
   }
 
   @Test
@@ -236,7 +233,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   private void checkIsaProperties(IdealStockAmount isa, Page<IdealStockAmount> page) {
     IdealStockAmount idealStockAmount = page.getContent().get(0);
     assertEquals(isa.getId(), idealStockAmount.getId());
-    assertEquals(amount, idealStockAmount.getAmount());
+    assertEquals(Integer.valueOf(1000), idealStockAmount.getAmount());
     assertEquals(facilityId, idealStockAmount.getFacility().getId());
     assertEquals(commodityTypeId, idealStockAmount.getCommodityType().getId());
     assertEquals(processingPeriodId, idealStockAmount.getProcessingPeriod().getId());

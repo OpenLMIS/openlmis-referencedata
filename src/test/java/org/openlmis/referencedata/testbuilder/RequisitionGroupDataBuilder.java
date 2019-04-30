@@ -106,4 +106,20 @@ public class RequisitionGroupDataBuilder {
     this.requisitionGroupProgramSchedules.add(schedule);
     return this;
   }
+
+  /**
+   * Sets name for new {@link RequisitionGroup}.
+   */
+  public RequisitionGroupDataBuilder withName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Sets code for new {@link RequisitionGroup}.
+   */
+  public RequisitionGroupDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
 }

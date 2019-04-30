@@ -32,7 +32,7 @@ public class CommodityTypeDataBuilder {
   /**
    * Creates a new instance of {@link CommodityType} without id field.
    */
-  private CommodityType buildAsNew() {
+  public CommodityType buildAsNew() {
     return new CommodityType(name, classificationSystem, classificationId, parent, children);
   }
 
@@ -44,5 +44,15 @@ public class CommodityTypeDataBuilder {
     commodityType.setId(id);
 
     return commodityType;
+  }
+
+  public CommodityTypeDataBuilder withClassificationSystem(String classificationSystem) {
+    this.classificationSystem = classificationSystem;
+    return this;
+  }
+
+  public CommodityTypeDataBuilder withClassificationId(String classificationId) {
+    this.classificationId = classificationId;
+    return this;
   }
 }

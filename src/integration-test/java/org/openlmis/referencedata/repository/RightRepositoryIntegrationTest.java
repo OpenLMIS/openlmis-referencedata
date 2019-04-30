@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import static java.lang.String.valueOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class RightRepositoryIntegrationTest
@@ -48,8 +48,9 @@ public class RightRepositoryIntegrationTest
 
   @Override
   Right generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    return Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
+    return new RightDataBuilder()
+        .withType(RightType.GENERAL_ADMIN)
+        .buildAsNew();
   }
 
   @Before

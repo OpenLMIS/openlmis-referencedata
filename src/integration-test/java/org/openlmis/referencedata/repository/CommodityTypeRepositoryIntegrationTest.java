@@ -24,10 +24,10 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.CommodityType;
+import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
 
@@ -47,8 +47,10 @@ public class CommodityTypeRepositoryIntegrationTest extends
 
   @Override
   CommodityType generateInstance() {
-    return new CommodityType("Name" + getNextInstanceNumber(), CLASSIFICATION_SYSTEM,
-        CLASSIFICATION_ID, null, new ArrayList<>());
+    return new CommodityTypeDataBuilder()
+        .withClassificationSystem(CLASSIFICATION_SYSTEM)
+        .withClassificationId(CLASSIFICATION_ID)
+        .buildAsNew();
   }
 
   @Test

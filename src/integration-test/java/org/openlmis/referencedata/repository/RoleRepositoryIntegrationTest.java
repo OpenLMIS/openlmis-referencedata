@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import static java.lang.String.valueOf;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
@@ -29,7 +28,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-
 import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +36,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.repository.custom.RoleRepositoryCustom;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -64,10 +63,11 @@ public class RoleRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Override
   Role generateInstance() {
-    int instanceNumber = this.getNextInstanceNumber();
-    Right right = Right.newRight(valueOf(instanceNumber), RightType.GENERAL_ADMIN);
+    Right right = new RightDataBuilder()
+        .withType(RightType.GENERAL_ADMIN)
+        .buildAsNew();
     rightRepository.save(right);
-    return Role.newRole(valueOf(instanceNumber), right);
+    return new RoleDataBuilder().withRights(right).buildAsNew();
   }
 
   @Before
