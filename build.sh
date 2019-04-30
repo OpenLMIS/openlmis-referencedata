@@ -7,4 +7,5 @@
   --source-file src/main/resources/messages_en.properties
 
 # Run Gradle build
+gradle dependencyCheckPurge || true
 gradle clean build integrationTest flywayTest dependencyCheckAnalyze
