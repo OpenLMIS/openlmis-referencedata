@@ -2,9 +2,6 @@ buildscript {
     repositories {
         mavenCentral()
     }
-    dependencies {
-        classpath 'org.owasp:dependency-check-gradle:4.0.1'
-    }
 }
 
 plugins {
@@ -22,7 +19,6 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'pmd'
-apply plugin: 'org.owasp.dependencycheck'
 
 group = serviceGroup
 version = serviceVersion
@@ -191,11 +187,6 @@ configurations {
 dockerCompose {
     stopContainers = false
 }
-
-dependencyCheck {
-    cveValidForHours = 12
-}
-check.dependsOn dependencyCheckUpdate
 
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
