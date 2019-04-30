@@ -192,6 +192,11 @@ dockerCompose {
     stopContainers = false
 }
 
+dependencyCheck {
+    cveValidForHours = 12
+}
+check.dependsOn dependencyCheckUpdate
+
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
