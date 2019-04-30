@@ -1,6 +1,13 @@
 #!/bin/bash
 
 set +x
+
+cleanup() {
+    rm -vf .env
+    docker-compose -f docker-compose.builder.yml down --volumes
+}
+trap cleanup EXIT
+
 sudo rm -f .env
 
 curl -o .env -L https://raw.githubusercontent.com/OpenLMIS/openlmis-ref-distro/master/settings-sample.env
@@ -16,6 +23,3 @@ echo "SONAR_PASSWORD=$SONAR_PASSWORD_TEMP" >> .env
 echo "SONAR_BRANCH=$GIT_BRANCH" >> .env
 
 docker-compose -f docker-compose.builder.yml run sonar
-docker-compose -f docker-compose.builder.yml down --volumes
-
-sudo rm -vrf .env
