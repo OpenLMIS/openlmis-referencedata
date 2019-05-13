@@ -43,14 +43,13 @@ scenarios:
         jsr223:
           execute: before
           script-text: |
-            import groovy.json.JsonSlurper
             import groovy.json.JsonOutput
 
-            def jsonSlurper = new JsonSlurper()
+            def random = new Random();
 
             def program = [
-              code: jsonSlurper.parseText(vars.get("code")),
-              name: "test program",
+              code: "code" + random.nextInt(),
+              name: "test name" + random.nextInt(),
               description: "test description",
               periodsSkippable: false,
               skipAuthorization: false,
