@@ -32,8 +32,6 @@ import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.Right;
-import org.openlmis.referencedata.domain.RightAssignment;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.User;
@@ -41,6 +39,8 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightAssignmentDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -350,7 +350,15 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   
   private void persistRightAssignment(User user, String rightName, UUID facilityId,
       UUID programId) {
-    rightRepository.save(Right.newRight(rightName, RightType.SUPERVISION));
-    rightAssignmentRepository.save(new RightAssignment(user, rightName, facilityId, programId));
+    rightRepository.save(new RightDataBuilder()
+        .withName(rightName)
+        .withType(RightType.SUPERVISION)
+        .buildAsNew());
+    rightAssignmentRepository.save(new RightAssignmentDataBuilder()
+        .withUser(user)
+        .withRightName(rightName)
+        .withFacility(facilityId)
+        .withProgram(programId)
+        .buildAsNew());
   }
 }

@@ -50,7 +50,6 @@ import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -60,6 +59,7 @@ import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramOrderableDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -137,8 +137,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     programRepository.save(program2);
 
     OrderableDisplayCategory orderableDisplayCategory =
-        OrderableDisplayCategory.createNew(Code.code("orderableDisplayCategoryCode"),
-            new OrderedDisplayValue("orderableDisplayCategoryName", 1));
+        new OrderableDisplayCategoryDataBuilder().buildAsNew();
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
     ProgramOrderable programOrderableFullSupply = new ProgramOrderableDataBuilder()

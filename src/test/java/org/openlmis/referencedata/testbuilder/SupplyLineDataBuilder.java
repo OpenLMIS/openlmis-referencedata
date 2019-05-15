@@ -37,6 +37,7 @@ public class SupplyLineDataBuilder {
     supervisoryNode = new SupervisoryNodeDataBuilder().build();
     program = new ProgramDataBuilder().build();
     supplyingFacility = new FacilityDataBuilder().build();
+    description = "description";
   }
 
   /**
@@ -79,7 +80,15 @@ public class SupplyLineDataBuilder {
    * Sets supplying facility for new {@link SupplyLine}.
    */
   public SupplyLineDataBuilder withSupplyingFacility(Facility facility) {
-    supplyingFacility = facility;
+    this.supplyingFacility = facility;
+    return this;
+  }
+
+  /**
+   * Sets description for new {@link SupplyLine}.
+   */
+  public SupplyLineDataBuilder withDescription(String description) {
+    this.description = description;
     return this;
   }
 }

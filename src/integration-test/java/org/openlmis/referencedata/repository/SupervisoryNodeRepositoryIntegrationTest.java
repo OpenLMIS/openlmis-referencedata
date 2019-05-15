@@ -36,7 +36,6 @@ import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RequisitionGroup;
-import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -45,6 +44,7 @@ import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.web.SupervisoryNodeSearchParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -386,8 +386,12 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
             .withSupervisoryNode(supervisoryNode)
             .buildAsNew());
 
-    requisitionGroupProgramScheduleRepository.save(RequisitionGroupProgramSchedule
-        .newRequisitionGroupProgramSchedule(requisitionGroup, program, schedule, false));
+    requisitionGroupProgramScheduleRepository.save(new RequisitionGroupProgramScheduleDataBuilder()
+        .withProgram(program)
+        .withRequisitionGroup(requisitionGroup)
+        .withSchedule(schedule)
+        .withDropOffFacility(facility)
+        .buildAsNew());
 
     result = supervisoryNodeRepository
         .search(params, null);

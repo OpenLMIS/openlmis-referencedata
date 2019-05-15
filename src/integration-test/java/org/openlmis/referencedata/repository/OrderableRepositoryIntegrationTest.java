@@ -353,8 +353,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // given an orderable in that program
     List<ProgramOrderable> programOrderables = new ArrayList<>();
-    Orderable validOrderable = new Orderable(Code.code(CODE + getNextInstanceNumber()),
-        Dispensable.createNew(EACH), 10, 5, false, UUID.randomUUID(), 1L);
+    Orderable validOrderable = generateInstance();
     validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));

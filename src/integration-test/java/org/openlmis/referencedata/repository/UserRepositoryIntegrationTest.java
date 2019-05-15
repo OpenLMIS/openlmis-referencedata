@@ -42,7 +42,6 @@ import javax.persistence.PersistenceException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FulfillmentRoleAssignment;
@@ -56,6 +55,13 @@ import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.SupervisionRoleAssignment;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.testbuilder.DirectRoleAssignmentDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
+import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
@@ -352,7 +358,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
     Right fulfillmentRight = saveNewRight("fulfillmentRight", ORDER_FULFILLMENT);
     Role fulfillmentRole = saveNewRole("fulfillmentRole", fulfillmentRight);
-    Facility warehouse = generateFacility(11, "warehouse");
+    Facility warehouse = generateFacility("warehouse");
 
     User warehouseClerk = repository.findOneByUsernameIgnoreCase(users.get(2).getUsername());
     warehouseClerk = assignRoleToUser(warehouseClerk,
@@ -381,9 +387,20 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     User user1 = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
     User user2 = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
 
-    user1.assignRoles(new DirectRoleAssignment(reportRole, user1),
-        new DirectRoleAssignment(adminRole, user1));
-    user2.assignRoles(new DirectRoleAssignment(reportRole, user2));
+    user1.assignRoles(
+        new DirectRoleAssignmentDataBuilder()
+            .withRole(reportRole)
+            .withUser(user1)
+            .buildAsNew(),
+        new DirectRoleAssignmentDataBuilder()
+            .withRole(adminRole)
+            .withUser(user1)
+            .buildAsNew());
+    user2.assignRoles(
+        new DirectRoleAssignmentDataBuilder()
+            .withRole(reportRole)
+            .withUser(user2)
+            .buildAsNew());
 
     // when
     Set<User> reportUsers = repository.findUsersByDirectRight(reportRight);
@@ -436,38 +453,34 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   private Facility generateFacility(int instanceNumber) {
-    return generateFacility(instanceNumber, "FacilityCode" + instanceNumber);
+    return generateFacility("FacilityCode" + instanceNumber);
   }
 
-  private Facility generateFacility(int instanceNumber, String type) {
-    GeographicLevel geographicLevel = generateGeographicLevel(instanceNumber);
-    GeographicZone geographicZone = generateGeographicZone(geographicLevel,
-        instanceNumber);
+  private Facility generateFacility(String type) {
+    GeographicLevel geographicLevel = generateGeographicLevel();
+    GeographicZone geographicZone = generateGeographicZone(geographicLevel);
     FacilityType facilityType = generateFacilityType(type);
-    Facility facility = new Facility("FacilityCode" + instanceNumber);
-    facility.setType(facilityType);
-    facility.setGeographicZone(geographicZone);
-    facility.setName("FacilityName" + instanceNumber);
-    facility.setDescription("FacilityDescription" + instanceNumber);
-    facility.setActive(true);
-    facility.setEnabled(true);
+    Facility facility = new FacilityDataBuilder()
+        .withType(facilityType)
+        .withGeographicZone(geographicZone)
+        .withoutOperator()
+        .buildAsNew();
     facilityRepository.save(facility);
     return facility;
   }
 
-  private GeographicLevel generateGeographicLevel(int instanceNumber) {
-    GeographicLevel geographicLevel = new GeographicLevel();
-    geographicLevel.setCode("GeographicLevel" + instanceNumber);
-    geographicLevel.setLevelNumber(1);
+  private GeographicLevel generateGeographicLevel() {
+    GeographicLevel geographicLevel = new GeographicLevelDataBuilder()
+        .withLevelNumber(1)
+        .buildAsNew();
     geographicLevelRepository.save(geographicLevel);
     return geographicLevel;
   }
 
-  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel,
-      int instanceNumber) {
-    GeographicZone geographicZone = new GeographicZone();
-    geographicZone.setCode("GeographicZone" + instanceNumber);
-    geographicZone.setLevel(geographicLevel);
+  private GeographicZone generateGeographicZone(GeographicLevel geographicLevel) {
+    GeographicZone geographicZone = new GeographicZoneDataBuilder()
+        .withLevel(geographicLevel)
+        .buildAsNew();
     geographicZoneRepository.save(geographicZone);
     return geographicZone;
   }
@@ -476,19 +489,18 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
     if ("warehouse".equals(type)) {
       return facilityTypeRepository.findOneByCode(type);
     }
-    FacilityType facilityType = new FacilityType();
-    facilityType.setCode(type);
+    FacilityType facilityType = new FacilityTypeDataBuilder().withCode(type).buildAsNew();
     facilityTypeRepository.save(facilityType);
     return facilityType;
   }
 
   private Right saveNewRight(String name, RightType type) {
-    Right right = Right.newRight(name, type);
+    Right right =  new RightDataBuilder().withType(type).withName(name).buildAsNew();
     return rightRepository.save(right);
   }
 
   private Role saveNewRole(String name, Right right) {
-    Role role = Role.newRole(name, right);
+    Role role = new RoleDataBuilder().withRights(right).withName(name).buildAsNew();
     return roleRepository.save(role);
   }
 

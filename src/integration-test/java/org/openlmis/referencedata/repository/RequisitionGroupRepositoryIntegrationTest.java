@@ -45,6 +45,7 @@ import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,11 +99,11 @@ public class RequisitionGroupRepositoryIntegrationTest
   }
 
   RequisitionGroup generateInstance(String code, String name) {
-    RequisitionGroup requisitionGroup = new RequisitionGroup();
-    requisitionGroup.setCode(code);
-    requisitionGroup.setName(name);
-    requisitionGroup.setSupervisoryNode(supervisoryNode);
-    return requisitionGroup;
+    return new RequisitionGroupDataBuilder()
+        .withSupervisoryNode(supervisoryNode)
+        .withCode(code)
+        .withName(name)
+        .buildAsNew();
   }
 
   @Before
@@ -503,7 +504,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     List<RequisitionGroupProgramSchedule> schedules = new ArrayList<>();
     schedules.add(rgps);
 
-    group.setRequisitionGroupProgramSchedules(schedules);
+    group.getRequisitionGroupProgramSchedules().addAll(schedules);
 
     return repository.save(group);
   }

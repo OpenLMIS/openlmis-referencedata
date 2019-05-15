@@ -175,11 +175,12 @@ public class SupplyLineRepositoryIntegrationTest
   }
 
   private SupplyLine cloneSupplyLine(SupplyLine supplyLine) {
-    SupplyLine clonedSupplyLine = new SupplyLine();
-    clonedSupplyLine.setProgram(supplyLine.getProgram());
-    clonedSupplyLine.setSupervisoryNode(generateSupervisoryNode());
-    clonedSupplyLine.setDescription(supplyLine.getDescription());
-    clonedSupplyLine.setSupplyingFacility(supplyLine.getSupplyingFacility());
+    SupplyLine clonedSupplyLine = new SupplyLineDataBuilder()
+        .withProgram(supplyLine.getProgram())
+        .withSupervisoryNode(supplyLine.getSupervisoryNode())
+        .withSupplyingFacility(supplyLine.getSupplyingFacility())
+        .withDescription(supplyLine.getDescription())
+        .buildAsNew();
     repository.save(clonedSupplyLine);
     return clonedSupplyLine;
   }
