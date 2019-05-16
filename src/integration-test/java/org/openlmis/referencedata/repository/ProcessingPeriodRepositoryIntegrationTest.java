@@ -46,6 +46,7 @@ import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -320,10 +321,11 @@ public class ProcessingPeriodRepositoryIntegrationTest
         .build();
     requisitionGroupRepository.save(requisitionGroup);
 
-    RequisitionGroupProgramSchedule requisitionGroupProgramSchedule =
-        RequisitionGroupProgramSchedule.newRequisitionGroupProgramSchedule(
-            requisitionGroup, program, schedule, false);
-    requisitionGroupProgramSchedule.setDropOffFacility(facility);
-    return requisitionGroupProgramSchedule;
+    return new RequisitionGroupProgramScheduleDataBuilder()
+        .withProgram(program)
+        .withRequisitionGroup(requisitionGroup)
+        .withSchedule(schedule)
+        .withDropOffFacility(facility)
+        .buildAsNew();
   }
 }
