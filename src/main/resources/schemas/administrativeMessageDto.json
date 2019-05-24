@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "AdministrativeMessageDto",
+  "description": "A single administrative message",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "title": {
+      "type": "string",
+      "title": "title"
+    },
+    "message": {
+      "type": "string",
+      "title": "message"
+    },
+    "createdDate": {
+      "type": "string",
+      "title": "createdDate"
+    },
+    "expiryDate": {
+      "type": "string",
+      "title": "expiryDate"
+    }
+  },
+  "required": [
+    "id",
+    "message",
+    "createdDate",
+    "expiryDate"
+  ]
+}
