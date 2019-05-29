@@ -1,6 +1,9 @@
 13.0.1 / WIP
 ==================
 
+New functionality added in a backwards-compatible manner:
+* [OLMIS-6322](https://openlmis.atlassian.net/browse/OLMIS-6322): Added new ADMINISTRATIVE_MESSAGES_MANAGE right. Assigned to System Administrator role by default.
+
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
 
