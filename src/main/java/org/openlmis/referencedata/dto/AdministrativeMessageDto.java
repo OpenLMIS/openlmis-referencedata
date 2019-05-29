@@ -29,7 +29,10 @@ public class AdministrativeMessageDto extends BaseDto {
 
   private String title;
   private String message;
+  private ZonedDateTime startDate;
   private ZonedDateTime expiryDate;
   private ZonedDateTime createdDate;
+  private Boolean active;
+  private ObjectReferenceDto author;
 
 }

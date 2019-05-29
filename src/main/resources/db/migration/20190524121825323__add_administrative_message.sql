@@ -6,11 +6,18 @@ CREATE TABLE administrative_messages (
     id uuid NOT NULL,
     title character varying(255),
     message text NOT NULL,
-    createddate timestamp with time zone,
-    expirydate timestamp with time zone NOT NULL
+    startdate timestamp with time zone,
+    createddate timestamp with time zone NOT NULL,
+    expirydate timestamp with time zone,
+    active boolean NOT NULL,
+    authorid uuid NOT NULL
 );
 
 ALTER TABLE ONLY administrative_messages
   ADD CONSTRAINT administrative_messages_pkey PRIMARY KEY (id);
 
-CREATE INDEX ON administrative_messages (expirydate);
+ALTER TABLE administrative_messages
+  ADD CONSTRAINT administrative_messages_fkey FOREIGN KEY (authorid)
+  REFERENCES referencedata.users(id);
+
+CREATE INDEX ON administrative_messages (active);

@@ -18,6 +18,8 @@ package org.openlmis.referencedata.domain;
 import java.time.ZonedDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,13 +41,28 @@ public class AdministrativeMessage extends BaseEntity {
   @Setter
   private String message;
 
-  @Column(nullable = false)
+  @Getter
+  @Setter
+  private ZonedDateTime startDate;
+
   @Getter
   @Setter
   private ZonedDateTime expiryDate;
 
+  @Column(nullable = false)
   @Getter
   @Setter
   private ZonedDateTime createdDate;
+
+  @Column(nullable = false)
+  @Getter
+  @Setter
+  private Boolean active;
+
+  @ManyToOne
+  @JoinColumn(name = "authorid")
+  @Getter
+  @Setter
+  private User author;
 
 }

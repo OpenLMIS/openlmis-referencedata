@@ -20,14 +20,27 @@
       "type": "string",
       "title": "createdDate"
     },
+    "startDate": {
+      "type": "string",
+      "title": "startDate"
+    },
     "expiryDate": {
       "type": "string",
       "title": "expiryDate"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
+    "author": {
+      "type": "object",
+      "$ref": "referenceObjectDto.json"
     }
   },
   "required": [
     "id",
     "message",
-    "expiryDate"
+    "active",
+    "author"
   ]
 }
