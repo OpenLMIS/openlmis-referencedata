@@ -20,4 +20,4 @@ ALTER TABLE administrative_messages
   ADD CONSTRAINT administrative_messages_fkey FOREIGN KEY (authorid)
   REFERENCES referencedata.users(id);
 
-CREATE INDEX ON administrative_messages (active);
+CREATE INDEX ON administrative_messages (active, authorid);
