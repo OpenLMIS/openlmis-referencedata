@@ -40,6 +40,11 @@ import org.springframework.validation.Validator;
 
 public class ProcessingPeriodValidatorTest {
 
+  private static final String START_DATE = "startDate";
+  private static final String END_DATE = "endDate";
+  private static final String PROCESSING_SCHEDULE = "processingSchedule";
+  private static final String NAME = "name";
+
   @Mock
   private ProcessingSchedule processingSchedule;
 
@@ -51,11 +56,6 @@ public class ProcessingPeriodValidatorTest {
 
   @InjectMocks
   private Validator validator = new ProcessingPeriodValidator();
-
-  private static final String START_DATE = "startDate";
-  private static final String END_DATE = "endDate";
-  private static final String PROCESSING_SCHEDULE = "processingSchedule";
-
   private ProcessingPeriod processingPeriod;
   private Errors errors;
 
@@ -70,10 +70,23 @@ public class ProcessingPeriodValidatorTest {
   @Test
   public void shouldRejectPeriodWithEmptyProcessingSchedule() {
     processingPeriod.setProcessingSchedule(null);
+
     validator.validate(processingPeriod, errors);
+
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
     assertErrorMessage(errors,PROCESSING_SCHEDULE, ProcessingPeriodMessageKeys.ERROR_SCHEDULE_NULL);
+  }
+
+  @Test
+  public void shouldRejectPeriodWithEmptyName() {
+    processingPeriod.setName(null);
+
+    validator.validate(processingPeriod, errors);
+
+    assertTrue(errors.hasErrors());
+    assertEquals(1, errors.getErrorCount());
+    assertErrorMessage(errors, NAME, ProcessingPeriodMessageKeys.ERROR_NAME_NULL);
   }
 
   @Test

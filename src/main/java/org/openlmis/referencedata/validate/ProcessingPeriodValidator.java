@@ -29,6 +29,7 @@ public class ProcessingPeriodValidator implements BaseValidator {
   private static final String START_DATE = "startDate";
   private static final String END_DATE = "endDate";
   private static final String PROCESSING_SCHEDULE = "processingSchedule";
+  private static final String NAME = "name";
 
   @Autowired
   private ProcessingPeriodRepository processingPeriodRepository;
@@ -40,10 +41,10 @@ public class ProcessingPeriodValidator implements BaseValidator {
 
   @Override
   public void validate(Object obj, Errors err) {
+    rejectIfEmptyOrWhitespace(err, NAME, ProcessingPeriodMessageKeys.ERROR_NAME_NULL);
     rejectIfEmpty(err, PROCESSING_SCHEDULE, ProcessingPeriodMessageKeys.ERROR_SCHEDULE_NULL);
     rejectIfEmpty(err, START_DATE, ProcessingPeriodMessageKeys.ERROR_START_DATE_NULL);
     rejectIfEmpty(err, END_DATE, ProcessingPeriodMessageKeys.ERROR_END_DATE_NULL);
-
     if (!err.hasErrors()) {
       ProcessingPeriod period = (ProcessingPeriod) obj;
       UUID periodId = period.getId();
@@ -51,11 +52,11 @@ public class ProcessingPeriodValidator implements BaseValidator {
           ? processingPeriodRepository.findOne(periodId) : null;
       if (existingPeriod != null) {
         rejectIfValueChanged(err, period.getProcessingSchedule(),
-            existingPeriod.getProcessingSchedule(), "processingSchedule");
+            existingPeriod.getProcessingSchedule(), PROCESSING_SCHEDULE);
         rejectIfValueChanged(err, period.getStartDate(),
-            existingPeriod.getStartDate(), "startDate");
+            existingPeriod.getStartDate(), START_DATE);
         rejectIfValueChanged(err, period.getEndDate(),
-            existingPeriod.getEndDate(), "endDate");
+            existingPeriod.getEndDate(), END_DATE);
         rejectIfValueChanged(err, period.getDurationInMonths(),
             existingPeriod.getDurationInMonths(), "durationInMonths");
       }
