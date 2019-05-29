@@ -1,3 +1,9 @@
+13.0.1 / WIP
+==================
+
+Bug fixes:
+* [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
+
 13.0.0 / 2019-05-27
 ==================
 
@@ -27,7 +33,6 @@ Improvements:
 Bug fixes:
 * [OLMIS-5981](https://openlmis.atlassian.net/browse/OLMIS-5981): Updated /supervisoryNodes/{supervisoryNode_id} PUT to throw exception when requisition group is missing and when requisition group is changed to another.
 * [OLMIS-6172](https://openlmis.atlassian.net/browse/OLMIS-6172): Fixed PUT /processingPeriods/id not to throw ClassCastException
-* [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
 
 12.0.0 / 2018-12-12
 ===================
