@@ -74,16 +74,20 @@ import org.springframework.http.MediaType;
 public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderables";
+  private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String UNIT = "unit";
   private static final String NAME = "name";
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
+  private static final String ID = "id";
+  private static final String VERSION_ID = "versionId";
   @Captor
   public ArgumentCaptor<OrderableSearchParams> searchParamsArgumentCaptor;
   private OrderableDto orderableDto;
 
   private Orderable orderable;
   private UUID orderableId = UUID.randomUUID();
+  private Long orderableVersionId = 1L;
 
   @Before
   @Override
@@ -99,7 +103,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         metaAttributes, null);
 
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
-        10, 5, false, orderableId, 1L);
+        10, 5, false, orderableId, orderableVersionId);
     orderable.setProgramOrderables(Collections.emptyList());
     orderable.export(orderableDto);
 
@@ -378,6 +382,45 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getNumberOfElements());
     assertEquals(10, response.getSize());
     assertEquals(0, response.getNumber());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindOrderableByIdentityId() {
+    OrderableDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, orderableId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(OrderableDto.class);
+
+    assertEquals(orderableId, response.getId());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldFindOrderableByIdentityIdAndVersionId() {
+    when(orderableRepository.findByIdentityIdAndIdentityVersionId(
+        orderable.getId(), orderableVersionId)).thenReturn(orderable);
+
+    OrderableDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .pathParam(ID, orderableId)
+        .queryParam(VERSION_ID, orderableVersionId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(OrderableDto.class);
+
+    assertEquals(orderableId, response.getId());
+    assertEquals(orderableVersionId, orderable.getVersionId());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
