@@ -165,17 +165,23 @@ public class OrderableController extends BaseController {
   public OrderableDto getChosenOrderable(
       @PathVariable("id") UUID productId,
       @RequestParam(required = false, value = "versionId") Long versionId) {
+    Profiler profiler = new Profiler("GET_ORDERABLE");
+    profiler.setLogger(XLOGGER);
 
     Orderable orderable;
     if (null == versionId) {
+      profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID");
       orderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(productId);
     } else {
+      profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID_AND_VERSION_ID");
       orderable = repository.findByIdentityIdAndIdentityVersionId(productId, versionId);
     }
 
     if (orderable == null) {
+      profiler.stop().log();
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     } else {
+      profiler.stop().log();
       return OrderableDto.newInstance(orderable);
     }
   }

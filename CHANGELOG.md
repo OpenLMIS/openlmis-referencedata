@@ -7,6 +7,9 @@ New functionality added in a backwards-compatible manner:
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
 
+Improvements:
+* [OLMIS-6127](https://openlmis.atlassian.net/browse/OLMIS-6127): Introduced second-level caching for Orderable.
+
 13.0.0 / 2019-05-27
 ==================
 

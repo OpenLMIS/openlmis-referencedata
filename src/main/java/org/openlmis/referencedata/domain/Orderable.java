@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -43,6 +44,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.javers.core.metamodel.annotation.DiffIgnore;
@@ -64,6 +67,8 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
     uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
         columnNames = {"code", "versionid"}))
 @NoArgsConstructor
+@Cacheable
+@Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
 public class Orderable implements Identifiable {
 
   public static final String TRADE_ITEM = "tradeItem";
@@ -77,6 +82,7 @@ public class Orderable implements Identifiable {
   @JoinColumn(name = "dispensableid", nullable = false)
   @DiffIgnore // same reason as one in Facility.supportedPrograms
   @Getter
+  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
   private Dispensable dispensable;
 
   @Getter
@@ -100,6 +106,7 @@ public class Orderable implements Identifiable {
       fetch = FetchType.EAGER)
   @DiffIgnore
   @Setter
+  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
   private List<ProgramOrderable> programOrderables;
 
   @LazyCollection(LazyCollectionOption.FALSE)
@@ -107,6 +114,7 @@ public class Orderable implements Identifiable {
   @DiffIgnore
   @Setter
   @Getter
+  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
   private Set<OrderableChild> children;
 
   @ElementCollection(fetch = FetchType.EAGER)
