@@ -145,15 +145,10 @@ pipeline {
                         withSonarQubeEnv('Sonar OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
                                 script {
-                                    try {
-                                        sh(script: "./ci-sonarAnalysis.sh")
+                                    sh(script: "./ci-sonarAnalysis.sh")
 
-                                        // workaround: Sonar plugin retrieves the path directly from the output
-                                        sh 'echo "Working dir: ${WORKSPACE}/build/sonar"'
-                                    }
-                                    catch (exc) {
-                                        currentBuild.result = 'UNSTABLE'
-                                    }
+                                    // workaround: Sonar plugin retrieves the path directly from the output
+                                    sh 'echo "Working dir: ${WORKSPACE}/build/sonar"'
                                 }
                             }
                         }
