@@ -1,4 +1,5 @@
 #!/usr/bin/env groovy
+import hudson.tasks.test.AbstractTestResultAction
 
 properties([
   [
@@ -71,9 +72,13 @@ pipeline {
                     script {
                         try {
                             sh( script: "./ci-buildImage.sh" )
+                              currentBuild.result = processTestResults('SUCCESS')
                         }
                         catch (exc) {
-                            currentBuild.result = 'UNSTABLE'
+                            currentBuild.result = processTestResults('FAILURE')
+                            if (currentBuild.result == 'FAILURE') {
+                                error(exc.toString())
+                            }
                         }
                     }
                 }
@@ -92,11 +97,6 @@ pipeline {
                     script {
                         notifyAfterFailure()
                     }
-                }
-                always {
-                    checkstyle pattern: '**/build/reports/checkstyle/*.xml'
-                    pmd pattern: '**/build/reports/pmd/*.xml'
-                    junit '**/build/test-results/*/*.xml'
                 }
             }
         }
@@ -161,7 +161,8 @@ pipeline {
                             script {
                                 def gate = waitForQualityGate()
                                 if (gate.status != 'OK') {
-                                    error 'Quality Gate FAILED'
+                                    echo 'Quality Gate FAILED'
+                                    currentBuild.result = 'UNSTABLE'
                                 }
                             }
                         }
@@ -278,4 +279,22 @@ def notifyAfterFailure() {
     emailext subject: "${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} ${currentBuild.result}",
         body: """<p>${env.JOB_NAME} - #${env.BUILD_NUMBER} ${env.STAGE_NAME} ${currentBuild.result}</p><p>Check console <a href="${env.BUILD_URL}">output</a> to view the results.</p>""",
         recipientProviders: [[$class: 'CulpritsRecipientProvider'], [$class: 'DevelopersRecipientProvider']]
+}
+
+def processTestResults(status) {
+    checkstyle pattern: '**/build/reports/checkstyle/*.xml'
+    pmd pattern: '**/build/reports/pmd/*.xml'
+    junit '**/build/test-results/*/*.xml'
+
+    AbstractTestResultAction testResultAction = currentBuild.rawBuild.getAction(AbstractTestResultAction.class)
+    if (testResultAction != null) {
+        failuresCount = testResultAction.failCount
+        echo "Failed tests count: ${failuresCount}"
+        if (failuresCount > 0) {
+            echo "Setting build unstable due to test failures"
+            status = 'UNSTABLE'
+        }
+    }
+
+    return status
 }
