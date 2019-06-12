@@ -29,6 +29,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
+import org.openlmis.referencedata.dto.SystemNotificationDto;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.testbuilder.SystemNotificationDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
@@ -47,29 +49,30 @@ public class SystemNotificationValidatorTest {
   private static final String EXPIRY_DATE = "expiryDate";
 
   @Mock
-  private User author;
-
-  @Mock
   private SystemNotificationRepository systemNotificationRepository;
 
   @InjectMocks
   private Validator validator = new SystemNotificationValidator();
   private SystemNotification systemNotification;
+  private SystemNotificationDto systemNotificationDto = new SystemNotificationDto();
   private Errors errors;
+  private User author;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
+    author = new UserDataBuilder().build();
     systemNotification = new SystemNotificationDataBuilder().withAuthor(author).build();
+    systemNotification.export(systemNotificationDto);
 
-    errors = new BeanPropertyBindingResult(systemNotification, "systemNotification");
+    errors = new BeanPropertyBindingResult(systemNotificationDto, "systemNotificationDto");
   }
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyAuthor() {
-    systemNotification.setAuthor(null);
+    systemNotificationDto.setAuthor(new ObjectReferenceDto());
 
-    validator.validate(systemNotification, errors);
+    validator.validate(systemNotificationDto, errors);
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
@@ -78,9 +81,9 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyCreatedDate() {
-    systemNotification.setCreatedDate(null);
+    systemNotificationDto.setCreatedDate(null);
 
-    validator.validate(systemNotification, errors);
+    validator.validate(systemNotificationDto, errors);
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
@@ -90,9 +93,9 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithExpiryDateBeforeStartDate() {
-    systemNotification.setExpiryDate(systemNotification.getStartDate().minusDays(1));
+    systemNotificationDto.setExpiryDate(systemNotification.getStartDate().minusDays(1));
 
-    validator.validate(systemNotification, errors);
+    validator.validate(systemNotificationDto, errors);
 
     assertTrue(errors.hasErrors());
     assertEquals(2, errors.getErrorCount());
@@ -104,9 +107,9 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyMessage() {
-    systemNotification.setMessage(null);
+    systemNotificationDto.setMessage(null);
 
-    validator.validate(systemNotification, errors);
+    validator.validate(systemNotificationDto, errors);
 
     assertTrue(errors.hasErrors());
     assertEquals(1, errors.getErrorCount());
@@ -122,7 +125,8 @@ public class SystemNotificationValidatorTest {
     when(systemNotificationRepository.findOne(systemNotification.getId()))
         .thenReturn(systemNotification);
 
-    validator.validate(systemNotification, errors);
+    systemNotification.export(systemNotificationDto);
+    validator.validate(systemNotificationDto, errors);
 
     assertFalse(errors.hasErrors());
   }
@@ -139,7 +143,8 @@ public class SystemNotificationValidatorTest {
     systemNotification.setCreatedDate(ZonedDateTime.now().plusDays(10));
     systemNotification.setAuthor(new UserDataBuilder().build());
 
-    validator.validate(systemNotification, errors);
+    systemNotification.export(systemNotificationDto);
+    validator.validate(systemNotificationDto, errors);
 
     assertTrue(errors.hasErrors());
     assertEquals(2, errors.getErrorCount());
@@ -149,7 +154,7 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldAcceptValidSystemNotification() {
-    validator.validate(systemNotification, errors);
+    validator.validate(systemNotificationDto, errors);
 
     assertFalse(errors.hasErrors());
   }

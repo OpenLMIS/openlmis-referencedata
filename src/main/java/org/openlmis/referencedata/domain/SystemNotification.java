@@ -90,8 +90,10 @@ public class SystemNotification extends BaseEntity {
     exporter.setStartDate(startDate);
     exporter.setExpiryDate(expiryDate);
     exporter.setCreatedDate(createdDate);
-    exporter.setAuthor(author);
     exporter.setActive(active);
+    if (author != null) {
+      exporter.setAuthor(author);
+    }
   }
 
   public interface Exporter extends BaseExporter {

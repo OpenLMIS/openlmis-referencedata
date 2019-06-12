@@ -68,18 +68,19 @@ public class SystemNotificationValidator implements BaseValidator {
    */
   @Override
   public void validate(Object obj, Errors err) {
+    verifyArguments(obj, err, SystemNotificationMessageKeys.ERROR_NULL);
     rejectIfEmpty(err, MESSAGE, SystemNotificationMessageKeys.ERROR_MESSAGE_REQUIRED);
-    rejectIfEmpty(err, AUTHOR, SystemNotificationMessageKeys.ERROR_AUTHOR_REQUIRED);
     rejectIfEmpty(err, ACTIVE, SystemNotificationMessageKeys.ERROR_ACTIVE_FLAG_REQUIRED);
     rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
     if (!err.hasErrors()) {
-      SystemNotification notification = (SystemNotification) obj;
+      SystemNotificationDto notification = (SystemNotificationDto) obj;
+      verifyAuthor(err, notification);
       UUID notificationId = notification.getId();
       SystemNotification existingNotification = (notificationId != null)
           ? repository.findOne(notificationId) : null;
       if (existingNotification != null) {
-        rejectIfValueChanged(err, notification.getAuthor(),
-            existingNotification.getAuthor(), AUTHOR);
+        rejectIfValueChanged(err, notification.getAuthor().getId(),
+            existingNotification.getAuthor().getId(), AUTHOR);
         rejectIfValueChanged(err, notification.getCreatedDate(),
             existingNotification.getCreatedDate(), CREATED_DATE);
       }
@@ -93,6 +94,12 @@ public class SystemNotificationValidator implements BaseValidator {
         rejectValue(err, EXPIRY_DATE,
             SystemNotificationMessageKeys.ERROR_EXPIRY_DATE_BEFORE_START_DATE);
       }
+    }
+  }
+
+  private void verifyAuthor(Errors errors, SystemNotificationDto notificationDto) {
+    if (notificationDto.getAuthor().getId() == null) {
+      rejectValue(errors, AUTHOR, SystemNotificationMessageKeys.ERROR_AUTHOR_REQUIRED);
     }
   }
 
