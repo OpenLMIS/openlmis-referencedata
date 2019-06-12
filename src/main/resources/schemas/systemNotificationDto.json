@@ -1,0 +1,45 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "SystemNotificationDto",
+  "description": "A single system notification",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "title": {
+      "type": "string",
+      "title": "title"
+    },
+    "message": {
+      "type": "string",
+      "title": "message"
+    },
+    "createdDate": {
+      "type": "string",
+      "title": "createdDate"
+    },
+    "startDate": {
+      "type": "string",
+      "title": "startDate"
+    },
+    "expiryDate": {
+      "type": "string",
+      "title": "expiryDate"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
+    "author": {
+      "type": "object",
+      "$ref": "referenceObjectDto.json"
+    }
+  },
+  "required": [
+    "message",
+    "active",
+    "author"
+  ]
+}

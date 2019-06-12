@@ -102,6 +102,7 @@ public abstract class MessageKeys {
   protected static final String SERVICE_ACCOUNT = "serviceAccount";
   protected static final String FHIR = "fhir";
   protected static final String SUPPLY_PARTNER = "supplyPartner";
+  protected static final String SYSTEM_NOTIFICATION = "systemNotification";
 
   // Common to subclasses
   protected static final String EMAIL = "email";

@@ -86,6 +86,7 @@ import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
+import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
@@ -106,6 +107,7 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
+import org.openlmis.referencedata.validate.SystemNotificationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -319,6 +321,12 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected SupplyPartnerBuilder supplyPartnerBuilder;
+
+  @MockBean
+  protected SystemNotificationRepository systemNotificationRepository;
+
+  @MockBean
+  protected SystemNotificationValidator systemNotificationValidator;
 
   /**
    * Constructor for test.
