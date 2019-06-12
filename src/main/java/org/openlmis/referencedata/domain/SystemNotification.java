@@ -56,7 +56,7 @@ public class SystemNotification extends BaseEntity {
   private User author;
 
   /**
-   * Creates new system notiffication object based on data from {@link Importer}
+   * Creates new system notification object based on data from {@link Importer}
    * and author argument.
    *
    * @param importer instance of {@link Importer}
@@ -77,7 +77,7 @@ public class SystemNotification extends BaseEntity {
   }
 
   /**
-   * Exports current state of facility object.
+   * Exports current state of system notification object.
    *
    * @param exporter instance of {@link Exporter}
    */
