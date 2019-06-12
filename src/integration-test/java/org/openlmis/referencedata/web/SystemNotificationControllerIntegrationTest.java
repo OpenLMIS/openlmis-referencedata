@@ -283,6 +283,28 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
+  public void shouldCreateSystemNotificationInPutIfDoesNotExist() {
+    given(userRepository.findOne(any(UUID.class))).willReturn(author);
+    UUID newNotificationId = UUID.randomUUID();
+    notificationDto.setId(newNotificationId);
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, newNotificationId)
+        .body(notificationDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK);
+
+    assertResponseBody(response, "", is(newNotificationId.toString()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestIfRequestIsInvalidInPutSystemNotification() {
     restAssured
         .given()

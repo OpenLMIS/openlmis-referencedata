@@ -34,7 +34,7 @@ import org.openlmis.referencedata.web.BaseController;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class SystemNotificationDto extends BaseDto implements SystemNotification.Exporter,
+public final class SystemNotificationDto extends BaseDto implements SystemNotification.Exporter,
     SystemNotification.Importer {
 
   @Setter

@@ -151,18 +151,7 @@ public class SystemNotificationController extends BaseController {
       throw new ValidationMessageException(SystemNotificationMessageKeys.ERROR_ID_PROVIDED);
     }
 
-    profiler.start("SYSTEM_NOTIFICATION_VALIDATION");
-    systemNotificationValidator.validate(systemNotificationDto, bindingResult);
-
-    profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
-    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
-    SystemNotification systemNotification =
-        SystemNotification.newInstance(systemNotificationDto, author);
-
-    profiler.start("SAVE_SYSTEM_NOTIFICATION");
-    systemNotificationRepository.save(systemNotification);
-
-    SystemNotificationDto dto = toDto(systemNotification, profiler);
+    SystemNotificationDto dto = validateAndSave(systemNotificationDto, bindingResult, profiler);
 
     profiler.stop().log();
     return dto;
@@ -189,18 +178,7 @@ public class SystemNotificationController extends BaseController {
       throw new ValidationMessageException(SystemNotificationMessageKeys.ERROR_ID_MISMATCH);
     }
 
-    profiler.start("SYSTEM_NOTIFICATION_VALIDATION");
-    systemNotificationValidator.validate(systemNotificationDto, bindingResult);
-
-    profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
-    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
-    SystemNotification systemNotification =
-        SystemNotification.newInstance(systemNotificationDto, author);
-
-    profiler.start("SAVE_SYSTEM_NOTIFICATION");
-    systemNotificationRepository.save(systemNotification);
-
-    SystemNotificationDto dto = toDto(systemNotification, profiler);
+    SystemNotificationDto dto = validateAndSave(systemNotificationDto, bindingResult, profiler);
 
     profiler.stop().log();
     return dto;
@@ -274,6 +252,22 @@ public class SystemNotificationController extends BaseController {
     }
 
     return systemNotification;
+  }
+
+  private SystemNotificationDto validateAndSave(SystemNotificationDto systemNotificationDto,
+      BindingResult bindingResult, Profiler profiler) {
+    profiler.start("SYSTEM_NOTIFICATION_VALIDATION");
+    systemNotificationValidator.validate(systemNotificationDto, bindingResult);
+
+    profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
+    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
+    SystemNotification systemNotification =
+        SystemNotification.newInstance(systemNotificationDto, author);
+
+    profiler.start("SAVE_SYSTEM_NOTIFICATION");
+    systemNotificationRepository.save(systemNotification);
+
+    return toDto(systemNotification, profiler);
   }
 
   private List<SystemNotificationDto> toDtos(List<SystemNotification> notifications,
