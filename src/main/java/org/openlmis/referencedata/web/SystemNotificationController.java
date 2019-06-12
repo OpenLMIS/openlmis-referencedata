@@ -62,11 +62,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(RESOURCE_PATH)
 public class SystemNotificationController extends BaseController {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(SystemNotification.class);
-
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/systemNotifications";
-
   public static final String ID_URL = "/{id}";
+
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(SystemNotification.class);
   private static final String AUDIT_LOG_URL = ID_URL + "/auditLog";
 
   @Autowired
