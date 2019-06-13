@@ -327,46 +327,6 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
-  public void shouldReturnBadRequestIfStartDateIsAfterExpiryDateInPutSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
-    notificationDto.setStartDate(notificationDto.getExpiryDate().plusDays(1));
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .pathParam(ID, notificationDto.getId())
-        .body(notificationDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(HttpStatus.SC_BAD_REQUEST)
-        .body(MESSAGE_KEY, is(ValidationMessageKeys.ERROR_IS_INVARIANT));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnBadRequestIfExpiryDateIsBeforeStartDateInPutSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
-    notificationDto.setExpiryDate(notificationDto.getStartDate().minusDays(1));
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-        .pathParam(ID, notificationDto.getId())
-        .body(notificationDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(HttpStatus.SC_BAD_REQUEST)
-        .body(MESSAGE_KEY, is(ValidationMessageKeys.ERROR_IS_INVARIANT));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
   public void shouldCreateSystemNotificationInPutIfDoesNotExist() {
     given(userRepository.findOne(any(UUID.class))).willReturn(author);
     UUID newNotificationId = UUID.randomUUID();
