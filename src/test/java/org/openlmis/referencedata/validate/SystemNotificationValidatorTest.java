@@ -81,6 +81,9 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyCreatedDate() {
+    when(systemNotificationRepository.findOne(systemNotification.getId()))
+        .thenReturn(systemNotification);
+
     systemNotificationDto.setCreatedDate(null);
 
     validator.validate(systemNotificationDto, errors);

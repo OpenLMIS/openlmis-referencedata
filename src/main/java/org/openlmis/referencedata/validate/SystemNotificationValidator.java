@@ -71,7 +71,6 @@ public class SystemNotificationValidator implements BaseValidator {
     verifyArguments(obj, err, SystemNotificationMessageKeys.ERROR_NULL);
     rejectIfEmpty(err, MESSAGE, SystemNotificationMessageKeys.ERROR_MESSAGE_REQUIRED);
     rejectIfEmpty(err, ACTIVE, SystemNotificationMessageKeys.ERROR_ACTIVE_FLAG_REQUIRED);
-    rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
     rejectIfEmpty(err, AUTHOR, SystemNotificationMessageKeys.ERROR_AUTHOR_REQUIRED);
     if (!err.hasErrors()) {
       SystemNotificationDto notification = (SystemNotificationDto) obj;
@@ -80,6 +79,7 @@ public class SystemNotificationValidator implements BaseValidator {
       SystemNotification existingNotification = (notificationId != null)
           ? repository.findOne(notificationId) : null;
       if (existingNotification != null) {
+        rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
         rejectIfValueChanged(err, notification.getAuthor().getId(),
             existingNotification.getAuthor().getId(), AUTHOR);
         rejectIfValueChanged(err, notification.getCreatedDate(),
