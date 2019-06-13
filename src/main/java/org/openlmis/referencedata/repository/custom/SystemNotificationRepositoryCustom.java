@@ -28,7 +28,7 @@ public interface SystemNotificationRepositoryCustom {
 
     UUID getAuthorId();
 
-    Boolean getActive();
+    Boolean getIsDisplayed();
 
   }
 

@@ -257,6 +257,7 @@ public class SystemNotificationController extends BaseController {
       BindingResult bindingResult, Profiler profiler) {
     profiler.start("SYSTEM_NOTIFICATION_VALIDATION");
     systemNotificationValidator.validate(systemNotificationDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
     User author = userRepository.findOne(systemNotificationDto.getAuthorId());

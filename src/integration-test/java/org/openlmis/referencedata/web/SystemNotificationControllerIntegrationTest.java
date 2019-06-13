@@ -25,6 +25,7 @@ import static org.mockito.Matchers.eq;
 
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,12 +37,14 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.SystemNotificationDto;
 import org.openlmis.referencedata.repository.custom.SystemNotificationRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.SystemNotificationDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SystemNotificationMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.ValidationMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +55,7 @@ import org.springframework.http.MediaType;
 public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String AUTHOR_ID = "authorId";
-  private static final String ACTIVE = "active";
+  private static final String IS_DISPLAYED = "isDisplayed";
 
   private static final String RESOURCE_PATH = SystemNotificationController.RESOURCE_PATH;
   private static final String ID_URL = RESOURCE_PATH + SystemNotificationController.ID_URL;
@@ -88,7 +91,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     parameters.put("page", 0);
     parameters.put("size", 10);
     parameters.put(AUTHOR_ID, notification.getAuthor().getId());
-    parameters.put(ACTIVE, true);
+    parameters.put(IS_DISPLAYED, true);
 
     restAssured
         .given()
@@ -213,6 +216,27 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
+  public void shouldReturnBadRequestIfRequiredFieldIsMissedInPostSystemNotifications() {
+    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
+
+    notificationDto.setId(null);
+    notificationDto.setAuthor(new ObjectReferenceDto());
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .body(notificationDto)
+        .when()
+        .post(RESOURCE_PATH)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(SystemNotificationMessageKeys.ERROR_AUTHOR_REQUIRED));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnBadRequestIfRequestBodyIsInvalidInPostSystemNotifications() {
     restAssured
         .given()
@@ -278,6 +302,66 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
         .statusCode(HttpStatus.SC_OK);
 
     assertResponseBody(response, "", is(notification.getId().toString()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfUneditableFieldIsChangedInPutSystemNotification() {
+    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    notificationDto.setCreatedDate(ZonedDateTime.now().plusDays(1));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, notificationDto.getId())
+        .body(notificationDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(ValidationMessageKeys.ERROR_IS_INVARIANT));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfStartDateIsAfterExpiryDateInPutSystemNotification() {
+    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    notificationDto.setStartDate(notificationDto.getExpiryDate().plusDays(1));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, notificationDto.getId())
+        .body(notificationDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(ValidationMessageKeys.ERROR_IS_INVARIANT));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestIfExpiryDateIsBeforeStartDateInPutSystemNotification() {
+    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    notificationDto.setExpiryDate(notificationDto.getStartDate().minusDays(1));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, notificationDto.getId())
+        .body(notificationDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(ValidationMessageKeys.ERROR_IS_INVARIANT));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

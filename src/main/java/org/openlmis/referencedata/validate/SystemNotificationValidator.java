@@ -72,6 +72,7 @@ public class SystemNotificationValidator implements BaseValidator {
     rejectIfEmpty(err, MESSAGE, SystemNotificationMessageKeys.ERROR_MESSAGE_REQUIRED);
     rejectIfEmpty(err, ACTIVE, SystemNotificationMessageKeys.ERROR_ACTIVE_FLAG_REQUIRED);
     rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
+    rejectIfEmpty(err, AUTHOR, SystemNotificationMessageKeys.ERROR_AUTHOR_REQUIRED);
     if (!err.hasErrors()) {
       SystemNotificationDto notification = (SystemNotificationDto) obj;
       verifyAuthor(err, notification);

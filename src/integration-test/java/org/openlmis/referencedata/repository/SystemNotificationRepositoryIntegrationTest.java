@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.Getter;
@@ -75,16 +76,22 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
         .buildAsNew();
     repository.save(notification2);
 
-    SystemNotification notification3 = generateInstance();
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().plusDays(1))
+        .buildAsNew();
     repository.save(notification3);
+
+    SystemNotification notification4 = generateInstance();
+    repository.save(notification4);
 
     SystemNotificationRepositoryCustom.SearchParams searchParams =
         new SystemNotificationRepositoryIntegrationTest.TestSearchParams(user.getId(), true);
 
     Page<SystemNotification> search = repository.search(searchParams, pageable);
     assertThat(search.getContent())
-        .hasSize(1)
-        .contains(notification3);
+        .hasSize(2)
+        .containsExactly(notification4, notification3);
   }
 
   @Test
@@ -97,6 +104,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
 
     SystemNotification notification2 = new SystemNotificationDataBuilder()
         .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().plusDays(1))
         .asInactive()
         .buildAsNew();
     repository.save(notification2);
@@ -104,21 +112,31 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     SystemNotification notification3 = generateInstance();
     repository.save(notification3);
 
+    SystemNotification notification4 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .buildAsNew();
+    repository.save(notification4);
+
     SystemNotificationRepositoryCustom.SearchParams searchParams =
         new SystemNotificationRepositoryIntegrationTest.TestSearchParams(user.getId(), null);
 
     Page<SystemNotification> search = repository.search(searchParams, pageable);
     assertThat(search.getContent())
-        .hasSize(2)
-        .contains(notification2, notification3);
+        .hasSize(3)
+        .containsExactly(notification3, notification4, notification2);
   }
 
   @Test
-  public void shouldReturnSystemNotificationsByActiveFlag() {
+  public void shouldReturnInactiveOrExpiredSystemNotifications() {
     User secondUser = new UserDataBuilder().buildAsNew();
     userRepository.save(secondUser);
 
-    SystemNotification notification1 = generateInstance(secondUser);
+    SystemNotification notification1 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .withExpiryDate(null)
+        .buildAsNew();
     repository.save(notification1);
 
     SystemNotification notification2 = new SystemNotificationDataBuilder()
@@ -127,16 +145,22 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
         .buildAsNew();
     repository.save(notification2);
 
-    SystemNotification notification3 = generateInstance();
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().minusDays(1))
+        .buildAsNew();
     repository.save(notification3);
+
+    SystemNotification notification4 = generateInstance();
+    repository.save(notification4);
 
     SystemNotificationRepositoryCustom.SearchParams searchParams =
         new SystemNotificationRepositoryIntegrationTest.TestSearchParams(null, false);
 
     Page<SystemNotification> search = repository.search(searchParams, pageable);
     assertThat(search.getContent())
-        .hasSize(1)
-        .contains(notification2);
+        .hasSize(3)
+        .contains(notification1, notification3, notification2);
   }
 
   @Test
@@ -170,19 +194,19 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
       implements SystemNotificationRepositoryCustom.SearchParams {
 
     private UUID authorId;
-    private Boolean active;
+    private Boolean isDisplayed;
 
     TestSearchParams() {
       this(null, true);
     }
 
-    TestSearchParams(UUID authorId, Boolean active) {
+    TestSearchParams(UUID authorId, Boolean isDisplayed) {
       this.authorId = Optional
           .ofNullable(authorId)
           .orElse(null);
 
-      this.active = Optional
-          .ofNullable(active)
+      this.isDisplayed = Optional
+          .ofNullable(isDisplayed)
           .orElse(null);
     }
   }

@@ -3408,7 +3408,7 @@ resourceTypes:
               Get a page of system notifications based on passed parameters. Please have in mind that
               only system notifications that match all parameters will be returned.
           queryParameters:
-              active:
+              isDisplayed:
                   description: >
                       This field presents if an system notification is active or not. It will be used
                       to find active/inactive system notifications.

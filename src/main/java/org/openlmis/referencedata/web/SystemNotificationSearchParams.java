@@ -33,9 +33,9 @@ public final class SystemNotificationSearchParams implements
     SystemNotificationRepositoryCustom.SearchParams {
 
   private static final String AUTHOR_ID = "authorId";
-  private static final String ACTIVE = "active";
+  private static final String IS_DISPLAYED = "isDisplayed";
 
-  private static final List<String> ALL_PARAMETERS = asList(AUTHOR_ID, ACTIVE);
+  private static final List<String> ALL_PARAMETERS = asList(AUTHOR_ID, IS_DISPLAYED);
 
   private SearchParams queryParams;
 
@@ -64,11 +64,11 @@ public final class SystemNotificationSearchParams implements
    *
    * @return Boolean value of active flag or null if params doesn't contain "active" key.
    */
-  public Boolean getActive() {
-    if (!queryParams.containsKey(ACTIVE)) {
+  public Boolean getIsDisplayed() {
+    if (!queryParams.containsKey(IS_DISPLAYED)) {
       return null;
     }
-    return queryParams.getBoolean(ACTIVE);
+    return queryParams.getBoolean(IS_DISPLAYED);
   }
 
   /**

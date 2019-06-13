@@ -26,7 +26,7 @@ import org.springframework.util.LinkedMultiValueMap;
 
 public class SystemNotificationSearchParamsTest {
 
-  private static final String ACTIVE = "active";
+  private static final String IS_DISPLAYED = "isDisplayed";
   private static final String AUTHOR_ID = "authorId";
 
   private LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
@@ -46,23 +46,23 @@ public class SystemNotificationSearchParamsTest {
 
     ToStringTestUtils
         .verify(SystemNotificationSearchParams.class, params,
-            "ACTIVE", "AUTHOR_ID", "ALL_PARAMETERS");
+            "IS_DISPLAYED", "AUTHOR_ID", "ALL_PARAMETERS");
   }
 
   @Test
   public void shouldReturnTrueIfActiveFlagValueIsTrue() {
-    queryMap.add(ACTIVE, true);
+    queryMap.add(IS_DISPLAYED, true);
     SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
 
-    assertThat(params.getActive()).isTrue();
+    assertThat(params.getIsDisplayed()).isTrue();
   }
 
   @Test
   public void shouldReturnFalseIfActiveFlagValueIsFalse() {
-    queryMap.add(ACTIVE, false);
+    queryMap.add(IS_DISPLAYED, false);
     SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
 
-    assertThat(params.getActive()).isFalse();
+    assertThat(params.getIsDisplayed()).isFalse();
   }
 
   @Test
@@ -70,7 +70,7 @@ public class SystemNotificationSearchParamsTest {
     queryMap.clear();
     SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
 
-    assertThat(params.getActive()).isNull();
+    assertThat(params.getIsDisplayed()).isNull();
   }
 
   @Test

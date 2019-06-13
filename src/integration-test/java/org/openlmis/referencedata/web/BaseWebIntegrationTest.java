@@ -107,7 +107,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
-import org.openlmis.referencedata.validate.SystemNotificationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.embedded.LocalServerPort;
@@ -324,9 +323,6 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected SystemNotificationRepository systemNotificationRepository;
-
-  @MockBean
-  protected SystemNotificationValidator systemNotificationValidator;
 
   /**
    * Constructor for test.

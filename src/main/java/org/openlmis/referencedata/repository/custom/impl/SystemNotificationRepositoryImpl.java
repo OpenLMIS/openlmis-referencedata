@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import com.google.common.base.Preconditions;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,6 +39,7 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
   private static final String ID = "id";
   private static final String AUTHOR = "author";
   private static final String ACTIVE = "active";
+  private static final String EXPIRY_DATE = "expiryDate";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -89,14 +92,35 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
 
     Predicate where = builder.conjunction();
     UUID authorId = params.getAuthorId();
-    Boolean active = params.getActive();
+    Boolean isDisplayed = params.getIsDisplayed();
+    Path<ZonedDateTime> expiryDate = root.get(EXPIRY_DATE);
+    Path<Boolean> active = root.get(ACTIVE);
 
     if (authorId != null) {
       where = builder.and(where, builder.equal(root.get(AUTHOR).get(ID), authorId));
     }
 
-    if (active != null) {
-      where = builder.and(where, builder.equal(root.get(ACTIVE), active));
+    if (isDisplayed != null) {
+      if (expiryDate == null) {
+        where = builder.and(where, builder.equal(active, isDisplayed));
+      }
+
+      if (expiryDate != null && !isDisplayed) {
+        Predicate orClause = builder.or(builder.lessThan(expiryDate, ZonedDateTime.now()),
+            builder.equal(active, false));
+        where = builder.and(where, orClause);
+      }
+
+      if (expiryDate != null && isDisplayed) {
+        where = builder.and(where, builder.greaterThanOrEqualTo(expiryDate,
+            ZonedDateTime.now()), builder.equal(active, true));
+      }
+    }
+
+    if (!count) {
+      newQuery.orderBy(
+          builder.desc(active),
+          builder.desc(expiryDate));
     }
 
     newQuery.where(where);

@@ -56,4 +56,9 @@ public class SystemNotificationDataBuilder {
     this.active = false;
     return this;
   }
+
+  public SystemNotificationDataBuilder withExpiryDate(ZonedDateTime expiryDate) {
+    this.expiryDate = expiryDate;
+    return this;
+  }
 }
