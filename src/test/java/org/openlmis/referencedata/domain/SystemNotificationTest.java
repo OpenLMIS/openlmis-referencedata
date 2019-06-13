@@ -18,7 +18,6 @@ package org.openlmis.referencedata.domain;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
-import org.openlmis.referencedata.testbuilder.SystemNotificationDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 
 public class SystemNotificationTest {
@@ -28,9 +27,6 @@ public class SystemNotificationTest {
     EqualsVerifier
         .forClass(SystemNotification.class)
         .withRedefinedSuperclass()
-        .withPrefabValues(SystemNotification.class,
-            new SystemNotificationDataBuilder().build(),
-            new SystemNotificationDataBuilder().build())
         .withPrefabValues(User.class,
             new UserDataBuilder().build(),
             new UserDataBuilder().build())
