@@ -89,7 +89,7 @@ public class SystemNotificationValidator implements BaseValidator {
       ZonedDateTime startDate = notification.getStartDate();
       ZonedDateTime expiryDate = notification.getExpiryDate();
 
-      if (expiryDate.isBefore(startDate)) {
+      if (expiryDate != null && startDate != null && expiryDate.isBefore(startDate)) {
         rejectValue(err, START_DATE,
             SystemNotificationMessageKeys.ERROR_START_DATE_AFTER_EXPIRY_DATE);
         rejectValue(err, EXPIRY_DATE,
