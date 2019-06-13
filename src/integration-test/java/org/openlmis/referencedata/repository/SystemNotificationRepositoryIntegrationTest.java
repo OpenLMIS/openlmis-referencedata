@@ -135,7 +135,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     SystemNotification notification1 = new SystemNotificationDataBuilder()
         .withAuthor(user)
         .asInactive()
-        .withExpiryDate(null)
+        .withoutExpiryDate()
         .buildAsNew();
     repository.save(notification1);
 

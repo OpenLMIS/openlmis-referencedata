@@ -61,4 +61,9 @@ public class SystemNotificationDataBuilder {
     this.expiryDate = expiryDate;
     return this;
   }
+
+  public SystemNotificationDataBuilder withoutExpiryDate() {
+    this.expiryDate = null;
+    return this;
+  }
 }

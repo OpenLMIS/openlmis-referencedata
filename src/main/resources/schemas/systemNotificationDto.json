@@ -35,6 +35,10 @@
     "author": {
       "type": "object",
       "$ref": "referenceObjectDto.json"
+    },
+    "isDisplayed": {
+      "type": "boolean",
+      "title": "isDisplayed"
     }
   },
   "required": [

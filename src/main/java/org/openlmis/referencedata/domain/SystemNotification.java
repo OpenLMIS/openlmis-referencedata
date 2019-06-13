@@ -94,6 +94,11 @@ public class SystemNotification extends BaseEntity {
     if (author != null) {
       exporter.setAuthor(author);
     }
+    if (expiryDate != null) {
+      exporter.setIsDisplayed(active && expiryDate.isAfter(ZonedDateTime.now()));
+    } else {
+      exporter.setIsDisplayed(active);
+    }
   }
 
   public interface Exporter extends BaseExporter {
@@ -111,6 +116,8 @@ public class SystemNotification extends BaseEntity {
     void setAuthor(User author);
 
     void setActive(boolean active);
+
+    void setIsDisplayed(boolean isDisplayed);
   }
 
   public interface Importer extends BaseImporter {
@@ -128,6 +135,8 @@ public class SystemNotification extends BaseEntity {
     UUID getAuthorId();
 
     boolean isActive();
+
+    boolean isDisplayed();
   }
 
   @PrePersist
