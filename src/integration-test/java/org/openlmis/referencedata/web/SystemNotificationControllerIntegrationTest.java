@@ -108,7 +108,15 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
-  public void shouldGetAllSystemNotifications() {
+  public void shouldGetAllSystemNotificationsWithoutCheckingRights() {
+    mockUserHasNoRight(RightName.SYSTEM_NOTIFICATIONS_MANAGE);
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("page", 0);
+    parameters.put("size", 10);
+    parameters.put(AUTHOR_ID, notification.getAuthor().getId());
+    parameters.put(IS_DISPLAYED, true);
+
     given(systemNotificationRepository.search(
         any(SystemNotificationRepositoryCustom.SearchParams.class), eq(pageable)))
         .willReturn(Pagination.getPage(Arrays.asList(notification, notification2)));
@@ -116,8 +124,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam(PAGE, pageable.getPageNumber())
-        .queryParam(SIZE, pageable.getPageSize())
+        .params(parameters)
         .when()
         .get(RESOURCE_PATH)
         .then()
@@ -289,6 +296,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldUpdateSystemNotification() {
     given(userRepository.findOne(any(UUID.class))).willReturn(author);
+    notificationDto.setStartDate(ZonedDateTime.now().plusDays(1));
 
     ValidatableResponse response = restAssured
         .given()

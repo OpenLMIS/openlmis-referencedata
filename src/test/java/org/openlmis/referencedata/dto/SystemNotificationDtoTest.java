@@ -64,6 +64,16 @@ public class SystemNotificationDtoTest {
   }
 
   @Test
+  public void shouldSetIsDisplayedFlagAsFalseIfSystemNotificationDoesNotStartYet() {
+    SystemNotification systemNotification = new SystemNotificationDataBuilder()
+        .withStartDate(ZonedDateTime.now().plusDays(1))
+        .build();
+    SystemNotificationDto dto = new SystemNotificationDto();
+    systemNotification.export(dto);
+    assertFalse(dto.isDisplayed());
+  }
+
+  @Test
   public void shouldSetIsDisplayedFlagAsTrueIfSystemNotificationIsActiveAndNonExpired() {
     SystemNotification systemNotification = new SystemNotificationDataBuilder()
         .build();
@@ -76,6 +86,16 @@ public class SystemNotificationDtoTest {
   public void shouldSetIsDisplayedFlagAsTrueIfSystemNotificationIsActiveAndExpiryDateIsNull() {
     SystemNotification systemNotification = new SystemNotificationDataBuilder()
         .withoutExpiryDate()
+        .build();
+    SystemNotificationDto dto = new SystemNotificationDto();
+    systemNotification.export(dto);
+    assertTrue(dto.isDisplayed());
+  }
+
+  @Test
+  public void shouldSetIsDisplayedFlagAsTrueIfSystemNotificationIsActiveAndStartDateIsNull() {
+    SystemNotification systemNotification = new SystemNotificationDataBuilder()
+        .withoutStartDate()
         .build();
     SystemNotificationDto dto = new SystemNotificationDto();
     systemNotification.export(dto);
