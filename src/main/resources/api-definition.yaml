@@ -1655,6 +1655,33 @@ resourceTypes:
                 401:
                     body:
                       application/json:
+      /supplying:
+          get:
+              is: [ secured ]
+              description: WARNING! Deprecated. Returns a list of facilities.
+              queryParameters:
+                  programId:
+                      displayName: programId
+                      type: string
+                      required: true
+                      repeat: false
+                  supervisoryNodeId:
+                      displayName: supervisoryNodeId
+                      type: string
+                      required: true
+                      repeat: false
+              responses:
+                200:
+                    body:
+                      application/json:
+                400:
+                    body:
+                      application/json:
+                        schema: errorResponse
+                401:
+                    body:
+                      application/json:
+
       /search:
           post:
               is: [ secured, paginated ]

@@ -1,9 +1,6 @@
 13.0.1 / WIP
 ==================
 
-Breaking changes:
-* [OLMIS-5008](https://openlmis.atlassian.net/browse/OLMIS-5008): Removed `GET /api/facilities/supplying` endpoint
-
 New functionality added in a backwards-compatible manner:
 * [OLMIS-6322](https://openlmis.atlassian.net/browse/OLMIS-6322): Added new ADMINISTRATIVE_MESSAGES_MANAGE right. Assigned to System Administrator role by default.
 * [OLMIS-6347](https://openlmis.atlassian.net/browse/OLMIS-6347): Added CRUD for administrative messages and renamed ADMINISTRATIVE_MESSAGES_MANAGE right to SYSTEM_NOTIFICATIONS_MANAGE.

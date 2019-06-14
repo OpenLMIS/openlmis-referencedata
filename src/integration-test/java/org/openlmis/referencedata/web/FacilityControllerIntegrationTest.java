@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -34,6 +35,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -62,6 +65,7 @@ import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBu
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -80,9 +84,11 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   public static final String SIZE = "size";
   private static final String PROGRAM_ID = "programId";
+  private static final String SUPERVISORY_NODE_ID = "supervisoryNodeId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String MINIMAL_URL = RESOURCE_URL + "/minimal";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SUPPLYING_URL = RESOURCE_URL + "/supplying";
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
   private static final String NAME_KEY = "name";
@@ -94,6 +100,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID programId;
   private UUID orderableId1;
   private UUID orderableId2;
+  private UUID supervisoryNodeId;
   private Program program;
   private GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
   private FacilityType facilityType = new FacilityTypeDataBuilder().build();
@@ -140,6 +147,104 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityTypeRepository.findOne(facilityType.getId())).willReturn(facilityType);
     given(facilityRepository.findOne(facility.getId())).willReturn(facility);
     given(facilityRepository.findOne(facility1.getId())).willReturn(facility1);
+  }
+
+  @Test
+  public void shouldReturnSupplyingDepots() {
+
+    int searchedFacilitiesAmt = 3;
+
+    SupervisoryNode searchedSupervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
+
+    List<SupplyLine> searchedSupplyLines =
+        generateSupplyLines(searchedFacilitiesAmt, searchedSupervisoryNode);
+    List<Facility> facilities = searchedSupplyLines
+        .stream()
+        .map(SupplyLine::getSupplyingFacility)
+        .distinct()
+        .collect(Collectors.toList());
+
+    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.exists(searchedSupervisoryNode.getId()))
+        .willReturn(true);
+    given(supplyLineRepository.findSupplyingFacilities(programId, searchedSupervisoryNode.getId()))
+        .willReturn(facilities);
+
+    FacilityDto[] response = restAssured.given()
+        .queryParam(PROGRAM_ID, programId)
+        .queryParam(SUPERVISORY_NODE_ID, searchedSupervisoryNode.getId())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(FacilityDto[].class);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
+    assertThat(response.length, is(facilities.size()));
+
+    Facility[] responseFacilities = Arrays
+        .stream(response)
+        .map(Facility::newFacility)
+        .toArray(Facility[]::new);
+
+    assertThat(facilities, hasItems(responseFacilities));
+  }
+
+  @Test
+  public void getSupplyingDepotsShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, UUID.randomUUID())
+        .queryParam(SUPERVISORY_NODE_ID, UUID.randomUUID())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingSupervisorNode() {
+    supervisoryNodeId = UUID.randomUUID();
+
+    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, programId)
+        .queryParam(SUPERVISORY_NODE_ID, supervisoryNodeId)
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnBadRequestWhenSearchingForSupplyingDepotsWithNotExistingProgram() {
+    SupervisoryNode searchedSupervisoryNode = new SupervisoryNodeDataBuilder()
+        .withFacility(facility)
+        .build();
+
+    given(programRepository.exists(programId)).willReturn(false);
+
+    restAssured.given()
+        .queryParam(PROGRAM_ID, programId)
+        .queryParam(SUPERVISORY_NODE_ID, searchedSupervisoryNode.getId())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .when()
+        .get(SUPPLYING_URL)
+        .then()
+        .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
