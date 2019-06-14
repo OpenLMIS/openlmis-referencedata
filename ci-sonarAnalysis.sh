@@ -3,8 +3,8 @@
 set +x
 
 cleanup() {
-    rm -vf .env
     docker-compose -f docker-compose.builder.yml down --volumes
+    rm -vf .env
 }
 trap cleanup EXIT
 
