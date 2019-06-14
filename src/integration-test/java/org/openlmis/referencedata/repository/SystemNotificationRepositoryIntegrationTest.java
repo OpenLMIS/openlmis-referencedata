@@ -136,7 +136,6 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
         .withAuthor(user)
         .asInactive()
         .withoutExpiryDate()
-        .withoutStartDate()
         .buildAsNew();
     repository.save(notification1);
 
@@ -155,19 +154,13 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     SystemNotification notification4 = generateInstance();
     repository.save(notification4);
 
-    SystemNotification notification5 = new SystemNotificationDataBuilder()
-        .withAuthor(user)
-        .withStartDate(ZonedDateTime.now().plusDays(1))
-        .buildAsNew();
-    repository.save(notification5);
-
     SystemNotificationRepositoryCustom.SearchParams searchParams =
         new SystemNotificationRepositoryIntegrationTest.TestSearchParams(null, false);
 
     Page<SystemNotification> search = repository.search(searchParams, pageable);
     assertThat(search.getContent())
-        .hasSize(4)
-        .containsExactly(notification5, notification3, notification1, notification2);
+        .hasSize(3)
+        .contains(notification1, notification3, notification2);
   }
 
   @Test
@@ -175,10 +168,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     User secondUser = new UserDataBuilder().buildAsNew();
     userRepository.save(secondUser);
 
-    SystemNotification notification1 = new SystemNotificationDataBuilder()
-        .withAuthor(user)
-        .withoutExpiryDate()
-        .buildAsNew();
+    SystemNotification notification1 = generateInstance(secondUser);
     repository.save(notification1);
 
     SystemNotification notification2 = new SystemNotificationDataBuilder()
@@ -196,7 +186,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     Page<SystemNotification> search = repository.search(searchParams, pageable);
     assertThat(search.getContent())
         .hasSize(3)
-        .containsExactly(notification1, notification3, notification2);
+        .contains(notification1, notification2, notification3);
   }
 
   @Getter

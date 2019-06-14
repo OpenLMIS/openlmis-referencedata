@@ -26,7 +26,7 @@ public class SystemNotificationDataBuilder {
   private UUID id = UUID.randomUUID();
   private String title = RandomStringUtils.randomAlphanumeric(5);
   private String message = "This is the OpenLMIS system notification.";
-  private ZonedDateTime startDate = ZonedDateTime.now().minusDays(10);
+  private ZonedDateTime startDate = ZonedDateTime.now().plusDays(3);
   private ZonedDateTime expiryDate = ZonedDateTime.now().plusDays(10);
   private ZonedDateTime createdDate = ZonedDateTime.now();
   private User author = new UserDataBuilder().buildAsNew();
@@ -64,16 +64,6 @@ public class SystemNotificationDataBuilder {
 
   public SystemNotificationDataBuilder withoutExpiryDate() {
     this.expiryDate = null;
-    return this;
-  }
-
-  public SystemNotificationDataBuilder withStartDate(ZonedDateTime startDate) {
-    this.startDate = startDate;
-    return this;
-  }
-
-  public SystemNotificationDataBuilder withoutStartDate() {
-    this.startDate = null;
     return this;
   }
 }

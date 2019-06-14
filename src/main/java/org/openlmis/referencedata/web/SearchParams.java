@@ -118,7 +118,7 @@ public final class SearchParams {
    * @return parsed local date
    */
   public Boolean getBoolean(String key) {
-    return Boolean.valueOf(params.getFirst(key).toString());
+    return (Boolean) params.getFirst(key);
   }
 
   /**

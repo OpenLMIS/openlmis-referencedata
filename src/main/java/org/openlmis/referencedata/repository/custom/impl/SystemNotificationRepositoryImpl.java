@@ -40,14 +40,12 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
   private static final String AUTHOR = "author";
   private static final String ACTIVE = "active";
   private static final String EXPIRY_DATE = "expiryDate";
-  private static final String START_DATE = "startDate";
-  private static final ZonedDateTime NOW = ZonedDateTime.now();
 
   @PersistenceContext
   private EntityManager entityManager;
 
   /**
-   * This method is supposed to retrieve all system notifications with matched parameters.
+   * This method is supposed to retrieve all supply partners with matched parameters.
    */
   public Page<SystemNotification> search(
       SystemNotificationRepositoryCustom.SearchParams params, Pageable pageable) {
@@ -96,7 +94,6 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     UUID authorId = params.getAuthorId();
     Boolean isDisplayed = params.getIsDisplayed();
     Path<ZonedDateTime> expiryDate = root.get(EXPIRY_DATE);
-    Path<ZonedDateTime> startDate = root.get(START_DATE);
     Path<Boolean> active = root.get(ACTIVE);
 
     if (authorId != null) {
@@ -104,8 +101,20 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     }
 
     if (isDisplayed != null) {
-      where = builder.and(where,
-          preparePredicate(isDisplayed, startDate, expiryDate, builder, active));
+      if (expiryDate == null) {
+        where = builder.and(where, builder.equal(active, isDisplayed));
+      }
+
+      if (expiryDate != null && !isDisplayed) {
+        Predicate orClause = builder.or(builder.lessThan(expiryDate, ZonedDateTime.now()),
+            builder.equal(active, false));
+        where = builder.and(where, orClause);
+      }
+
+      if (expiryDate != null && isDisplayed) {
+        where = builder.and(where, builder.greaterThanOrEqualTo(expiryDate,
+            ZonedDateTime.now()), builder.equal(active, true));
+      }
     }
 
     if (!count) {
@@ -117,47 +126,6 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     newQuery.where(where);
 
     return newQuery;
-  }
-
-  private Predicate preparePredicate(Boolean isDisplayed, Path<ZonedDateTime> startDate,
-      Path<ZonedDateTime> expiryDate, CriteriaBuilder builder, Path<Boolean> active) {
-    if (isDisplayed) {
-      return prepareDisplayed(startDate, expiryDate, builder, active);
-    } else {
-      return prepareNotDisplayed(startDate, expiryDate, builder, active);
-    }
-  }
-
-  private Predicate prepareDisplayed(Path<ZonedDateTime> startDate, Path<ZonedDateTime> expiryDate,
-      CriteriaBuilder builder, Path<Boolean> active) {
-    Predicate datesPredicate;
-    if (expiryDate == null && startDate == null) {
-      return builder.isTrue(active);
-    } else if (expiryDate != null && startDate == null) {
-      datesPredicate = builder.greaterThanOrEqualTo(expiryDate, NOW);
-    } else if (expiryDate == null) {
-      datesPredicate = builder.lessThanOrEqualTo(startDate, NOW);
-    } else {
-      datesPredicate = builder.and(builder.greaterThanOrEqualTo(expiryDate, NOW),
-          builder.lessThanOrEqualTo(startDate, NOW));
-    }
-    return builder.and(datesPredicate, builder.isTrue(active));
-  }
-
-  private Predicate prepareNotDisplayed(Path<ZonedDateTime> startDate,
-      Path<ZonedDateTime> expiryDate, CriteriaBuilder builder, Path<Boolean> active) {
-    Predicate datesPredicate;
-    if (expiryDate == null && startDate == null) {
-      return builder.isFalse(active);
-    } else if (expiryDate != null && startDate == null) {
-      datesPredicate = builder.lessThan(expiryDate, NOW);
-    } else if (expiryDate == null) {
-      datesPredicate = builder.greaterThan(startDate, NOW);
-    } else {
-      datesPredicate = builder.or(builder.lessThan(expiryDate, NOW),
-          builder.greaterThan(startDate, NOW));
-    }
-    return builder.or(datesPredicate, builder.isFalse(active));
   }
 
 }

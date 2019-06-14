@@ -81,9 +81,9 @@ public class SystemNotificationValidator implements BaseValidator {
       if (existingNotification != null) {
         rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
         rejectIfValueChanged(err, notification.getAuthor().getId(),
-            existingNotification.getAuthor().getId());
-        rejectIfDateChanged(err, notification.getCreatedDate(),
-            existingNotification.getCreatedDate());
+            existingNotification.getAuthor().getId(), AUTHOR);
+        rejectIfValueChanged(err, notification.getCreatedDate(),
+            existingNotification.getCreatedDate(), CREATED_DATE);
       }
 
       ZonedDateTime startDate = notification.getStartDate();
@@ -104,15 +104,9 @@ public class SystemNotificationValidator implements BaseValidator {
     }
   }
 
-  private void rejectIfValueChanged(Errors errors, Object value, Object savedValue) {
+  private void rejectIfValueChanged(Errors errors, Object value, Object savedValue, String field) {
     if (value != null && savedValue != null && !savedValue.equals(value)) {
-      rejectValue(errors, AUTHOR, ValidationMessageKeys.ERROR_IS_INVARIANT, AUTHOR);
-    }
-  }
-
-  private void rejectIfDateChanged(Errors errors, ZonedDateTime value, ZonedDateTime savedValue) {
-    if (value != null && savedValue != null && !savedValue.isEqual(value)) {
-      rejectValue(errors, CREATED_DATE, ValidationMessageKeys.ERROR_IS_INVARIANT, CREATED_DATE);
+      rejectValue(errors, field, ValidationMessageKeys.ERROR_IS_INVARIANT, field);
     }
   }
 

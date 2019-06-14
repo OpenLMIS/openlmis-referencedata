@@ -60,9 +60,9 @@ public final class SystemNotificationSearchParams implements
   }
 
   /**
-   * Gets {@link Boolean} for isDisplayed key from params.
+   * Gets {@link Boolean} for active key from params.
    *
-   * @return Boolean value of isDisplayed flag or null if params doesn't contain "isDisplayed" key.
+   * @return Boolean value of active flag or null if params doesn't contain "active" key.
    */
   public Boolean getIsDisplayed() {
     if (!queryParams.containsKey(IS_DISPLAYED)) {

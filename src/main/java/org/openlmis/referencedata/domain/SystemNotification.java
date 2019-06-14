@@ -94,12 +94,7 @@ public class SystemNotification extends BaseEntity {
     if (author != null) {
       exporter.setAuthor(author);
     }
-    if (expiryDate != null && startDate != null) {
-      exporter.setIsDisplayed(active && expiryDate.isAfter(ZonedDateTime.now())
-          && startDate.isBefore(ZonedDateTime.now()));
-    } else if (startDate != null) {
-      exporter.setIsDisplayed(active && startDate.isBefore(ZonedDateTime.now()));
-    } else if (expiryDate != null) {
+    if (expiryDate != null) {
       exporter.setIsDisplayed(active && expiryDate.isAfter(ZonedDateTime.now()));
     } else {
       exporter.setIsDisplayed(active);

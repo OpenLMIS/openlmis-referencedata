@@ -3412,7 +3412,7 @@ resourceTypes:
                   description: >
                       This field presents if an system notification is active or not. It will be used
                       to find active/inactive system notifications.
-                  type: boolean
+                  type: string
                   required: false
                   repeat: false
               authorId:
