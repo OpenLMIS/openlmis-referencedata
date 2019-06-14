@@ -7,6 +7,8 @@ services:
       - db
       - log
     env_file: .env
+    environment:
+      JAVA_OPTS: '-server -Xmx1024m -Dlogging.config=/config/log/logback.xml'
 
   db:
     image: openlmis/postgres:9.6-postgis
