@@ -91,8 +91,6 @@ public class SystemNotificationController extends BaseController {
     Profiler profiler = new Profiler("GET_SYSTEM_NOTIFICATIONS");
     profiler.setLogger(XLOGGER);
 
-    checkAdminRight(RightName.SYSTEM_NOTIFICATIONS_MANAGE, profiler);
-
     profiler.start("FIND_SYSTEM_NOTIFICATIONS");
     SystemNotificationSearchParams searchParams =
         new SystemNotificationSearchParams(requestParams);
