@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import com.google.common.base.Preconditions;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +23,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,9 +37,8 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
   private static final String ID = "id";
   private static final String AUTHOR = "author";
   private static final String ACTIVE = "active";
+  private static final String DISPLAYED = "displayed";
   private static final String EXPIRY_DATE = "expiryDate";
-  private static final String START_DATE = "startDate";
-  private static final ZonedDateTime NOW = ZonedDateTime.now();
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -95,69 +92,24 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     Predicate where = builder.conjunction();
     UUID authorId = params.getAuthorId();
     Boolean isDisplayed = params.getIsDisplayed();
-    Path<ZonedDateTime> expiryDate = root.get(EXPIRY_DATE);
-    Path<ZonedDateTime> startDate = root.get(START_DATE);
-    Path<Boolean> active = root.get(ACTIVE);
 
     if (authorId != null) {
       where = builder.and(where, builder.equal(root.get(AUTHOR).get(ID), authorId));
     }
 
     if (isDisplayed != null) {
-      where = builder.and(where,
-          preparePredicate(isDisplayed, startDate, expiryDate, builder, active));
+      where = builder.and(where, builder.equal(root.get(DISPLAYED), isDisplayed));
     }
 
     if (!count) {
       newQuery.orderBy(
-          builder.desc(active),
-          builder.desc(expiryDate));
+          builder.desc(root.get(ACTIVE)),
+          builder.desc(root.get(EXPIRY_DATE)));
     }
 
     newQuery.where(where);
 
     return newQuery;
-  }
-
-  private Predicate preparePredicate(Boolean isDisplayed, Path<ZonedDateTime> startDate,
-      Path<ZonedDateTime> expiryDate, CriteriaBuilder builder, Path<Boolean> active) {
-    if (isDisplayed) {
-      return prepareDisplayed(startDate, expiryDate, builder, active);
-    } else {
-      return prepareNotDisplayed(startDate, expiryDate, builder, active);
-    }
-  }
-
-  private Predicate prepareDisplayed(Path<ZonedDateTime> startDate, Path<ZonedDateTime> expiryDate,
-      CriteriaBuilder builder, Path<Boolean> active) {
-    Predicate datesPredicate;
-    if (expiryDate == null && startDate == null) {
-      return builder.isTrue(active);
-    } else if (expiryDate != null && startDate == null) {
-      datesPredicate = builder.greaterThanOrEqualTo(expiryDate, NOW);
-    } else if (expiryDate == null) {
-      datesPredicate = builder.lessThanOrEqualTo(startDate, NOW);
-    } else {
-      datesPredicate = builder.and(builder.greaterThanOrEqualTo(expiryDate, NOW),
-          builder.lessThanOrEqualTo(startDate, NOW));
-    }
-    return builder.and(datesPredicate, builder.isTrue(active));
-  }
-
-  private Predicate prepareNotDisplayed(Path<ZonedDateTime> startDate,
-      Path<ZonedDateTime> expiryDate, CriteriaBuilder builder, Path<Boolean> active) {
-    Predicate datesPredicate;
-    if (expiryDate == null && startDate == null) {
-      return builder.isFalse(active);
-    } else if (expiryDate != null && startDate == null) {
-      datesPredicate = builder.lessThan(expiryDate, NOW);
-    } else if (expiryDate == null) {
-      datesPredicate = builder.greaterThan(startDate, NOW);
-    } else {
-      datesPredicate = builder.or(builder.lessThan(expiryDate, NOW),
-          builder.greaterThan(startDate, NOW));
-    }
-    return builder.or(datesPredicate, builder.isFalse(active));
   }
 
 }

@@ -128,6 +128,53 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
   }
 
   @Test
+  public void shouldReturnActiveAndNonExpiredSystemNotifications() {
+    User secondUser = new UserDataBuilder().buildAsNew();
+    userRepository.save(secondUser);
+
+    SystemNotification notification1 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withoutExpiryDate()
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification1);
+
+    SystemNotification notification2 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .buildAsNew();
+    repository.save(notification2);
+
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().plusYears(1))
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification3);
+
+    SystemNotification notification4 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withoutExpiryDate()
+        .withStartDate(ZonedDateTime.now().minusYears(1))
+        .buildAsNew();
+    repository.save(notification4);
+
+    SystemNotification notification5 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withStartDate(ZonedDateTime.now().minusYears(1))
+        .buildAsNew();
+    repository.save(notification5);
+
+    SystemNotificationRepositoryCustom.SearchParams searchParams =
+        new SystemNotificationRepositoryIntegrationTest.TestSearchParams(null, true);
+
+    Page<SystemNotification> search = repository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(4)
+        .containsExactly(notification1, notification4, notification3, notification5);
+  }
+
+  @Test
   public void shouldReturnInactiveOrExpiredSystemNotifications() {
     User secondUser = new UserDataBuilder().buildAsNew();
     userRepository.save(secondUser);
@@ -149,6 +196,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     SystemNotification notification3 = new SystemNotificationDataBuilder()
         .withAuthor(user)
         .withExpiryDate(ZonedDateTime.now().minusDays(1))
+        .withoutStartDate()
         .buildAsNew();
     repository.save(notification3);
 
@@ -158,6 +206,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     SystemNotification notification5 = new SystemNotificationDataBuilder()
         .withAuthor(user)
         .withStartDate(ZonedDateTime.now().plusDays(1))
+        .withoutExpiryDate()
         .buildAsNew();
     repository.save(notification5);
 

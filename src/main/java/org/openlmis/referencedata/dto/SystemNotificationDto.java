@@ -69,7 +69,8 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
   private ObjectReferenceDto author;
 
   @Getter
-  private boolean isDisplayed;
+  @Setter
+  private boolean displayed;
 
   @Override
   @JsonIgnore
@@ -90,11 +91,6 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
   public void setAuthor(User author) {
     this.author = new ObjectReferenceDto(serviceUrl,
         BaseController.API_PATH + "/users", author.getId());
-  }
-
-  @JsonSetter("isDisplayed")
-  public void setIsDisplayed(boolean isDisplayed) {
-    this.isDisplayed = isDisplayed;
   }
 
   /**

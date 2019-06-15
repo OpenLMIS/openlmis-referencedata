@@ -22,6 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -57,6 +58,8 @@ public class SystemNotification extends BaseEntity {
   @JoinColumn(name = "authorid", nullable = false)
   private User author;
 
+  private boolean displayed;
+
   /**
    * Creates new system notification object based on data from {@link Importer}
    * and author argument.
@@ -75,6 +78,7 @@ public class SystemNotification extends BaseEntity {
     systemNotification.setCreatedDate(importer.getCreatedDate());
     systemNotification.setActive(importer.isActive());
     systemNotification.setAuthor(author);
+    systemNotification.setDisplayed(importer.isDisplayed());
     return systemNotification;
   }
 
@@ -91,18 +95,9 @@ public class SystemNotification extends BaseEntity {
     exporter.setExpiryDate(expiryDate);
     exporter.setCreatedDate(createdDate);
     exporter.setActive(active);
+    exporter.setDisplayed(displayed);
     if (author != null) {
       exporter.setAuthor(author);
-    }
-    if (expiryDate != null && startDate != null) {
-      exporter.setIsDisplayed(active && expiryDate.isAfter(ZonedDateTime.now())
-          && startDate.isBefore(ZonedDateTime.now()));
-    } else if (startDate != null) {
-      exporter.setIsDisplayed(active && startDate.isBefore(ZonedDateTime.now()));
-    } else if (expiryDate != null) {
-      exporter.setIsDisplayed(active && expiryDate.isAfter(ZonedDateTime.now()));
-    } else {
-      exporter.setIsDisplayed(active);
     }
   }
 
@@ -122,7 +117,7 @@ public class SystemNotification extends BaseEntity {
 
     void setActive(boolean active);
 
-    void setIsDisplayed(boolean isDisplayed);
+    void setDisplayed(boolean displayed);
   }
 
   public interface Importer extends BaseImporter {
@@ -147,6 +142,25 @@ public class SystemNotification extends BaseEntity {
   @PrePersist
   private void prePersist() {
     this.createdDate = ZonedDateTime.now();
+    setDisplayed();
+  }
+
+  @PreUpdate
+  private void preUpdate() {
+    setDisplayed();
+  }
+
+  private void setDisplayed() {
+    if (expiryDate != null && startDate != null) {
+      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now())
+          && startDate.isBefore(ZonedDateTime.now());
+    } else if (startDate != null) {
+      this.displayed = active && startDate.isBefore(ZonedDateTime.now());
+    } else if (expiryDate != null) {
+      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now());
+    } else {
+      this.displayed = active;
+    }
   }
 
 }

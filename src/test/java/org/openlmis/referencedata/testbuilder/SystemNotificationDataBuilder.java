@@ -31,10 +31,11 @@ public class SystemNotificationDataBuilder {
   private ZonedDateTime createdDate = ZonedDateTime.now();
   private User author = new UserDataBuilder().buildAsNew();
   private boolean active = true;
+  private boolean displayed = true;
 
   public SystemNotification buildAsNew() {
     return new SystemNotification(title, message, startDate, expiryDate, createdDate, active,
-        author);
+        author, displayed);
   }
 
   /**

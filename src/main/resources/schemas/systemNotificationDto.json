@@ -36,9 +36,9 @@
       "type": "object",
       "$ref": "referenceObjectDto.json"
     },
-    "isDisplayed": {
+    "displayed": {
       "type": "boolean",
-      "title": "isDisplayed"
+      "title": "displayed"
     }
   },
   "required": [
