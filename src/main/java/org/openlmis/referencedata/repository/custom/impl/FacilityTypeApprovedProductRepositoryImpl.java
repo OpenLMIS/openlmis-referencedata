@@ -159,23 +159,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("facilityTypeId", facilityTypeId);
     }
 
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-    Integer limit = maxAndFirst.getLeft();
-    Integer offset = maxAndFirst.getRight();
-
-    if (limit > 0) {
-      builder.append(NATIVE_PAGE_REQUEST);
-      params.put("limit", limit);
-      params.put("offset", offset);
-    }
-
-    Query nativeQuery = entityManager.createNativeQuery(builder.toString());
-    params.forEach(nativeQuery::setParameter);
-
-    SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
-    sqlQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
-
-    return nativeQuery;
+    return createQuery(pageable, builder, params);
   }
 
   private Query prepareQuery(List<String> facilityTypeCodes,
@@ -199,6 +183,10 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("facilityTypeCodes", facilityTypeCodes);
     }
 
+    return createQuery(pageable, builder, params);
+  }
+
+  private Query createQuery(Pageable pageable, StringBuilder builder, Map<String, Object> params) {
     Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
     Integer limit = maxAndFirst.getLeft();
     Integer offset = maxAndFirst.getRight();
