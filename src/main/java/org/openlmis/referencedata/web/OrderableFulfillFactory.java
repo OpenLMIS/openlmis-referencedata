@@ -31,11 +31,16 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderableFulfillFactory {
+
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
 
   @Autowired
   private TradeItemRepository tradeItemRepository;
@@ -50,22 +55,25 @@ public class OrderableFulfillFactory {
    * Create new instance of {@link OrderableFulfill} for the given orderable.
    */
   public OrderableFulfill createFor(Orderable orderable) {
+    Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL");
+    profiler.setLogger(XLOGGER);
     String tradeItemId = orderable.getTradeItemIdentifier();
-
-    if (isNotBlank(tradeItemId)) {
-      return createForTradeItem(tradeItemId, orderable);
-    }
-
     String commodityTypeId = orderable.getCommodityTypeIdentifier();
 
-    if (isNotBlank(commodityTypeId)) {
-      return createForCommodityType(commodityTypeId, orderable);
+    OrderableFulfill result = null;
+    if (isNotBlank(tradeItemId)) {
+      result = createForTradeItem(tradeItemId, orderable);
+    } else if (isNotBlank(commodityTypeId)) {
+      result = createForCommodityType(commodityTypeId, orderable);
     }
 
-    return null;
+    profiler.stop().log();
+    return result;
   }
 
   private OrderableFulfill createForTradeItem(String id, Orderable tradeItemOrderable) {
+    Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL_FOR_TRADE_ITEM");
+    profiler.setLogger(XLOGGER);
     TradeItem tradeItem = tradeItemRepository.findOne(UUID.fromString(id));
 
     List<UUID> canBeFulfilledByMe = Lists.newArrayList();
@@ -79,10 +87,13 @@ public class OrderableFulfillFactory {
         }
     );
 
+    profiler.stop().log();
     return OrderableFulfill.ofTradeItem(canBeFulfilledByMe);
   }
 
   private OrderableFulfill createForCommodityType(String id, Orderable commodityTypeOrderable) {
+    Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL_FOR_COMMODITY_TYPE");
+    profiler.setLogger(XLOGGER);
     CommodityType commodityType = commodityTypeRepository.findOne(UUID.fromString(id));
 
     List<UUID> canFulfillForMe = Lists.newArrayList();
@@ -96,6 +107,7 @@ public class OrderableFulfillFactory {
         }
     );
 
+    profiler.stop().log();
     return OrderableFulfill.ofCommodityType(canFulfillForMe);
   }
 

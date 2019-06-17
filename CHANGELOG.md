@@ -11,6 +11,7 @@ Bug fixes:
 Improvements:
 * [OLMIS-6127](https://openlmis.atlassian.net/browse/OLMIS-6127): Introduced second-level caching for Orderable.
 * [OLMIS-6362](https://openlmis.atlassian.net/browse/OLMIS-6362): Update facility names for demo data with meaningful names.
+* [OLMIS-6384](https://openlmis.atlassian.net/browse/OLMIS-6384): Spike: Performance improvements in /orderableFulfills endpoint.
 
 13.0.0 / 2019-05-27
 ==================
