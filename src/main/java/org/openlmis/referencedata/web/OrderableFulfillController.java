@@ -43,7 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Transactional
 public class OrderableFulfillController extends BaseController {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
+  private static final XLogger XLOGGER = XLoggerFactory
+          .getXLogger(OrderableFulfillController.class);
 
   @Autowired
   private OrderableRepository orderableRepository;
@@ -65,7 +66,7 @@ public class OrderableFulfillController extends BaseController {
     Map<UUID, OrderableFulfill> map = Maps.newHashMap();
 
     handlePage(
-        pageable -> getOrderables(ids, pageable),
+        pageable -> getOrderables(ids, profiler, pageable),
         orderable -> addEntry(map, orderable)
     );
 
@@ -73,14 +74,11 @@ public class OrderableFulfillController extends BaseController {
     return map;
   }
 
-  private Page<Orderable> getOrderables(Set<UUID> ids, Pageable pageable) {
-    Profiler profiler = new Profiler("GET_ORDERABLES");
-    profiler.setLogger(XLOGGER);
-    Page<Orderable> result = ids.isEmpty()
+  private Page<Orderable> getOrderables(Set<UUID> ids, Profiler profiler, Pageable pageable) {
+    profiler.start("GET_ORDERABLES");
+    return ids.isEmpty()
         ? orderableRepository.findAllLatest(pageable)
         : orderableRepository.findAllLatestByIds(ids, pageable);
-    profiler.stop().log();
-    return result;
   }
 
   private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable) {

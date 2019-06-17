@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OrderableFulfillFactory {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableFulfillFactory.class);
 
   @Autowired
   private TradeItemRepository tradeItemRepository;
@@ -62,18 +62,18 @@ public class OrderableFulfillFactory {
 
     OrderableFulfill result = null;
     if (isNotBlank(tradeItemId)) {
-      result = createForTradeItem(tradeItemId, orderable);
+      result = createForTradeItem(tradeItemId, orderable, profiler);
     } else if (isNotBlank(commodityTypeId)) {
-      result = createForCommodityType(commodityTypeId, orderable);
+      result = createForCommodityType(commodityTypeId, orderable, profiler);
     }
 
     profiler.stop().log();
     return result;
   }
 
-  private OrderableFulfill createForTradeItem(String id, Orderable tradeItemOrderable) {
-    Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL_FOR_TRADE_ITEM");
-    profiler.setLogger(XLOGGER);
+  private OrderableFulfill createForTradeItem(String id, Orderable tradeItemOrderable,
+                                              Profiler profiler) {
+    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_TRADE_ITEM");
     TradeItem tradeItem = tradeItemRepository.findOne(UUID.fromString(id));
 
     List<UUID> canBeFulfilledByMe = Lists.newArrayList();
@@ -87,13 +87,12 @@ public class OrderableFulfillFactory {
         }
     );
 
-    profiler.stop().log();
     return OrderableFulfill.ofTradeItem(canBeFulfilledByMe);
   }
 
-  private OrderableFulfill createForCommodityType(String id, Orderable commodityTypeOrderable) {
-    Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL_FOR_COMMODITY_TYPE");
-    profiler.setLogger(XLOGGER);
+  private OrderableFulfill createForCommodityType(String id, Orderable commodityTypeOrderable,
+                                                  Profiler profiler) {
+    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_COMMODITY_TYPE");
     CommodityType commodityType = commodityTypeRepository.findOne(UUID.fromString(id));
 
     List<UUID> canFulfillForMe = Lists.newArrayList();
@@ -107,7 +106,6 @@ public class OrderableFulfillFactory {
         }
     );
 
-    profiler.stop().log();
     return OrderableFulfill.ofCommodityType(canFulfillForMe);
   }
 
