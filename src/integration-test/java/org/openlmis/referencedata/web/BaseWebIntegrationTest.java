@@ -183,6 +183,9 @@ public abstract class BaseWebIntegrationTest {
   @Value("${service.url}")
   protected String baseUri;
 
+  @Value("${time.zoneId}")
+  protected String timeZoneId;
+
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(80);
 

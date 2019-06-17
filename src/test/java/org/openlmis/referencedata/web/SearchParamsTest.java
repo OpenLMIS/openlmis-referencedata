@@ -209,6 +209,16 @@ public class SearchParamsTest {
   }
 
   @Test
+  public void shouldGetBooleanFromString() {
+    String key = "boolean";
+    map.add(key, "true");
+
+    SearchParams searchParams = new SearchParams(map);
+
+    assertTrue(searchParams.getBoolean(key));
+  }
+
+  @Test
   public void shouldGetMap() {
     String key = "map";
     Map<String, String> newMap = new HashMap<>();

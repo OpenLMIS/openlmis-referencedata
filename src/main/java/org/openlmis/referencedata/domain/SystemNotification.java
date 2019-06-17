@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -24,6 +25,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,9 +37,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "timeZoneId")
 @Table(name = "system_notifications")
 public class SystemNotification extends BaseEntity {
+
+  @Transient
+  private String timeZoneId;
 
   private String title;
 
@@ -59,6 +64,31 @@ public class SystemNotification extends BaseEntity {
   private User author;
 
   private boolean displayed;
+
+  /**
+   * Default constructor.
+   *
+   * @param title system notification title
+   * @param message system notification message
+   * @param startDate system notification start date
+   * @param expiryDate system notification expiry date
+   * @param createdDate system notification create date
+   * @param active true if system notification is active
+   * @param author system notification author
+   * @param displayed true if system notification is displayed
+   */
+  public SystemNotification(String title, String message, ZonedDateTime startDate,
+      ZonedDateTime expiryDate, ZonedDateTime createdDate, boolean active, User author,
+      boolean displayed) {
+    this.setTitle(title);
+    this.setMessage(message);
+    this.setStartDate(startDate);
+    this.setExpiryDate(expiryDate);
+    this.setCreatedDate(createdDate);
+    this.setActive(active);
+    this.setAuthor(author);
+    this.setDisplayed(displayed);
+  }
 
   /**
    * Creates new system notification object based on data from {@link Importer}
@@ -152,12 +182,12 @@ public class SystemNotification extends BaseEntity {
 
   private void setDisplayed() {
     if (expiryDate != null && startDate != null) {
-      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now())
-          && startDate.isBefore(ZonedDateTime.now());
+      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now(ZoneId.of(timeZoneId)))
+          && startDate.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId)));
     } else if (startDate != null) {
-      this.displayed = active && startDate.isBefore(ZonedDateTime.now());
+      this.displayed = active && startDate.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId)));
     } else if (expiryDate != null) {
-      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now());
+      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now(ZoneId.of(timeZoneId)));
     } else {
       this.displayed = active;
     }

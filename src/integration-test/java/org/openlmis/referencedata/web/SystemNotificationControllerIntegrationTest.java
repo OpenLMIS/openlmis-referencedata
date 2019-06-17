@@ -77,6 +77,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     pageable = new PageRequest(0, 10);
 
     notificationDto.setServiceUrl(baseUri);
+    notificationDto.setTimeZoneId(timeZoneId);
     notification.export(notificationDto);
 
     given(systemNotificationRepository.save(any(SystemNotification.class)))
