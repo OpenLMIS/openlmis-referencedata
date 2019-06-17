@@ -25,6 +25,9 @@ import java.util.UUID;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.UuidUtil;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 @Transactional
 public class OrderableFulfillController extends BaseController {
 
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(FacilityController.class);
+
   @Autowired
   private OrderableRepository orderableRepository;
 
@@ -53,6 +58,9 @@ public class OrderableFulfillController extends BaseController {
   @ResponseStatus(HttpStatus.OK)
   public Map<UUID, OrderableFulfill> getOrderableFulfills(
       @RequestParam MultiValueMap<String, Object> requestParams) {
+    Profiler profiler = new Profiler("GET_ORDERABLE_FULFILLS");
+    profiler.setLogger(XLOGGER);
+
     Set<UUID> ids = UuidUtil.getIds(requestParams);
     Map<UUID, OrderableFulfill> map = Maps.newHashMap();
 
@@ -61,13 +69,18 @@ public class OrderableFulfillController extends BaseController {
         orderable -> addEntry(map, orderable)
     );
 
+    profiler.stop().log();
     return map;
   }
 
   private Page<Orderable> getOrderables(Set<UUID> ids, Pageable pageable) {
-    return ids.isEmpty()
+    Profiler profiler = new Profiler("GET_ORDERABLES");
+    profiler.setLogger(XLOGGER);
+    Page<Orderable> result = ids.isEmpty()
         ? orderableRepository.findAllLatest(pageable)
         : orderableRepository.findAllLatestByIds(ids, pageable);
+    profiler.stop().log();
+    return result;
   }
 
   private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable) {
