@@ -52,15 +52,18 @@ public class FacilityTypeApprovedProductRepositoryImpl
       + " INNER JOIN referencedata.facilities f ON f.typeId = ft.id AND f.id = '%s'";
 
   private static final String NATIVE_SELECT_FTAP_IDS = "SELECT DISTINCT ftap.id AS ID"
-      + " FROM facility_type_approved_products AS ftap";
+      + " FROM referencedata.facility_type_approved_products AS ftap";
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
   private static final String NATIVE_ORDERABLE_INNER_JOIN =
-      " INNER JOIN orderables AS o"
+      " INNER JOIN referencedata.orderables AS o"
           + " ON o.id = ftap.orderableId"
-          + " AND o.versionId IN (SELECT MAX(versionId) FROM orderables WHERE id = o.id)";
+          + " AND o.versionId IN ("
+          + "   SELECT MAX(versionId)"
+          + "   FROM referencedata.orderables"
+          + "   WHERE id = o.id)";
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
-      " INNER JOIN program_orderables AS po"
+      " INNER JOIN referencedata.program_orderables AS po"
           + " ON o.id = po.orderableId"
           + " AND o.versionId = po.orderableVersionId"
           + " AND p.id = po.programId"
