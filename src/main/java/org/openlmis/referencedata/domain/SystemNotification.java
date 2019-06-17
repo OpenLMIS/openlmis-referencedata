@@ -73,7 +73,7 @@ public class SystemNotification extends BaseEntity {
    * @param author notification author to set.
    * @return new instance of facility.
    */
-  public static SystemNotification newInstance(Importer importer, User author) {
+  public static SystemNotification newInstance(Importer importer, User author, String timeZoneId) {
     SystemNotification systemNotification = new SystemNotification();
     systemNotification.setId(importer.getId());
     systemNotification.setTitle(importer.getTitle());
@@ -84,6 +84,7 @@ public class SystemNotification extends BaseEntity {
     systemNotification.setActive(importer.isActive());
     systemNotification.setAuthor(author);
     systemNotification.setDisplayed(importer.isDisplayed());
+    systemNotification.setTimeZoneId(timeZoneId);
     return systemNotification;
   }
 

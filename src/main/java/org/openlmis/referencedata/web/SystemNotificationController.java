@@ -263,7 +263,7 @@ public class SystemNotificationController extends BaseController {
     profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
     User author = userRepository.findOne(systemNotificationDto.getAuthorId());
     SystemNotification systemNotification =
-        SystemNotification.newInstance(systemNotificationDto, author);
+        SystemNotification.newInstance(systemNotificationDto, author, timeZoneId);
 
     profiler.start("SAVE_SYSTEM_NOTIFICATION");
     systemNotificationRepository.save(systemNotification);
@@ -276,12 +276,12 @@ public class SystemNotificationController extends BaseController {
     profiler.start("EXPORT_SYSTEM_NOTIFICATIONS_TO_DTOS");
     return notifications
         .stream()
-        .map(elem -> SystemNotificationDto.newInstance(elem, serviceUrl, timeZoneId))
+        .map(elem -> SystemNotificationDto.newInstance(elem, serviceUrl))
         .collect(Collectors.toList());
   }
 
   private SystemNotificationDto toDto(SystemNotification notification, Profiler profiler) {
     profiler.start("EXPORT_SYSTEM_NOTIFICATION_TO_DTO");
-    return SystemNotificationDto.newInstance(notification, serviceUrl, timeZoneId);
+    return SystemNotificationDto.newInstance(notification, serviceUrl);
   }
 }

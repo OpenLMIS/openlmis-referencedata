@@ -39,10 +39,6 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
 
   @Setter
   @JsonIgnore
-  private String timeZoneId;
-
-  @Setter
-  @JsonIgnore
   private String serviceUrl;
 
   @Getter
@@ -101,10 +97,9 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
    * Creates a new instance based on data from a domain object.
    */
   public static SystemNotificationDto newInstance(SystemNotification systemNotification,
-      String serviceUrl, String timeZoneId) {
+      String serviceUrl) {
     SystemNotificationDto dto = new SystemNotificationDto();
     dto.setServiceUrl(serviceUrl);
-    dto.setTimeZoneId(timeZoneId);
     systemNotification.export(dto);
 
     return dto;
