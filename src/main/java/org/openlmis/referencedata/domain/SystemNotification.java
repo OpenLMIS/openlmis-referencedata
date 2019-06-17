@@ -66,31 +66,6 @@ public class SystemNotification extends BaseEntity {
   private boolean displayed;
 
   /**
-   * Default constructor.
-   *
-   * @param title system notification title
-   * @param message system notification message
-   * @param startDate system notification start date
-   * @param expiryDate system notification expiry date
-   * @param createdDate system notification create date
-   * @param active true if system notification is active
-   * @param author system notification author
-   * @param displayed true if system notification is displayed
-   */
-  public SystemNotification(String title, String message, ZonedDateTime startDate,
-      ZonedDateTime expiryDate, ZonedDateTime createdDate, boolean active, User author,
-      boolean displayed) {
-    this.setTitle(title);
-    this.setMessage(message);
-    this.setStartDate(startDate);
-    this.setExpiryDate(expiryDate);
-    this.setCreatedDate(createdDate);
-    this.setActive(active);
-    this.setAuthor(author);
-    this.setDisplayed(displayed);
-  }
-
-  /**
    * Creates new system notification object based on data from {@link Importer}
    * and author argument.
    *
