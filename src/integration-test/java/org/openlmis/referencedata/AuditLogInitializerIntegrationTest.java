@@ -181,8 +181,7 @@ public class AuditLogInitializerIntegrationTest {
     FacilityType facilityType = addNewFacilityType();
     Program program = addNewProgram();
     Orderable orderable = addNewOrderable();
-    addFtap(ftapId, program.getId(), orderable.getId(), orderable.getVersionId(),
-        facilityType.getId());
+    addFtap(ftapId, program.getId(), orderable.getId(), facilityType.getId());
 
     executeTest(ftapId, FacilityTypeApprovedProduct.class);
   }
@@ -528,8 +527,7 @@ public class AuditLogInitializerIntegrationTest {
         .executeUpdate();
   }
 
-  private void addFtap(UUID id, UUID programId, UUID orderableId,
-      Long orderableVersionId, UUID typeId) {
+  private void addFtap(UUID id, UUID programId, UUID orderableId, UUID typeId) {
     entityManager.flush();
     entityManager
         .createNativeQuery(SqlInsert.INSERT_FTAP_SQL)
@@ -540,7 +538,6 @@ public class AuditLogInitializerIntegrationTest {
         .setParameter(5, typeId) //facility type id
         .setParameter(6, orderableId) //orderable id
         .setParameter(7, programId) //program id
-        .setParameter(8, orderableVersionId) //orderable version id
         .executeUpdate();
   }
 

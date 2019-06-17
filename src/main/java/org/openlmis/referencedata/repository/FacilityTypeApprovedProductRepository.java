@@ -17,7 +17,6 @@ package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +28,8 @@ public interface FacilityTypeApprovedProductRepository
     FacilityTypeApprovedProductRepositoryCustom,
     BaseAuditableRepository<FacilityTypeApprovedProduct, UUID> {
 
-  FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableAndProgramId(
-      UUID facilityTypeId, Orderable orderable, UUID programId
+  FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableIdAndProgramId(
+      UUID facilityTypeId, UUID orderableId, UUID programId
   );
 
   @Query(value = "SELECT\n"

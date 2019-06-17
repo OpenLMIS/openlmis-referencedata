@@ -1,5 +1,9 @@
-13.0.1 / WIP
+14.0.0 / WIP
 ==================
+
+Breaking changes:
+* [OLMIS-6351](https://openlmis.atlassian.net/browse/OLMIS-6351): Drop reference to orderable version from Facility Type Approved Product
+  * Facility Type Approved Product references an orderable by its ID.  
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-6322](https://openlmis.atlassian.net/browse/OLMIS-6322): Added new ADMINISTRATIVE_MESSAGES_MANAGE right. Assigned to System Administrator role by default.

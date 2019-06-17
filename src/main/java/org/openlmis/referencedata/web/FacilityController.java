@@ -16,14 +16,18 @@
 package org.openlmis.referencedata.web;
 
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
@@ -34,6 +38,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
@@ -50,6 +55,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -83,6 +89,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private FacilityTypeApprovedProductRepository facilityTypeApprovedProductRepository;
+
+  @Autowired
+  private OrderableRepository orderableRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -490,21 +499,33 @@ public class FacilityController extends BaseController {
   }
 
   private Page<ApprovedProductDto> toDto(Page<FacilityTypeApprovedProduct> products,
-                                         Pageable pageable, Profiler profiler) {
+      Pageable pageable, Profiler profiler) {
     profiler.start("EXPORT_PRODUCTS_TO_DTO");
 
-    List<ApprovedProductDto> productDtos = products.getContent()
+    List<FacilityTypeApprovedProduct> ftaps = products.getContent();
+
+    Set<UUID> orderableId = ftaps
         .stream()
-        .map(this::toDto)
-        .collect(Collectors.toList());
+        .map(FacilityTypeApprovedProduct::getOrderableId)
+        .collect(Collectors.toSet());
 
-    return toPage(productDtos, pageable, products.getTotalElements(), profiler);
-  }
+    Map<UUID, Orderable> orderables = orderableRepository
+        .findAllLatestByIds(orderableId, new PageRequest(0, orderableId.size()))
+        .getContent()
+        .stream()
+        .collect(Collectors.toMap(Orderable::getId, Function.identity()));
 
-  private ApprovedProductDto toDto(FacilityTypeApprovedProduct product) {
-    ApprovedProductDto productDto = new ApprovedProductDto();
-    product.export(productDto);
-    return productDto;
+    List<ApprovedProductDto> dtos = new ArrayList<>();
+    for (FacilityTypeApprovedProduct ftap : ftaps) {
+      ApprovedProductDto productDto = new ApprovedProductDto();
+      ftap.export(productDto);
+
+      productDto.setOrderable(orderables.get(ftap.getOrderableId()));
+
+      dtos.add(productDto);
+    }
+
+    return toPage(dtos, pageable, products.getTotalElements(), profiler);
   }
 
   private Page<MinimalFacilityDto> toMinimalDto(Page<Facility> facilities, Profiler profiler,

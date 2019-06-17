@@ -32,18 +32,15 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.dto.FacilityTypeDto;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -51,9 +48,6 @@ public class FacilityTypeApprovedProductBuilderTest {
 
   @Rule
   public ExpectedException exception = ExpectedException.none();
-
-  @Mock
-  private OrderableRepository orderableRepository;
 
   @Mock
   private ProgramRepository programRepository;
@@ -72,14 +66,13 @@ public class FacilityTypeApprovedProductBuilderTest {
   @Before
   public void setUp() {
     new FacilityTypeApprovedProductsDataBuilder()
-        .withOrderable(orderable)
         .withProgram(program)
         .withFacilityType(facilityType)
         .build()
         .export(importer);
 
-    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
-        .thenReturn(orderable);
+    importer.setOrderable(orderable);
+
     when(programRepository.findOne(program.getId())).thenReturn(program);
     when(facilityTypeRepository.findOne(facilityType.getId())).thenReturn(facilityType);
   }
@@ -93,20 +86,9 @@ public class FacilityTypeApprovedProductBuilderTest {
         .hasFieldOrPropertyWithValue("maxPeriodsOfStock", importer.getMaxPeriodsOfStock())
         .hasFieldOrPropertyWithValue("minPeriodsOfStock", importer.getMinPeriodsOfStock())
         .hasFieldOrPropertyWithValue("emergencyOrderPoint", importer.getEmergencyOrderPoint())
-        .hasFieldOrPropertyWithValue("orderable", orderable)
+        .hasFieldOrPropertyWithValue("orderableId", orderable.getId())
         .hasFieldOrPropertyWithValue("program", program)
         .hasFieldOrPropertyWithValue("facilityType", facilityType);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfOrderableCouldNotBeFound() {
-    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
-        .thenReturn(null);
-
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);
-
-    builder.build(importer);
   }
 
   @Test
@@ -130,15 +112,6 @@ public class FacilityTypeApprovedProductBuilderTest {
   }
 
   @Test
-  public void shouldThrowExceptionIfOrderableIdDoesNotExist() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);
-
-    importer.getOrderable().setId(null);
-    builder.build(importer);
-  }
-
-  @Test
   public void shouldThrowExceptionIfProgramIdDoesNotExist() {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(ProgramMessageKeys.ERROR_NOT_FOUND);
@@ -153,15 +126,6 @@ public class FacilityTypeApprovedProductBuilderTest {
     exception.expectMessage(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
 
     importer.getFacilityType().setId(null);
-    builder.build(importer);
-  }
-
-  @Test
-  public void shouldThrowExceptionIfOrderableImporterDoesNotExist() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);
-
-    importer.setOrderable((OrderableDto) null);
     builder.build(importer);
   }
 

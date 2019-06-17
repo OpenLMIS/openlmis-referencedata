@@ -37,6 +37,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
+import javax.transaction.Transactional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,6 +68,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.test.context.transaction.TestTransaction;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
@@ -252,13 +255,15 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType2, true));
     ftapRepository.save(generateProduct(facilityType2, false));
 
-    List<UUID> orderableIds = singletonList(orderableFullSupply.getId());
+    List<UUID> orderableIds = Lists
+        .newArrayList(orderableFullSupply.getId(), orderableNonFullSupply.getId());
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
         .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
 
-    assertThat(page.getContent(), hasSize(1));
-    assertEquals(page.getContent().get(0).getOrderable(), orderableFullSupply);
+    assertThat(page.getContent(), hasSize(2));
+    assertEquals(page.getContent().get(0).getOrderableId(), orderableFullSupply.getId());
+    assertEquals(page.getContent().get(1).getOrderableId(), orderableNonFullSupply.getId());
   }
 
   @Test
@@ -295,7 +300,11 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
-    ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
+
+    Orderable orderable = orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+
+    ProgramOrderable programOrderable = orderable.getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
     assertTrue(programOrderable.isFullSupply());
     assertTrue(programOrderable.isActive());
@@ -330,7 +339,11 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
-    ProgramOrderable programOrderable = ftap.getOrderable().getProgramOrderable(program);
+
+    Orderable orderable = orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+
+    ProgramOrderable programOrderable = orderable.getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
     assertFalse(programOrderable.isFullSupply());
     assertTrue(programOrderable.isActive());
@@ -371,8 +384,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftap = ftapRepository.save(ftap);
     UUID id = ftap.getId();
 
-    ftap = ftapRepository.findByFacilityTypeIdAndOrderableAndProgramId(
-        ftap.getFacilityType().getId(), ftap.getOrderable(), ftap.getProgram().getId()
+    ftap = ftapRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        ftap.getFacilityType().getId(), ftap.getOrderableId(), ftap.getProgram().getId()
     );
 
     assertNotNull(ftap);
@@ -479,12 +492,30 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
             hasProperty("code", isOneOf(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE)))));
   }
 
+  @Test(expected = JpaSystemException.class)
+  @Transactional(Transactional.TxType.REQUIRES_NEW)
+  public void shouldNotAllowSaveFtapWithInvalidOrderable() {
+    TestTransaction.flagForCommit();
+
+    FacilityTypeApprovedProduct product = generateProduct(facilityType1, true);
+    product.setOrderableId(UUID.randomUUID());
+
+    ftapRepository.save(product);
+
+    // Trigger is fired at the end of the transaction
+    TestTransaction.end();
+  }
+
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
-    assertTrue(ftap.getOrderable().getProgramOrderable(program).isFullSupply());
-    assertTrue(ftap.getOrderable().getProgramOrderable(program).isActive());
+
+    Orderable orderable = orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+
+    assertTrue(orderable.getProgramOrderable(program).isFullSupply());
+    assertTrue(orderable.getProgramOrderable(program).isActive());
   }
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
@@ -509,7 +540,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
       FacilityType facilityType, Program program, Orderable orderable) {
     return new FacilityTypeApprovedProductsDataBuilder()
         .withFacilityType(facilityType)
-        .withOrderable(orderable)
+        .withOrderableId(orderable.getId())
         .withProgram(program)
         .withMaxPeriodsOfStock(12.00)
         .buildAsNew();

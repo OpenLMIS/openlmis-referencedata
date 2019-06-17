@@ -43,7 +43,7 @@ final class SqlInsert {
 
   private static final String[] FTAP_FIELDS = {
       "id", "emergencyorderpoint", "maxperiodsofstock", "minperiodsofstock", "facilitytypeid",
-      "orderableid", PROGRAM_ID, "orderableversionid"
+      "orderableid", PROGRAM_ID
   };
 
   private static final String[] FACILITY_TYPE_FIELDS = {

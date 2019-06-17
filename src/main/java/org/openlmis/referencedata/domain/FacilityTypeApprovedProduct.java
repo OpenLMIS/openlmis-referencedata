@@ -15,10 +15,10 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -41,14 +41,10 @@ import org.javers.core.metamodel.annotation.TypeName;
 @ToString
 public class FacilityTypeApprovedProduct extends BaseEntity {
 
-  @ManyToOne
-  @JoinColumns({
-      @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId", nullable = false)
-      })
+  @Column(nullable = false)
   @Getter
   @Setter
-  private Orderable orderable;
+  private UUID orderableId;
 
   @ManyToOne
   @JoinColumn(name = "programId", nullable = false)
@@ -85,6 +81,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
     ftap.setId(importer.getId());
+    ftap.setOrderableId(importer.getOrderableId());
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
@@ -101,7 +98,6 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
-    exporter.setOrderable(orderable);
     exporter.setProgram(program);
     exporter.setFacilityType(facilityType);
   }
@@ -113,8 +109,6 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     void setMinPeriodsOfStock(Double minPeriodsOfStock);
 
     void setEmergencyOrderPoint(Double emergencyOrderPoint);
-
-    void setOrderable(Orderable orderable);
 
     void setProgram(Program program);
 
@@ -129,7 +123,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
 
     Double getEmergencyOrderPoint();
 
-    Orderable.Importer getOrderable();
+    UUID getOrderableId();
 
     Program.Importer getProgram();
 

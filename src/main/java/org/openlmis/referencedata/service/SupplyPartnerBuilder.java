@@ -186,8 +186,7 @@ public class SupplyPartnerBuilder
         .searchProducts(facilityTypeCodes, programCode, pageable)
         .getContent()
         .stream()
-        .map(FacilityTypeApprovedProduct::getOrderable)
-        .map(Orderable::getId)
+        .map(FacilityTypeApprovedProduct::getOrderableId)
         .collect(Collectors.toSet());
 
     Set<UUID> orderableIds = orderables

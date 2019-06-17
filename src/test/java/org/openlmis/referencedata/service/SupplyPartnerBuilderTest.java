@@ -115,7 +115,7 @@ public class SupplyPartnerBuilderTest {
   private Orderable orderable = new OrderableDataBuilder().build();
   private FacilityTypeApprovedProduct approvedProduct =
       new FacilityTypeApprovedProductsDataBuilder()
-          .withOrderable(orderable)
+          .withOrderableId(orderable.getId())
           .withFacilityType(facility.getType())
           .build();
   private SupplyPartner supplyPartner = new SupplyPartnerDataBuilder()

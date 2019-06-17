@@ -17,6 +17,8 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -50,10 +52,18 @@ public final class ApprovedProductDto
     this.orderable = orderable;
   }
 
-  @Override
   @JsonIgnore
   public void setOrderable(Orderable orderable) {
     this.orderable = OrderableDto.newInstance(orderable);
+  }
+
+  @Override
+  @JsonIgnore
+  public UUID getOrderableId() {
+    return Optional
+        .ofNullable(orderable)
+        .map(BaseDto::getId)
+        .orElse(null);
   }
 
   @JsonSetter("program")

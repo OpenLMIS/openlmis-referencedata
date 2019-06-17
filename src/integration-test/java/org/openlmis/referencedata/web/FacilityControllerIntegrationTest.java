@@ -52,7 +52,9 @@ import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
@@ -64,6 +66,7 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
@@ -98,8 +101,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public static final String CODE = "code";
 
   private UUID programId;
-  private UUID orderableId1;
-  private UUID orderableId2;
+  private UUID orderableId;
   private UUID supervisoryNodeId;
   private Program program;
   private GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
@@ -123,8 +125,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     super.setUp();
 
     programId = UUID.randomUUID();
-    orderableId1 = UUID.randomUUID();
-    orderableId2 = UUID.randomUUID();
+    orderableId = UUID.randomUUID();
     program = new ProgramDataBuilder().withId(programId).build();
     program1 = new ProgramDataBuilder().withId(programId).build();
     facility = new FacilityDataBuilder()
@@ -409,10 +410,17 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindApprovedProductsForFacility() {
     pageable = new PageRequest(0, Integer.MAX_VALUE);
+    Orderable orderable = new OrderableDataBuilder().build();
+    FacilityTypeApprovedProduct approvedProduct = new FacilityTypeApprovedProductsDataBuilder()
+        .withOrderableId(orderable.getId())
+        .build();
+
+    when(orderableRepository
+        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
         eq(program.getId()), eq(false), eq(null), eq(pageable)))
-        .thenReturn(new PageImpl<>(Collections.singletonList(
-            new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
+        .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, program.getId())
@@ -431,18 +439,24 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindApprovedProductsForFacilityAndOrderableIds() {
     pageable = new PageRequest(0, Integer.MAX_VALUE);
-    List<UUID> orderableIds = asList(orderableId1, orderableId2);
+    Orderable orderable = new OrderableDataBuilder().build();
+    List<UUID> orderableIds = Arrays.asList(orderable.getId(), orderableId);
+    FacilityTypeApprovedProduct approvedProduct = new FacilityTypeApprovedProductsDataBuilder()
+        .withOrderableId(orderable.getId())
+        .build();
 
+    when(orderableRepository
+        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
         eq(program.getId()), eq(false), eq(orderableIds), eq(pageable)))
-        .thenReturn(new PageImpl<>(Collections.singletonList(
-            new FacilityTypeApprovedProductsDataBuilder().build()), pageable, 1));
+        .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, program.getId())
         .queryParam(FULL_SUPPLY, false)
-        .queryParam("orderableId", orderableId1)
-        .queryParam("orderableId", orderableId2)
+        .queryParam("orderableId", orderable.getId())
+        .queryParam("orderableId", orderableId)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL + "/" + facility.getId() + APPROVED_PRODUCTS)

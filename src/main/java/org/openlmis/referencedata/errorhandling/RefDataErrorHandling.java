@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.errorhandling;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -37,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -48,6 +51,7 @@ public class RefDataErrorHandling extends BaseHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
 
   private static final Map<String, String> CONSTRAINT_MAP = new HashMap<>();
+  private static final Map<String, String> SQL_STATES = new HashMap<>();
 
   static {
     CONSTRAINT_MAP.put("unq_program_code", ProgramMessageKeys.ERROR_CODE_DUPLICATED);
@@ -66,6 +70,9 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("unq_supply_partner_association_programid_supervisorynodeid",
         SupplyPartnerMessageKeys.ERROR_ASSOCIATION_DUPLICATED);
     CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_MUST_HAVE_A_UNIQUE_NAME);
+
+    // https://www.postgresql.org/docs/9.6/static/errcodes-appendix.html
+    SQL_STATES.put("23503", OrderableMessageKeys.ERROR_NOT_FOUND);
   }
 
   /**
@@ -138,5 +145,32 @@ public class RefDataErrorHandling extends BaseHandler {
   public LocalizedMessage handleUnauthorizedException(UnauthorizedException ex) {
     LOGGER.info(ex.getMessage());
     return getLocalizedMessage(ex.asMessage());
+  }
+
+  /**
+   * Handles Jpa System Exception.
+   * @param exp the Jpa System Exception
+   * @return the user-oriented error message.
+   */
+  @ExceptionHandler(JpaSystemException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public LocalizedMessage handleJpaSystemException(JpaSystemException exp) {
+    LOGGER.info(exp.getMessage());
+
+    if (exp.getCause() instanceof PersistenceException) {
+      PersistenceException persistence = (PersistenceException) exp.getCause();
+
+      if (persistence.getCause() instanceof SQLException) {
+        SQLException sql = (SQLException) persistence.getCause();
+        String message = SQL_STATES.get(sql.getSQLState());
+
+        if (null != message) {
+          return getLocalizedMessage(message);
+        }
+      }
+    }
+
+    return getLocalizedMessage(exp.getMessage());
   }
 }

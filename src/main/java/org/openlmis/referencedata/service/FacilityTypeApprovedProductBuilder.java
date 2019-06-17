@@ -20,13 +20,10 @@ import static org.openlmis.referencedata.domain.FacilityTypeApprovedProduct.newF
 
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,9 +31,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacilityTypeApprovedProductBuilder
     implements DomainResourceBuilder<Importer, FacilityTypeApprovedProduct> {
-
-  @Autowired
-  private OrderableRepository orderableRepository;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -48,16 +42,12 @@ public class FacilityTypeApprovedProductBuilder
    * Creates new {@link FacilityTypeApprovedProduct} based on data from importer.
    */
   public FacilityTypeApprovedProduct build(Importer importer) {
-    Orderable orderable = findResource(
-        orderableRepository::findFirstByIdentityIdOrderByIdentityVersionIdDesc,
-        importer.getOrderable(), OrderableMessageKeys.ERROR_NOT_FOUND);
     Program program = findResource(programRepository::findOne, importer.getProgram(),
         ProgramMessageKeys.ERROR_NOT_FOUND);
     FacilityType facilityType = findResource(facilityTypeRepository::findOne,
         importer.getFacilityType(), FacilityTypeMessageKeys.ERROR_NOT_FOUND);
 
     FacilityTypeApprovedProduct approvedProduct = newFacilityTypeApprovedProduct(importer);
-    approvedProduct.setOrderable(orderable);
     approvedProduct.setProgram(program);
     approvedProduct.setFacilityType(facilityType);
 

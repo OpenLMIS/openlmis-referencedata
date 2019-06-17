@@ -18,13 +18,12 @@ package org.openlmis.referencedata.testbuilder;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 
 public class FacilityTypeApprovedProductsDataBuilder {
 
   private UUID id;
-  private Orderable orderable;
+  private UUID orderableId;
   private Program program;
   private FacilityType facilityType;
   private Double maxPeriodsOfStock;
@@ -36,7 +35,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
    */
   public FacilityTypeApprovedProductsDataBuilder() {
     id = UUID.randomUUID();
-    orderable = new OrderableDataBuilder().build();
+    orderableId = UUID.randomUUID();
     program = new ProgramDataBuilder().build();
     facilityType = new FacilityTypeDataBuilder().build();
     maxPeriodsOfStock = 3.0;
@@ -44,8 +43,8 @@ public class FacilityTypeApprovedProductsDataBuilder {
     emergencyOrderPoint = 0.0;
   }
 
-  public FacilityTypeApprovedProductsDataBuilder withOrderable(Orderable orderable) {
-    this.orderable = orderable;
+  public FacilityTypeApprovedProductsDataBuilder withOrderableId(UUID orderableId) {
+    this.orderableId = orderableId;
     return this;
   }
 
@@ -75,7 +74,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
   }
 
   public FacilityTypeApprovedProduct buildAsNew() {
-    return new FacilityTypeApprovedProduct(orderable, program,
+    return new FacilityTypeApprovedProduct(orderableId, program,
           facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint);
   }
 }

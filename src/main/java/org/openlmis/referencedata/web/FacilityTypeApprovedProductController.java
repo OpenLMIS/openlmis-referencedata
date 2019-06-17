@@ -20,8 +20,12 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
@@ -32,10 +36,12 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -225,27 +231,54 @@ public class FacilityTypeApprovedProductController extends BaseController {
   private ApprovedProductDto toDto(FacilityTypeApprovedProduct prod) {
     ApprovedProductDto productDto = new ApprovedProductDto();
     prod.export(productDto);
+
+    Orderable orderable = orderableRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(prod.getOrderableId());
+
+    productDto.setOrderable(orderable);
+
     return productDto;
   }
 
   private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods) {
+    Set<UUID> orderableId = prods
+        .stream()
+        .map(FacilityTypeApprovedProduct::getOrderableId)
+        .collect(Collectors.toSet());
+
+    Map<UUID, Orderable> orderables = orderableRepository
+        .findAllLatestByIds(orderableId, new PageRequest(0, orderableId.size()))
+        .getContent()
+        .stream()
+        .collect(Collectors.toMap(Orderable::getId, Function.identity()));
+
     List<ApprovedProductDto> dtos = new ArrayList<>();
     for (FacilityTypeApprovedProduct ftap : prods) {
-      dtos.add(toDto(ftap));
+      ApprovedProductDto productDto = new ApprovedProductDto();
+      ftap.export(productDto);
+
+      productDto.setOrderable(orderables.get(ftap.getOrderableId()));
+
+      dtos.add(productDto);
     }
 
     return dtos;
   }
 
   private void validateFtapNotDuplicated(ApprovedProductDto approvedProductDto) {
-    UUID orderableId = approvedProductDto.getOrderable().getId();
+    UUID orderableId = approvedProductDto.getOrderableId();
 
     Orderable latestOrderable = orderableRepository
         .findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderableId);
+
+    if (null == latestOrderable) {
+      throw new ValidationMessageException(OrderableMessageKeys.ERROR_NOT_FOUND);
+    }
+
     FacilityTypeApprovedProduct existing = repository
-        .findByFacilityTypeIdAndOrderableAndProgramId(
+        .findByFacilityTypeIdAndOrderableIdAndProgramId(
             approvedProductDto.getFacilityType().getId(),
-            latestOrderable,
+            latestOrderable.getId(),
             approvedProductDto.getProgram().getId());
 
     if (existing != null

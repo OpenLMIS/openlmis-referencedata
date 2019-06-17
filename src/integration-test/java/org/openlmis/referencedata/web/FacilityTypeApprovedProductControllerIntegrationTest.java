@@ -37,22 +37,25 @@ import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -75,33 +78,24 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Before
   @Override
   public void setUp() {
-    program = new Program("programCode");
-    program.setPeriodsSkippable(true);
-    program.setId(UUID.randomUUID());
+    program = new ProgramDataBuilder().build();
+    orderableDisplayCategory = new OrderableDisplayCategoryDataBuilder().build();
+    orderable = new OrderableDataBuilder().build();
+    facilityType1 = new FacilityTypeDataBuilder().build();
 
-    orderableDisplayCategory = OrderableDisplayCategory.createNew(
-        Code.code("orderableDisplayCategoryCode"),
-        new OrderedDisplayValue("orderableDisplayCategoryName", 1));
-    orderableDisplayCategory.setId(UUID.randomUUID());
+    facilityTypeAppProd = new FacilityTypeApprovedProductsDataBuilder()
+        .withFacilityType(facilityType1)
+        .withProgram(program)
+        .withOrderableId(orderable.getId())
+        .withMaxPeriodsOfStock(6.0)
+        .build();
 
-    orderable = new Orderable(Code.code("abcd"), Dispensable.createNew("each"),
-        10, 5, false, UUID.randomUUID(), 1L);
-    orderable.setProgramOrderables(Collections.emptyList());
-    orderable.setId(UUID.randomUUID());
+    facilityTypeAppProdId = facilityTypeAppProd.getId();
 
-    facilityType1 = new FacilityType("facilityType1");
-    facilityType1.setId(UUID.randomUUID());
-
-    facilityTypeAppProdId = UUID.randomUUID();
-    facilityTypeAppProd = new FacilityTypeApprovedProduct();
-    facilityTypeAppProd.setId(facilityTypeAppProdId);
-    facilityTypeAppProd.setFacilityType(facilityType1);
-    facilityTypeAppProd.setProgram(program);
-    facilityTypeAppProd.setOrderable(orderable);
-    facilityTypeAppProd.setMaxPeriodsOfStock(6.00);
 
     ftapDto = new ApprovedProductDto();
     facilityTypeAppProd.export(ftapDto);
+    ftapDto.setOrderable(orderable);
 
     given(facilityTypeApprovedProductRepository.save(any(FacilityTypeApprovedProduct.class)))
         .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
@@ -109,6 +103,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     // used in deserialization
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
         .willReturn(orderable);
+    given(orderableRepository
+        .findAllLatestByIds(Collections.singleton(orderable.getId()), new PageRequest(0, 1)))
+        .willReturn(new PageImpl<>(Collections.singletonList(orderable)));
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(facilityTypeRepository.findOne(facilityType1.getId())).willReturn(facilityType1);
 
@@ -296,8 +293,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
-      facilityType1.getId(), orderable, program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+      facilityType1.getId(), orderable.getId(), program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()
@@ -322,8 +319,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
-        facilityType1.getId(), orderable, program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        facilityType1.getId(), orderable.getId(), program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()
@@ -347,8 +344,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     FacilityTypeApprovedProduct existingFtap =
         mock(FacilityTypeApprovedProduct.class);
     when(existingFtap.getId()).thenReturn(facilityTypeAppProdId);
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableAndProgramId(
-        facilityType1.getId(), orderable, program.getId()
+    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
+        facilityType1.getId(), orderable.getId(), program.getId()
     )).thenReturn(existingFtap);
 
     restAssured.given()

@@ -19,7 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
+import java.sql.SQLException;
 import java.util.Locale;
+import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,9 +36,11 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.i18n.MessageService;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.jpa.JpaSystemException;
 
 @SuppressWarnings("PMD.TooManyMethods")
 @RunWith(MockitoJUnitRunner.class)
@@ -125,43 +129,98 @@ public class RefDataErrorHandlingTest {
   @Test
   public void shouldHandleMessageException() {
     // given
-    String messageKey = "key";
-    ValidationMessageException exp = new ValidationMessageException(messageKey);
+    ValidationMessageException exp = new ValidationMessageException(ERROR_MESSAGE);
 
     // when
-    mockMessage(messageKey);
+    mockMessage(ERROR_MESSAGE);
     LocalizedMessage message = errorHandler.handleMessageException(exp);
 
     // then
-    assertMessage(message, messageKey);
+    assertMessage(message, ERROR_MESSAGE);
   }
 
   @Test
   public void shouldHandleNotFoundException() {
     // given
-    String messageKey = "key";
-    NotFoundException exp = new NotFoundException(messageKey);
+    NotFoundException exp = new NotFoundException(ERROR_MESSAGE);
+
+    // when
+    mockMessage(ERROR_MESSAGE);
+    LocalizedMessage message = errorHandler.handleNotFoundException(exp);
+
+    // then
+    assertMessage(message, ERROR_MESSAGE);
+  }
+
+  @Test
+  public void shouldHandleUnauthorizedException() {
+    // given
+    UnauthorizedException exp = new UnauthorizedException(new Message(ERROR_MESSAGE));
+
+    // when
+    mockMessage(ERROR_MESSAGE);
+    LocalizedMessage message = errorHandler.handleUnauthorizedException(exp);
+
+    // then
+    assertMessage(message, ERROR_MESSAGE);
+  }
+
+  @Test
+  public void shouldHandleSqlException() {
+    // given
+    String messageKey = OrderableMessageKeys.ERROR_NOT_FOUND;
+    JpaSystemException exp = new JpaSystemException(
+        new PersistenceException(
+            new SQLException("sql error", "23503", new NullPointerException(messageKey))));
 
     // when
     mockMessage(messageKey);
-    LocalizedMessage message = errorHandler.handleNotFoundException(exp);
+    LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
 
     // then
     assertMessage(message, messageKey);
   }
 
   @Test
-  public void shouldHandleUnauthorizedException() {
+  public void shouldReturnNormalMessageIfExceptionIsNotPersistenceException() {
     // given
-    String messageKey = "key";
-    UnauthorizedException exp = new UnauthorizedException(new Message(messageKey));
+    JpaSystemException exp = new JpaSystemException(new NullPointerException(ERROR_MESSAGE));
 
     // when
-    mockMessage(messageKey);
-    LocalizedMessage message = errorHandler.handleUnauthorizedException(exp);
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
 
     // then
-    assertMessage(message, messageKey);
+    assertMessage(message, exp.getMessage());
+  }
+
+  @Test
+  public void shouldReturnNormalMessageIfExceptionIsNotSqlException() {
+    // given
+    JpaSystemException exp = new JpaSystemException(
+        new PersistenceException(new NullPointerException(ERROR_MESSAGE)));
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
+  }
+
+  @Test
+  public void shouldReturnNormalMessageIfSqlStatusIsNotRecognizable() {
+    // given
+    JpaSystemException exp = new JpaSystemException(
+        new PersistenceException(
+            new SQLException("sql error", "10", new NullPointerException(ERROR_MESSAGE))));
+
+    // when
+    mockMessage(exp.getMessage());
+    LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
+
+    // then
+    assertMessage(message, exp.getMessage());
   }
 
   private void assertMessage(LocalizedMessage localized, String key) {
