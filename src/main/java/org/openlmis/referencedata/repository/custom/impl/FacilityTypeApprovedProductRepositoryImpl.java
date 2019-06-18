@@ -75,6 +75,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String HQL_SELECT_FTAP_BY_IDS = "SELECT ftap"
       + " FROM FacilityTypeApprovedProduct AS ftap"
       + " WHERE ftap.id IN (:ids)";
+  private static final String NATIVE_WHERE_FTAP_ACTIVE_FLAG = " WHERE ftap.active = :active";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -163,7 +164,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("facilityTypeId", facilityTypeId);
     }
 
-    builder.append(" AND ftap.active = :active");
+    builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
     return createQuery(pageable, builder, params);
@@ -190,7 +191,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("facilityTypeCodes", facilityTypeCodes);
     }
 
-    builder.append(" AND ftap.active = :active");
+    builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
     return createQuery(pageable, builder, params);

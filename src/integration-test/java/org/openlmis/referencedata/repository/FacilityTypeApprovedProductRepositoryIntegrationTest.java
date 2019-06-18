@@ -439,7 +439,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     result = ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE),
         null, false, null);
     assertEquals(2, result.getContent().size());
-
   }
 
   @Test
@@ -592,14 +591,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
                                                       boolean fullSupply,
                                                       boolean active) {
     return generateProduct(facilityType, fullSupply, program, active);
-  }
-
-
-  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
-                                                      boolean fullSupply,
-                                                      Program program) {
-    return getFacilityTypeApprovedProduct(facilityType, program,
-        fullSupply ? orderableFullSupply : orderableNonFullSupply, true);
   }
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,

@@ -29,5 +29,5 @@ public interface FacilityTypeApprovedProductRepositoryCustom {
 
   Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
                                                    String programCode,
-                                                   Boolean activeFlag, Pageable pageable);
+                                                   Boolean active, Pageable pageable);
 }
