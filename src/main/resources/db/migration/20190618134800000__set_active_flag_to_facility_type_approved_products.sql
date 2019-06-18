@@ -1,1 +1,0 @@
-UPDATE referencedata.facility_type_approved_products SET active = true;
