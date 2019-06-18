@@ -78,9 +78,9 @@ public final class FacilityTypeApprovedProductSearchParams {
   }
 
   /**
-   * Gets {@link String} for "active" key from params.
+   * Gets {@link Boolean} for "active" key from params.
    *
-   * @return String value of program or null if params doesn't contain "active" key.
+   * @return Boolean value of program or null if params doesn't contain "active" key.
    */
   public Boolean getActiveFlag() {
     if (!queryParams.containsKey(ACTIVE)) {

@@ -88,9 +88,4 @@ public final class ApprovedProductDto
   public void setFacilityType(FacilityType facilityType) {
     this.facilityType = FacilityTypeDto.newInstance(facilityType);
   }
-
-  @JsonSetter("active")
-  public void setActive(Boolean active) {
-    this.active = active;
-  }
 }
