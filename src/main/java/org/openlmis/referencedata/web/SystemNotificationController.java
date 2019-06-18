@@ -25,12 +25,11 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SystemNotification;
-import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SystemNotificationDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
-import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.SystemNotificationBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SystemNotificationMessageKeys;
@@ -75,10 +74,7 @@ public class SystemNotificationController extends BaseController {
   private SystemNotificationValidator systemNotificationValidator;
 
   @Autowired
-  private UserRepository userRepository;
-
-  @Value("${time.zoneId}")
-  private String timeZoneId;
+  private SystemNotificationBuilder systemNotificationBuilder;
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -260,10 +256,8 @@ public class SystemNotificationController extends BaseController {
     systemNotificationValidator.validate(systemNotificationDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    profiler.start("GET_SYSTEM_NOTIFICATION_AUTHOR");
-    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
-    SystemNotification systemNotification =
-        SystemNotification.newInstance(systemNotificationDto, author, timeZoneId);
+    profiler.start("BUILD_SYSTEM_NOTIFICATION");
+    SystemNotification systemNotification = systemNotificationBuilder.build(systemNotificationDto);
 
     profiler.start("SAVE_SYSTEM_NOTIFICATION");
     systemNotificationRepository.save(systemNotification);

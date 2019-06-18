@@ -32,10 +32,9 @@ public class SystemNotificationDataBuilder {
   private User author = new UserDataBuilder().buildAsNew();
   private boolean active = true;
   private boolean displayed = true;
-  private String timeZoneId = "UTC";
 
   public SystemNotification buildAsNew() {
-    return new SystemNotification(timeZoneId, title, message, startDate, expiryDate, createdDate,
+    return new SystemNotification(title, message, startDate, expiryDate, createdDate,
         active, author, displayed);
   }
 

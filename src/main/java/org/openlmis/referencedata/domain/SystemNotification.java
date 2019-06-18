@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.domain;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
@@ -23,9 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,12 +34,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "timeZoneId")
+@EqualsAndHashCode
 @Table(name = "system_notifications")
 public class SystemNotification extends BaseEntity {
-
-  @Transient
-  private String timeZoneId;
 
   private String title;
 
@@ -73,7 +67,7 @@ public class SystemNotification extends BaseEntity {
    * @param author notification author to set.
    * @return new instance of facility.
    */
-  public static SystemNotification newInstance(Importer importer, User author, String timeZoneId) {
+  public static SystemNotification newInstance(Importer importer, User author) {
     SystemNotification systemNotification = new SystemNotification();
     systemNotification.setId(importer.getId());
     systemNotification.setTitle(importer.getTitle());
@@ -84,7 +78,6 @@ public class SystemNotification extends BaseEntity {
     systemNotification.setActive(importer.isActive());
     systemNotification.setAuthor(author);
     systemNotification.setDisplayed(importer.isDisplayed());
-    systemNotification.setTimeZoneId(timeZoneId);
     return systemNotification;
   }
 
@@ -148,25 +141,6 @@ public class SystemNotification extends BaseEntity {
   @PrePersist
   private void prePersist() {
     this.createdDate = ZonedDateTime.now();
-    setDisplayed();
-  }
-
-  @PreUpdate
-  private void preUpdate() {
-    setDisplayed();
-  }
-
-  private void setDisplayed() {
-    if (expiryDate != null && startDate != null) {
-      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now(ZoneId.of(timeZoneId)))
-          && startDate.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId)));
-    } else if (startDate != null) {
-      this.displayed = active && startDate.isBefore(ZonedDateTime.now(ZoneId.of(timeZoneId)));
-    } else if (expiryDate != null) {
-      this.displayed = active && expiryDate.isAfter(ZonedDateTime.now(ZoneId.of(timeZoneId)));
-    } else {
-      this.displayed = active;
-    }
   }
 
 }
