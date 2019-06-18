@@ -29,6 +29,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
   private Double maxPeriodsOfStock;
   private Double minPeriodsOfStock;
   private Double emergencyOrderPoint;
+  private Boolean active;
 
   /**
    * Returns instance of {@link FacilityTypeApprovedProductsDataBuilder} with sample data.
@@ -41,6 +42,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
     maxPeriodsOfStock = 3.0;
     minPeriodsOfStock = 1.0;
     emergencyOrderPoint = 0.0;
+    active = true;
   }
 
   public FacilityTypeApprovedProductsDataBuilder withOrderableId(UUID orderableId) {
@@ -63,6 +65,11 @@ public class FacilityTypeApprovedProductsDataBuilder {
     return this;
   }
 
+  public FacilityTypeApprovedProductsDataBuilder withActive(Boolean active) {
+    this.active = active;
+    return this;
+  }
+
   /**
    * Builds instance of {@link FacilityTypeApprovedProduct}.
    */
@@ -75,6 +82,6 @@ public class FacilityTypeApprovedProductsDataBuilder {
 
   public FacilityTypeApprovedProduct buildAsNew() {
     return new FacilityTypeApprovedProduct(orderableId, program,
-          facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint);
+          facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint, active);
   }
 }

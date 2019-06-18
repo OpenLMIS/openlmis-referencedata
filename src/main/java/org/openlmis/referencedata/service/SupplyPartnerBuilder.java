@@ -183,7 +183,7 @@ public class SupplyPartnerBuilder
     String programCode = program.getCode().toString();
     PageRequest pageable = new PageRequest(DEFAULT_PAGE_NUMBER, NO_PAGINATION);
     Set<UUID> approvedProductIds = facilityTypeApprovedProductRepository
-        .searchProducts(facilityTypeCodes, programCode, pageable)
+        .searchProducts(facilityTypeCodes, programCode, null, pageable)
         .getContent()
         .stream()
         .map(FacilityTypeApprovedProduct::getOrderableId)

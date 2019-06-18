@@ -419,7 +419,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
-        eq(program.getId()), eq(false), eq(null), eq(pageable)))
+        eq(program.getId()), eq(false), eq(null), eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
@@ -449,7 +449,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
-        eq(program.getId()), eq(false), eq(orderableIds), eq(pageable)))
+        eq(program.getId()), eq(false), eq(orderableIds), eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
     PageImplRepresentation productDtos = restAssured.given()
@@ -486,7 +486,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
     when(facilityTypeApprovedProductRepository
         .searchProducts(any(UUID.class), any(UUID.class), any(Boolean.class), any(List.class),
-            any(Pageable.class)))
+            any(Boolean.class), any(Pageable.class)))
         .thenThrow(new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND));
 
     restAssured.given()

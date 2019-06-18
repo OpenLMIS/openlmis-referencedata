@@ -36,6 +36,7 @@ public class FacilityTypeApprovedProductSearchParamsTest {
 
   private static final String FACILITY_TYPE = "facilityType";
   private static final String PROGRAM = "program";
+  private static final String ACTIVE = "active";
 
   private LinkedMultiValueMap<String, Object> queryMap;
 
@@ -76,6 +77,15 @@ public class FacilityTypeApprovedProductSearchParamsTest {
   }
 
   @Test
+  public void shouldGetActiveValueFromParameters() {
+    queryMap.add(ACTIVE, "true");
+    FacilityTypeApprovedProductSearchParams params
+        = new FacilityTypeApprovedProductSearchParams(queryMap);
+
+    assertThat(params.getActiveFlag()).isEqualTo(true);
+  }
+
+  @Test
   public void shouldGetNullIfMapHasNoNameProperty() {
     FacilityTypeApprovedProductSearchParams params
         = new FacilityTypeApprovedProductSearchParams(queryMap);
@@ -107,6 +117,6 @@ public class FacilityTypeApprovedProductSearchParamsTest {
         = new FacilityTypeApprovedProductSearchParams(queryMap);
 
     ToStringTestUtils.verify(FacilityTypeApprovedProductSearchParams.class, params,
-        "FACILITY_TYPE", "PROGRAM", "ALL_PARAMETERS");
+        "FACILITY_TYPE", "PROGRAM", "ACTIVE", "ALL_PARAMETERS");
   }
 }

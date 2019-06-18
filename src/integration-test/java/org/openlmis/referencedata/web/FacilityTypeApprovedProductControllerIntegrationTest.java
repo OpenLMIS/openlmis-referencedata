@@ -88,6 +88,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .withProgram(program)
         .withOrderableId(orderable.getId())
         .withMaxPeriodsOfStock(6.0)
+        .withActive(true)
         .build();
 
     facilityTypeAppProdId = facilityTypeAppProd.getId();
@@ -369,7 +370,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(facilityTypeApprovedProductRepository
         .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
             eq(program.getCode().toString()),
-            any(Pageable.class)))
+            eq(null), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
     PageImplRepresentation response = restAssured
@@ -391,12 +392,39 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
+  public void shouldSearchInActiveFtaps() {
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
+            eq(program.getCode().toString()),
+            eq(false), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam("facilityType", facilityType1.getCode())
+        .queryParam("program", program.getCode().toString())
+        .queryParam("active", "false")
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(ftapDto.getId().toString(),
+        ((java.util.LinkedHashMap)response.getContent().get(0)).get("id"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPaginateSearchFtaps() {
 
     Pageable pageable = new PageRequest(0, 10);
     given(facilityTypeApprovedProductRepository
         .searchProducts(Lists.newArrayList(facilityType1.getCode()),
-            program.getCode().toString(), pageable))
+            program.getCode().toString(), null, pageable))
         .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
     PageImplRepresentation response = restAssured

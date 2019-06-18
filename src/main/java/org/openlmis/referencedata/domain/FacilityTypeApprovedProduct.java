@@ -71,6 +71,11 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   @Setter
   private Double emergencyOrderPoint;
 
+  @Column(nullable = false, columnDefinition = "boolean DEFAULT true")
+  @Getter
+  @Setter
+  private Boolean active;
+
   /**
    * Creates new FacilityTypeApprovedProduct based on data
    * from {@link FacilityTypeApprovedProduct.Importer}.
@@ -85,6 +90,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
+    ftap.setActive(importer.getActive());
     return ftap;
   }
 
@@ -100,6 +106,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
     exporter.setProgram(program);
     exporter.setFacilityType(facilityType);
+    exporter.setActive(active);
   }
 
   public interface Exporter extends BaseExporter {
@@ -113,6 +120,8 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     void setProgram(Program program);
 
     void setFacilityType(FacilityType facilityType);
+
+    void setActive(Boolean active);
   }
 
   public interface Importer extends BaseImporter {
@@ -128,5 +137,7 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     Program.Importer getProgram();
 
     FacilityType.Importer getFacilityType();
+
+    Boolean getActive();
   }
 }

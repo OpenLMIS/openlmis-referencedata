@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -38,6 +39,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import javax.transaction.Transactional;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -243,7 +245,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
 
     assertThat(page.getContent(), hasSize(2));
   }
@@ -259,7 +261,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .newArrayList(orderableFullSupply.getId(), orderableNonFullSupply.getId());
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
 
     assertThat(page.getContent(), hasSize(2));
     assertEquals(page.getContent().get(0).getOrderableId(), orderableFullSupply.getId());
@@ -277,7 +279,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
 
     assertThat(page.getContent(), hasSize(1));
   }
@@ -291,7 +293,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), true, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), true, orderableIds, null, pageable);
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -314,12 +316,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   public void shouldGetNonFullSupply() {
     // Create a full supply product
     ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType2, false, program));
+    ftapRepository.save(generateProduct(facilityType2, false, program, true));
 
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null, pageable);
 
     // At this point we have no non-full supply products
     assertEquals(0, page.getContent().size());
@@ -328,7 +330,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType1, false));
 
     page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null, pageable);
 
     // We should be able to find non-full supply product we have created
     assertEquals(1, page.getContent().size());
@@ -356,7 +358,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), null, true, orderableIds, pageable);
+        .searchProducts(facility.getId(), null, true, orderableIds, null, pageable);
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -375,7 +377,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     expectedException.expect(ValidationMessageException.class);
     expectedException.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
 
-    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), pageable);
+    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), null, pageable);
   }
 
   @Test
@@ -407,11 +409,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(generateProduct(facilityType2, false));
 
     Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, null);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, true, null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
 
-    result = ftapRepository.searchProducts(singletonList(FACILITY_TYPE2_CODE), null, null);
+    result = ftapRepository.searchProducts(singletonList(FACILITY_TYPE2_CODE), null,
+        null, null);
     assertEquals(2, result.getContent().size());
     for (FacilityTypeApprovedProduct ftap : result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
@@ -419,17 +422,39 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldSearchByActiveFlag() {
+    ftapRepository.save(generateProduct(facilityType1, true, false));
+    ftapRepository.save(generateProduct(facilityType2, true, true));
+    ftapRepository.save(generateProduct(facilityType2, false, false));
+
+    Page<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null,
+        true, null);
+    assertEquals(1, result.getContent().size());
+
+    result = ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE),
+        null, null, null);
+    assertEquals(1, result.getContent().size());
+
+    result = ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE),
+        null, false, null);
+    assertEquals(2, result.getContent().size());
+
+  }
+
+  @Test
   public void shouldSearchByFacilityTypeAndProgram() {
     ftapRepository.save(generateProduct(facilityType1, true));
 
     Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), PROGRAM_CODE, null);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), PROGRAM_CODE,
+            null, null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
     assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
 
     result = ftapRepository
-        .searchProducts(singletonList(FACILITY_TYPE2_CODE), "nonExistingCode", null);
+        .searchProducts(singletonList(FACILITY_TYPE2_CODE), "nonExistingCode", null, null);
     assertEquals(0, result.getContent().size());
   }
 
@@ -437,7 +462,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   public void searchShouldReturnEmptyPageNotNull() {
     // given and when
     Page<FacilityTypeApprovedProduct> actual = ftapRepository
-        .searchProducts(singletonList("abc"), null, null);
+        .searchProducts(singletonList("abc"), null, null, null);
 
     // then
     assertNotNull(actual);
@@ -455,7 +480,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     // when
     Pageable pageRequest = new PageRequest(1, 2);
     Page<FacilityTypeApprovedProduct> actual =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, pageRequest);
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, null, pageRequest);
 
     // then
     assertNotNull(actual);
@@ -464,6 +489,45 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     assertEquals(2, actual.getTotalPages());
     assertEquals(4, actual.getTotalElements());
     assertEquals(2, actual.getContent().size());
+  }
+
+  @Test
+  public void shouldSaveFacilityTypeApprovedProductWithActiveFlagEnabled() {
+    //given
+    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true, true);
+    ftapRepository.save(activeProduct);
+
+    //when
+    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+
+    //then
+    Assert.assertTrue(savedProduct.getActive());
+  }
+
+  @Test
+  public void shouldSaveFacilityTypeApprovedProductWithDefaultActiveFlag() {
+    //given
+    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true);
+    ftapRepository.save(activeProduct);
+
+    //when
+    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+
+    //then
+    Assert.assertTrue(savedProduct.getActive());
+  }
+
+  @Test
+  public void shouldSaveFacilityTypeApprovedProductWithActiveFlagDisabled() {
+    //given
+    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true, false);
+    ftapRepository.save(activeProduct);
+
+    //when
+    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+
+    //then
+    Assert.assertFalse(savedProduct.getActive());
   }
 
   @Test
@@ -482,7 +546,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
     // when
     Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
-        Lists.newArrayList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null, new PageRequest(0, 10));
+        Lists.newArrayList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null, null,
+        new PageRequest(0, 10));
 
     // then
     assertThat(actual, is(notNullValue()));
@@ -520,29 +585,44 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
                                                       boolean fullSupply) {
-    return generateProduct(facilityType, fullSupply, program);
+    return generateProduct(facilityType, fullSupply, program, true);
   }
+
+  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+                                                      boolean fullSupply,
+                                                      boolean active) {
+    return generateProduct(facilityType, fullSupply, program, active);
+  }
+
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
                                                       boolean fullSupply,
                                                       Program program) {
     return getFacilityTypeApprovedProduct(facilityType, program,
-        fullSupply ? orderableFullSupply : orderableNonFullSupply);
+        fullSupply ? orderableFullSupply : orderableNonFullSupply, true);
+  }
+
+  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+                                                      boolean fullSupply,
+                                                      Program program, Boolean active) {
+    return getFacilityTypeApprovedProduct(facilityType, program,
+        fullSupply ? orderableFullSupply : orderableNonFullSupply, active);
   }
 
   private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
                                                       Program program,
                                                       Orderable orderable) {
-    return getFacilityTypeApprovedProduct(facilityType, program, orderable);
+    return getFacilityTypeApprovedProduct(facilityType, program, orderable, true);
   }
 
   private FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
-      FacilityType facilityType, Program program, Orderable orderable) {
+      FacilityType facilityType, Program program, Orderable orderable, Boolean active) {
     return new FacilityTypeApprovedProductsDataBuilder()
         .withFacilityType(facilityType)
         .withOrderableId(orderable.getId())
         .withProgram(program)
         .withMaxPeriodsOfStock(12.00)
+        .withActive(active)
         .buildAsNew();
   }
 

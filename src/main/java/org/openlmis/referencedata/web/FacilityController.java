@@ -312,6 +312,7 @@ public class FacilityController extends BaseController {
       @RequestParam(required = false, value = "programId") UUID programId,
       @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
       @RequestParam(required = false, value = "orderableId") List<UUID> orderablesId,
+      @RequestParam(required = false, value = "active") Boolean active,
       @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
 
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
@@ -319,7 +320,7 @@ public class FacilityController extends BaseController {
 
     profiler.start("FIND_APPROVED_PRODUCTS");
     Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facilityId, programId, fullSupply, orderablesId, pageable);
+        .searchProducts(facilityId, programId, fullSupply, orderablesId, active, pageable);
 
     Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 

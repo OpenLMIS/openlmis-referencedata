@@ -33,8 +33,9 @@ public final class FacilityTypeApprovedProductSearchParams {
 
   private static final String FACILITY_TYPE = "facilityType";
   private static final String PROGRAM = "program";
+  private static final String ACTIVE = "active";
 
-  private static final List<String> ALL_PARAMETERS = asList(FACILITY_TYPE, PROGRAM);
+  private static final List<String> ALL_PARAMETERS = asList(FACILITY_TYPE, PROGRAM, ACTIVE);
 
   private SearchParams queryParams;
 
@@ -74,6 +75,18 @@ public final class FacilityTypeApprovedProductSearchParams {
       return null;
     }
     return queryParams.getFirst(PROGRAM);
+  }
+
+  /**
+   * Gets {@link String} for "active" key from params.
+   *
+   * @return String value of program or null if params doesn't contain "active" key.
+   */
+  public Boolean getActiveFlag() {
+    if (!queryParams.containsKey(ACTIVE)) {
+      return null;
+    }
+    return Boolean.parseBoolean(queryParams.getFirst(ACTIVE));
   }
 
   /**

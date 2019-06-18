@@ -167,7 +167,8 @@ public class FacilityTypeApprovedProductController extends BaseController {
         new FacilityTypeApprovedProductSearchParams(queryParams);
 
     Page<FacilityTypeApprovedProduct> ftaps = repository
-        .searchProducts(searchParams.getFacilityTypeCodes(), searchParams.getProgram(), pageable);
+        .searchProducts(searchParams.getFacilityTypeCodes(), searchParams.getProgram(),
+            searchParams.getActiveFlag(), pageable);
 
     return Pagination.getPage(toDto(ftaps.getContent()), pageable, ftaps.getTotalElements());
   }

@@ -81,7 +81,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
-      Boolean fullSupply, List<UUID> orderableIds, Pageable pageable) {
+      Boolean fullSupply, List<UUID> orderableIds, Boolean active, Pageable pageable) {
 
     Profiler profiler = new Profiler("FTAP_REPOSITORY_SEARCH");
     profiler.setLogger(XLOGGER);
@@ -89,14 +89,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
     profiler.start("SEARCH_FACILITY_TYPE_ID");
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
-    Query nativeQuery = prepareQuery(facilityTypeId, programId, fullSupply, orderableIds, pageable);
+    Query nativeQuery = prepareQuery(facilityTypeId, programId, fullSupply, orderableIds,
+        active, pageable);
     return executeQuery(nativeQuery, pageable);
   }
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
-      String programCode, Pageable pageable) {
-    Query nativeQuery = prepareQuery(facilityTypeCodes, programCode, pageable);
+      String programCode, Boolean active, Pageable pageable) {
+    Query nativeQuery = prepareQuery(facilityTypeCodes, programCode, active, pageable);
     return executeQuery(nativeQuery, pageable);
 
   }
@@ -134,7 +135,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   private Query prepareQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
-      List<UUID> orderableIds, Pageable pageable) {
+      List<UUID> orderableIds, Boolean active, Pageable pageable) {
     StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
     Map<String, Object> params = Maps.newHashMap();
 
@@ -162,11 +163,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("facilityTypeId", facilityTypeId);
     }
 
+    builder.append(" AND ftap.active = :active");
+    params.put("active", null == active || active);
+
     return createQuery(pageable, builder, params);
   }
 
   private Query prepareQuery(List<String> facilityTypeCodes,
-      String programCode, Pageable pageable) {
+      String programCode, Boolean active, Pageable pageable) {
     StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
     Map<String, Object> params = Maps.newHashMap();
 
@@ -185,6 +189,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
       builder.append(" AND ft.code in (:facilityTypeCodes)");
       params.put("facilityTypeCodes", facilityTypeCodes);
     }
+
+    builder.append(" AND ftap.active = :active");
+    params.put("active", null == active || active);
 
     return createQuery(pageable, builder, params);
   }

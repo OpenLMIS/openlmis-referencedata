@@ -145,7 +145,7 @@ public class SupplyPartnerBuilderTest {
         .thenReturn(Pagination.getPage(Lists.newArrayList(orderable)));
     when(facilityTypeApprovedProductRepository
         .searchProducts(eq(Collections.singletonList(facility.getType().getCode())),
-            eq(program.getCode().toString()), any(Pageable.class)))
+            eq(program.getCode().toString()), eq(null), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct)));
   }
 

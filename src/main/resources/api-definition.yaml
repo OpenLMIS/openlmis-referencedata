@@ -2367,6 +2367,15 @@ resourceTypes:
                 type: string
                 required: false
                 repeat: false
+            active:
+              description: >
+                If set to true, the endpoint will try to find active FTAPs.
+                If set to false, the endpoint will try to find inactive FTAPs.
+                If not set, the endpoint will try to find active FTAPs (default behaviour).
+              displayName: active
+              type: boolean
+              required: false
+              repeat: false
           responses:
             200:
                 body:
@@ -2424,7 +2433,7 @@ resourceTypes:
                             schema: localizedErrorResponse
             delete:
                 is: [ secured ]
-                description: "[AVOID USING] Completely removes facility type approved product. This action is not recoverable."
+                description: "WARNING! Deprecated. [AVOID USING] Completely removes facility type approved product. This action is not recoverable."
                 responses:
                     "204":
                     "403":

@@ -46,6 +46,7 @@ public final class ApprovedProductDto
   private Double maxPeriodsOfStock;
   private Double minPeriodsOfStock;
   private Double emergencyOrderPoint;
+  private Boolean active;
 
   @JsonSetter("orderable")
   public void setOrderable(OrderableDto orderable) {
@@ -86,5 +87,11 @@ public final class ApprovedProductDto
   @JsonIgnore
   public void setFacilityType(FacilityType facilityType) {
     this.facilityType = FacilityTypeDto.newInstance(facilityType);
+  }
+
+  @Override
+  @JsonSetter("active")
+  public void setActive(Boolean active) {
+    this.active = active;
   }
 }
