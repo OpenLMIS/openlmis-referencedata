@@ -19,6 +19,7 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -242,6 +243,11 @@ public class FacilityTypeApprovedProductController extends BaseController {
   }
 
   private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods) {
+
+    if (prods.size() == 0) {
+      return Collections.emptyList();
+    }
+
     Set<UUID> orderableId = prods
         .stream()
         .map(FacilityTypeApprovedProduct::getOrderableId)

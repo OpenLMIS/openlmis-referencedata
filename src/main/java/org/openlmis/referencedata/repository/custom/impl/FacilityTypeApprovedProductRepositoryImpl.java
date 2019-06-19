@@ -89,14 +89,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
     Query nativeQuery = prepareQuery(facilityTypeId, programId, fullSupply, orderableIds,
-        active, pageable);
+        active);
     return executeQuery(nativeQuery, pageable);
   }
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
       String programCode, Boolean active, Pageable pageable) {
-    Query nativeQuery = prepareQuery(facilityTypeCodes, programCode, active, pageable);
+    Query nativeQuery = prepareQuery(facilityTypeCodes, programCode, active);
     return executeQuery(nativeQuery, pageable);
 
   }
@@ -140,7 +140,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   private Query prepareQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
-      List<UUID> orderableIds, Boolean active, Pageable pageable) {
+      List<UUID> orderableIds, Boolean active) {
     StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
     Map<String, Object> params = Maps.newHashMap();
 
@@ -175,7 +175,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   private Query prepareQuery(List<String> facilityTypeCodes,
-      String programCode, Boolean active, Pageable pageable) {
+      String programCode, Boolean active) {
     StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
     Map<String, Object> params = Maps.newHashMap();
 

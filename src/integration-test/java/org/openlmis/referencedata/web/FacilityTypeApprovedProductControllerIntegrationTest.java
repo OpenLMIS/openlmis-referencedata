@@ -66,6 +66,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String FACILITY_TYPE_PARAM = "facilityType";
+  private static final String PROGRAM_PARAM = "program";
+  private static final String ACTIVE_PARAM = "active";
 
   private Program program;
   private Orderable orderable;
@@ -377,8 +380,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam("facilityType", facilityType1.getCode())
-        .queryParam("program", program.getCode().toString())
+        .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
+        .queryParam(PROGRAM_PARAM, program.getCode().toString())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -403,9 +406,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam("facilityType", facilityType1.getCode())
-        .queryParam("program", program.getCode().toString())
-        .queryParam("active", "false")
+        .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
+        .queryParam(PROGRAM_PARAM, program.getCode().toString())
+        .queryParam(ACTIVE_PARAM, "false")
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -415,6 +418,31 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(1, response.getContent().size());
     assertEquals(ftapDto.getId().toString(),
         ((java.util.LinkedHashMap)response.getContent().get(0)).get("id"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSearchNoFtaps() {
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
+            eq(program.getCode().toString()),
+            eq(false), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList()));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
+        .queryParam(PROGRAM_PARAM, program.getCode().toString())
+        .queryParam(ACTIVE_PARAM, "false")
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageImplRepresentation.class);
+
+    assertEquals(0, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
