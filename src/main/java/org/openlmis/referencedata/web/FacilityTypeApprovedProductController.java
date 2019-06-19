@@ -244,7 +244,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
   private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods) {
 
-    if (prods.size() == 0) {
+    if (prods.isEmpty()) {
       return Collections.emptyList();
     }
 
