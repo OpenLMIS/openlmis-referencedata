@@ -39,16 +39,10 @@ import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
-import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
-import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.validate.FacilityValidator;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -92,15 +86,6 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private OrderableRepository orderableRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private SupervisoryNodeRepository supervisoryNodeRepository;
-
-  @Autowired
-  private SupplyLineRepository supplyLineRepository;
 
   @Autowired
   private FacilityService facilityService;
@@ -372,46 +357,6 @@ public class FacilityController extends BaseController {
 
     profiler.start("DELETE_FACILITY");
     facilityRepository.delete(facility);
-  }
-
-  /**
-   * Retrieves all available supplying facilities for program and supervisory node.
-   *
-   * @param programId         program to filter facilities.
-   * @param supervisoryNodeId supervisoryNode to filter facilities.
-   * @return matched facilities.
-   */
-  @RequestMapping(value = RESOURCE_PATH + "/supplying", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
-  public List<FacilityDto> getSupplyingDepots(
-      @RequestParam(value = "programId") UUID programId,
-      @RequestParam(value = "supervisoryNodeId") UUID supervisoryNodeId) {
-    Profiler profiler = new Profiler("GET_SUPPLYING_DEPOTS");
-    profiler.setLogger(XLOGGER);
-
-    profiler.start("EXISTS_PROGRAM");
-    if (!programRepository.exists(programId)) {
-      profiler.stop().log();
-      throw new ValidationMessageException(
-          new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
-    }
-
-    profiler.start("EXISTS_SUPERVISORY_NODE");
-    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
-      profiler.stop().log();
-      throw new ValidationMessageException(
-          new Message(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID, supervisoryNodeId));
-    }
-
-    profiler.start("FIND_SUPPLYING_FACILITIES");
-    List<Facility> facilities = supplyLineRepository
-        .findSupplyingFacilities(programId, supervisoryNodeId);
-
-    List<FacilityDto> dto = toDto(facilities, profiler);
-
-    profiler.stop().log();
-    return dto;
   }
 
   /**

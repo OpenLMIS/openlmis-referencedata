@@ -4,6 +4,7 @@
 Breaking changes:
 * [OLMIS-6351](https://openlmis.atlassian.net/browse/OLMIS-6351): Drop reference to orderable version from Facility Type Approved Product
   * Facility Type Approved Product references an orderable by its ID.  
+* [OLMIS-5008](https://openlmis.atlassian.net/browse/OLMIS-5008): Removed `GET /api/facilities/supplying` endpoint
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-6322](https://openlmis.atlassian.net/browse/OLMIS-6322): Added new ADMINISTRATIVE_MESSAGES_MANAGE right. Assigned to System Administrator role by default.
