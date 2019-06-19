@@ -37,8 +37,8 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.SystemNotificationDto;
+import org.openlmis.referencedata.dto.UserObjectReferenceDto;
 import org.openlmis.referencedata.repository.custom.SystemNotificationRepositoryCustom;
 import org.openlmis.referencedata.testbuilder.SystemNotificationDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
@@ -137,6 +137,37 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
+  public void shouldGetSystemNotificationsWithExpand() {
+
+    Map<String, Object> parameters = new HashMap<>();
+    parameters.put("page", 0);
+    parameters.put("size", 10);
+    parameters.put(AUTHOR_ID, notification.getAuthor().getId());
+    parameters.put(IS_DISPLAYED, true);
+
+    given(systemNotificationRepository.search(
+        any(SystemNotificationRepositoryCustom.SearchParams.class), eq(pageable)))
+        .willReturn(Pagination.getPage(Arrays.asList(notification), pageable, 1));
+
+    parameters.put("expand", "author");
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .params(parameters)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_PATH)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .body("content", hasSize(1));
+
+    assertResponseBody(response, "content[0]", is(notification.getId().toString()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldGetSystemNotification() {
     given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
 
@@ -227,7 +258,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
 
     notificationDto.setId(null);
-    notificationDto.setAuthor(new ObjectReferenceDto());
+    notificationDto.setAuthor(new UserObjectReferenceDto());
 
     restAssured
         .given()

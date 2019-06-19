@@ -19,6 +19,7 @@ import static java.util.Arrays.asList;
 import static org.openlmis.referencedata.util.messagekeys.SystemNotificationMessageKeys.ERROR_INVALID_PARAMS;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -34,8 +35,9 @@ public final class SystemNotificationSearchParams implements
 
   private static final String AUTHOR_ID = "authorId";
   private static final String IS_DISPLAYED = "isDisplayed";
+  private static final String EXPAND = "expand";
 
-  private static final List<String> ALL_PARAMETERS = asList(AUTHOR_ID, IS_DISPLAYED);
+  private static final List<String> ALL_PARAMETERS = asList(AUTHOR_ID, IS_DISPLAYED, EXPAND);
 
   private SearchParams queryParams;
 
@@ -69,6 +71,10 @@ public final class SystemNotificationSearchParams implements
       return null;
     }
     return queryParams.getBoolean(IS_DISPLAYED);
+  }
+
+  public Set<String> getExpand() {
+    return queryParams.getStrings(EXPAND);
   }
 
   /**

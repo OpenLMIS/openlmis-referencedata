@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.web.SystemNotificationController.RESOUR
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
@@ -96,11 +97,9 @@ public class SystemNotificationController extends BaseController {
     Page<SystemNotification> notifications =
         systemNotificationRepository.search(searchParams, pageable);
 
-    List<SystemNotificationDto> notificationDtos = toDtos(notifications.getContent(), profiler);
-
     profiler.start("CREATE_FINAL_RESULT_PAGE");
-    Page<SystemNotificationDto> page = Pagination.getPage(notificationDtos, pageable,
-        notifications.getTotalElements());
+    Page<SystemNotificationDto> page =
+        exportToDtosWithExpand(notifications, pageable, searchParams.getExpand());
 
     profiler.stop().log();
     return page;
@@ -265,17 +264,28 @@ public class SystemNotificationController extends BaseController {
     return toDto(systemNotification, profiler);
   }
 
-  private List<SystemNotificationDto> toDtos(List<SystemNotification> notifications,
-      Profiler profiler) {
-    profiler.start("EXPORT_SYSTEM_NOTIFICATIONS_TO_DTOS");
-    return notifications
-        .stream()
-        .map(elem -> SystemNotificationDto.newInstance(elem, serviceUrl))
-        .collect(Collectors.toList());
-  }
-
   private SystemNotificationDto toDto(SystemNotification notification, Profiler profiler) {
     profiler.start("EXPORT_SYSTEM_NOTIFICATION_TO_DTO");
     return SystemNotificationDto.newInstance(notification, serviceUrl);
+  }
+
+  private SystemNotificationDto exportToDtoWithExpand(SystemNotification systemNotification,
+      Set<String> expand) {
+    SystemNotificationDto systemNotificationDto = null;
+
+    if (systemNotification != null) {
+      systemNotificationDto = SystemNotificationDto.newInstance(systemNotification, serviceUrl);
+      expandDto(systemNotificationDto, systemNotification, expand);
+    }
+
+    return systemNotificationDto;
+  }
+
+  private Page<SystemNotificationDto> exportToDtosWithExpand(Page<SystemNotification> page,
+      Pageable pageable, Set<String> expand) {
+    List<SystemNotificationDto> list = page.getContent().stream()
+        .map(systemNotification -> exportToDtoWithExpand(systemNotification, expand))
+        .collect(Collectors.toList());
+    return Pagination.getPage(list, pageable, page.getTotalElements());
   }
 }

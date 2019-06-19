@@ -16,9 +16,12 @@
 package org.openlmis.referencedata.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -28,6 +31,7 @@ public class SystemNotificationSearchParamsTest {
 
   private static final String IS_DISPLAYED = "isDisplayed";
   private static final String AUTHOR_ID = "authorId";
+  private static final String EXPAND = "expand";
 
   private LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
 
@@ -46,7 +50,7 @@ public class SystemNotificationSearchParamsTest {
 
     ToStringTestUtils
         .verify(SystemNotificationSearchParams.class, params,
-            "IS_DISPLAYED", "AUTHOR_ID", "ALL_PARAMETERS");
+            "IS_DISPLAYED", "AUTHOR_ID", "ALL_PARAMETERS", "EXPAND");
   }
 
   @Test
@@ -87,6 +91,26 @@ public class SystemNotificationSearchParamsTest {
     SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
 
     assertThat(params.getAuthorId()).isNull();
+  }
+
+  @Test
+  public void shouldGetExpandFromParametersIfKeyIsPresent() {
+    final String expand1 = "expand1";
+    final String expand2 = "expand2";
+
+    queryMap.add(EXPAND, expand1);
+    queryMap.add(EXPAND, expand2);
+
+    SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
+
+    MatcherAssert.assertThat(params.getExpand(), hasItems(expand1, expand2));
+  }
+
+  @Test
+  public void shouldGetEmptySetIfMapHasNoExpandKey() {
+    SystemNotificationSearchParams params = new SystemNotificationSearchParams(queryMap);
+
+    MatcherAssert.assertThat(params.getExpand(), hasSize(0));
   }
 
   @Test(expected = ValidationMessageException.class)

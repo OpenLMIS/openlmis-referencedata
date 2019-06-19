@@ -34,7 +34,7 @@
     },
     "author": {
       "type": "object",
-      "$ref": "referenceObjectDto.json"
+      "$ref": "userObjectReference.json"
     },
     "displayed": {
       "type": "boolean",

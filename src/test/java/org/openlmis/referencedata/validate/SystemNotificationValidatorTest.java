@@ -29,8 +29,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.domain.User;
-import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.SystemNotificationDto;
+import org.openlmis.referencedata.dto.UserObjectReferenceDto;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.testbuilder.SystemNotificationDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
@@ -70,7 +70,7 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyAuthor() {
-    systemNotificationDto.setAuthor(new ObjectReferenceDto());
+    systemNotificationDto.setAuthor(new UserObjectReferenceDto());
 
     validator.validate(systemNotificationDto, errors);
 

@@ -3403,6 +3403,12 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: false
+              expand:
+                  displayName: expand
+                  description: expand
+                  type: string
+                  required: false
+                  repeat: true
           responses:
               200:
                   description: The request is valid and a page of system notifications has been returned.

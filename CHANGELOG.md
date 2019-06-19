@@ -3,13 +3,14 @@
 
 Breaking changes:
 * [OLMIS-6351](https://openlmis.atlassian.net/browse/OLMIS-6351): Drop reference to orderable version from Facility Type Approved Product
-  * Facility Type Approved Product references an orderable by its ID.  
+  * Facility Type Approved Product references an orderable by its ID.
 * [OLMIS-5008](https://openlmis.atlassian.net/browse/OLMIS-5008): Removed `GET /api/facilities/supplying` endpoint
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-6322](https://openlmis.atlassian.net/browse/OLMIS-6322): Added new ADMINISTRATIVE_MESSAGES_MANAGE right. Assigned to System Administrator role by default.
 * [OLMIS-6347](https://openlmis.atlassian.net/browse/OLMIS-6347): Added CRUD for administrative messages and renamed ADMINISTRATIVE_MESSAGES_MANAGE right to SYSTEM_NOTIFICATIONS_MANAGE.
 * [OLMIS-6352](https://openlmis.atlassian.net/browse/OLMIS-6352): Added active flag to Facility Type Approved Products
+* [OLMIS-6361](https://openlmis.atlassian.net/browse/OLMIS-6361): Added expand pattern to GET /api/systemNotifications endpoint.
 
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
