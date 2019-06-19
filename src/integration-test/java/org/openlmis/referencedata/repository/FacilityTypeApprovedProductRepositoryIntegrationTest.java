@@ -422,6 +422,17 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   }
 
   @Test
+  public void shouldNotFindInactiveFtap() {
+    ftapRepository.save(generateProduct(facilityType1, true, true));
+    Pageable pageRequest = new PageRequest(0, 10);
+
+    Page<FacilityTypeApprovedProduct> result =
+        ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE), null,
+            false, pageRequest);
+    assertEquals(0, result.getContent().size());
+  }
+
+  @Test
   public void shouldSearchByActiveFlag() {
     ftapRepository.save(generateProduct(facilityType1, true, false));
     ftapRepository.save(generateProduct(facilityType2, true, true));

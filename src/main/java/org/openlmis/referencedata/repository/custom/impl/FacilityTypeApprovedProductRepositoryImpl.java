@@ -70,8 +70,6 @@ public class FacilityTypeApprovedProductRepositoryImpl
           + " AND po.active IS TRUE";
   private static final String NATIVE_FACILITY_TYPE_INNER_JOIN =
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
-  private static final String NATIVE_PAGE_REQUEST = " LIMIT :limit OFFSET :offset";
-
   private static final String HQL_SELECT_FTAP_BY_IDS = "SELECT ftap"
       + " FROM FacilityTypeApprovedProduct AS ftap"
       + " WHERE ftap.id IN (:ids)";
@@ -112,9 +110,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    Integer limit = maxAndFirst.getLeft();
+    Integer offset = maxAndFirst.getRight();
+
     List<FacilityTypeApprovedProduct> resultList = entityManager
         .createQuery(HQL_SELECT_FTAP_BY_IDS, FacilityTypeApprovedProduct.class)
         .setParameter("ids", ids)
+        .setFirstResult(offset)
+        .setMaxResults(limit)
         .getResultList();
 
     return Pagination.getPage(resultList, pageable, ids.size());
@@ -167,7 +171,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
-    return createQuery(pageable, builder, params);
+    return createQuery(builder, params);
   }
 
   private Query prepareQuery(List<String> facilityTypeCodes,
@@ -194,19 +198,10 @@ public class FacilityTypeApprovedProductRepositoryImpl
     builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
-    return createQuery(pageable, builder, params);
+    return createQuery(builder, params);
   }
 
-  private Query createQuery(Pageable pageable, StringBuilder builder, Map<String, Object> params) {
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-    Integer limit = maxAndFirst.getLeft();
-    Integer offset = maxAndFirst.getRight();
-
-    if (limit > 0) {
-      builder.append(NATIVE_PAGE_REQUEST);
-      params.put("limit", limit);
-      params.put("offset", offset);
-    }
+  private Query createQuery(StringBuilder builder, Map<String, Object> params) {
 
     Query nativeQuery = entityManager.createNativeQuery(builder.toString());
     params.forEach(nativeQuery::setParameter);
