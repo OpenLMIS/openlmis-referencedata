@@ -28,6 +28,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
@@ -162,7 +163,9 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
         .statusCode(HttpStatus.SC_OK)
         .body("content", hasSize(1));
 
-    assertResponseBody(response, "content[0]", is(notification.getId().toString()));
+    assertResponseBodyWithExpand(response, "content[0]", Arrays.asList(
+        is(notification.getAuthor().getFirstName()),
+        is(notification.getAuthor().getLastName())));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -539,6 +542,14 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
         .body("message", is(notification.getMessage()))
         .body("active", is(notification.isActive()))
         .body("author.id", is(notification.getAuthor().getId().toString()));
+  }
+
+  private void assertResponseBodyWithExpand(ValidatableResponse response, String resourcePath,
+      List<Matcher<String>> idMatchers) {
+    response
+        .rootPath(resourcePath)
+        .body("author.firstName", idMatchers.get(0))
+        .body("author.lastName", idMatchers.get(1));
   }
 
 }
