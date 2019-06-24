@@ -33,6 +33,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 
 import com.google.common.collect.ImmutableMap;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,8 +56,6 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.DispensableDto;
-import org.openlmis.referencedata.dto.MetadataDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
@@ -79,11 +78,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
   private static final String VERSION_ID = "versionId";
+
   @Captor
   public ArgumentCaptor<OrderableSearchParams> searchParamsArgumentCaptor;
-  private OrderableDto orderableDto;
 
   private Orderable orderable;
+  private OrderableDto orderableDto = new OrderableDto();
+
   private UUID orderableId = UUID.randomUUID();
   private Long orderableVersionId = 1L;
 
@@ -92,14 +93,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void setUp() {
     super.setUp();
 
-    ZonedDateTime zdtNow = ZonedDateTime.now();
-    orderableDto = new OrderableDto(CODE, new DispensableDto(UNIT, null, null, UNIT),
-        NAME, null, 10L, 5L, false, Collections.emptySet(), Collections.emptySet(), null, null,
-        new MetadataDto("1", zdtNow), null);
-
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
         10, 5, false, orderableId, orderableVersionId);
     orderable.setProgramOrderables(Collections.emptyList());
+    orderable.setLastUpdated(ZonedDateTime.now(ZoneId.of("UTC")));
     orderable.export(orderableDto);
 
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);
