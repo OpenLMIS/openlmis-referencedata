@@ -89,14 +89,14 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void searchShouldReturnBadRequestOnException() {
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("page", 0);
-    parameters.put("size", 10);
     parameters.put(AUTHOR_ID, notification.getAuthor().getId());
     parameters.put(IS_DISPLAYED, true);
 
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .params(parameters)
         .param("some-unknown-parameter", "some-value")
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -109,12 +109,10 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   }
 
   @Test
-  public void shouldGetAllSystemNotificationsWithoutCheckingRights() {
+  public void shouldGetSystemNotificationsByParamsWithoutCheckingRights() {
     mockUserHasNoRight(RightName.SYSTEM_NOTIFICATIONS_MANAGE);
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("page", 0);
-    parameters.put("size", 10);
     parameters.put(AUTHOR_ID, notification.getAuthor().getId());
     parameters.put(IS_DISPLAYED, true);
 
@@ -125,7 +123,33 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .params(parameters)
+        .when()
+        .get(RESOURCE_PATH)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .body("content", hasSize(2));
+
+    assertResponseBody(response, "content[0]", is(notification.getId().toString()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetAllSystemNotificationsWithoutCheckingRights() {
+    mockUserHasNoRight(RightName.SYSTEM_NOTIFICATIONS_MANAGE);
+
+    given(systemNotificationRepository.search(
+        any(SystemNotificationRepositoryCustom.SearchParams.class), eq(pageable)))
+        .willReturn(Pagination.getPage(Arrays.asList(notification, notification2)));
+
+    ValidatableResponse response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .when()
         .get(RESOURCE_PATH)
         .then()
@@ -141,8 +165,6 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   public void shouldGetSystemNotificationsWithExpand() {
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("page", 0);
-    parameters.put("size", 10);
     parameters.put(AUTHOR_ID, notification.getAuthor().getId());
     parameters.put(IS_DISPLAYED, true);
 
@@ -155,6 +177,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
         .params(parameters)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
