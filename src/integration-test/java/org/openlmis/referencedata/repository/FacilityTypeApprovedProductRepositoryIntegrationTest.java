@@ -422,7 +422,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   }
 
   @Test
-  public void shouldNotFindInactiveFtap() {
+  public void shouldNotFindInactiveFtapWhenNoInactiveFtapSaved() {
     ftapRepository.save(generateProduct(facilityType1, true, true));
     Pageable pageRequest = new PageRequest(0, 10);
 
