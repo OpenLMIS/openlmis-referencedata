@@ -11,6 +11,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-6347](https://openlmis.atlassian.net/browse/OLMIS-6347): Added CRUD for administrative messages and renamed ADMINISTRATIVE_MESSAGES_MANAGE right to SYSTEM_NOTIFICATIONS_MANAGE.
 * [OLMIS-6352](https://openlmis.atlassian.net/browse/OLMIS-6352): Added active flag to Facility Type Approved Products
 * [OLMIS-6361](https://openlmis.atlassian.net/browse/OLMIS-6361): Added expand pattern to GET /api/systemNotifications endpoint.
+* [OLMIS-6388](https://openlmis.atlassian.net/browse/OLMIS-6388): Added setting isDisplayed flag in system notification based on startDate, expiryDate and active flag.
 
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
