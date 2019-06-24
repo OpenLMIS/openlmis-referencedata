@@ -36,9 +36,9 @@
       "type": "object",
       "$ref": "userObjectReference.json"
     },
-    "displayed": {
+    "isDisplayed": {
       "type": "boolean",
-      "title": "displayed"
+      "title": "isDisplayed"
     }
   },
   "required": [

@@ -69,8 +69,7 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
   private UserObjectReferenceDto author;
 
   @Getter
-  @Setter
-  private boolean displayed;
+  private Boolean isDisplayed;
 
   @Override
   @JsonIgnore
@@ -93,13 +92,21 @@ public final class SystemNotificationDto extends BaseDto implements SystemNotifi
         BaseController.API_PATH + "/users", author.getId());
   }
 
+  @JsonSetter("isDisplayed")
+  public void setIsDisplayed(boolean isDisplayed) {
+    this.isDisplayed = isDisplayed;
+  }
+
   /**
    * Creates a new instance based on data from a domain object.
    */
   public static SystemNotificationDto newInstance(SystemNotification systemNotification,
-      String serviceUrl) {
+      String serviceUrl, Boolean isDisplayed) {
     SystemNotificationDto dto = new SystemNotificationDto();
     dto.setServiceUrl(serviceUrl);
+    if (isDisplayed != null) {
+      dto.setIsDisplayed(isDisplayed);
+    }
     systemNotification.export(dto);
 
     return dto;

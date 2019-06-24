@@ -26,11 +26,12 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SystemNotification;
+import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.SystemNotificationDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
-import org.openlmis.referencedata.service.SystemNotificationBuilder;
+import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SystemNotificationMessageKeys;
@@ -44,6 +45,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,7 +77,7 @@ public class SystemNotificationController extends BaseController {
   private SystemNotificationValidator systemNotificationValidator;
 
   @Autowired
-  private SystemNotificationBuilder systemNotificationBuilder;
+  private UserRepository userRepository;
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -99,7 +101,8 @@ public class SystemNotificationController extends BaseController {
 
     profiler.start("CREATE_FINAL_RESULT_PAGE");
     Page<SystemNotificationDto> page =
-        exportToDtosWithExpand(notifications, pageable, searchParams.getExpand());
+        exportToDtosWithExpand(notifications, pageable, searchParams.getExpand(),
+            searchParams.getIsDisplayed());
 
     profiler.stop().log();
     return page;
@@ -249,6 +252,15 @@ public class SystemNotificationController extends BaseController {
     return systemNotification;
   }
 
+  private List<SystemNotification> notificationsToDisplay(Pageable pageable) {
+    MultiValueMap<String, Object> paramsMap = new LinkedMultiValueMap<>();
+    paramsMap.add("isDisplayed", true);
+    SystemNotificationSearchParams params = new SystemNotificationSearchParams(paramsMap);
+    Page<SystemNotification> page = systemNotificationRepository.search(params, pageable);
+
+    return page.getContent();
+  }
+
   private SystemNotificationDto validateAndSave(SystemNotificationDto systemNotificationDto,
       BindingResult bindingResult, Profiler profiler) {
     profiler.start("SYSTEM_NOTIFICATION_VALIDATION");
@@ -256,7 +268,9 @@ public class SystemNotificationController extends BaseController {
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     profiler.start("BUILD_SYSTEM_NOTIFICATION");
-    SystemNotification systemNotification = systemNotificationBuilder.build(systemNotificationDto);
+    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
+    SystemNotification systemNotification =
+        SystemNotification.newInstance(systemNotificationDto, author);
 
     profiler.start("SAVE_SYSTEM_NOTIFICATION");
     systemNotificationRepository.save(systemNotification);
@@ -266,15 +280,16 @@ public class SystemNotificationController extends BaseController {
 
   private SystemNotificationDto toDto(SystemNotification notification, Profiler profiler) {
     profiler.start("EXPORT_SYSTEM_NOTIFICATION_TO_DTO");
-    return SystemNotificationDto.newInstance(notification, serviceUrl);
+    return SystemNotificationDto.newInstance(notification, serviceUrl, null);
   }
 
   private SystemNotificationDto exportToDtoWithExpand(SystemNotification systemNotification,
-      Set<String> expand) {
+      Set<String> expand, Boolean isDisplayed) {
     SystemNotificationDto systemNotificationDto = null;
 
     if (systemNotification != null) {
-      systemNotificationDto = SystemNotificationDto.newInstance(systemNotification, serviceUrl);
+      systemNotificationDto = SystemNotificationDto.newInstance(systemNotification, serviceUrl,
+          isDisplayed);
       expandDto(systemNotificationDto, systemNotification, expand);
     }
 
@@ -282,10 +297,24 @@ public class SystemNotificationController extends BaseController {
   }
 
   private Page<SystemNotificationDto> exportToDtosWithExpand(Page<SystemNotification> page,
-      Pageable pageable, Set<String> expand) {
+      Pageable pageable, Set<String> expand, Boolean isDisplayed) {
+
     List<SystemNotificationDto> list = page.getContent().stream()
-        .map(systemNotification -> exportToDtoWithExpand(systemNotification, expand))
+        .map(systemNotification -> exportToDtoWithExpand(systemNotification, expand,
+            verifyIfShouldBeDisplayed(isDisplayed, page, pageable, systemNotification)))
         .collect(Collectors.toList());
     return Pagination.getPage(list, pageable, page.getTotalElements());
+  }
+
+  private Boolean verifyIfShouldBeDisplayed(Boolean isDisplayed, Page<SystemNotification> page,
+      Pageable pageable, SystemNotification notification) {
+    if (isDisplayed != null) {
+      if (isDisplayed) {
+        return page.getContent().contains(notification);
+      } else {
+        return !page.getContent().contains(notification);
+      }
+    }
+    return notificationsToDisplay(pageable).contains(notification);
   }
 }

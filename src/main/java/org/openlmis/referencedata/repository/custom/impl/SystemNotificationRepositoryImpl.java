@@ -15,17 +15,19 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import com.google.common.base.Preconditions;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.and;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import org.apache.commons.lang3.tuple.Pair;
+import javax.persistence.Query;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.repository.custom.SystemNotificationRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -34,11 +36,37 @@ import org.springframework.data.domain.Pageable;
 
 public class SystemNotificationRepositoryImpl implements SystemNotificationRepositoryCustom {
 
-  private static final String ID = "id";
-  private static final String AUTHOR = "author";
-  private static final String ACTIVE = "active";
-  private static final String DISPLAYED = "displayed";
-  private static final String EXPIRY_DATE = "expiryDate";
+  private static final String HQL_COUNT = "SELECT DISTINCT COUNT(*)"
+      + " FROM SystemNotification AS sn"
+      + " INNER JOIN sn.author AS a";
+
+  private static final String HQL_SELECT = "SELECT DISTINCT sn"
+      + " FROM SystemNotification AS sn"
+      + " INNER JOIN sn.author AS a";
+
+  private static final String WHERE = "WHERE";
+  private static final String AND = " AND ";
+  private static final String OR = " OR ";
+  private static final String DEFAULT_SORT = "sn.active DESC, sn.expiryDate DESC";
+  private static final String ORDER_BY = "ORDER BY";
+
+  private static final String WITH_AUTHOR_ID = "a.id = :authorId";
+  private static final String WITH_ACTIVE = "sn.active = :isDisplayed";
+  private static final String NOW = ":now";
+
+  private static final String START_DATE = "sn.startDate";
+  private static final String EXPIRY_DATE = "sn.expiryDate";
+  private static final String IS_NOT_NULL = " IS NOT NULL";
+  private static final String IS_NULL = " IS NULL";
+  private static final String DATE_AFTER_NOW = " > " + NOW;
+  private static final String DATE_BEFORE_NOW = " < " + NOW;
+  private static final String DATE_AFTER_OR_EQUAL_NOW = " >= " + NOW;
+  private static final String DATE_BEFORE_OR_EQUAL_NOW = " <= " + NOW;
+
+  private static final String NULL_START_DATE = START_DATE + IS_NULL;
+  private static final String NULL_EXPIRY_DATE = EXPIRY_DATE + IS_NULL;
+  private static final String NOT_NULL_START_DATE = START_DATE + IS_NOT_NULL;
+  private static final String NOT_NULL_EXPIRY_DATE = EXPIRY_DATE + IS_NOT_NULL;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -47,69 +75,75 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
    * This method is supposed to retrieve all system notifications with matched parameters.
    */
   public Page<SystemNotification> search(
-      SystemNotificationRepositoryCustom.SearchParams params, Pageable pageable) {
-    Preconditions.checkNotNull(params);
-    Preconditions.checkNotNull(pageable);
+      SystemNotificationRepositoryCustom.SearchParams searchParams, Pageable pageable) {
+    Map<String, Object> params = Maps.newHashMap();
+    Query countQuery = entityManager.createQuery(prepareQuery(
+        HQL_COUNT, params, searchParams), Long.class);
+    params.forEach(countQuery::setParameter);
+    Long count = (Long) countQuery.getSingleResult();
 
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(builder, countQuery, true, params);
-
-    Long count = entityManager.createQuery(countQuery).getSingleResult();
-
-    if (count == 0) {
-      return Pagination.getPage(Collections.emptyList());
+    if (count < 1) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
-    CriteriaQuery<SystemNotification> query = builder.createQuery(SystemNotification.class);
-    query = prepareQuery(builder, query, false, params);
+    params = Maps.newHashMap();
+    String hqlWithSort = Joiner.on(' ').join(Lists.newArrayList(
+        prepareQuery(HQL_SELECT, params, searchParams),
+        ORDER_BY, PageableUtil.getOrderPredicate(pageable, "sn.", DEFAULT_SORT)));
 
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-
-    List<SystemNotification> resultList = entityManager.createQuery(query)
-        .setMaxResults(maxAndFirst.getLeft())
-        .setFirstResult(maxAndFirst.getRight())
+    Query searchQuery = entityManager.createQuery(hqlWithSort, SystemNotification.class);
+    params.forEach(searchQuery::setParameter);
+    List<SystemNotification> resultList =  searchQuery
+        .setMaxResults(pageable.getPageSize())
+        .setFirstResult(pageable.getOffset())
         .getResultList();
 
     return Pagination.getPage(resultList, pageable, count);
   }
 
-  private <E> CriteriaQuery<E> prepareQuery(CriteriaBuilder builder, CriteriaQuery<E> query,
-      boolean count, SystemNotificationRepositoryCustom.SearchParams params) {
+  private String prepareQuery(String baseSql, Map<String, Object> params,
+      SystemNotificationRepositoryCustom.SearchParams searchParams) {
 
-    Root<SystemNotification> root = query.from(SystemNotification.class);
-    CriteriaQuery<E> newQuery;
+    List<String> sql = Lists.newArrayList(baseSql);
+    List<String> where = Lists.newArrayList();
+    List<String> or = Lists.newArrayList();
 
-    if (count) {
-      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
-      newQuery = (CriteriaQuery<E>) countQuery.select(builder.count(root));
-    } else {
-      CriteriaQuery<SystemNotification> typeQuery = (CriteriaQuery<SystemNotification>) query;
-      newQuery = (CriteriaQuery<E>) typeQuery.select(root);
+    if (searchParams.getAuthorId() != null) {
+      where.add(WITH_AUTHOR_ID);
+      params.put("authorId", searchParams.getAuthorId());
     }
 
-    Predicate where = builder.conjunction();
-    UUID authorId = params.getAuthorId();
-    Boolean isDisplayed = params.getIsDisplayed();
+    if (searchParams.getIsDisplayed() != null) {
+      where.add(WITH_ACTIVE);
+      params.put("isDisplayed", searchParams.getIsDisplayed());
+      params.put("now", ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
 
-    if (authorId != null) {
-      where = builder.and(where, builder.equal(root.get(AUTHOR).get(ID), authorId));
+      if (searchParams.getIsDisplayed()) {
+        where.add("((" + and(NULL_START_DATE, NULL_EXPIRY_DATE) + ")");
+        or.add("(" + and(NULL_EXPIRY_DATE, NOT_NULL_START_DATE,
+            START_DATE + DATE_BEFORE_OR_EQUAL_NOW) + ")");
+        or.add("(" + and(NULL_START_DATE, NOT_NULL_EXPIRY_DATE,
+            EXPIRY_DATE + DATE_AFTER_OR_EQUAL_NOW) + ")");
+        or.add("(" + and(NOT_NULL_START_DATE, NOT_NULL_EXPIRY_DATE,
+            EXPIRY_DATE + DATE_AFTER_OR_EQUAL_NOW, START_DATE + DATE_BEFORE_OR_EQUAL_NOW) + "))");
+      } else {
+        or.add("(" + and(NULL_START_DATE, NULL_EXPIRY_DATE) + ")");
+        or.add("(" + and(NOT_NULL_START_DATE, START_DATE + DATE_AFTER_NOW) + ")");
+        or.add("(" + and(NOT_NULL_EXPIRY_DATE, EXPIRY_DATE + DATE_BEFORE_NOW) + ")");
+      }
     }
 
-    if (isDisplayed != null) {
-      where = builder.and(where, builder.equal(root.get(DISPLAYED), isDisplayed));
+    if (!where.isEmpty()) {
+      sql.add(WHERE);
+      sql.add(Joiner.on(AND).join(where));
     }
 
-    if (!count) {
-      newQuery.orderBy(
-          builder.desc(root.get(ACTIVE)),
-          builder.desc(root.get(EXPIRY_DATE)));
+    if (!or.isEmpty()) {
+      sql.add(OR);
+      sql.add(Joiner.on(OR).join(or));
     }
 
-    newQuery.where(where);
-
-    return newQuery;
+    return Joiner.on(' ').join(sql);
   }
 
 }

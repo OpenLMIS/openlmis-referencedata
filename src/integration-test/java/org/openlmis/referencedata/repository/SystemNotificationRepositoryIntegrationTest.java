@@ -63,6 +63,38 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
   }
 
   @Test
+  public void shouldReturnSystemNotificationsThatMatchAllSearchParams() {
+    User secondUser = new UserDataBuilder().buildAsNew();
+    userRepository.save(secondUser);
+
+    SystemNotification notification1 = generateInstance(secondUser);
+    repository.save(notification1);
+
+    SystemNotification notification2 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .buildAsNew();
+    repository.save(notification2);
+
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().plusDays(1))
+        .buildAsNew();
+    repository.save(notification3);
+
+    SystemNotification notification4 = generateInstance();
+    repository.save(notification4);
+
+    SystemNotificationRepositoryCustom.SearchParams searchParams =
+        new SystemNotificationRepositoryIntegrationTest.TestSearchParams(user.getId(), true);
+
+    Page<SystemNotification> search = repository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(2)
+        .containsExactly(notification4, notification3);
+  }
+
+  @Test
   public void shouldReturnSystemNotificationsByAuthorId() {
     User secondUser = new UserDataBuilder().buildAsNew();
     userRepository.save(secondUser);
@@ -93,6 +125,98 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
     assertThat(search.getContent())
         .hasSize(3)
         .containsExactly(notification3, notification4, notification2);
+  }
+
+  @Test
+  public void shouldReturnActiveAndNonExpiredSystemNotifications() {
+    User secondUser = new UserDataBuilder().buildAsNew();
+    userRepository.save(secondUser);
+
+    SystemNotification notification1 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withoutExpiryDate()
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification1);
+
+    SystemNotification notification2 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .buildAsNew();
+    repository.save(notification2);
+
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().plusYears(1))
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification3);
+
+    SystemNotification notification4 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withoutExpiryDate()
+        .withStartDate(ZonedDateTime.now().minusYears(1))
+        .buildAsNew();
+    repository.save(notification4);
+
+    SystemNotification notification5 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withStartDate(ZonedDateTime.now().minusYears(1))
+        .buildAsNew();
+    repository.save(notification5);
+
+    SystemNotificationRepositoryCustom.SearchParams searchParams =
+        new SystemNotificationRepositoryIntegrationTest.TestSearchParams(null, true);
+
+    Page<SystemNotification> search = repository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(4)
+        .contains(notification4, notification1, notification3, notification5);
+  }
+
+  @Test
+  public void shouldReturnInactiveOrExpiredSystemNotifications() {
+    User secondUser = new UserDataBuilder().buildAsNew();
+    userRepository.save(secondUser);
+
+    SystemNotification notification1 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .withoutExpiryDate()
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification1);
+
+    SystemNotification notification2 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .asInactive()
+        .buildAsNew();
+    repository.save(notification2);
+
+    SystemNotification notification3 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withExpiryDate(ZonedDateTime.now().minusDays(1))
+        .withoutStartDate()
+        .buildAsNew();
+    repository.save(notification3);
+
+    SystemNotification notification4 = generateInstance();
+    repository.save(notification4);
+
+    SystemNotification notification5 = new SystemNotificationDataBuilder()
+        .withAuthor(user)
+        .withStartDate(ZonedDateTime.now().plusDays(1))
+        .withoutExpiryDate()
+        .buildAsNew();
+    repository.save(notification5);
+
+    SystemNotificationRepositoryCustom.SearchParams searchParams =
+        new SystemNotificationRepositoryIntegrationTest.TestSearchParams(null, false);
+
+    Page<SystemNotification> search = repository.search(searchParams, pageable);
+    assertThat(search.getContent())
+        .hasSize(4)
+        .containsExactly(notification5, notification3, notification1, notification2);
   }
 
   @Test

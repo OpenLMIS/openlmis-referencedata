@@ -43,6 +43,10 @@ class SqlConstants {
     return String.join(" AND ", conditions);
   }
 
+  static String and(String... parameters) {
+    return String.join(" AND ", parameters);
+  }
+
   static String getField(String... fields) {
     return String.join(".", fields);
   }

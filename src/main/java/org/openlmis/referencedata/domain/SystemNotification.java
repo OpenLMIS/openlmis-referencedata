@@ -57,8 +57,6 @@ public class SystemNotification extends BaseEntity {
   @JoinColumn(name = "authorid", nullable = false)
   private User author;
 
-  private boolean displayed;
-
   /**
    * Creates new system notification object based on data from {@link Importer}
    * and author argument.
@@ -77,7 +75,6 @@ public class SystemNotification extends BaseEntity {
     systemNotification.setCreatedDate(importer.getCreatedDate());
     systemNotification.setActive(importer.isActive());
     systemNotification.setAuthor(author);
-    systemNotification.setDisplayed(importer.isDisplayed());
     return systemNotification;
   }
 
@@ -94,7 +91,6 @@ public class SystemNotification extends BaseEntity {
     exporter.setExpiryDate(expiryDate);
     exporter.setCreatedDate(createdDate);
     exporter.setActive(active);
-    exporter.setDisplayed(displayed);
     if (author != null) {
       exporter.setAuthor(author);
     }
@@ -115,8 +111,6 @@ public class SystemNotification extends BaseEntity {
     void setAuthor(User author);
 
     void setActive(boolean active);
-
-    void setDisplayed(boolean displayed);
   }
 
   public interface Importer extends BaseImporter {
@@ -134,8 +128,6 @@ public class SystemNotification extends BaseEntity {
     UUID getAuthorId();
 
     boolean isActive();
-
-    boolean isDisplayed();
   }
 
   @PrePersist
