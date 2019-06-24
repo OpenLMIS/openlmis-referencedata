@@ -17,15 +17,13 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
-import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -38,12 +36,10 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class OrderableDto extends BaseDto implements Orderable.Importer,
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public final class OrderableDto extends BaseDto implements Orderable.Importer,
     Orderable.Exporter {
-
-  public static final String META_KEY_VERSION_ID = "versionId";
-  public static final String META_KEY_LAST_UPDATED = "lastUpdated";
 
   private String productCode;
 
@@ -67,7 +63,7 @@ public class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private Map<String, Object> extraData;
 
-  private Map<String, String> meta = new HashMap<>();
+  private MetadataDto meta = new MetadataDto();
 
   @JsonIgnore
   private OrderableRepository orderableRepository;
@@ -125,65 +121,12 @@ public class OrderableDto extends BaseDto implements Orderable.Importer,
 
   @Override
   public void setVersionId(Long versionId) {
-    meta.put(META_KEY_VERSION_ID, versionId.toString());
+    meta.setVersionId(versionId.toString());
   }
 
   @Override
   public void setLastUpdated(ZonedDateTime lastUpdated) {
-    meta.put(META_KEY_LAST_UPDATED, lastUpdated.toString());
+    meta.setLastUpdated(lastUpdated);
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (!(obj instanceof OrderableDto)) {
-      return false;
-    }
-    if (!super.equals(obj)) {
-      return false;
-    }
-    OrderableDto that = (OrderableDto) obj;
-    boolean mainPropertiesEquals = Objects.equals(productCode, that.productCode)
-        && Objects.equals(dispensable, that.dispensable)
-        && Objects.equals(fullProductName, that.fullProductName)
-        && Objects.equals(description, that.description);
-    boolean packPropertiesEquals = Objects.equals(netContent, that.netContent)
-        && Objects.equals(packRoundingThreshold, that.packRoundingThreshold)
-        && Objects.equals(roundToZero, that.roundToZero);
-    boolean mapPropertiesEquals = Objects.equals(programs, that.programs)
-        && Objects.equals(identifiers, that.identifiers)
-        && Objects.equals(extraData, that.extraData)
-        && isMetaEquals(that);
-    return mainPropertiesEquals && packPropertiesEquals && mapPropertiesEquals;
-  }
-
-  @Override
-  public int hashCode() {
-
-    return Objects
-        .hash(super.hashCode(), productCode, dispensable, fullProductName, description, netContent,
-            packRoundingThreshold, roundToZero, programs, identifiers, extraData, meta);
-  }
-
-  boolean isMetaEquals(OrderableDto that) {
-    for (Map.Entry<String, String> metaEntry : meta.entrySet()) {
-      String metaKey = metaEntry.getKey();
-      Object metaValue = metaEntry.getValue();
-      if (null != metaKey && metaKey.equalsIgnoreCase(META_KEY_LAST_UPDATED)) {
-        Instant instantThis = ZonedDateTime.parse(metaValue.toString()).toInstant();
-        Instant instantThat = ZonedDateTime.parse(that.meta.get(META_KEY_LAST_UPDATED)).toInstant();
-        if (!instantThis.equals(instantThat)) {
-          return false;
-        }
-      } else {
-        if (!metaValue.equals(that.meta.get(metaKey))) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
 }

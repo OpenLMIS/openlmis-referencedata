@@ -25,8 +25,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
-import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_LAST_UPDATED;
-import static org.openlmis.referencedata.dto.OrderableDto.META_KEY_VERSION_ID;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ID_MISMATCH;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
@@ -38,7 +36,6 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +56,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.dto.MetadataDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
@@ -95,12 +93,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     super.setUp();
 
     ZonedDateTime zdtNow = ZonedDateTime.now();
-    Map<String, String> metaAttributes = new HashMap<>();
-    metaAttributes.put(META_KEY_VERSION_ID, "1");
-    metaAttributes.put(META_KEY_LAST_UPDATED, zdtNow.toString());
     orderableDto = new OrderableDto(CODE, new DispensableDto(UNIT, null, null, UNIT),
         NAME, null, 10L, 5L, false, Collections.emptySet(), Collections.emptySet(), null, null,
-        metaAttributes, null);
+        new MetadataDto("1", zdtNow), null);
 
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
         10, 5, false, orderableId, orderableVersionId);
