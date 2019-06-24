@@ -44,6 +44,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -162,6 +166,37 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertEquals(response1.getId(), response2.getId());
     assertEquals(11L, response2.getNetContent().longValue());
+  }
+
+  @Test
+  public void shouldUpdateSequentially() throws InterruptedException {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    ExecutorService executorService = Executors.newFixedThreadPool(java.lang.Thread.activeCount());
+    int requestCount = 10;
+    for (int i = 0; i < requestCount; i++) {
+      String requestIndex = String.valueOf(i);
+      executorService.execute(() -> {
+        orderableDto.setDescription(requestIndex);
+        OrderableDto response = restAssured
+                .given()
+                .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(orderableDto)
+                .when()
+                .put(RESOURCE_URL)
+                .then()
+                .statusCode(200)
+                .extract().as(OrderableDto.class);
+        assertEquals(response.getDescription(), response.getDescription());
+      });
+    }
+
+    try {
+      executorService.awaitTermination(10L, TimeUnit.SECONDS);
+    } catch (InterruptedException ie) {
+      executorService.shutdownNow();
+      throw ie;
+    }
   }
 
   @Test
