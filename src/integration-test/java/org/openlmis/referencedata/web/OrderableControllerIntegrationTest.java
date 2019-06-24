@@ -538,7 +538,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private void mockDecreasingResponseTime(int requestCount) {
     when(orderableRepository.save(any(Orderable.class))).then((invocation) -> {
       Orderable orderable = (Orderable) invocation.getArguments()[0];
-      Thread.sleep(10 * requestCount - requestCount * Integer.valueOf(orderable.getDescription()));
+      TimeUnit.MILLISECONDS.sleep(10 * requestCount
+              - requestCount * Integer.valueOf(orderable.getDescription()));
       return orderable;
     });
   }
