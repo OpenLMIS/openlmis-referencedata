@@ -187,7 +187,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
                 .then()
                 .statusCode(200)
                 .extract().as(OrderableDto.class);
-        assertEquals(response.getDescription(), response.getDescription());
+        assertEquals("shouldFail", response.getDescription());
       });
     }
 
