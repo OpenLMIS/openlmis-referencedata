@@ -43,10 +43,14 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -169,26 +173,17 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldUpdateSequentially() throws InterruptedException {
-    mockUserHasRight(ORDERABLES_MANAGE);
-    ExecutorService executorService = Executors.newFixedThreadPool(java.lang.Thread.activeCount());
+  public void shouldUpdateSequentially() throws Exception {
     int requestCount = 10;
-    for (int i = 0; i < requestCount; i++) {
-      String requestIndex = String.valueOf(i);
-      executorService.execute(() -> {
-        orderableDto.setDescription(requestIndex);
-        OrderableDto response = restAssured
-                .given()
-                .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(orderableDto)
-                .when()
-                .put(RESOURCE_URL)
-                .then()
-                .statusCode(200)
-                .extract().as(OrderableDto.class);
-        assertEquals("shouldFail", response.getDescription());
-      });
+
+    mockUserHasRight(ORDERABLES_MANAGE);
+    mockDecreasingResponseTime(requestCount);
+
+    Queue<String> queue = new ConcurrentLinkedQueue<>();
+    ExecutorService executorService = Executors.newFixedThreadPool(java.lang.Thread.activeCount());
+
+    for (int requestNumber = 0; requestNumber < requestCount; requestNumber++) {
+      simulateAsyncCreateRequestAndLogToQueue(queue, executorService, requestNumber);
     }
 
     try {
@@ -197,6 +192,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
       executorService.shutdownNow();
       throw ie;
     }
+
+    assertEquals(requestCount, queue.size());
+    assertProperExecutionOrder(requestCount, queue);
+    executorService.shutdownNow();
   }
 
   @Test
@@ -518,4 +517,38 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     }
   }
 
+  private void simulateAsyncCreateRequestAndLogToQueue(Queue<String> queue,
+                                                       ExecutorService executorService,
+                                                       int requestNumber) throws Exception {
+    String requestIndex = String.valueOf(requestNumber);
+
+    Future future = executorService.submit(() -> {
+      orderableDto.setDescription(requestIndex);
+      restAssured
+              .given()
+              .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+              .contentType(MediaType.APPLICATION_JSON_VALUE)
+              .body(orderableDto)
+              .when()
+              .put(RESOURCE_URL)
+              .then()
+              .statusCode(200)
+              .extract().as(OrderableDto.class);
+      queue.add(requestIndex);
+    });
+
+    future.get();
+  }
+
+  private void assertProperExecutionOrder(int requestCount, Queue<String> queue) {
+    IntStream.range(0, requestCount).forEach(i -> assertEquals(String.valueOf(i), queue.poll()));
+  }
+
+  private void mockDecreasingResponseTime(int requestCount) {
+    when(orderableRepository.save(any(Orderable.class))).then((invocation) -> {
+      Orderable orderable = (Orderable) invocation.getArguments()[0];
+      Thread.sleep(10 * requestCount - requestCount * Integer.valueOf(orderable.getDescription()));
+      return orderable;
+    });
+  }
 }
