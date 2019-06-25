@@ -21,6 +21,7 @@ Improvements:
 * [OLMIS-6362](https://openlmis.atlassian.net/browse/OLMIS-6362): Update facility names for demo data with meaningful names.
 * [OLMIS-6384](https://openlmis.atlassian.net/browse/OLMIS-6384): Added new profilers to `/orderableFulfills` endpoint
 * [OLMIS-6129](https://openlmis.atlassian.net/browse/OLMIS-6129): Added package-lock.json file and removed package-lock.json from .gitignore.
+* [OLMIS-6390](https://openlmis.atlassian.net/browse/OLMIS-6390): Provided serializable isolation level to Orderable update & create.
 
 13.0.0 / 2019-05-27
 ==================
