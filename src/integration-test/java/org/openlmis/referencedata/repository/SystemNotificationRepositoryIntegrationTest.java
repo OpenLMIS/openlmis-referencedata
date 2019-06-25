@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -161,7 +162,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
 
     SystemNotification notification5 = new SystemNotificationDataBuilder()
         .withAuthor(user)
-        .withStartDate(ZonedDateTime.now().minusYears(1))
+        .withStartDate(ZonedDateTime.now(ZoneId.of("Europe/Warsaw")).minusMinutes(10))
         .buildAsNew();
     repository.save(notification5);
 

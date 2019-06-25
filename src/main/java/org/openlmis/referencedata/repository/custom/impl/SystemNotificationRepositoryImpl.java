@@ -20,8 +20,6 @@ import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.and
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +50,7 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
 
   private static final String WITH_AUTHOR_ID = "a.id = :authorId";
   private static final String WITH_ACTIVE = "sn.active = :isDisplayed";
-  private static final String NOW = ":now";
+  private static final String NOW = "NOW()";
 
   private static final String START_DATE = "sn.startDate";
   private static final String EXPIRY_DATE = "sn.expiryDate";
@@ -116,7 +114,6 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     if (searchParams.getIsDisplayed() != null) {
       where.add(WITH_ACTIVE);
       params.put("isDisplayed", searchParams.getIsDisplayed());
-      params.put("now", ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")));
 
       if (searchParams.getIsDisplayed()) {
         where.add("((" + and(NULL_START_DATE, NULL_EXPIRY_DATE) + ")");
