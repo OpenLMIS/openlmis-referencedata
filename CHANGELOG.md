@@ -22,6 +22,7 @@ Improvements:
 * [OLMIS-6384](https://openlmis.atlassian.net/browse/OLMIS-6384): Added new profilers to `/orderableFulfills` endpoint
 * [OLMIS-6129](https://openlmis.atlassian.net/browse/OLMIS-6129): Added package-lock.json file and removed package-lock.json from .gitignore.
 * [OLMIS-6390](https://openlmis.atlassian.net/browse/OLMIS-6390): Provided serializable isolation level to Orderable update & create.
+* [OLMIS-6374](https://openlmis.atlassian.net/browse/OLMIS-6374): Add new profile for audit logging.
 
 13.0.0 / 2019-05-27
 ==================
