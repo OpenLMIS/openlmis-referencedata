@@ -15,11 +15,17 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.apache.commons.lang3.BooleanUtils.toBooleanDefaultIfNull;
+
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -29,17 +35,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
+import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
+import org.openlmis.referencedata.domain.VersionIdentity.VersionExporter;
+import org.openlmis.referencedata.domain.VersionIdentity.VersionImporter;
 
 @Entity
 @Table(name = "facility_type_approved_products", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(name = "unq_ftap",
-        columnNames = { "orderableId", "programId", "facilityTypeId" }))
+        columnNames = {"orderableId", "programId", "facilityTypeId"}))
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode
 @TypeName("FacilityTypeApprovedProduct")
 @ToString
-public class FacilityTypeApprovedProduct extends BaseEntity {
+public class FacilityTypeApprovedProduct implements Versionable {
+
+  @EmbeddedId
+  private VersionIdentity identity;
 
   @Column(nullable = false)
   @Getter
@@ -76,28 +89,67 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
   @Setter
   private Boolean active;
 
+  @Getter
+  @Setter
+  private ZonedDateTime lastUpdated;
+
+  @PrePersist
+  @PreUpdate
+  public void updateLastUpdatedDate() {
+    lastUpdated = ZonedDateTime.now();
+  }
+
   /**
-   * Creates new FacilityTypeApprovedProduct based on data
-   * from {@link FacilityTypeApprovedProduct.Importer}.
+   * A minimal constructor with only required fields.
+   *
+   * @param id - the resource's UUID. The random UUID will be generated if the null value was
+   *             passed.
+   * @param versionId - the resource's version number. The 1 value will be used if the null value
+   *                    was passed.
+   * @param orderableId - the {@link Orderable} UUID.
+   * @param program - the {@link Program} instance.
+   * @param facilityType - The {@link FacilityType} instance.
+   * @param maxPeriodsOfStock - Maximum periods of stock for this resource.
+   * @param active - true if this resource should be active; otherwise false. The true value will be
+   *                 used if the null value was passed.
+   */
+  public FacilityTypeApprovedProduct(UUID id, Long versionId, UUID orderableId,
+      Program program, FacilityType facilityType, Double maxPeriodsOfStock, Boolean active) {
+    this.identity = new VersionIdentity(id, versionId);
+    this.orderableId = orderableId;
+    this.program = program;
+    this.facilityType = facilityType;
+    this.maxPeriodsOfStock = maxPeriodsOfStock;
+    this.active = toBooleanDefaultIfNull(active, true);
+    this.lastUpdated = ZonedDateTime.now();
+  }
+
+  /**
+   * Creates new FacilityTypeApprovedProduct based on data from {@link
+   * FacilityTypeApprovedProduct.Importer}.
    *
    * @param importer instance of {@link FacilityTypeApprovedProduct.Importer}
    * @return new instance of FacilityTypeApprovedProduct.
    */
   public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct();
-    ftap.setId(importer.getId());
-    ftap.setOrderableId(importer.getOrderableId());
-    ftap.setMaxPeriodsOfStock(importer.getMaxPeriodsOfStock());
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(
+        importer.getId(), importer.getVersionId(), importer.getOrderableId(),
+        null, null, importer.getMaxPeriodsOfStock(), importer.getActive()
+    );
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
     ftap.setEmergencyOrderPoint(importer.getEmergencyOrderPoint());
 
-    if (importer.getActive() == null) {
-      ftap.setActive(true);
-    } else {
-      ftap.setActive(importer.getActive());
-    }
-
     return ftap;
+  }
+
+  @Override
+  public UUID getId() {
+    return identity.getId();
+  }
+
+  @Override
+  public Long getVersionId() {
+    return identity.getVersionId();
   }
 
   /**
@@ -106,16 +158,18 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
    * @param exporter exporter to export to
    */
   public void export(Exporter exporter) {
-    exporter.setId(getId());
+    exporter.setId(identity.getId());
     exporter.setMaxPeriodsOfStock(maxPeriodsOfStock);
     exporter.setMinPeriodsOfStock(minPeriodsOfStock);
     exporter.setEmergencyOrderPoint(emergencyOrderPoint);
     exporter.setProgram(program);
     exporter.setFacilityType(facilityType);
     exporter.setActive(active);
+    exporter.setVersionId(identity.getVersionId());
+    exporter.setLastUpdated(lastUpdated);
   }
 
-  public interface Exporter extends BaseExporter {
+  public interface Exporter extends BaseExporter, VersionExporter {
 
     void setMaxPeriodsOfStock(Double maxPeriodsOfStock);
 
@@ -128,9 +182,11 @@ public class FacilityTypeApprovedProduct extends BaseEntity {
     void setFacilityType(FacilityType facilityType);
 
     void setActive(Boolean active);
+
+    void setLastUpdated(ZonedDateTime lastUpdated);
   }
 
-  public interface Importer extends BaseImporter {
+  public interface Importer extends BaseImporter, VersionImporter {
 
     Double getMaxPeriodsOfStock();
 

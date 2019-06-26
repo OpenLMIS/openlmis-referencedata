@@ -12,6 +12,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-6352](https://openlmis.atlassian.net/browse/OLMIS-6352): Added active flag to Facility Type Approved Products
 * [OLMIS-6361](https://openlmis.atlassian.net/browse/OLMIS-6361): Added expand pattern to GET /api/systemNotifications endpoint.
 * [OLMIS-6388](https://openlmis.atlassian.net/browse/OLMIS-6388): Added setting isDisplayed flag in system notification based on startDate, expiryDate and active flag.
+* [OLMIS-6358](https://openlmis.atlassian.net/browse/OLMIS-6358): Added versioning to Facility Type Approved Product resource.
 
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.

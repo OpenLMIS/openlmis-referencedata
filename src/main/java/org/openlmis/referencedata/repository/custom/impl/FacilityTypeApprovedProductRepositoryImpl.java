@@ -72,7 +72,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
   private static final String HQL_SELECT_FTAP_BY_IDS = "SELECT ftap"
       + " FROM FacilityTypeApprovedProduct AS ftap"
-      + " WHERE ftap.id IN (:ids)";
+      + " WHERE ftap.identity.id IN (:ids)";
   private static final String NATIVE_WHERE_FTAP_ACTIVE_FLAG = " WHERE ftap.active = :active";
 
   @PersistenceContext

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -23,6 +24,7 @@ import org.openlmis.referencedata.domain.Program;
 public class FacilityTypeApprovedProductsDataBuilder {
 
   private UUID id;
+  private Long versionId;
   private UUID orderableId;
   private Program program;
   private FacilityType facilityType;
@@ -30,12 +32,14 @@ public class FacilityTypeApprovedProductsDataBuilder {
   private Double minPeriodsOfStock;
   private Double emergencyOrderPoint;
   private Boolean active;
+  private ZonedDateTime lastUpdated;
 
   /**
    * Returns instance of {@link FacilityTypeApprovedProductsDataBuilder} with sample data.
    */
   public FacilityTypeApprovedProductsDataBuilder() {
     id = UUID.randomUUID();
+    versionId = 1L;
     orderableId = UUID.randomUUID();
     program = new ProgramDataBuilder().build();
     facilityType = new FacilityTypeDataBuilder().build();
@@ -43,6 +47,17 @@ public class FacilityTypeApprovedProductsDataBuilder {
     minPeriodsOfStock = 1.0;
     emergencyOrderPoint = 0.0;
     active = true;
+    lastUpdated = ZonedDateTime.now();
+  }
+
+  public FacilityTypeApprovedProductsDataBuilder withId(UUID id) {
+    this.id = id;
+    return this;
+  }
+
+  public FacilityTypeApprovedProductsDataBuilder withVersionId(Number versionId) {
+    this.versionId = versionId.longValue();
+    return this;
   }
 
   public FacilityTypeApprovedProductsDataBuilder withOrderableId(UUID orderableId) {
@@ -60,8 +75,8 @@ public class FacilityTypeApprovedProductsDataBuilder {
     return this;
   }
 
-  public FacilityTypeApprovedProductsDataBuilder withMaxPeriodsOfStock(Double maxPeriodsOfStock) {
-    this.maxPeriodsOfStock = maxPeriodsOfStock;
+  public FacilityTypeApprovedProductsDataBuilder withMaxPeriodsOfStock(Number maxPeriodsOfStock) {
+    this.maxPeriodsOfStock = maxPeriodsOfStock.doubleValue();
     return this;
   }
 
@@ -74,14 +89,12 @@ public class FacilityTypeApprovedProductsDataBuilder {
    * Builds instance of {@link FacilityTypeApprovedProduct}.
    */
   public FacilityTypeApprovedProduct build() {
-    FacilityTypeApprovedProduct ftap = buildAsNew();
-    ftap.setId(id);
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(id, versionId,
+        orderableId, program, facilityType, maxPeriodsOfStock, active);
+    ftap.setMinPeriodsOfStock(minPeriodsOfStock);
+    ftap.setEmergencyOrderPoint(emergencyOrderPoint);
+    ftap.setLastUpdated(lastUpdated);
 
     return ftap;
-  }
-
-  public FacilityTypeApprovedProduct buildAsNew() {
-    return new FacilityTypeApprovedProduct(orderableId, program,
-          facilityType, maxPeriodsOfStock, minPeriodsOfStock, emergencyOrderPoint, active);
   }
 }

@@ -38,12 +38,12 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
-import javax.transaction.Transactional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Facility;
@@ -67,15 +67,23 @@ import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramOrderableDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.transaction.TestTransaction;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-@SuppressWarnings("PMD.TooManyMethods")
-public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
-    BaseCrudRepositoryIntegrationTest<FacilityTypeApprovedProduct> {
+@SuppressWarnings({"PMD.TooManyMethods"})
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -124,11 +132,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   private Orderable orderable2;
   private Facility facility;
   private Pageable pageable;
-
-  @Override
-  FacilityTypeApprovedProductRepository getRepository() {
-    return this.ftapRepository;
-  }
 
   @Before
   public void setUp() {
@@ -218,7 +221,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     pageable = new PageRequest(0, 10);
   }
 
-  @Override
   FacilityTypeApprovedProduct generateInstance() {
     return generateProduct(facilityType1, true);
   }
@@ -508,7 +510,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(activeProduct);
 
     //when
-    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+    FacilityTypeApprovedProduct savedProduct = ftapRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
 
     //then
     Assert.assertTrue(savedProduct.getActive());
@@ -521,7 +524,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(activeProduct);
 
     //when
-    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+    FacilityTypeApprovedProduct savedProduct = ftapRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
 
     //then
     Assert.assertTrue(savedProduct.getActive());
@@ -534,7 +538,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
     ftapRepository.save(activeProduct);
 
     //when
-    FacilityTypeApprovedProduct savedProduct = ftapRepository.findOne(activeProduct.getId());
+    FacilityTypeApprovedProduct savedProduct = ftapRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
 
     //then
     Assert.assertFalse(savedProduct.getActive());
@@ -568,7 +573,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
   }
 
   @Test(expected = JpaSystemException.class)
-  @Transactional(Transactional.TxType.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void shouldNotAllowSaveFtapWithInvalidOrderable() {
     TestTransaction.flagForCommit();
 
@@ -579,6 +584,21 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
 
     // Trigger is fired at the end of the transaction
     TestTransaction.end();
+  }
+
+  @Test
+  public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
+    // given
+    FacilityTypeApprovedProduct newestFtap = generateInstanceWithTwoVersions();
+
+    // when
+    FacilityTypeApprovedProduct foundFtap = ftapRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(newestFtap.getId());
+
+    // then
+    assertEquals(newestFtap, foundFtap);
+    assertEquals(2L, foundFtap.getVersionId().longValue());
+
   }
 
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
@@ -625,7 +645,31 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest extends
         .withProgram(program)
         .withMaxPeriodsOfStock(12.00)
         .withActive(active)
-        .buildAsNew();
+        .build();
+  }
+
+  private FacilityTypeApprovedProduct generateInstanceWithTwoVersions() {
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
+        .withVersionId(1)
+        .withActive(false)
+        .withMaxPeriodsOfStock(5)
+        .withFacilityType(facilityType1)
+        .withProgram(program2)
+        .withOrderableId(orderable2.getId())
+        .build();
+    ftap = ftapRepository.save(ftap);
+
+    FacilityTypeApprovedProduct ftapNewVersion = new FacilityTypeApprovedProductsDataBuilder()
+        .withId(ftap.getId())
+        .withVersionId(2)
+        .withActive(true)
+        .withMaxPeriodsOfStock(5.26)
+        .withFacilityType(facilityType1)
+        .withProgram(program2)
+        .withOrderableId(orderable2.getId())
+        .build();
+
+    return ftapRepository.save(ftapNewVersion);
   }
 
 }

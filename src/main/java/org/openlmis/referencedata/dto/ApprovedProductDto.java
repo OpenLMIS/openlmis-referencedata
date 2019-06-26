@@ -15,8 +15,11 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -47,6 +50,7 @@ public final class ApprovedProductDto
   private Double minPeriodsOfStock;
   private Double emergencyOrderPoint;
   private Boolean active;
+  private MetadataDto meta = new MetadataDto();
 
   @JsonSetter("orderable")
   public void setOrderable(OrderableDto orderable) {
@@ -87,5 +91,21 @@ public final class ApprovedProductDto
   @JsonIgnore
   public void setFacilityType(FacilityType facilityType) {
     this.facilityType = FacilityTypeDto.newInstance(facilityType);
+  }
+
+  @Override
+  public void setVersionId(Long versionId) {
+    meta.setVersionId(versionId.toString());
+  }
+
+  @Override
+  public Long getVersionId() {
+    String metaVersionId = meta.getVersionId();
+    return isBlank(metaVersionId) ? null : Long.valueOf(metaVersionId);
+  }
+
+  @Override
+  public void setLastUpdated(ZonedDateTime lastUpdated) {
+    meta.setLastUpdated(lastUpdated);
   }
 }

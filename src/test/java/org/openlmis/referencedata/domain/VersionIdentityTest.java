@@ -21,21 +21,28 @@ import static org.junit.Assert.assertFalse;
 import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public class OrderableIdentityTest {
+public class VersionIdentityTest {
 
   @Test
   public void equalsContract() {
     EqualsVerifier
-        .forClass(OrderableIdentity.class)
+        .forClass(VersionIdentity.class)
         .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    VersionIdentity dto = new VersionIdentity();
+    ToStringTestUtils.verify(VersionIdentity.class, dto);
   }
 
   @Test
   public void equalsShouldBeOnId() {
     // given
-    OrderableIdentity ident = new OrderableIdentity();
-    OrderableIdentity identDifferentId = new OrderableIdentity();
+    VersionIdentity ident = new VersionIdentity();
+    VersionIdentity identDifferentId = new VersionIdentity();
 
     // when
     boolean isEqual = ident.equals(identDifferentId);
@@ -47,8 +54,8 @@ public class OrderableIdentityTest {
   @Test
   public void equalsShouldBeOnVersion() {
     // given
-    OrderableIdentity ident = new OrderableIdentity();
-    OrderableIdentity identDifferentId = new OrderableIdentity(ident.getId(),
+    VersionIdentity ident = new VersionIdentity();
+    VersionIdentity identDifferentId = new VersionIdentity(ident.getId(),
         ident.getVersionId() + 1);
 
     // when
@@ -62,7 +69,7 @@ public class OrderableIdentityTest {
   @Test
   public void shouldInsertDefaultValues() {
     // when
-    OrderableIdentity identity = new OrderableIdentity(null, null);
+    VersionIdentity identity = new VersionIdentity(null, null);
 
     // then
     assertThat(identity.getId()).isNotNull();
@@ -76,7 +83,7 @@ public class OrderableIdentityTest {
     Long versionId = 100L;
 
     // when
-    OrderableIdentity identity = new OrderableIdentity(id, versionId);
+    VersionIdentity identity = new VersionIdentity(id, versionId);
 
     // then
     assertThat(identity.getId()).isEqualTo(id);

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.OrderableIdentity;
+import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +34,8 @@ import org.springframework.data.repository.query.Param;
  * Persistence repository for saving/finding {@link Orderable}.
  */
 public interface OrderableRepository extends
-    JpaRepository<Orderable, OrderableIdentity>, OrderableRepositoryCustom,
-    BaseAuditableRepository<Orderable, OrderableIdentity> {
+    JpaRepository<Orderable, VersionIdentity>, OrderableRepositoryCustom,
+    BaseAuditableRepository<Orderable, VersionIdentity> {
 
   @Override
   <S extends Orderable> S save(S entity);

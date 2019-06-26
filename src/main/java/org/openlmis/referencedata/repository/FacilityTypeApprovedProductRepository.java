@@ -17,35 +17,38 @@ package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface FacilityTypeApprovedProductRepository
-    extends PagingAndSortingRepository<FacilityTypeApprovedProduct, UUID>,
+public interface FacilityTypeApprovedProductRepository extends
     FacilityTypeApprovedProductRepositoryCustom,
-    BaseAuditableRepository<FacilityTypeApprovedProduct, UUID> {
+    BaseAuditableRepository<FacilityTypeApprovedProduct, VersionIdentity> {
 
   FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableIdAndProgramId(
       UUID facilityTypeId, UUID orderableId, UUID programId
   );
 
-  @Query(value = "SELECT\n"
-      + "    ftap.*\n"
-      + "FROM\n"
-      + "    referencedata.facility_type_approved_products ftap\n"
-      + "WHERE\n"
-      + "    id NOT IN (\n"
-      + "        SELECT\n"
-      + "            id\n"
-      + "        FROM\n"
-      + "            referencedata.facility_type_approved_products ftap\n"
-      + "            INNER JOIN referencedata.jv_global_id g "
-      + "ON CAST(ftap.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
-      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
-      + "    )\n"
+  FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
+
+  @Query(value = "SELECT"
+      + "   ftap.*"
+      + " FROM"
+      + "   referencedata.facility_type_approved_products ftap"
+      + " WHERE"
+      + "   id NOT IN ("
+      + "     SELECT"
+      + "       id"
+      + "     FROM"
+      + "       referencedata.facility_type_approved_products ftap"
+      + "       INNER JOIN referencedata.jv_global_id g"
+      + "         ON (CAST(ftap.id AS varchar) = SUBSTRING("
+      + "           CAST(CAST(g.local_id AS json)->'id' AS varchar), 2, 36))"
+      + "         AND (CAST(ftap.versionId AS varchar) ="
+      + "           CAST(CAST(g.local_id AS json)->'versionId' AS varchar))"
+      + "       INNER JOIN referencedata.jv_snapshot s ON g.global_id_pk = s.global_id_fk)"
       + " ORDER BY ?#{#pageable}",
       nativeQuery = true)
   Page<FacilityTypeApprovedProduct> findAllWithoutSnapshots(Pageable pageable);

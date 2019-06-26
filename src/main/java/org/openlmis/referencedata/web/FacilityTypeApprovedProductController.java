@@ -88,12 +88,13 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
     validateFtapNotDuplicated(approvedProductDto);
 
+    // Ignore provided id
+    approvedProductDto.setId(null);
+
     LOGGER.debug("Creating new facilityTypeApprovedProduct");
     FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
         .build(approvedProductDto);
 
-    // Ignore provided id
-    facilityTypeApprovedProduct.setId(null);
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
     return toDto(save);
   }
@@ -141,9 +142,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @ResponseBody
   public ApprovedProductDto getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
 
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-          repository.findOne(facilityTypeApprovedProductId);
     if (facilityTypeApprovedProduct == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -185,8 +186,10 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public void deleteFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct =
-          repository.findOne(facilityTypeApprovedProductId);
+
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
+
     if (facilityTypeApprovedProduct == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -220,7 +223,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
     rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    FacilityTypeApprovedProduct instance = repository.findOne(id);
+    FacilityTypeApprovedProduct instance = repository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+
     if (instance == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     }

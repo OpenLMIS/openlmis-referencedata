@@ -24,6 +24,7 @@ import org.javers.core.metamodel.object.CdoSnapshot;
 import org.javers.repository.jql.QueryBuilder;
 import org.javers.spring.annotation.JaversSpringDataAuditable;
 import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.domain.Versionable;
 import org.openlmis.referencedata.repository.BaseAuditableRepository;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.slf4j.ext.XLogger;
@@ -105,17 +106,23 @@ public class AuditLogInitializer implements CommandLineRunner {
     //...check whether there exists a snapshot for it in the audit log.
     // Note that we don't care about checking for logged changes, per se,
     // and thus use findSnapshots() rather than findChanges()
-    Identifiable baseEntity = (Identifiable) object;
+    Identifiable identifiable = (Identifiable) object;
+    Object localId = identifiable.getId();
 
-    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(baseEntity.getId(), object.getClass());
+    if (identifiable instanceof Versionable) {
+      Versionable versionable = (Versionable) identifiable;
+      localId = versionable.getVersionIdentity();
+    }
+
+    QueryBuilder jqlQuery = QueryBuilder.byInstanceId(localId, object.getClass());
     List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
 
     //If there are no snapshots of the domain object, then take one
     if (snapshots.isEmpty()) {
-      javers.commit("System: AuditLogInitializer", baseEntity);
+      javers.commit("System: AuditLogInitializer", identifiable);
     } else {
       LOGGER.info(MessageKeys.ERROR_JAVERS_EXISTING_ENTRY,
-          baseEntity.getClass(), baseEntity.getId());
+          identifiable.getClass(), localId);
     }
   }
 }

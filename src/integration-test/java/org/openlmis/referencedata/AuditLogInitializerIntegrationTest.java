@@ -178,12 +178,17 @@ public class AuditLogInitializerIntegrationTest {
   public void shouldCreateSnapshotsForFtap() {
     //given
     UUID ftapId = UUID.randomUUID();
+    Long versionId = 1000L;
     FacilityType facilityType = addNewFacilityType();
     Program program = addNewProgram();
     Orderable orderable = addNewOrderable();
-    addFtap(ftapId, program.getId(), orderable.getId(), facilityType.getId());
+    addFtap(ftapId, versionId, program.getId(), orderable.getId(), facilityType.getId());
 
-    executeTest(ftapId, FacilityTypeApprovedProduct.class);
+    // create an instance to get version identity required for audit log
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(
+        ftapId, versionId, null, null, null, null, null);
+
+    executeTest(ftap.getVersionIdentity(), FacilityTypeApprovedProduct.class);
   }
 
   @Test
@@ -374,7 +379,7 @@ public class AuditLogInitializerIntegrationTest {
     executeTest(supplyPartnerId, SupplyPartner.class);
   }
 
-  private void executeTest(UUID id, Class clazz) {
+  private void executeTest(Object id, Class clazz) {
     //when
     QueryBuilder jqlQuery = QueryBuilder.byInstanceId(id, clazz);
     List<CdoSnapshot> snapshots = javers.findSnapshots(jqlQuery.build());
@@ -527,17 +532,18 @@ public class AuditLogInitializerIntegrationTest {
         .executeUpdate();
   }
 
-  private void addFtap(UUID id, UUID programId, UUID orderableId, UUID typeId) {
+  private void addFtap(UUID id, Long versionId, UUID programId, UUID orderableId, UUID typeId) {
     entityManager.flush();
     entityManager
         .createNativeQuery(SqlInsert.INSERT_FTAP_SQL)
         .setParameter(1, id)
-        .setParameter(2, 8.23) //emergency order point
-        .setParameter(3, 9.23) //max periods of stock
-        .setParameter(4, 7) // min period of stock
-        .setParameter(5, typeId) //facility type id
-        .setParameter(6, orderableId) //orderable id
-        .setParameter(7, programId) //program id
+        .setParameter(2, versionId) // versionId
+        .setParameter(3, 8.23) // emergency order point
+        .setParameter(4, 9.23) // max periods of stock
+        .setParameter(5, 7) // min period of stock
+        .setParameter(6, typeId) // facility type id
+        .setParameter(7, orderableId) // orderable id
+        .setParameter(8, programId) // program id
         .executeUpdate();
   }
 

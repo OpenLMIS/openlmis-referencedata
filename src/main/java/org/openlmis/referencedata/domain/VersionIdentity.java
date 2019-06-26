@@ -24,29 +24,43 @@ import javax.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.Type;
 
 @Getter
 @Setter
 @Embeddable
 @EqualsAndHashCode
-public class OrderableIdentity implements Identifiable, Serializable {
+@ToString
+public class VersionIdentity implements Serializable {
 
   @Type(type = UUID_TYPE)
   private UUID id;
 
   private Long versionId;
 
-  OrderableIdentity() {
+  VersionIdentity() {
     this(null, null);
   }
 
-  OrderableIdentity(UUID id, Long versionId) {
+  VersionIdentity(UUID id, Long versionId) {
     // it seems like we can't use @GeneratedValue and @GenericGenerator annotations
     // in the @Embeddable class like this one. That is why we generate a value for
     // the id field manually but only if the passed value is null.
     this.id = Optional.ofNullable(id).orElseGet(UUID::randomUUID);
     this.versionId = Optional.ofNullable(versionId).orElse(1L);
+  }
+
+  interface VersionExporter {
+
+    void setVersionId(Long versionId);
+
+  }
+
+  interface VersionImporter {
+
+    Long getVersionId();
+
   }
 
 }

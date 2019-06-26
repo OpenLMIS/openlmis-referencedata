@@ -54,6 +54,8 @@ import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
 import org.openlmis.referencedata.domain.BaseEntity.BaseImporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
+import org.openlmis.referencedata.domain.VersionIdentity.VersionExporter;
+import org.openlmis.referencedata.domain.VersionIdentity.VersionImporter;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
@@ -69,7 +71,7 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @NoArgsConstructor
 @Cacheable
 @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
-public class Orderable implements Identifiable {
+public class Orderable implements Versionable {
 
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
@@ -132,7 +134,7 @@ public class Orderable implements Identifiable {
   private ExtraDataEntity extraData = new ExtraDataEntity();
 
   @EmbeddedId
-  private OrderableIdentity identity;
+  private VersionIdentity identity;
 
   @Getter
   @Setter
@@ -156,7 +158,7 @@ public class Orderable implements Identifiable {
     this.netContent = netContent;
     this.packRoundingThreshold = packRoundingThreshold;
     this.roundToZero = roundToZero;
-    this.identity = new OrderableIdentity(id, versionId);
+    this.identity = new VersionIdentity(id, versionId);
     this.lastUpdated = ZonedDateTime.now();
   }
 
@@ -169,7 +171,7 @@ public class Orderable implements Identifiable {
    */
   public static Orderable updateFrom(Orderable persistedOrderable, Importer importer) {
     Orderable orderable = newInstance(importer);
-    orderable.identity = new OrderableIdentity(persistedOrderable.getId(),
+    orderable.identity = new VersionIdentity(persistedOrderable.getId(),
         persistedOrderable.getVersionId() + 1);
     return orderable;
   }
@@ -197,7 +199,7 @@ public class Orderable implements Identifiable {
     orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
     orderable.extraData.updateFrom(importer.getExtraData());
 
-    orderable.identity = new OrderableIdentity(importer.getId(), importer.getVersionId());
+    orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionId());
     orderable.lastUpdated = ZonedDateTime.now();
     return orderable;
   }
@@ -217,6 +219,7 @@ public class Orderable implements Identifiable {
     identity.setId(id);
   }
 
+  @Override
   public Long getVersionId() {
     return identity.getVersionId();
   }
@@ -324,7 +327,7 @@ public class Orderable implements Identifiable {
     this.extraData.updateFrom(extraData);
   }
 
-  public interface Exporter extends BaseExporter, ExtraDataExporter {
+  public interface Exporter extends BaseExporter, ExtraDataExporter, VersionExporter {
 
     void setProductCode(String productCode);
 
@@ -346,12 +349,10 @@ public class Orderable implements Identifiable {
 
     void setIdentifiers(Map<String, String> identifiers);
 
-    void setVersionId(Long versionId);
-
     void setLastUpdated(ZonedDateTime lastUpdated);
   }
 
-  public interface Importer extends BaseImporter, ExtraDataImporter {
+  public interface Importer extends BaseImporter, ExtraDataImporter, VersionImporter {
 
     String getProductCode();
 
@@ -373,6 +374,5 @@ public class Orderable implements Identifiable {
 
     Map<String, String> getIdentifiers();
 
-    Long getVersionId();
   }
 }

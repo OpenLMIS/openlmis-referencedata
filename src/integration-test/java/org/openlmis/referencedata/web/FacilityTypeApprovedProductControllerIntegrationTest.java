@@ -102,7 +102,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     ftapDto.setOrderable(orderable);
 
     given(facilityTypeApprovedProductRepository.save(any(FacilityTypeApprovedProduct.class)))
-        .willAnswer(new SaveAnswer<FacilityTypeApprovedProduct>());
+        .willAnswer(invocation -> invocation.getArgumentAt(0, FacilityTypeApprovedProduct.class));
 
     // used in deserialization
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
@@ -119,7 +119,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldDeleteFacilityTypeApprovedProduct() {
 
-    given(facilityTypeApprovedProductRepository.findOne(facilityTypeAppProdId))
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
         .willReturn(facilityTypeAppProd);
 
     restAssured
@@ -198,7 +199,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     facilityTypeAppProd.setMaxPeriodsOfStock(9.00);
     ftapDto.setId(UUID.randomUUID());
     facilityTypeAppProd.export(ftapDto);
-    given(facilityTypeApprovedProductRepository.findOne(facilityTypeAppProdId))
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
         .willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
@@ -257,7 +259,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldGetFacilityTypeApprovedProduct() {
 
-    given(facilityTypeApprovedProductRepository.findOne(facilityTypeAppProdId))
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
         .willReturn(facilityTypeAppProd);
     given(programRepository.findOne(program.getId())).willReturn(program);
     given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
@@ -362,9 +365,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .then()
         .statusCode(200);
 
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
-        RamlMatchers.hasNoViolations());
-    verify(facilityTypeApprovedProductRepository).save(facilityTypeAppProd);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
@@ -510,7 +511,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
-    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class)))
+        .willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -522,7 +525,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
-    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -534,7 +538,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
-    given(facilityTypeApprovedProductRepository.findOne(any(UUID.class)))
+    given(facilityTypeApprovedProductRepository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class)))
         .willReturn(facilityTypeAppProd);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
