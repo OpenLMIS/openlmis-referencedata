@@ -21,17 +21,19 @@ import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface FacilityTypeApprovedProductRepository extends
     FacilityTypeApprovedProductRepositoryCustom,
     BaseAuditableRepository<FacilityTypeApprovedProduct, VersionIdentity> {
 
-  FacilityTypeApprovedProduct findByFacilityTypeIdAndOrderableIdAndProgramId(
-      UUID facilityTypeId, UUID orderableId, UUID programId
-  );
-
   FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
+
+  @Query("UPDATE FacilityTypeApprovedProduct SET active = false WHERE identity.id = :id")
+  @Modifying(flushAutomatically = true, clearAutomatically = true)
+  void deactivatePreviousVersions(@Param("id") UUID id);
 
   @Query(value = "SELECT"
       + "   ftap.*"

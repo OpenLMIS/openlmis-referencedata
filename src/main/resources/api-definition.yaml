@@ -2379,26 +2379,29 @@ resourceTypes:
                   repeat: false
             put:
                 is: [ secured ]
-                description: Update existing facilityTypeApprovedProduct.
+                description: Update existing facility type approved product or create a new one with the given ID.
                 body:
                     application/json:
                 responses:
-                    "200":
+                    200:
+                        description: The request is valid and the given facility type approved product has been updated or created with the given ID.
                         body:
-                            application/json:
-
-                    "400":
+                          application/json:
+                            schema: approvedProductDto
+                    400:
+                        description: The request's body is invalid
                         body:
-                            application/json:
-                              schema: localizedErrorResponse
-                    "403":
+                          application/json:
+                            schema: localizedErrorResponse
+                    401:
+                        description: The request does not contain a token or the token might be invalid.
                         body:
-                            application/json:
-                              schema: localizedErrorResponse
-                    "404":
+                          application/json:
+                    403:
+                        description: The server understood the request but refuses to authorize it.
                         body:
-                            application/json:
-                                schema: localizedErrorResponse
+                          application/json:
+                            schema: localizedErrorResponse
             get:
                 is: [ secured ]
                 description: Get chosen facilityTypeApprovedProduct.

@@ -23,8 +23,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
 import com.google.common.collect.Lists;
@@ -228,18 +226,19 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  // PUT /facilityTypeApprovedProducts/{id}
+
   @Test
-  public void shouldPutFacilityTypeApprovedProduct() {
+  public void shouldUpdateFacilityTypeApprovedProduct() {
+    FacilityTypeApprovedProduct original = new FacilityTypeApprovedProductsDataBuilder()
+        .build();
 
     facilityTypeAppProd.setMaxPeriodsOfStock(9.00);
-    ftapDto.setId(UUID.randomUUID());
     facilityTypeAppProd.export(ftapDto);
+
     given(facilityTypeApprovedProductRepository
         .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
-        .willReturn(facilityTypeAppProd);
-    given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
-        .willReturn(orderableDisplayCategory);
+        .willReturn(original);
 
     ApprovedProductDto response = restAssured
         .given()
@@ -251,7 +250,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().as(ApprovedProductDto.class);
+        .body("meta.versionId", is(Long.toString(original.getVersionId() + 1)))
+        .extract()
+        .as(ApprovedProductDto.class);
 
     ftapEquals(ftapDto, response);
     assertEquals(9.00, response.getMaxPeriodsOfStock(), 0.00);
@@ -259,7 +260,37 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
-  public void shouldReturn403WhenUserHasNoRightsToPutFacilityTypeApprovedProduct() {
+  public void shouldReturnBadRequestIfIdMismatchForPutFacilityTypeApprovedProduct() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", UUID.randomUUID())
+        .body(ftapDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInPutFacilityTypeApprovedProduct() {
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .body(ftapDto)
+        .when()
+        .put(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnForbiddenWhenUserHasNoRightsToPutFacilityTypeApprovedProduct() {
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
@@ -270,23 +301,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .put(ID_URL)
         .then()
-        .statusCode(403);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void putShouldReturnBadRequestIfIdMismatch() {
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", UUID.randomUUID())
-        .body(ftapDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(400)
-        .body(MESSAGE_KEY, is(FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH));
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -326,28 +341,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .get(ID_URL)
         .then()
         .statusCode(401);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldUpdateExistingFtap() {
-    FacilityTypeApprovedProduct existingFtap =
-        mock(FacilityTypeApprovedProduct.class);
-    when(existingFtap.getId()).thenReturn(facilityTypeAppProdId);
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        facilityType1.getId(), orderable.getId(), program.getId()
-    )).thenReturn(existingFtap);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", ftapDto.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(ftapDto)
-        .log().body()
-        .put(ID_URL)
-        .then()
-        .statusCode(200);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

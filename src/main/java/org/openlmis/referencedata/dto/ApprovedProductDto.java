@@ -51,6 +51,21 @@ public final class ApprovedProductDto
   private Boolean active;
   private MetadataDto meta = new MetadataDto();
 
+  /**
+   * A copy constructor.
+   */
+  public ApprovedProductDto(ApprovedProductDto original) {
+    setId(original.getId());
+    this.orderable = original.orderable;
+    this.program = original.program;
+    this.facilityType = original.facilityType;
+    this.maxPeriodsOfStock = original.maxPeriodsOfStock;
+    this.minPeriodsOfStock = original.minPeriodsOfStock;
+    this.emergencyOrderPoint = original.emergencyOrderPoint;
+    this.active = original.active;
+    this.meta = new MetadataDto(original.meta);
+  }
+
   @JsonSetter("orderable")
   public void setOrderable(OrderableDto orderable) {
     this.orderable = orderable;

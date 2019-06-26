@@ -32,4 +32,12 @@ import lombok.ToString;
 public final class MetadataDto {
   private String versionId;
   private ZonedDateTime lastUpdated;
+
+  /**
+   * A copy constructor.
+   */
+  public MetadataDto(MetadataDto original) {
+    this.versionId = original.versionId;
+    this.lastUpdated = original.lastUpdated;
+  }
 }

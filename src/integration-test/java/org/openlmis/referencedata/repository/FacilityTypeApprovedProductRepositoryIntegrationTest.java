@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.apache.commons.lang.BooleanUtils.isFalse;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
@@ -382,20 +384,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), null, pageable);
   }
 
-  @Test
-  public void shouldFindByRelations() {
-    FacilityTypeApprovedProduct ftap = generateInstance();
-    ftap = ftapRepository.save(ftap);
-    UUID id = ftap.getId();
-
-    ftap = ftapRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        ftap.getFacilityType().getId(), ftap.getOrderableId(), ftap.getProgram().getId()
-    );
-
-    assertNotNull(ftap);
-    assertEquals(id, ftap.getId());
-  }
-
   @Test(expected = PersistenceException.class)
   public void shouldNotAllowDuplicates() {
     ftapRepository.save(generateInstance());
@@ -479,6 +467,30 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     // then
     assertNotNull(actual);
     assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void shouldDeactivatePreviousVersions() {
+    // given
+    FacilityTypeApprovedProduct ftapWithTwoVersions = generateInstanceWithTwoVersions();
+    FacilityTypeApprovedProduct anotherFtap = generateInstance();
+    anotherFtap.setActive(true);
+
+    ftapRepository.save(Arrays.asList(ftapWithTwoVersions, anotherFtap));
+
+    // when
+    ftapRepository.deactivatePreviousVersions(ftapWithTwoVersions.getId());
+    entityManager.flush();
+
+    // then
+    assertThat("Non-related ftap should be untouched", anotherFtap.getActive(), is(true));
+
+    boolean previousVersionAreDeactivated = StreamSupport
+        .stream(ftapRepository.findAll().spliterator(), false)
+        .filter(ftap -> ftap.getId().equals(ftapWithTwoVersions.getId()))
+        .allMatch(ftap -> isFalse(ftap.getActive()));
+
+    assertThat("Not all versions have been deactivated", previousVersionAreDeactivated, is(true));
   }
 
   @Test

@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -37,6 +36,7 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.UuidUtil;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -127,20 +127,43 @@ public class FacilityTypeApprovedProductController extends BaseController {
   public ApprovedProductDto updateFacilityTypeApprovedProduct(
         @RequestBody ApprovedProductDto approvedProductDto,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+    Profiler profiler = new Profiler("UPDATE_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
 
-    if (null != approvedProductDto.getId()
-        && !Objects.equals(approvedProductDto.getId(), facilityTypeApprovedProductId)) {
+    checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE, profiler);
+
+    if (!UuidUtil.sameId(approvedProductDto.getId(), facilityTypeApprovedProductId)) {
+      profiler.stop().log();
       throw new ValidationMessageException(
           FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH);
     }
 
-    XLOGGER.debug("Updating facilityTypeApprovedProduct");
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
-        .build(approvedProductDto);
+    profiler.start("GET_PREVIOUS_FTAP");
+    FacilityTypeApprovedProduct currentVersion = repository
+        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
+    long versionId = 1;
 
-    FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
-    return toDto(save);
+    if (null != currentVersion) {
+      profiler.start("DEACTIVATE_PREVIOUS_FTAP_VERSIONS");
+      repository.deactivatePreviousVersions(facilityTypeApprovedProductId);
+
+      versionId = currentVersion.getVersionId() + 1;
+    }
+
+    profiler.start("BUILD_FTAP_FROM_DTO");
+    ApprovedProductDto data = new ApprovedProductDto(approvedProductDto);
+    data.setVersionId(versionId);
+
+    FacilityTypeApprovedProduct newVersion = facilityTypeApprovedProductBuilder.build(data);
+
+    profiler.start("SAVE");
+    FacilityTypeApprovedProduct save = repository.save(newVersion);
+
+    profiler.start("EXPORT_FTAP_TO_DTO");
+    ApprovedProductDto dto = toDto(save);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
