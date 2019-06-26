@@ -115,7 +115,6 @@ public class FacilityTypeApprovedProduct implements Versionable {
     this.facilityType = facilityType;
     this.maxPeriodsOfStock = maxPeriodsOfStock;
     this.active = toBooleanDefaultIfNull(active, true);
-    this.lastUpdated = ZonedDateTime.now();
   }
 
   /**
