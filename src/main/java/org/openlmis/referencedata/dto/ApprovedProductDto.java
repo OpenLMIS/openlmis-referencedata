@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.dto;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.time.ZonedDateTime;
@@ -28,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -100,8 +99,12 @@ public final class ApprovedProductDto
 
   @Override
   public Long getVersionId() {
-    String metaVersionId = meta.getVersionId();
-    return isBlank(metaVersionId) ? null : Long.valueOf(metaVersionId);
+    return Optional
+        .ofNullable(meta)
+        .map(MetadataDto::getVersionId)
+        .filter(StringUtils::isNotBlank)
+        .map(Long::valueOf)
+        .orElse(null);
   }
 
   @Override
