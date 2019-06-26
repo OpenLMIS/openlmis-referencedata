@@ -35,6 +35,10 @@
       "type": "number",
       "title": "emergencyOrderPoint"
     },
+    "active": {
+      "type": "boolean",
+      "title": "active"
+    },
     "meta": {
       "type": "object",
       "$ref": "metadata.json",
@@ -42,9 +46,8 @@
     }
   },
   "required": [
-    "id",
-    "program",
     "orderable",
+    "program",
     "facilityType",
     "maxPeriodsOfStock"
   ]

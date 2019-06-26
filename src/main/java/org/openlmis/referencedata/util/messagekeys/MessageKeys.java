@@ -72,6 +72,7 @@ public abstract class MessageKeys {
   protected static final String MODIFIED_KEY = "modifiedKey";
   protected static final String FIELD_IS_INVARIANT = "fieldIsInvariant";
   protected static final String MISSING = "missing";
+  protected static final String PROVIDED = "provided";
 
   // Entities
   protected static final String LOT = "lot";

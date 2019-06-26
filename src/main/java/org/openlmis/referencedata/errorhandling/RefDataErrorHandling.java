@@ -27,6 +27,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProcessingScheduleMessageKeys;
@@ -70,6 +71,7 @@ public class RefDataErrorHandling extends BaseHandler {
     CONSTRAINT_MAP.put("unq_supply_partner_association_programid_supervisorynodeid",
         SupplyPartnerMessageKeys.ERROR_ASSOCIATION_DUPLICATED);
     CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_MUST_HAVE_A_UNIQUE_NAME);
+    CONSTRAINT_MAP.put("unq_ftap", FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED);
 
     // https://www.postgresql.org/docs/9.6/static/errcodes-appendix.html
     SQL_STATES.put("23503", OrderableMessageKeys.ERROR_NOT_FOUND);

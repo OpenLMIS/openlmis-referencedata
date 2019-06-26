@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.web.FacilityTypeApprovedProductController.RESOURCE_PATH;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,32 +38,37 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityTypeApprovedProductBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+@RestController
 @Transactional
+@RequestMapping(RESOURCE_PATH)
 public class FacilityTypeApprovedProductController extends BaseController {
 
-  private static final Logger LOGGER =
-        LoggerFactory.getLogger(FacilityTypeApprovedProductController.class);
+  private static final XLogger XLOGGER = XLoggerFactory
+      .getXLogger(FacilityTypeApprovedProductController.class);
+
+  public static final String RESOURCE_PATH = API_PATH + "/facilityTypeApprovedProducts";
 
   @Autowired
   private FacilityTypeApprovedProductRepository repository;
@@ -79,24 +85,34 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @param approvedProductDto A facilityTypeApprovedProduct bound to the request body.
    * @return the created facilityTypeApprovedProduct.
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.POST)
+  @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
   public ApprovedProductDto createFacilityTypeApprovedProduct(
         @RequestBody ApprovedProductDto approvedProductDto) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+    Profiler profiler = new Profiler("CREATE_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
 
-    validateFtapNotDuplicated(approvedProductDto);
+    checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE, profiler);
 
-    // Ignore provided id
-    approvedProductDto.setId(null);
+    if (null != approvedProductDto.getId()) {
+      profiler.stop().log();
+      throw new ValidationMessageException(
+          FacilityTypeApprovedProductMessageKeys.ERROR_ID_PROVIDED);
+    }
 
-    LOGGER.debug("Creating new facilityTypeApprovedProduct");
+    profiler.start("BUILD_FTAP_FROM_DTO");
+    XLOGGER.debug("Creating new facilityTypeApprovedProduct");
     FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
         .build(approvedProductDto);
 
+    profiler.start("SAVE");
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
-    return toDto(save);
+
+    profiler.start("EXPORT_FTAP_TO_DTO");
+    ApprovedProductDto dto = toDto(save);
+
+    profiler.stop().log();
+    return dto;
   }
 
   /**
@@ -107,9 +123,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    *                                      which we want to update.
    * @return the updated facilityTypeApprovedProduct.
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.PUT)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
+  @PutMapping("/{id}")
   public ApprovedProductDto updateFacilityTypeApprovedProduct(
         @RequestBody ApprovedProductDto approvedProductDto,
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
@@ -121,9 +135,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
           FacilityTypeApprovedProductMessageKeys.ERROR_ID_MISMATCH);
     }
 
-    validateFtapNotDuplicated(approvedProductDto);
-
-    LOGGER.debug("Updating facilityTypeApprovedProduct");
+    XLOGGER.debug("Updating facilityTypeApprovedProduct");
     FacilityTypeApprovedProduct facilityTypeApprovedProduct = facilityTypeApprovedProductBuilder
         .build(approvedProductDto);
 
@@ -137,9 +149,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct which we want to get
    * @return the FacilityTypeApprovedProduct.
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
+  @GetMapping("/{id}")
   public ApprovedProductDto getFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
     FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
@@ -160,8 +170,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    *                    * program
    * @return a list of approved products matching the criteria
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts", method = RequestMethod.GET)
-  @ResponseBody
+  @GetMapping
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
         @RequestParam MultiValueMap<String, Object> queryParams, Pageable pageable) {
 
@@ -181,7 +190,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
    *                                      which we want to delete.
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts/{id}", method = RequestMethod.DELETE)
+  @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityTypeApprovedProduct(
         @PathVariable("id") UUID facilityTypeApprovedProductId) {
@@ -207,9 +216,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @param page A Pageable object that allows client to optionally add "page" (page number)
    *             and "size" (page size) query parameters to the request.
    */
-  @RequestMapping(value = "/facilityTypeApprovedProducts/{id}/auditLog", method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
+  @GetMapping("/{id}/auditLog")
   public ResponseEntity<String> getFacilityTypeApprovedProductAuditLog(
       @PathVariable("id") UUID id,
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
@@ -277,26 +284,4 @@ public class FacilityTypeApprovedProductController extends BaseController {
     return dtos;
   }
 
-  private void validateFtapNotDuplicated(ApprovedProductDto approvedProductDto) {
-    UUID orderableId = approvedProductDto.getOrderableId();
-
-    Orderable latestOrderable = orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderableId);
-
-    if (null == latestOrderable) {
-      throw new ValidationMessageException(OrderableMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    FacilityTypeApprovedProduct existing = repository
-        .findByFacilityTypeIdAndOrderableIdAndProgramId(
-            approvedProductDto.getFacilityType().getId(),
-            latestOrderable.getId(),
-            approvedProductDto.getProgram().getId());
-
-    if (existing != null
-        && !Objects.equals(existing.getId(), approvedProductDto.getId())) {
-      throw new ValidationMessageException(
-          FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED);
-    }
-  }
 }

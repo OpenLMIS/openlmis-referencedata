@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -25,8 +24,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDERABLES_MANAGE;
 
@@ -34,6 +31,7 @@ import com.google.common.collect.Lists;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
 import java.util.UUID;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.PageImplRepresentation;
@@ -102,7 +100,13 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     ftapDto.setOrderable(orderable);
 
     given(facilityTypeApprovedProductRepository.save(any(FacilityTypeApprovedProduct.class)))
-        .willAnswer(invocation -> invocation.getArgumentAt(0, FacilityTypeApprovedProduct.class));
+        .willAnswer(invocation -> {
+          FacilityTypeApprovedProduct resource = invocation
+              .getArgumentAt(0, FacilityTypeApprovedProduct.class);
+          resource.updateLastUpdatedDate();
+
+          return resource;
+        });
 
     // used in deserialization
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
@@ -153,6 +157,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  // POST /facilityTypeApprovedProducts
+
   @Test
   public void shouldPostFacilityTypeApprovedProduct() {
     given(programRepository.findOne(program.getId())).willReturn(program);
@@ -169,7 +175,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(201)
+        .statusCode(HttpStatus.SC_CREATED)
         .extract().as(ApprovedProductDto.class);
 
     ftapEquals(ftapDto, response);
@@ -177,7 +183,37 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   }
 
   @Test
-  public void shouldReturn403WhenUserHasNoRightsToPostFacilityTypeApprovedProduct() {
+  public void shouldReturnBadRequestIfIdFieldProvidedFtapPost() {
+    ftapDto.setId(UUID.randomUUID());
+
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(ftapDto)
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(LocalizedMessage.MESSAGE_KEY_FIELD,
+            is(FacilityTypeApprovedProductMessageKeys.ERROR_ID_PROVIDED));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInPostFacilityTypeApprovedProduct() {
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(ftapDto)
+        .when()
+        .post(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnForbiddenWhenUserHasNoRightsForPostFacilityTypeApprovedProduct() {
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured.given()
@@ -187,10 +223,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-
   }
 
   @Test
@@ -293,57 +328,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .statusCode(401);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturnBadRequestForDuplicateFtapPut() {
-    FacilityTypeApprovedProduct existingFtap =
-        mock(FacilityTypeApprovedProduct.class);
-    when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-      facilityType1.getId(), orderable.getId(), program.getId()
-    )).thenReturn(existingFtap);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("id", ftapDto.getId())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(ftapDto)
-        .put(ID_URL)
-        .then()
-        .statusCode(400)
-        .content(LocalizedMessage.MESSAGE_KEY_FIELD,
-            equalTo(FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
-        RamlMatchers.hasNoViolations());
-    verify(facilityTypeApprovedProductRepository,
-        never()).save(any(FacilityTypeApprovedProduct.class));
-  }
-
-  @Test
-  public void shouldReturnBadRequestForDuplicateFtapPost() {
-    FacilityTypeApprovedProduct existingFtap =
-        mock(FacilityTypeApprovedProduct.class);
-    when(existingFtap.getId()).thenReturn(UUID.randomUUID());
-    when(facilityTypeApprovedProductRepository.findByFacilityTypeIdAndOrderableIdAndProgramId(
-        facilityType1.getId(), orderable.getId(), program.getId()
-    )).thenReturn(existingFtap);
-
-    restAssured.given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(ftapDto)
-        .post(RESOURCE_URL)
-        .then()
-        .statusCode(400)
-        .content(LocalizedMessage.MESSAGE_KEY_FIELD,
-            equalTo(FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED));
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(),
-        RamlMatchers.hasNoViolations());
-    verify(facilityTypeApprovedProductRepository,
-        never()).save(any(FacilityTypeApprovedProduct.class));
   }
 
   @Test
