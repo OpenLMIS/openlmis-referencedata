@@ -93,12 +93,6 @@ public class FacilityTypeApprovedProduct implements Versionable {
   @Setter
   private ZonedDateTime lastUpdated;
 
-  @PrePersist
-  @PreUpdate
-  public void updateLastUpdatedDate() {
-    lastUpdated = ZonedDateTime.now();
-  }
-
   /**
    * A minimal constructor with only required fields.
    *
@@ -150,6 +144,12 @@ public class FacilityTypeApprovedProduct implements Versionable {
   @Override
   public Long getVersionId() {
     return identity.getVersionId();
+  }
+
+  @PrePersist
+  @PreUpdate
+  public void updateLastUpdatedDate() {
+    lastUpdated = ZonedDateTime.now();
   }
 
   /**
