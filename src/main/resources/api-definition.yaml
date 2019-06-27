@@ -2404,18 +2404,32 @@ resourceTypes:
                             schema: localizedErrorResponse
             get:
                 is: [ secured ]
-                description: Get chosen facilityTypeApprovedProduct.
+                description: Get chosen facility type approved product.
+                queryParameters:
+                  versionId:
+                      description: >
+                        Specify which version of the resource should be returned. Please be advised
+                        that if the given version does not exist, the endpoint will return
+                        the Not Found error message.
+                      displayName: versionId
+                      type: integer
+                      required: false
+                      repeat: false
                 responses:
-                    "200":
+                    200:
+                        description: The request is valid and the given facility type approved product will be returned.
                         body:
                             application/json:
+                                schema: approvedProductDto
                     401:
+                        description: The request does not contain a token or the token might be invalid.
                         body:
-                          application/json:
-                    "404":
+                            application/json:
+                    404:
+                        description: The server could not find a facility type approved product with the given id and version.
                         body:
-                          application/json:
-                            schema: localizedErrorResponse
+                            application/json:
+                                schema: localizedErrorResponse
             delete:
                 is: [ secured ]
                 description: "WARNING! Deprecated. [AVOID USING] Completely removes facility type approved product. This action is not recoverable."

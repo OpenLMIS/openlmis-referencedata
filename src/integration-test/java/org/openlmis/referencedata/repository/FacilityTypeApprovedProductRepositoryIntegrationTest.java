@@ -610,7 +610,20 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     // then
     assertEquals(newestFtap, foundFtap);
     assertEquals(2L, foundFtap.getVersionId().longValue());
+  }
 
+  @Test
+  public void shouldFindByGivenIdAndVersion() {
+    // given
+    FacilityTypeApprovedProduct newestFtap = generateInstanceWithTwoVersions();
+
+    // when
+    FacilityTypeApprovedProduct foundFtap = ftapRepository
+        .findByIdentityIdAndIdentityVersionId(newestFtap.getId(), newestFtap.getVersionId());
+
+    // then
+    assertEquals(newestFtap, foundFtap);
+    assertEquals(newestFtap.getVersionId(), foundFtap.getVersionId());
   }
 
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {

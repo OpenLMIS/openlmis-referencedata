@@ -108,8 +108,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
     profiler.start("SAVE");
     FacilityTypeApprovedProduct save = repository.save(facilityTypeApprovedProduct);
 
-    profiler.start("EXPORT_FTAP_TO_DTO");
-    ApprovedProductDto dto = toDto(save);
+    ApprovedProductDto dto = toDto(save, profiler);
 
     profiler.stop().log();
     return dto;
@@ -159,8 +158,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
     profiler.start("SAVE");
     FacilityTypeApprovedProduct save = repository.save(newVersion);
 
-    profiler.start("EXPORT_FTAP_TO_DTO");
-    ApprovedProductDto dto = toDto(save);
+    ApprovedProductDto dto = toDto(save, profiler);
 
     profiler.stop().log();
     return dto;
@@ -169,19 +167,36 @@ public class FacilityTypeApprovedProductController extends BaseController {
   /**
    * Get chosen facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct which we want to get
+   * @param id UUID of facilityTypeApprovedProduct which we want to get
+   * @param versionId specify which version should be returned. If null provided, the latest version
+   *                  will be returned.
    * @return the FacilityTypeApprovedProduct.
    */
   @GetMapping("/{id}")
-  public ApprovedProductDto getFacilityTypeApprovedProduct(
-        @PathVariable("id") UUID facilityTypeApprovedProductId) {
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
+  public ApprovedProductDto getFacilityTypeApprovedProduct(@PathVariable("id") UUID id,
+      @RequestParam(name = "versionId", required = false) Long versionId) {
+    Profiler profiler = new Profiler("GET_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
+
+    FacilityTypeApprovedProduct facilityTypeApprovedProduct;
+
+    if (null == versionId) {
+      profiler.start("FIND_FTAP_BY_ID");
+      facilityTypeApprovedProduct = repository
+          .findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+    } else {
+      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_ID");
+      facilityTypeApprovedProduct = repository.findByIdentityIdAndIdentityVersionId(id, versionId);
+    }
 
     if (facilityTypeApprovedProduct == null) {
+      profiler.stop().log();
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
     } else {
-      return toDto(facilityTypeApprovedProduct);
+      ApprovedProductDto dto = toDto(facilityTypeApprovedProduct, profiler);
+
+      profiler.stop().log();
+      return dto;
     }
   }
 
@@ -265,7 +280,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
     );
   }
 
-  private ApprovedProductDto toDto(FacilityTypeApprovedProduct prod) {
+  private ApprovedProductDto toDto(FacilityTypeApprovedProduct prod, Profiler profiler) {
+    profiler.start("EXPORT_FTAP_TO_DTO");
+
     ApprovedProductDto productDto = new ApprovedProductDto();
     prod.export(productDto);
 

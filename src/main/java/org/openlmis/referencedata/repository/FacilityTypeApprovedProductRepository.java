@@ -31,6 +31,8 @@ public interface FacilityTypeApprovedProductRepository extends
 
   FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
 
+  FacilityTypeApprovedProduct findByIdentityIdAndIdentityVersionId(UUID id, Long versionId);
+
   @Query("UPDATE FacilityTypeApprovedProduct SET active = false WHERE identity.id = :id")
   @Modifying(flushAutomatically = true, clearAutomatically = true)
   void deactivatePreviousVersions(@Param("id") UUID id);

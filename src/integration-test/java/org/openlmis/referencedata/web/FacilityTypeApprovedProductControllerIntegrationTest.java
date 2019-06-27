@@ -306,15 +306,13 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  // GET /facilityTypeApprovedProducts/{id}
+
   @Test
   public void shouldGetFacilityTypeApprovedProduct() {
-
     given(facilityTypeApprovedProductRepository
         .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
         .willReturn(facilityTypeAppProd);
-    given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
-        .willReturn(orderableDisplayCategory);
 
     ApprovedProductDto response = restAssured
         .given()
@@ -324,23 +322,46 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(200)
-        .extract().as(ApprovedProductDto.class);
+        .statusCode(HttpStatus.SC_OK)
+        .extract()
+        .as(ApprovedProductDto.class);
 
     ftapEquals(ftapDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void getShouldReturnUnauthorizedWithoutAuthorization() {
-
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInGetFacilityTypeApprovedProduct() {
     restAssured.given()
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
         .when()
         .get(ID_URL)
         .then()
-        .statusCode(401);
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundForNonExistingResourceVersionInGetFacilityTypeApprovedProduct() {
+    Long versionId = 1000L;
+
+    given(facilityTypeApprovedProductRepository
+        .findByIdentityIdAndIdentityVersionId(facilityTypeAppProdId, versionId))
+        .willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .queryParam("versionId", versionId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_NOT_FOUND)
+        .body(MESSAGE_KEY, is(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
