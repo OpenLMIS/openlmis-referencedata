@@ -2360,16 +2360,19 @@ resourceTypes:
               repeat: false
           responses:
             200:
+                description: The request is valid and a page of facility type approved products will be returned.
                 body:
-                  application/json:
-                      schema: approvedProductDtoPage
+                    application/json:
+                       schema: approvedProductDtoPage
             400:
+                description: The request's body is invalid
                 body:
-                  application/json:
-                    schema: localizedErrorResponse
+                    application/json:
+                        schema: localizedErrorResponse
             401:
+                description: The request does not contain a token or the token might be invalid.
                 body:
-                  application/json:
+                    application/json:
       /{id}:
             uriParameters:
               id:

@@ -64,7 +64,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FACILITY_TYPE_PARAM = "facilityType";
   private static final String PROGRAM_PARAM = "program";
-  private static final String ACTIVE_PARAM = "active";
 
   private Program program;
   private Orderable orderable;
@@ -404,9 +403,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  // GET /facilityTypeApprovedProducts
+
   @Test
   public void shouldSearchFtaps() {
-
     given(facilityTypeApprovedProductRepository
         .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
             eq(program.getCode().toString()),
@@ -422,114 +422,17 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .statusCode(HttpStatus.SC_OK)
+        .extract()
+        .as(PageImplRepresentation.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(ftapDto.getId().toString(),
-        ((java.util.LinkedHashMap)response.getContent().get(0)).get("id"));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+        ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
   }
 
   @Test
-  public void shouldSearchInActiveFtaps() {
-    given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
-            eq(program.getCode().toString()),
-            eq(false), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
-
-    PageImplRepresentation response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
-        .queryParam(PROGRAM_PARAM, program.getCode().toString())
-        .queryParam(ACTIVE_PARAM, "false")
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertEquals(1, response.getContent().size());
-    assertEquals(ftapDto.getId().toString(),
-        ((java.util.LinkedHashMap)response.getContent().get(0)).get("id"));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldSearchNoFtaps() {
-    given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
-            eq(program.getCode().toString()),
-            eq(false), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList()));
-
-    PageImplRepresentation response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
-        .queryParam(PROGRAM_PARAM, program.getCode().toString())
-        .queryParam(ACTIVE_PARAM, "false")
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertEquals(0, response.getContent().size());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldPaginateSearchFtaps() {
-
-    Pageable pageable = new PageRequest(0, 10);
-    given(facilityTypeApprovedProductRepository
-        .searchProducts(Lists.newArrayList(facilityType1.getCode()),
-            program.getCode().toString(), null, pageable))
-        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
-
-    PageImplRepresentation response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .queryParam("page", pageable.getPageNumber())
-        .queryParam("size", pageable.getPageSize())
-        .queryParam("facilityType", facilityType1.getCode())
-        .queryParam("program", program.getCode().toString())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
-
-    assertEquals(1, response.getContent().size());
-    assertEquals(1, response.getTotalElements());
-    assertEquals(1, response.getTotalPages());
-    assertEquals(1, response.getNumberOfElements());
-    assertEquals(10, response.getSize());
-    assertEquals(0, response.getNumber());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void getAllShouldReturnUnauthorizedWithoutAuthorization() {
-
-    restAssured.given()
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(401);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldReturn400WhenInvalidSearchParamsAreProvided() {
+  public void shouldReturnBadRequestWhenInvalidSearchParamsAreProvidedInSearchEndpoint() {
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -537,10 +440,24 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(400);
+        .statusCode(HttpStatus.SC_BAD_REQUEST);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+  @Test
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInSearchEndpoint() {
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  // GET /facilityTypeApprovedProducts/{id}/auditLog
 
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
