@@ -27,10 +27,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -84,9 +80,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
   private static final String NATIVE_WHERE_FTAP_ACTIVE_FLAG = " WHERE ftap.active = :active";
 
-  private static final String IDENTITY = "identity";
-  private static final String ID = "id";
-  private static final String VERSION_ID = "versionId";
+  private static final String HQL_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap"
+      + " FROM FacilityTypeApprovedProduct AS ftap"
+      + " WHERE ";
+
+  private static final String HQL_IDENTITY = "(ftap.identity.id = '%s'"
+      + " AND ftap.identity.versionId = %d)";
+  private static final String OR = " OR ";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -224,28 +224,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Integer limit = maxAndFirst.getLeft();
     Integer offset = maxAndFirst.getRight();
 
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<FacilityTypeApprovedProduct> query = builder
-        .createQuery(FacilityTypeApprovedProduct.class);
-
-    Root<FacilityTypeApprovedProduct> root = query.from(FacilityTypeApprovedProduct.class);
-    Predicate[] combinedPredicates = new Predicate[identities.size()];
-
-    int index = 0;
-    for (Pair<UUID, Long> pair : identities) {
-      Predicate predicate = builder.conjunction();
-      predicate = builder.and(predicate,
-          builder.equal(root.get(IDENTITY).get(ID), pair.getLeft()));
-      predicate = builder.and(predicate,
-          builder.equal(root.get(IDENTITY).get(VERSION_ID), pair.getRight()));
-
-      combinedPredicates[index++] = predicate;
-    }
-
-    query.where(builder.or(combinedPredicates));
+    String hql = HQL_SELECT_FTAPS_BY_IDENTITES + identities
+        .stream()
+        .map(pair -> String.format(HQL_IDENTITY, pair.getLeft(), pair.getRight()))
+        .collect(Collectors.joining(OR));
 
     List<FacilityTypeApprovedProduct> resultList = entityManager
-        .createQuery(query)
+        .createQuery(hql, FacilityTypeApprovedProduct.class)
         .setFirstResult(offset)
         .setMaxResults(limit)
         .getResultList();
