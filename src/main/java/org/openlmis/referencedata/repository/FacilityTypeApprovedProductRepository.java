@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.VersionIdentity;
@@ -28,6 +29,8 @@ import org.springframework.data.repository.query.Param;
 public interface FacilityTypeApprovedProductRepository extends
     FacilityTypeApprovedProductRepositoryCustom,
     BaseAuditableRepository<FacilityTypeApprovedProduct, VersionIdentity> {
+
+  List<FacilityTypeApprovedProduct> findByIdentityId(UUID id);
 
   FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
 

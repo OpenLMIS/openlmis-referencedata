@@ -118,12 +118,13 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
   }
 
+  // DELETE /facilityTypeApprovedProducts/{id}
+
   @Test
   public void shouldDeleteFacilityTypeApprovedProduct() {
-
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
-        .willReturn(facilityTypeAppProd);
+        .findByIdentityId(facilityTypeAppProdId))
+        .willReturn(Collections.singletonList(facilityTypeAppProd));
 
     restAssured
         .given()
@@ -133,13 +134,27 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .delete(ID_URL)
         .then()
-        .statusCode(204);
+        .statusCode(HttpStatus.SC_NO_CONTENT);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
-  public void shouldReturn403IfUserHasNoRightToDeleteFacilityTypeApprovedProduct() {
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInDeleteFacilityTypeApprovedProduct() {
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnForbiddenIfUserHasNoRightToDeleteFacilityTypeApprovedProduct() {
     mockUserHasNoRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
 
     restAssured
@@ -150,7 +165,30 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when()
         .delete(ID_URL)
         .then()
-        .statusCode(403);
+        .statusCode(HttpStatus.SC_FORBIDDEN);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotFoundForNonExistingResourceVersionInDeleteEndpoint() {
+    Long versionId = 1000L;
+
+    given(facilityTypeApprovedProductRepository
+        .findByIdentityIdAndIdentityVersionId(facilityTypeAppProdId, versionId))
+        .willReturn(null);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam("id", facilityTypeAppProdId)
+        .queryParam("versionId", versionId)
+        .when()
+        .delete(ID_URL)
+        .then()
+        .statusCode(HttpStatus.SC_NOT_FOUND)
+        .body(MESSAGE_KEY, is(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

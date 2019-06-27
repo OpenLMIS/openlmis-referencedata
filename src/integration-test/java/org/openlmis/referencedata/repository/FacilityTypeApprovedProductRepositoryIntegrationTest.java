@@ -635,6 +635,28 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(newestFtap.getVersionId(), foundFtap.getVersionId());
   }
 
+  @Test
+  public void shouldFindAllVersionsForTheGivenFtap() {
+    // given
+    FacilityTypeApprovedProduct ftap = saveAndGetProduct(facilityType1, true);
+
+    // when
+    List<FacilityTypeApprovedProduct> found = ftapRepository.findByIdentityId(ftap.getId());
+
+    // then
+    assertThat(found, hasSize(2));
+  }
+
+  @Test
+  public void shouldReturnEmptyListIfFtapNotExistForFindByIdentityId() {
+    // given and when
+    List<FacilityTypeApprovedProduct> actual = ftapRepository.findByIdentityId(UUID.randomUUID());
+
+    // then
+    assertThat(actual, is(notNullValue()));
+    assertThat(actual, hasSize(0));
+  }
+
   private void assertFacilityTypeApprovedProduct(FacilityTypeApprovedProduct ftap) {
     assertEquals(program, ftap.getProgram());
     assertEquals(facilityType1.getId(), ftap.getFacilityType().getId());

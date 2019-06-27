@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.collections.CollectionUtils;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
@@ -235,23 +236,43 @@ public class FacilityTypeApprovedProductController extends BaseController {
   /**
    * Allows deleting facilityTypeApprovedProduct.
    *
-   * @param facilityTypeApprovedProductId UUID of facilityTypeApprovedProduct
-   *                                      which we want to delete.
+   * @param id UUID of facilityTypeApprovedProduct which we want to delete.
+   * @param versionId Specify what version of the resource should be deleted.
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteFacilityTypeApprovedProduct(
-        @PathVariable("id") UUID facilityTypeApprovedProductId) {
-    rightService.checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
+  public void deleteFacilityTypeApprovedProduct(@PathVariable("id") UUID id,
+      @RequestParam(name = "versionId", required = false) Long versionId) {
+    Profiler profiler = new Profiler("DELETE_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
 
-    FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
+    checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE, profiler);
 
-    if (facilityTypeApprovedProduct == null) {
-      throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
+    if (null == versionId) {
+      profiler.start("FIND_ALL_FTAPS_BY_ID");
+      List<FacilityTypeApprovedProduct> facilityTypeApprovedProducts = repository
+          .findByIdentityId(id);
+
+      if (CollectionUtils.isEmpty(facilityTypeApprovedProducts)) {
+        throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
+      }
+
+      profiler.start("DELETE_ALL_VERSIONS");
+      repository.delete(facilityTypeApprovedProducts);
     } else {
+      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_ID");
+      FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
+          .findByIdentityIdAndIdentityVersionId(id, versionId);
+
+      if (facilityTypeApprovedProduct == null) {
+        throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
+      }
+
+      profiler.start("DELETE");
       repository.delete(facilityTypeApprovedProduct);
     }
+
+    profiler.stop().log();
   }
 
 
