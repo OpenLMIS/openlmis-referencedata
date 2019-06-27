@@ -23,12 +23,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -51,8 +58,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
       + " FROM referencedata.facility_types AS ft"
       + " INNER JOIN referencedata.facilities f ON f.typeId = ft.id AND f.id = '%s'";
 
-  private static final String NATIVE_SELECT_FTAP_IDS = "SELECT DISTINCT ftap.id AS ID"
-      + " FROM referencedata.facility_type_approved_products AS ftap";
+  private static final String NATIVE_SELECT_FTAP_IDENTITIES = "SELECT DISTINCT"
+      + "   ftap.id AS id,"
+      + "   ftap.versionId AS versionId"
+      + " FROM referencedata.facility_type_approved_products AS ftap"
+      + " INNER JOIN (SELECT id, MAX(versionId) AS versionId"
+      + "   FROM referencedata.facility_type_approved_products GROUP BY id) AS latest"
+      + "   ON ftap.id = latest.id AND ftap.versionId = latest.versionId";
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
   private static final String NATIVE_ORDERABLE_INNER_JOIN =
@@ -70,10 +82,11 @@ public class FacilityTypeApprovedProductRepositoryImpl
           + " AND po.active IS TRUE";
   private static final String NATIVE_FACILITY_TYPE_INNER_JOIN =
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
-  private static final String HQL_SELECT_FTAP_BY_IDS = "SELECT ftap"
-      + " FROM FacilityTypeApprovedProduct AS ftap"
-      + " WHERE ftap.identity.id IN (:ids)";
   private static final String NATIVE_WHERE_FTAP_ACTIVE_FLAG = " WHERE ftap.active = :active";
+
+  private static final String IDENTITY = "identity";
+  private static final String ID = "id";
+  private static final String VERSION_ID = "versionId";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -88,40 +101,18 @@ public class FacilityTypeApprovedProductRepositoryImpl
     profiler.start("SEARCH_FACILITY_TYPE_ID");
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
-    Query nativeQuery = prepareQuery(facilityTypeId, programId, fullSupply, orderableIds,
+    Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
         active);
-    return executeQuery(nativeQuery, pageable);
+    List<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    return retrieveFtaps(identities, pageable);
   }
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(List<String> facilityTypeCodes,
       String programCode, Boolean active, Pageable pageable) {
-    Query nativeQuery = prepareQuery(facilityTypeCodes, programCode, active);
-    return executeQuery(nativeQuery, pageable);
-
-  }
-
-  private Page<FacilityTypeApprovedProduct> executeQuery(Query query, Pageable pageable) {
-    // appropriate scalar is added to native query
-    @SuppressWarnings("unchecked")
-    List<UUID> ids = query.getResultList();
-
-    if (CollectionUtils.isEmpty(ids)) {
-      return Pagination.getPage(Collections.emptyList(), pageable, 0);
-    }
-
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-    Integer limit = maxAndFirst.getLeft();
-    Integer offset = maxAndFirst.getRight();
-
-    List<FacilityTypeApprovedProduct> resultList = entityManager
-        .createQuery(HQL_SELECT_FTAP_BY_IDS, FacilityTypeApprovedProduct.class)
-        .setParameter("ids", ids)
-        .setFirstResult(offset)
-        .setMaxResults(limit)
-        .getResultList();
-
-    return Pagination.getPage(resultList, pageable, ids.size());
+    Query nativeQuery = prepareNativeQuery(facilityTypeCodes, programCode, active);
+    List<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    return retrieveFtaps(identities, pageable);
   }
 
   private UUID getFacilityTypeId(UUID facilityId, Profiler profiler) {
@@ -139,9 +130,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
   }
 
-  private Query prepareQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
+  private Query prepareNativeQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
       List<UUID> orderableIds, Boolean active) {
-    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
+    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDENTITIES);
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
@@ -171,12 +162,12 @@ public class FacilityTypeApprovedProductRepositoryImpl
     builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
-    return createQuery(builder, params);
+    return createNativeQuery(builder, params);
   }
 
-  private Query prepareQuery(List<String> facilityTypeCodes,
-      String programCode, Boolean active) {
-    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDS);
+  private Query prepareNativeQuery(List<String> facilityTypeCodes, String programCode,
+      Boolean active) {
+    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDENTITIES);
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
@@ -198,18 +189,68 @@ public class FacilityTypeApprovedProductRepositoryImpl
     builder.append(NATIVE_WHERE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
-    return createQuery(builder, params);
+    return createNativeQuery(builder, params);
   }
 
-  private Query createQuery(StringBuilder builder, Map<String, Object> params) {
-
+  private Query createNativeQuery(StringBuilder builder, Map<String, Object> params) {
     Query nativeQuery = entityManager.createNativeQuery(builder.toString());
     params.forEach(nativeQuery::setParameter);
 
     SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
-    sqlQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
+    sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
+    sqlQuery.addScalar("versionId", LongType.INSTANCE);
 
     return nativeQuery;
+  }
+
+  private List<Pair<UUID, Long>> executeNativeQuery(Query nativeQuery) {
+    // appropriate configuration has been set in the native query
+    @SuppressWarnings("unchecked")
+    List<Object[]> identities = nativeQuery.getResultList();
+
+    return identities
+        .stream()
+        .map(identity -> ImmutablePair.of((UUID) identity[0], (Long) identity[1]))
+        .collect(Collectors.toList());
+  }
+
+  private Page<FacilityTypeApprovedProduct> retrieveFtaps(List<Pair<UUID, Long>> identities,
+      Pageable pageable) {
+    if (CollectionUtils.isEmpty(identities)) {
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
+    }
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    Integer limit = maxAndFirst.getLeft();
+    Integer offset = maxAndFirst.getRight();
+
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<FacilityTypeApprovedProduct> query = builder
+        .createQuery(FacilityTypeApprovedProduct.class);
+
+    Root<FacilityTypeApprovedProduct> root = query.from(FacilityTypeApprovedProduct.class);
+    Predicate[] combinedPredicates = new Predicate[identities.size()];
+
+    int index = 0;
+    for (Pair<UUID, Long> pair : identities) {
+      Predicate predicate = builder.conjunction();
+      predicate = builder.and(predicate,
+          builder.equal(root.get(IDENTITY).get(ID), pair.getLeft()));
+      predicate = builder.and(predicate,
+          builder.equal(root.get(IDENTITY).get(VERSION_ID), pair.getRight()));
+
+      combinedPredicates[index++] = predicate;
+    }
+
+    query.where(builder.or(combinedPredicates));
+
+    List<FacilityTypeApprovedProduct> resultList = entityManager
+        .createQuery(query)
+        .setFirstResult(offset)
+        .setMaxResults(limit)
+        .getResultList();
+
+    return Pagination.getPage(resultList, pageable, identities.size());
   }
 
 }

@@ -211,15 +211,25 @@ public class FacilityTypeApprovedProductController extends BaseController {
   @GetMapping
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
         @RequestParam MultiValueMap<String, Object> queryParams, Pageable pageable) {
+    Profiler profiler = new Profiler("GET_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
 
+    profiler.start("PARSE_QUERY_PARAMETERS");
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(queryParams);
 
+    profiler.start("SEARCH_FTAPS");
     Page<FacilityTypeApprovedProduct> ftaps = repository
         .searchProducts(searchParams.getFacilityTypeCodes(), searchParams.getProgram(),
             searchParams.getActiveFlag(), pageable);
 
-    return Pagination.getPage(toDto(ftaps.getContent()), pageable, ftaps.getTotalElements());
+    List<ApprovedProductDto> content = toDto(ftaps.getContent(), profiler);
+
+    profiler.start("CREATE_PAGE");
+    Page<ApprovedProductDto> page = Pagination.getPage(content, pageable, ftaps.getTotalElements());
+
+    profiler.stop().log();
+    return page;
   }
 
   /**
@@ -294,12 +304,13 @@ public class FacilityTypeApprovedProductController extends BaseController {
     return productDto;
   }
 
-  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods) {
-
+  private List<ApprovedProductDto> toDto(Collection<FacilityTypeApprovedProduct> prods,
+      Profiler profiler) {
     if (prods.isEmpty()) {
       return Collections.emptyList();
     }
 
+    profiler.start("RETRIEVE_LATEST_ORDERABLES_BY_IDS");
     Set<UUID> orderableId = prods
         .stream()
         .map(FacilityTypeApprovedProduct::getOrderableId)
@@ -311,6 +322,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));
 
+    profiler.start("EXPORT_FTAPS_TO_DTO");
     List<ApprovedProductDto> dtos = new ArrayList<>();
     for (FacilityTypeApprovedProduct ftap : prods) {
       ApprovedProductDto productDto = new ApprovedProductDto();

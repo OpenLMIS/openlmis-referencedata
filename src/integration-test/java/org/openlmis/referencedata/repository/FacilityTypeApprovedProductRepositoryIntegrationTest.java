@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -128,21 +129,27 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   private Program program;
   private Program program2;
+
   private Orderable orderableFullSupply;
   private Orderable orderableNonFullSupply;
   private Orderable orderable1;
   private Orderable orderable2;
+
   private Facility facility;
+
   private Pageable pageable;
 
   @Before
   public void setUp() {
     facilityType1 = new FacilityTypeDataBuilder().withCode(FACILITY_TYPE_CODE).buildAsNew();
     facilityTypeRepository.save(facilityType1);
+
     facilityType2 = new FacilityTypeDataBuilder().withCode(FACILITY_TYPE2_CODE).buildAsNew();
     facilityTypeRepository.save(facilityType2);
+
     program = new ProgramDataBuilder().withCode(PROGRAM_CODE).build();
     programRepository.save(program);
+
     program2 = new ProgramDataBuilder().withCode("programCode2").build();
     programRepository.save(program2);
 
@@ -223,13 +230,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     pageable = new PageRequest(0, 10);
   }
 
-  FacilityTypeApprovedProduct generateInstance() {
-    return generateProduct(facilityType1, true);
-  }
-
   @Test
   public void shouldEditExistingProducts() {
-    ftapRepository.save(generateInstance());
+    saveAndGetProduct(facilityType1, true);
     Iterable<FacilityTypeApprovedProduct> all = ftapRepository.findAll();
     FacilityTypeApprovedProduct ftap = all.iterator().next();
     ftap.setMaxPeriodsOfStock(10.00);
@@ -241,10 +244,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldGetFullAndNonFullSupply() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType2, true));
-    ftapRepository.save(generateProduct(facilityType2, false));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, true);
+    saveAndGetProduct(facilityType2, false);
 
     List<UUID> orderableIds = emptyList();
 
@@ -256,10 +259,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldGetFullAndNonFullSupplyFilteredByOrderableIds() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType2, true));
-    ftapRepository.save(generateProduct(facilityType2, false));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, true);
+    saveAndGetProduct(facilityType2, false);
 
     List<UUID> orderableIds = Lists
         .newArrayList(orderableFullSupply.getId(), orderableNonFullSupply.getId());
@@ -274,10 +277,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldPaginate() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType2, true));
-    ftapRepository.save(generateProduct(facilityType2, false));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, true);
+    saveAndGetProduct(facilityType2, false);
 
     pageable = new PageRequest(0, 1);
     List<UUID> orderableIds = emptyList();
@@ -290,9 +293,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldGetFullSupply() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType2, true));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, true);
 
     List<UUID> orderableIds = emptyList();
 
@@ -319,8 +322,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldGetNonFullSupply() {
     // Create a full supply product
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateProduct(facilityType2, false, program, true));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType2, false, program, true);
 
     List<UUID> orderableIds = emptyList();
 
@@ -331,7 +334,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(0, page.getContent().size());
 
     // Create a non-full supply product
-    ftapRepository.save(generateProduct(facilityType1, false));
+    saveAndGetProduct(facilityType1, false);
 
     page = ftapRepository
         .searchProducts(facility.getId(), program.getId(), false, orderableIds, null, pageable);
@@ -357,7 +360,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldSkipFilteringWhenProgramIsNotProvided() {
-    ftapRepository.save(generateProduct(facilityType1, true));
+    saveAndGetProduct(facilityType1, true);
 
     List<UUID> orderableIds = emptyList();
 
@@ -375,7 +378,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldThrowExceptionIfFacilityWasNotFound() {
-    ftapRepository.save(generateProduct(facilityType1, true));
+    saveAndGetProduct(facilityType1, true);
 
     expectedException.expectCause(isA(NoResultException.class));
     expectedException.expect(ValidationMessageException.class);
@@ -386,17 +389,17 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test(expected = PersistenceException.class)
   public void shouldNotAllowDuplicates() {
-    ftapRepository.save(generateInstance());
-    ftapRepository.save(generateInstance());
+    ftapRepository.save(saveAndGetProduct(facilityType1, true));
+    ftapRepository.save(saveAndGetProduct(facilityType1, true));
 
     entityManager.flush();
   }
 
   @Test
   public void shouldSearchByFacilityType() {
-    ftapRepository.save(generateProduct(facilityType1, true));
-    ftapRepository.save(generateProduct(facilityType2, true));
-    ftapRepository.save(generateProduct(facilityType2, false));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType2, true);
+    saveAndGetProduct(facilityType2, false);
 
     Page<FacilityTypeApprovedProduct> result =
         ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, true, null);
@@ -413,20 +416,29 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldNotFindInactiveFtapWhenNoInactiveFtapSaved() {
-    ftapRepository.save(generateProduct(facilityType1, true, true));
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
+        .withVersionId(1)
+        .withActive(true)
+        .withMaxPeriodsOfStock(5)
+        .withFacilityType(facilityType1)
+        .withProgram(program)
+        .withOrderableId(orderableFullSupply.getId())
+        .build();
+    ftapRepository.save(ftap);
+
     Pageable pageRequest = new PageRequest(0, 10);
 
     Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE), null,
+        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null,
             false, pageRequest);
     assertEquals(0, result.getContent().size());
   }
 
   @Test
   public void shouldSearchByActiveFlag() {
-    ftapRepository.save(generateProduct(facilityType1, true, false));
-    ftapRepository.save(generateProduct(facilityType2, true, true));
-    ftapRepository.save(generateProduct(facilityType2, false, false));
+    saveAndGetProduct(facilityType1, true, false);
+    saveAndGetProduct(facilityType2, true, true);
+    saveAndGetProduct(facilityType2, false, false);
 
     Page<FacilityTypeApprovedProduct> result =
         ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null,
@@ -444,7 +456,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   @Test
   public void shouldSearchByFacilityTypeAndProgram() {
-    ftapRepository.save(generateProduct(facilityType1, true));
+    saveAndGetProduct(facilityType1, true);
 
     Page<FacilityTypeApprovedProduct> result =
         ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), PROGRAM_CODE,
@@ -472,8 +484,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldDeactivatePreviousVersions() {
     // given
-    FacilityTypeApprovedProduct ftapWithTwoVersions = generateInstanceWithTwoVersions();
-    FacilityTypeApprovedProduct anotherFtap = generateInstance();
+    FacilityTypeApprovedProduct ftapWithTwoVersions = saveAndGetProduct(facilityType1, true);
+    FacilityTypeApprovedProduct anotherFtap = saveAndGetProduct(facilityType2, true);
     anotherFtap.setActive(true);
 
     ftapRepository.save(Arrays.asList(ftapWithTwoVersions, anotherFtap));
@@ -496,10 +508,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void searchShouldPaginate() {
     // given
-    ftapRepository.save(generateProduct(facilityType1, true));
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType1, program2, orderable1));
-    ftapRepository.save(generateProduct(facilityType1, program2, orderable2));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType1, program2, orderable1);
+    saveAndGetProduct(facilityType1, program2, orderable2);
 
     // when
     Pageable pageRequest = new PageRequest(1, 2);
@@ -518,8 +530,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldSaveFacilityTypeApprovedProductWithActiveFlagEnabled() {
     //given
-    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true, true);
-    ftapRepository.save(activeProduct);
+    FacilityTypeApprovedProduct activeProduct = saveAndGetProduct(facilityType1, true, true);
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
@@ -532,8 +543,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldSaveFacilityTypeApprovedProductWithDefaultActiveFlag() {
     //given
-    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true);
-    ftapRepository.save(activeProduct);
+    FacilityTypeApprovedProduct activeProduct = saveAndGetProduct(facilityType1, true);
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
@@ -546,8 +556,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldSaveFacilityTypeApprovedProductWithActiveFlagDisabled() {
     //given
-    FacilityTypeApprovedProduct activeProduct = generateProduct(facilityType1, true, false);
-    ftapRepository.save(activeProduct);
+    FacilityTypeApprovedProduct activeProduct = saveAndGetProduct(facilityType1, true, false);
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
@@ -560,16 +569,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldSearchBySeveralFacilityTypes() {
     // given
-    ftapRepository.save(generateProduct(facilityType1, true));
-    ftapRepository.save(generateProduct(facilityType1, false));
-    ftapRepository.save(generateProduct(facilityType2, program2, orderable1));
-    ftapRepository.save(generateProduct(facilityType2, program2, orderable2));
-    ftapRepository.save(generateProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true));
-    ftapRepository.save(generateProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), false));
-    ftapRepository.save(generateProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true));
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, program2, orderable1);
+    saveAndGetProduct(facilityType2, program2, orderable2);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), false);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
 
     // when
     Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
@@ -589,7 +598,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   public void shouldNotAllowSaveFtapWithInvalidOrderable() {
     TestTransaction.flagForCommit();
 
-    FacilityTypeApprovedProduct product = generateProduct(facilityType1, true);
+    FacilityTypeApprovedProduct product = saveAndGetProduct(facilityType1, true);
     product.setOrderableId(UUID.randomUUID());
 
     ftapRepository.save(product);
@@ -601,7 +610,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
     // given
-    FacilityTypeApprovedProduct newestFtap = generateInstanceWithTwoVersions();
+    FacilityTypeApprovedProduct newestFtap = saveAndGetProduct(facilityType1, true);
 
     // when
     FacilityTypeApprovedProduct foundFtap = ftapRepository
@@ -609,13 +618,13 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     // then
     assertEquals(newestFtap, foundFtap);
-    assertEquals(2L, foundFtap.getVersionId().longValue());
+    assertEquals(newestFtap.getVersionId(), foundFtap.getVersionId());
   }
 
   @Test
   public void shouldFindByGivenIdAndVersion() {
     // given
-    FacilityTypeApprovedProduct newestFtap = generateInstanceWithTwoVersions();
+    FacilityTypeApprovedProduct newestFtap = saveAndGetProduct(facilityType1, true);
 
     // when
     FacilityTypeApprovedProduct foundFtap = ftapRepository
@@ -638,60 +647,52 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertTrue(orderable.getProgramOrderable(program).isActive());
   }
 
-  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+  private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,
                                                       boolean fullSupply) {
-    return generateProduct(facilityType, fullSupply, program, true);
+    return saveAndGetProduct(facilityType, fullSupply, program, true);
   }
 
-  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+  private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,
                                                       boolean fullSupply,
                                                       boolean active) {
-    return generateProduct(facilityType, fullSupply, program, active);
+    return saveAndGetProduct(facilityType, fullSupply, program, active);
   }
 
-  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+  private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,
                                                       boolean fullSupply,
                                                       Program program, Boolean active) {
-    return getFacilityTypeApprovedProduct(facilityType, program,
-        fullSupply ? orderableFullSupply : orderableNonFullSupply, active);
+    Orderable orderable = fullSupply ? orderableFullSupply : orderableNonFullSupply;
+    return saveAndGetProductWithTwoVersions(facilityType, program, orderable, active);
   }
 
-  private FacilityTypeApprovedProduct generateProduct(FacilityType facilityType,
+  private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,
                                                       Program program,
                                                       Orderable orderable) {
-    return getFacilityTypeApprovedProduct(facilityType, program, orderable, true);
+    return saveAndGetProductWithTwoVersions(facilityType, program, orderable, true);
   }
 
-  private FacilityTypeApprovedProduct getFacilityTypeApprovedProduct(
-      FacilityType facilityType, Program program, Orderable orderable, Boolean active) {
-    return new FacilityTypeApprovedProductsDataBuilder()
-        .withFacilityType(facilityType)
-        .withOrderableId(orderable.getId())
-        .withProgram(program)
-        .withMaxPeriodsOfStock(12.00)
-        .withActive(active)
-        .build();
-  }
+  private FacilityTypeApprovedProduct saveAndGetProductWithTwoVersions(FacilityType facilityType,
+      Program program, Orderable orderable, Boolean active) {
+    Long versionId = ThreadLocalRandom.current().nextLong(0, 1000);
 
-  private FacilityTypeApprovedProduct generateInstanceWithTwoVersions() {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
-        .withVersionId(1)
+        .withVersionId(versionId)
         .withActive(false)
         .withMaxPeriodsOfStock(5)
-        .withFacilityType(facilityType1)
-        .withProgram(program2)
-        .withOrderableId(orderable2.getId())
+        .withFacilityType(facilityType)
+        .withProgram(program)
+        .withOrderableId(orderable.getId())
         .build();
     ftap = ftapRepository.save(ftap);
 
     FacilityTypeApprovedProduct ftapNewVersion = new FacilityTypeApprovedProductsDataBuilder()
         .withId(ftap.getId())
-        .withVersionId(2)
-        .withActive(true)
+        .withVersionId(versionId + 1)
+        .withActive(active)
         .withMaxPeriodsOfStock(5.26)
-        .withFacilityType(facilityType1)
-        .withProgram(program2)
-        .withOrderableId(orderable2.getId())
+        .withFacilityType(facilityType)
+        .withProgram(program)
+        .withOrderableId(orderable.getId())
         .build();
 
     return ftapRepository.save(ftapNewVersion);
