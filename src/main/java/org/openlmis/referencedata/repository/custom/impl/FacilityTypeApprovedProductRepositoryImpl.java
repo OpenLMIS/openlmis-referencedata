@@ -80,12 +80,11 @@ public class FacilityTypeApprovedProductRepositoryImpl
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
   private static final String NATIVE_WHERE_FTAP_ACTIVE_FLAG = " WHERE ftap.active = :active";
 
-  private static final String HQL_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap"
-      + " FROM FacilityTypeApprovedProduct AS ftap"
+  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*"
+      + " FROM referencedata.facility_type_approved_products AS ftap"
       + " WHERE ";
 
-  private static final String HQL_IDENTITY = "(ftap.identity.id = '%s'"
-      + " AND ftap.identity.versionId = %d)";
+  private static final String NATIVE_IDENTITY = "(id = '%s' AND versionId = %d)";
   private static final String OR = " OR ";
 
   @PersistenceContext
@@ -224,13 +223,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Integer limit = maxAndFirst.getLeft();
     Integer offset = maxAndFirst.getRight();
 
-    String hql = HQL_SELECT_FTAPS_BY_IDENTITES + identities
+    String hql = NATIVE_SELECT_FTAPS_BY_IDENTITES + identities
         .stream()
-        .map(pair -> String.format(HQL_IDENTITY, pair.getLeft(), pair.getRight()))
+        .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
         .collect(Collectors.joining(OR));
 
+    // appropriate class has been passed in the createNativeQuery method
+    @SuppressWarnings("unchecked")
     List<FacilityTypeApprovedProduct> resultList = entityManager
-        .createQuery(hql, FacilityTypeApprovedProduct.class)
+        .createNativeQuery(hql, FacilityTypeApprovedProduct.class)
         .setFirstResult(offset)
         .setMaxResults(limit)
         .getResultList();
