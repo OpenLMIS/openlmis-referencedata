@@ -1,8 +1,8 @@
 id,code,dispensableid,fullproductname,netcontent,packroundingthreshold,roundtozero,description,extradata,versionid
-7f7b83db-580d-4269-88d2-7f9c80a591a9,0002-1200,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Amyvid,5,2,false,Product description goes here.,,1
-bfde33c3-83f1-4feb-a27c-842852f66b71,0002-1407,b6eb78c8-3c62-427e-87a8-e16615f9683d,Quinidine Gluconate,1,0,false,Product description goes here.,,1
-7b9b66e0-f008-4c38-93ec-7a5f4868cca9,0002-1433,daf071e6-2394-4ac9-b5a1-97a433d49160,Trulicity,1,0,false,Product description goes here.,,1
-142bc03c-f4fc-40a8-a1ef-efebc900b171,0002-1445,690b6b04-688f-4249-904c-f310f2785217,TALTZ,1,0,false,Product description goes here.,,1
+7f7b83db-580d-4269-88d2-7f9c80a591a9,C300,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Depo-Estradiol,5,2,false,Product description goes here.,,1
+bfde33c3-83f1-4feb-a27c-842852f66b71,C400,b6eb78c8-3c62-427e-87a8-e16615f9683d,Male Condom,1,0,false,Product description goes here.,,1
+7b9b66e0-f008-4c38-93ec-7a5f4868cca9,C600,daf071e6-2394-4ac9-b5a1-97a433d49160,Levonorgestrel,1,0,false,Product description goes here.,,1
+142bc03c-f4fc-40a8-a1ef-efebc900b171,C102,690b6b04-688f-4249-904c-f310f2785217,Adiuvantia,1,0,false,Product description goes here.,,1
 430e898a-59a8-465a-8431-98cd55bbe418,0002-1975,afa35730-18eb-4cff-9031-bcd88bcf67ac,AXIRON,1,0,false,Product description goes here.,,1
 b42db3d0-b2a1-46db-abd0-99421878a4da,0002-3004,0c83003d-c6c4-458d-9f29-7afa8eed045a,Prozac,1,0,false,Product description goes here.,,1
 f573f7d1-b90b-4c3c-8d8b-b8865315d32d,0002-3227,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,Strattera,1,0,false,Product description goes here.,,1
@@ -10014,11 +10014,11 @@ a1e0323a-82d9-4230-92cc-63ef3296f64a,30805-007,3a7a8e99-6ce3-4e14-9ad1-3085f2290
 6e1468ce-c5be-4a5b-b2b5-929c3933f67e,30807-2002,54d6f74f-2d10-4d69-92ff-31da53c16b46,Quit Nits Advance,20,9,true,Product description goes here.,,1
 0dd421e8-6b00-439f-9794-93a732ddb550,30807-3003,22011f6f-1b25-42cd-aedf-e5e92efa186b,Quit Nits Preventative,75,10,true,Product description goes here.,,1
 04b12cc9-3f8f-4a16-8027-81c616c99933,30815-0040,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,Hydro-Q,67,7,true,Product description goes here.,,1
-d059457a-b7ec-4353-89c6-dde0fc7a0c4b,31190-100,b8764f2b-c649-4991-b160-fd9c9b8c258b,ALCOHOL FREE HAND SANITIZER,51,8,true,,,1
+d059457a-b7ec-4353-89c6-dde0fc7a0c4b,ARV0001,b8764f2b-c649-4991-b160-fd9c9b8c258b,Abacavir 300mg Tables,51,8,true,,,1
 3fecd8a4-d130-4e82-95ff-7d7620e24d8d,31190-101,eea1399c-b99d-4e8a-af86-6a8062978bd9,Skin protectant,97,5,true,,,1
 65df9af9-dd9d-4df4-8157-bce65b4a42dd,31190-200,62d6457e-02ab-49b0-8952-a1ed5bd8d056,SunScreen SPF30,24,9,true,,,1
-952aabc6-ffa8-4e9a-ac4d-82b843704a82,31190-300,0198a03d-d138-489d-a1f4-3c4a1719b987,INSTANT HAND SANITIZER WITH ALOE and VITAMIN E,87,1,false,,,1
-fd77b03e-5578-429b-9802-6d7e4d8cb91d,31190-320,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,SPF 30 SUNSCREEN,40,7,false,,,1
+952aabc6-ffa8-4e9a-ac4d-82b843704a82,ARV0004,0198a03d-d138-489d-a1f4-3c4a1719b987,Abacavir oral solution 20mg/ml,87,1,false,,,1
+fd77b03e-5578-429b-9802-6d7e4d8cb91d,ARV0005,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,Zidovudine/Lamivudine 300/150mg Tablets,40,7,false,,,1
 dc576f79-8d1c-4f4c-a94f-1ddda1065c85,31190-700,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,SunScreen SPF 30,43,6,true,,,1
 81dd320e-6d28-446a-8613-8bb899d6c206,31382-830,375127ec-0ac9-4b91-9111-7f1d2bbbd0ac,Zorcaine,32,5,true,,,1
 e1e51f5a-1bda-4777-a074-d865206e546f,31382-931,33259963-6feb-48d6-b29d-d313936cdbb3,Carbocaine with Neo-Cobefrin,91,6,true,,,1
