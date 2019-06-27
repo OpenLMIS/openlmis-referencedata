@@ -10015,17 +10015,17 @@ a1e0323a-82d9-4230-92cc-63ef3296f64a,30805-007,3a7a8e99-6ce3-4e14-9ad1-3085f2290
 0dd421e8-6b00-439f-9794-93a732ddb550,30807-3003,22011f6f-1b25-42cd-aedf-e5e92efa186b,Quit Nits Preventative,75,10,true,Product description goes here.,,1
 04b12cc9-3f8f-4a16-8027-81c616c99933,30815-0040,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,Hydro-Q,67,7,true,Product description goes here.,,1
 d059457a-b7ec-4353-89c6-dde0fc7a0c4b,ARV0001,b8764f2b-c649-4991-b160-fd9c9b8c258b,Abacavir 300mg Tables,51,8,true,,,1
-3fecd8a4-d130-4e82-95ff-7d7620e24d8d,31190-101,eea1399c-b99d-4e8a-af86-6a8062978bd9,Skin protectant,97,5,true,,,1
-65df9af9-dd9d-4df4-8157-bce65b4a42dd,31190-200,62d6457e-02ab-49b0-8952-a1ed5bd8d056,SunScreen SPF30,24,9,true,,,1
+3fecd8a4-d130-4e82-95ff-7d7620e24d8d,ARV0002,eea1399c-b99d-4e8a-af86-6a8062978bd9,Lamivudine/Zidovudine/Nevirapine 30/60/50mg,97,5,true,,,1
+65df9af9-dd9d-4df4-8157-bce65b4a42dd,ARV0003,62d6457e-02ab-49b0-8952-a1ed5bd8d056,Tenofovir/Emitricitabine/Efavirenz 300mg/200mg/600mg,24,9,true,,,1
 952aabc6-ffa8-4e9a-ac4d-82b843704a82,ARV0004,0198a03d-d138-489d-a1f4-3c4a1719b987,Abacavir oral solution 20mg/ml,87,1,false,,,1
 fd77b03e-5578-429b-9802-6d7e4d8cb91d,ARV0005,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,Zidovudine/Lamivudine 300/150mg Tablets,40,7,false,,,1
-dc576f79-8d1c-4f4c-a94f-1ddda1065c85,31190-700,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,SunScreen SPF 30,43,6,true,,,1
-81dd320e-6d28-446a-8613-8bb899d6c206,31382-830,375127ec-0ac9-4b91-9111-7f1d2bbbd0ac,Zorcaine,32,5,true,,,1
-e1e51f5a-1bda-4777-a074-d865206e546f,31382-931,33259963-6feb-48d6-b29d-d313936cdbb3,Carbocaine with Neo-Cobefrin,91,6,true,,,1
-7f0aac5f-582a-4a6a-a8e1-dd534200f257,31507-576,c19e7465-a528-409d-a6e3-0d2da8ffa43a,Hand Guard Foaming Antimicrobial,84,8,false,,,1
-dc6e49d4-6fd8-49d0-ac4f-44d055c4b49d,31507-585,afa35730-18eb-4cff-9031-bcd88bcf67ac,Hand Guard Foaming Instant Hand Sanitizer,95,7,true,,,1
-f7169041-733a-4279-bcbb-aee248e1b9dd,31507-876,b9c10903-dad3-47b6-b6e5-21dd9d232ad8,Hand Guard High Foaming Antiseptic Hand and Body Wash,68,2,false,,,1
-a4460709-c908-4b94-b3c0-faf5eeefcc03,31511-007,7dea5bc1-daf4-4c82-a447-d9393822c4fc,Nobac Plus AB-F,32,7,false,,,1
+dc576f79-8d1c-4f4c-a94f-1ddda1065c85,ARV0006,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,Efavirenz 200mg,43,6,true,,,1
+81dd320e-6d28-446a-8613-8bb899d6c206,ARV0007,375127ec-0ac9-4b91-9111-7f1d2bbbd0ac,Nevirapine Tablets for Oral Susp 50mg,32,5,true,,,1
+e1e51f5a-1bda-4777-a074-d865206e546f,ARV0008,33259963-6feb-48d6-b29d-d313936cdbb3,Abacavir/Lamivudine 60/30mg,91,6,true,,,1
+7f0aac5f-582a-4a6a-a8e1-dd534200f257,ARV0009,c19e7465-a528-409d-a6e3-0d2da8ffa43a,Tenofovir 300mg Tablets,84,8,false,,,1
+dc6e49d4-6fd8-49d0-ac4f-44d055c4b49d,ARV0010,afa35730-18eb-4cff-9031-bcd88bcf67ac,Co-trimoxazole 120mg Tablets,95,7,true,,,1
+f7169041-733a-4279-bcbb-aee248e1b9dd,ARV0011,b9c10903-dad3-47b6-b6e5-21dd9d232ad8,Efavirenz 50mg,68,2,false,,,1
+a4460709-c908-4b94-b3c0-faf5eeefcc03,ARV0012,7dea5bc1-daf4-4c82-a447-d9393822c4fc,Lamivudine/Zidovudine 30/60mg (Pead),32,7,false,,,1
 2400e410-b8dd-4954-b1c0-80d8a8e785fc,C1,62d6457e-02ab-49b0-8952-a1ed5bd8d056,Acetylsalicylic Acid,16,8,false,Product description goes here.,,1
 103396e1-f5e4-4754-bb7b-1c799097dfea,C2,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Glibenclamide,40,20,false,Product description goes here.,,1
 bac90734-6e58-426e-849b-331286ec77d2,C3,1bfced14-16ad-44df-b73f-5106353972d0,Streptococcus Pneumoniae Vaccine,5,2,false,Product description goes here.,,1
