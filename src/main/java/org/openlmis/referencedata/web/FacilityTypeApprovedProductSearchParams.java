@@ -15,86 +15,49 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Arrays.asList;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_LACK_PARAMS;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.util.Message;
-import org.springframework.util.MultiValueMap;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 
-@EqualsAndHashCode
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public final class FacilityTypeApprovedProductSearchParams {
+@EqualsAndHashCode
+public final class FacilityTypeApprovedProductSearchParams implements
+    FacilityTypeApprovedProductRepositoryCustom.SearchParams {
 
-  private static final String FACILITY_TYPE = "facilityType";
-  private static final String PROGRAM = "program";
-  private static final String ACTIVE = "active";
-
-  private static final List<String> ALL_PARAMETERS = asList(FACILITY_TYPE, PROGRAM, ACTIVE);
-
-  private SearchParams queryParams;
-
-  /**
-   * Wraps map of query params into an object.
-   */
-  public FacilityTypeApprovedProductSearchParams(MultiValueMap<String, Object> queryMap) {
-    queryParams = new SearchParams(queryMap);
-    validate();
-  }
+  private List<String> facilityTypeCodes;
+  private String programCode;
+  private Boolean active;
+  private List<VersionIdentityDto> identities;
 
   /**
-   * Gets {@link List} of {@link String} for "facilityType" key from params.
-   *
-   * @return list of string values of facility type codes
-   * @throws ValidationMessageException if params doesn't contain at least one "facilityType" key.
+   * Retrieve identifiers as a set of id-versionId pairs.
    */
-  public List<String> getFacilityTypeCodes() {
-    if (!queryParams.containsKey(FACILITY_TYPE)) {
-      throw new ValidationMessageException(ERROR_LACK_PARAMS);
-    }
-
-    return queryParams
-        .get(FACILITY_TYPE)
+  @JsonIgnore
+  public Set<Pair<UUID, Long>> getIdentityPairs() {
+    return Optional
+        .ofNullable(identities)
+        .orElse(Collections.emptyList())
         .stream()
-        .map(String::valueOf)
-        .collect(Collectors.toList());
+        .map(identity -> ImmutablePair.of(identity.getId(), identity.getVersionId()))
+        .collect(Collectors.toSet());
   }
 
-  /**
-   * Gets {@link String} for "program" key from params.
-   *
-   * @return String value of program or null if params doesn't contain "program" key.
-   */
-  public String getProgram() {
-    if (!queryParams.containsKey(PROGRAM)) {
-      return null;
-    }
-    return queryParams.getFirst(PROGRAM);
-  }
-
-  /**
-   * Gets {@link Boolean} for "active" key from params.
-   *
-   * @return Boolean value of program or null if params doesn't contain "active" key.
-   */
-  public Boolean getActiveFlag() {
-    if (!queryParams.containsKey(ACTIVE)) {
-      return null;
-    }
-    return Boolean.parseBoolean(queryParams.getFirst(ACTIVE));
-  }
-
-  /**
-   * Checks if query params are valid. Returns false if any provided param is not on supported list.
-   */
-  public void validate() {
-    if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
-      throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
-    }
-  }
 }

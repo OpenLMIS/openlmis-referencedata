@@ -64,6 +64,7 @@ import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
+import org.openlmis.referencedata.web.FacilityTypeApprovedProductSearchParams;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -143,9 +144,14 @@ public class SupplyPartnerBuilderTest {
     when(orderableRepository.findAllLatestByIds(
         Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
         .thenReturn(Pagination.getPage(Lists.newArrayList(orderable)));
+
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParams(
+            Collections.singletonList(facility.getType().getCode()),
+            program.getCode().toString(), null, null);
+
     when(facilityTypeApprovedProductRepository
-        .searchProducts(eq(Collections.singletonList(facility.getType().getCode())),
-            eq(program.getCode().toString()), eq(null), any(Pageable.class)))
+        .searchProducts(eq(searchParams), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct)));
   }
 

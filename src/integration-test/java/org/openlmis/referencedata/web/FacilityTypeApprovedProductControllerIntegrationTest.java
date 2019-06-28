@@ -41,6 +41,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductSearchParamsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
@@ -62,6 +63,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String RESOURCE_URL = "/api/facilityTypeApprovedProducts";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
+
   private static final String FACILITY_TYPE_PARAM = "facilityType";
   private static final String PROGRAM_PARAM = "program";
 
@@ -408,9 +411,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldSearchFtaps() {
     given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(Lists.newArrayList(facilityType1.getCode())),
-            eq(program.getCode().toString()),
-            eq(null), any(Pageable.class)))
+        .searchProducts(any(QueryFacilityTypeApprovedProductSearchParams.class),
+            any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
 
     PageImplRepresentation response = restAssured
@@ -456,6 +458,52 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
+
+  // POST /facilityTypeApprovedProducts
+
+  @Test
+  public void shouldPostSearchFtaps() {
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+        .withFacilityTypeCode(facilityType1.getCode())
+        .withProgramCode(program.getCode().toString())
+        .withIdentity(facilityTypeAppProd.getId(), facilityTypeAppProd.getVersionId())
+        .build();
+
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(eq(searchParams), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(searchParams)
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .extract()
+        .as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(ftapDto.getId().toString(),
+        ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInPostSearchEndpoint() {
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(new FacilityTypeApprovedProductSearchParams())
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
 
   // GET /facilityTypeApprovedProducts/{id}/auditLog
 

@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.repository;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.apache.commons.lang.BooleanUtils.isFalse;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
@@ -24,6 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.isOneOf;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,8 +35,10 @@ import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -58,8 +60,11 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.VersionIdentity;
+import org.openlmis.referencedata.domain.Versionable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductSearchParamsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
@@ -401,13 +406,20 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     saveAndGetProduct(facilityType2, true);
     saveAndGetProduct(facilityType2, false);
 
-    Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, true, null);
+    Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withActive(true)
+            .build(),
+        null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
 
-    result = ftapRepository.searchProducts(singletonList(FACILITY_TYPE2_CODE), null,
-        null, null);
+    result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+        .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .build(),
+        null);
     assertEquals(2, result.getContent().size());
     for (FacilityTypeApprovedProduct ftap : result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
@@ -428,9 +440,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     Pageable pageRequest = new PageRequest(0, 10);
 
-    Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null,
-            false, pageRequest);
+    Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withActive(false)
+            .build(),
+        pageRequest);
     assertEquals(0, result.getContent().size());
   }
 
@@ -440,45 +455,178 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     saveAndGetProduct(facilityType2, true, true);
     saveAndGetProduct(facilityType2, false, false);
 
-    Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null,
-        true, null);
+    // only active
+    Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .withActive(true)
+            .build(),
+        null);
     assertEquals(1, result.getContent().size());
 
-    result = ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE),
-        null, null, null);
-    assertEquals(1, result.getContent().size());
-
-    result = ftapRepository.searchProducts(Arrays.asList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE),
-        null, false, null);
+    // only not active
+    result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .withActive(false)
+            .build(),
+        null);
     assertEquals(2, result.getContent().size());
+
+    // all if not provided
+    result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .build(),
+        null);
+    assertEquals(3, result.getContent().size());
   }
 
   @Test
   public void shouldSearchByFacilityTypeAndProgram() {
     saveAndGetProduct(facilityType1, true);
 
-    Page<FacilityTypeApprovedProduct> result =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), PROGRAM_CODE,
-            null, null);
+    Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withProgramCode(PROGRAM_CODE)
+            .build(),
+        null);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
     assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
 
-    result = ftapRepository
-        .searchProducts(singletonList(FACILITY_TYPE2_CODE), "nonExistingCode", null, null);
+    result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .withProgramCode("nonExistingCode")
+            .build(),
+        null);
     assertEquals(0, result.getContent().size());
   }
 
   @Test
   public void searchShouldReturnEmptyPageNotNull() {
     // given and when
-    Page<FacilityTypeApprovedProduct> actual = ftapRepository
-        .searchProducts(singletonList("abc"), null, null, null);
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode("abc")
+            .build(),
+        null);
 
     // then
     assertNotNull(actual);
     assertNotNull(actual.getContent());
+  }
+
+  @Test
+  public void searchShouldPaginate() {
+    // given
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType1, program2, orderable1);
+    saveAndGetProduct(facilityType1, program2, orderable2);
+
+    // when
+    Pageable pageRequest = new PageRequest(1, 2);
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .build(),
+        pageRequest);
+
+    // then
+    assertNotNull(actual);
+    assertEquals(1, actual.getNumber());
+    assertEquals(2, actual.getSize());
+    assertEquals(2, actual.getTotalPages());
+    assertEquals(4, actual.getTotalElements());
+    assertEquals(2, actual.getContent().size());
+  }
+
+  @Test
+  public void shouldSearchBySeveralFacilityTypes() {
+    // given
+    saveAndGetProduct(facilityType1, true);
+    saveAndGetProduct(facilityType1, false);
+    saveAndGetProduct(facilityType2, program2, orderable1);
+    saveAndGetProduct(facilityType2, program2, orderable2);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), false);
+    saveAndGetProduct(
+        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
+
+    // when
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withFacilityTypeCode(FACILITY_TYPE_CODE)
+            .withFacilityTypeCode(FACILITY_TYPE2_CODE)
+            .build(),
+        new PageRequest(0, 10));
+
+    // then
+    assertThat(actual, is(notNullValue()));
+    assertThat(actual.getContent(), hasSize(4));
+    assertThat(actual.getContent(),
+        hasItems(hasProperty("facilityType",
+            hasProperty("code", isOneOf(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE)))));
+  }
+
+  @Test
+  public void shouldFindResourcesByIdVersionIdPairs() {
+    FacilityTypeApprovedProduct ftap1 = saveAndGetProduct(facilityType1, true);
+    FacilityTypeApprovedProduct ftap2 = saveAndGetProduct(facilityType2, false);
+    FacilityTypeApprovedProduct ftap3 = saveAndGetProduct(facilityType1, false);
+    FacilityTypeApprovedProduct ftap4 = saveAndGetProduct(facilityType2, true);
+
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(ftap1.getId(), ftap1.getVersionId())
+            .withIdentity(ftap2.getId(), ftap2.getVersionId())
+            .build(),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(2));
+
+    Set<VersionIdentity> identities = actual
+        .getContent()
+        .stream()
+        .map(Versionable::getVersionIdentity)
+        .collect(Collectors.toSet());
+
+    assertThat(identities, hasItems(ftap1.getVersionIdentity(), ftap2.getVersionIdentity()));
+    assertThat(identities, not(hasItems(ftap3.getVersionIdentity(), ftap4.getVersionIdentity())));
+  }
+
+  @Test
+  public void shouldFindPreviousVersions() {
+    FacilityTypeApprovedProduct ftap = saveAndGetProduct(facilityType1, true);
+
+    // current version
+    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(ftap.getId(), ftap.getVersionId())
+            .build(),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(1));
+    assertThat(actual.getContent().get(0).getVersionIdentity(), is(ftap.getVersionIdentity()));
+
+    // previous version
+    actual = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(ftap.getId(), ftap.getVersionId() - 1)
+            .build(),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(1));
+    assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(ftap.getId()));
+    assertThat(actual.getContent().get(0).getVersionId(), is(ftap.getVersionId() - 1));
   }
 
   @Test
@@ -503,28 +651,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         .allMatch(ftap -> isFalse(ftap.getActive()));
 
     assertThat("Not all versions have been deactivated", previousVersionAreDeactivated, is(true));
-  }
-
-  @Test
-  public void searchShouldPaginate() {
-    // given
-    saveAndGetProduct(facilityType1, true);
-    saveAndGetProduct(facilityType1, false);
-    saveAndGetProduct(facilityType1, program2, orderable1);
-    saveAndGetProduct(facilityType1, program2, orderable2);
-
-    // when
-    Pageable pageRequest = new PageRequest(1, 2);
-    Page<FacilityTypeApprovedProduct> actual =
-        ftapRepository.searchProducts(singletonList(FACILITY_TYPE_CODE), null, null, pageRequest);
-
-    // then
-    assertNotNull(actual);
-    assertEquals(1, actual.getNumber());
-    assertEquals(2, actual.getSize());
-    assertEquals(2, actual.getTotalPages());
-    assertEquals(4, actual.getTotalElements());
-    assertEquals(2, actual.getContent().size());
   }
 
   @Test
@@ -564,33 +690,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     //then
     Assert.assertFalse(savedProduct.getActive());
-  }
-
-  @Test
-  public void shouldSearchBySeveralFacilityTypes() {
-    // given
-    saveAndGetProduct(facilityType1, true);
-    saveAndGetProduct(facilityType1, false);
-    saveAndGetProduct(facilityType2, program2, orderable1);
-    saveAndGetProduct(facilityType2, program2, orderable2);
-    saveAndGetProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
-    saveAndGetProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), false);
-    saveAndGetProduct(
-        facilityTypeRepository.save(new FacilityTypeDataBuilder().buildAsNew()), true);
-
-    // when
-    Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
-        Lists.newArrayList(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE), null, null,
-        new PageRequest(0, 10));
-
-    // then
-    assertThat(actual, is(notNullValue()));
-    assertThat(actual.getContent(), hasSize(4));
-    assertThat(actual.getContent(),
-        hasItems(hasProperty("facilityType",
-            hasProperty("code", isOneOf(FACILITY_TYPE_CODE, FACILITY_TYPE2_CODE)))));
   }
 
   @Test(expected = JpaSystemException.class)

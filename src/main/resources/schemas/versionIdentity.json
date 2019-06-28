@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "VersionIdentity",
+  "description": "The following object presents verionable resource identity",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "versionId": {
+      "type": "integer",
+      "title": "versionId"
+    }
+  },
+  "required": [
+    "id",
+    "versionId"
+  ]
+}

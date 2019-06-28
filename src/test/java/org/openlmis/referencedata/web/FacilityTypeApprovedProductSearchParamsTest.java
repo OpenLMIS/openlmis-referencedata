@@ -16,91 +16,19 @@
 package org.openlmis.referencedata.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_LACK_PARAMS;
 
+import java.util.Set;
+import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.junit.Before;
-import org.junit.Rule;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.ToStringTestUtils;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.springframework.util.LinkedMultiValueMap;
+import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductSearchParamsDataBuilder;
 
 public class FacilityTypeApprovedProductSearchParamsTest {
-
-  @Rule
-  public ExpectedException exception = ExpectedException.none();
-
-  private static final String FACILITY_TYPE = "facilityType";
-  private static final String PROGRAM = "program";
-  private static final String ACTIVE = "active";
-
-  private LinkedMultiValueMap<String, Object> queryMap;
-
-  @Before
-  public void setUp() {
-    queryMap = new LinkedMultiValueMap<>();
-  }
-
-  @Test
-  public void shouldGetFacilityTypeValuesFromParameters() {
-    queryMap.add(FACILITY_TYPE, "facilityType");
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
-
-    assertThat(params.getFacilityTypeCodes())
-        .hasSize(1)
-        .contains("facilityType");
-  }
-
-  @Test
-  public void shouldThrowExceptionIfMapHasNoFacilityTypeProperty() {
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
-
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_LACK_PARAMS);
-
-    params.getFacilityTypeCodes();
-  }
-
-  @Test
-  public void shouldGetProgramValueFromParameters() {
-    queryMap.add(PROGRAM, "name");
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
-
-    assertThat(params.getProgram()).isEqualTo("name");
-  }
-
-  @Test
-  public void shouldGetActiveValueFromParameters() {
-    queryMap.add(ACTIVE, "true");
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
-
-    assertThat(params.getActiveFlag()).isEqualTo(true);
-  }
-
-  @Test
-  public void shouldGetNullIfMapHasNoNameProperty() {
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
-
-    assertThat(params.getProgram()).isNull();
-  }
-
-  @Test
-  public void shouldThrowExceptionIfThereIsUnknownParameterInParameters() {
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_INVALID_PARAMS);
-
-    queryMap.add("some-param", "some-value");
-    new FacilityTypeApprovedProductSearchParams(queryMap);
-  }
 
   @Test
   public void equalsContract() {
@@ -112,11 +40,27 @@ public class FacilityTypeApprovedProductSearchParamsTest {
 
   @Test
   public void shouldImplementToString() {
-    queryMap.add(PROGRAM, "some-name");
-    FacilityTypeApprovedProductSearchParams params
-        = new FacilityTypeApprovedProductSearchParams(queryMap);
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParams();
 
-    ToStringTestUtils.verify(FacilityTypeApprovedProductSearchParams.class, params,
-        "FACILITY_TYPE", "PROGRAM", "ACTIVE", "ALL_PARAMETERS");
+    ToStringTestUtils.verify(FacilityTypeApprovedProductSearchParams.class, searchParams);
+  }
+
+  @Test
+  public void shouldConvertIdentitiesToPairs() {
+    // given
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(UUID.randomUUID(), 1L)
+            .withIdentity(UUID.randomUUID(), 2L)
+            .build();
+
+    // when
+    Set<Pair<UUID, Long>> pairs = searchParams.getIdentityPairs();
+
+    // then
+    for (VersionIdentityDto identity : searchParams.getIdentities()) {
+      assertThat(pairs).contains(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+    }
   }
 }

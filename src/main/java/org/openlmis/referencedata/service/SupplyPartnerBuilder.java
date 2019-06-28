@@ -53,6 +53,7 @@ import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
+import org.openlmis.referencedata.web.FacilityTypeApprovedProductSearchParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -182,8 +183,12 @@ public class SupplyPartnerBuilder
 
     String programCode = program.getCode().toString();
     PageRequest pageable = new PageRequest(DEFAULT_PAGE_NUMBER, NO_PAGINATION);
+
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParams(facilityTypeCodes, programCode, null, null);
+
     Set<UUID> approvedProductIds = facilityTypeApprovedProductRepository
-        .searchProducts(facilityTypeCodes, programCode, null, pageable)
+        .searchProducts(searchParams, pageable)
         .getContent()
         .stream()
         .map(FacilityTypeApprovedProduct::getOrderableId)

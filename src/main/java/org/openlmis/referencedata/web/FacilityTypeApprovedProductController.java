@@ -207,7 +207,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * @param queryParams a map containing search parameters. Supported keys are:
    *                    * facilityType [required]
    *                    * program
-   * @return a list of approved products matching the criteria
+   * @return a page of approved products matching the criteria
    */
   @GetMapping
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
@@ -216,13 +216,36 @@ public class FacilityTypeApprovedProductController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     profiler.start("PARSE_QUERY_PARAMETERS");
-    FacilityTypeApprovedProductSearchParams searchParams =
-        new FacilityTypeApprovedProductSearchParams(queryParams);
+    QueryFacilityTypeApprovedProductSearchParams searchParams =
+        new QueryFacilityTypeApprovedProductSearchParams(queryParams);
 
     profiler.start("SEARCH_FTAPS");
-    Page<FacilityTypeApprovedProduct> ftaps = repository
-        .searchProducts(searchParams.getFacilityTypeCodes(), searchParams.getProgram(),
-            searchParams.getActiveFlag(), pageable);
+    Page<FacilityTypeApprovedProduct> ftaps = repository.searchProducts(searchParams, pageable);
+
+    List<ApprovedProductDto> content = toDto(ftaps.getContent(), profiler);
+
+    profiler.start("CREATE_PAGE");
+    Page<ApprovedProductDto> page = Pagination.getPage(content, pageable, ftaps.getTotalElements());
+
+    profiler.stop().log();
+    return page;
+  }
+
+  /**
+   * Search approved products by search criteria.
+   *
+   * @param body - specify criteria for approved products.
+   * @param pageable  - specify which and how many elements should be returned.
+   * @return a page of approved products matching the criteria
+   */
+  @PostMapping("/search")
+  public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
+      @RequestBody FacilityTypeApprovedProductSearchParams body, Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_FACILITY_TYPE_APPROVED_PRODUCT");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("SEARCH_FTAPS");
+    Page<FacilityTypeApprovedProduct> ftaps = repository.searchProducts(body, pageable);
 
     List<ApprovedProductDto> content = toDto(ftaps.getContent(), profiler);
 

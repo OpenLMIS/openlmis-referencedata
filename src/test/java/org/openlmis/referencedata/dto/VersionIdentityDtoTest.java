@@ -13,32 +13,28 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository.custom;
+package org.openlmis.referencedata.dto;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public interface FacilityTypeApprovedProductRepositoryCustom {
+public class VersionIdentityDtoTest {
 
-  Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID program,
-      Boolean fullSupply, List<UUID> orderableIds, Boolean active, Pageable pageable);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(VersionIdentityDto.class)
+        .withRedefinedSuperclass()
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
+  }
 
-  Page<FacilityTypeApprovedProduct> searchProducts(SearchParams searchParams, Pageable pageable);
-
-  interface SearchParams {
-
-    List<String> getFacilityTypeCodes();
-
-    String getProgramCode();
-
-    Boolean getActive();
-
-    Set<Pair<UUID, Long>> getIdentityPairs();
-
+  @Test
+  public void shouldImplementToString() {
+    VersionIdentityDto identity = new VersionIdentityDto(UUID.randomUUID(), 1L);
+    ToStringTestUtils.verify(VersionIdentityDto.class, identity);
   }
 }

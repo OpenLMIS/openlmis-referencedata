@@ -56,6 +56,8 @@ schemas:
           "required": ["messageKey"]
       }
 
+  - approvedProductSearchQuery: !include schemas/approvedProductSearchQuery.json
+
   - approvedProductDto: !include schemas/approvedProductDto.json
 
   - approvedProductDtoPage: !include schemas/approvedProductDtoPage.json
@@ -2373,6 +2375,23 @@ resourceTypes:
                 description: The request does not contain a token or the token might be invalid.
                 body:
                     application/json:
+      /search:
+            post:
+                is: [ secured, paginated ]
+                description: Return a page of approved products by search criteria.
+                body:
+                    application/json:
+                        schema: approvedProductSearchQuery
+                responses:
+                    200:
+                        description: The request is valid and a page of facility type approved products will be returned.
+                        body:
+                            application/json:
+                                schema: approvedProductDtoPage
+                    401:
+                        description: The request does not contain a token or the token might be invalid.
+                        body:
+                            application/json:
       /{id}:
             uriParameters:
               id:
@@ -2385,6 +2404,7 @@ resourceTypes:
                 description: Update existing facility type approved product or create a new one with the given ID.
                 body:
                     application/json:
+                        schema: approvedProductDto
                 responses:
                     200:
                         description: The request is valid and the given facility type approved product has been updated or created with the given ID.

@@ -13,32 +13,28 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository.custom;
+package org.openlmis.referencedata.dto;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.lang3.tuple.Pair;
-import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-public interface FacilityTypeApprovedProductRepositoryCustom {
+@Getter
+@Setter
+@ToString(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+public final class VersionIdentityDto extends BaseDto {
+  private Long versionId;
 
-  Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID program,
-      Boolean fullSupply, List<UUID> orderableIds, Boolean active, Pageable pageable);
-
-  Page<FacilityTypeApprovedProduct> searchProducts(SearchParams searchParams, Pageable pageable);
-
-  interface SearchParams {
-
-    List<String> getFacilityTypeCodes();
-
-    String getProgramCode();
-
-    Boolean getActive();
-
-    Set<Pair<UUID, Long>> getIdentityPairs();
-
+  public VersionIdentityDto(UUID id, Long versionId) {
+    super(id);
+    this.versionId = versionId;
   }
+
 }
