@@ -215,8 +215,6 @@ public class FacilityTypeApprovedProductRepositoryImpl
           .append(String.join(AND, where));
     }
 
-    System.err.println(builder.toString());
-
     return createNativeQuery(builder, params);
   }
 
