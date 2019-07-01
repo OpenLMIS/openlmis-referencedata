@@ -2,7 +2,7 @@
   "type": "object",
   "$schema": "http://json-schema.org/draft-04/schema",
   "title": "VersionIdentity",
-  "description": "The following object presents verionable resource identity",
+  "description": "The following object presents versionable resource identity",
   "properties": {
     "id": {
       "type": "string",
