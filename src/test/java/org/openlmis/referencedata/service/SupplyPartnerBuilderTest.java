@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
+import static org.openlmis.referencedata.util.Pagination.NO_PAGINATION;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -148,7 +150,7 @@ public class SupplyPartnerBuilderTest {
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(
             Collections.singletonList(facility.getType().getCode()),
-            program.getCode().toString(), null, null);
+            program.getCode().toString(), null, null, DEFAULT_PAGE_NUMBER, NO_PAGINATION);
 
     when(facilityTypeApprovedProductRepository
         .searchProducts(eq(searchParams), any(Pageable.class)))

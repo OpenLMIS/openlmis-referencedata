@@ -38,6 +38,20 @@
         "uniqueItems": true,
         "$ref": "versionIdentity.json"
       }
+    },
+    "page": {
+      "type": [
+        "null",
+        "integer"
+      ],
+      "title": "page"
+    },
+    "size": {
+      "type": [
+        "null",
+        "integer"
+      ],
+      "title": "size"
     }
   }
 }

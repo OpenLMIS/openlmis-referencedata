@@ -182,13 +182,13 @@ public class SupplyPartnerBuilder
         .collect(Collectors.toList());
 
     String programCode = program.getCode().toString();
-    PageRequest pageable = new PageRequest(DEFAULT_PAGE_NUMBER, NO_PAGINATION);
 
     FacilityTypeApprovedProductSearchParams searchParams =
-        new FacilityTypeApprovedProductSearchParams(facilityTypeCodes, programCode, null, null);
+        new FacilityTypeApprovedProductSearchParams(facilityTypeCodes, programCode, null, null,
+            DEFAULT_PAGE_NUMBER, NO_PAGINATION);
 
     Set<UUID> approvedProductIds = facilityTypeApprovedProductRepository
-        .searchProducts(searchParams, pageable)
+        .searchProducts(searchParams, searchParams.getPageable())
         .getContent()
         .stream()
         .map(FacilityTypeApprovedProduct::getOrderableId)

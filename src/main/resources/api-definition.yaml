@@ -2377,7 +2377,7 @@ resourceTypes:
                     application/json:
       /search:
             post:
-                is: [ secured, paginated ]
+                is: [ secured ]
                 description: Return a page of approved products by search criteria.
                 body:
                     application/json:

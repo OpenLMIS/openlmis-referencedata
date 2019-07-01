@@ -235,16 +235,16 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * Search approved products by search criteria.
    *
    * @param body - specify criteria for approved products.
-   * @param pageable  - specify which and how many elements should be returned.
    * @return a page of approved products matching the criteria
    */
   @PostMapping("/search")
   public Page<ApprovedProductDto> searchFacilityTypeApprovedProducts(
-      @RequestBody FacilityTypeApprovedProductSearchParams body, Pageable pageable) {
+      @RequestBody FacilityTypeApprovedProductSearchParams body) {
     Profiler profiler = new Profiler("SEARCH_FACILITY_TYPE_APPROVED_PRODUCT");
     profiler.setLogger(XLOGGER);
 
     profiler.start("SEARCH_FTAPS");
+    Pageable pageable = body.getPageable();
     Page<FacilityTypeApprovedProduct> ftaps = repository.searchProducts(body, pageable);
 
     List<ApprovedProductDto> content = toDto(ftaps.getContent(), profiler);

@@ -32,6 +32,9 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Getter
 @Setter
@@ -46,6 +49,8 @@ public final class FacilityTypeApprovedProductSearchParams implements
   private String programCode;
   private Boolean active;
   private List<VersionIdentityDto> identities;
+  private Integer page;
+  private Integer size;
 
   /**
    * Retrieve identifiers as a set of id-versionId pairs.
@@ -58,6 +63,17 @@ public final class FacilityTypeApprovedProductSearchParams implements
         .stream()
         .map(identity -> ImmutablePair.of(identity.getId(), identity.getVersionId()))
         .collect(Collectors.toSet());
+  }
+
+  /**
+   * Retrieve a {@link Pageable} instance with correct page and size parameters.
+   */
+  @JsonIgnore
+  public Pageable getPageable() {
+    return new PageRequest(
+        Optional.ofNullable(page).orElse(Pagination.DEFAULT_PAGE_NUMBER),
+        Optional.ofNullable(size).orElse(Pagination.NO_PAGINATION)
+    );
   }
 
 }
