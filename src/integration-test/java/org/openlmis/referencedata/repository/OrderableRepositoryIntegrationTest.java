@@ -193,6 +193,23 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
+  public void findAllLatestByIdsWithPageableShouldFindOnlyMatchingIds() {
+    //given
+    Orderable orderable = generateInstance();
+    orderable = repository.save(orderable);
+
+    repository.save(generateInstance());
+
+    // when
+    Set<UUID> ids = newHashSet(orderable.getId());
+    Page<Orderable> found = repository.findAllLatestByIds(ids,
+        new PageRequest(0, 5));
+
+    // then
+    assertEquals(1, found.getTotalElements());
+  }
+
+  @Test
   public void findAllLatestByIdsShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given orderables I want
     Orderable orderable = createOrderableWithTwoVersions();

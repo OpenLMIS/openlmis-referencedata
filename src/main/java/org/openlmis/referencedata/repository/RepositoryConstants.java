@@ -21,6 +21,7 @@ class RepositoryConstants {
   static final String JOIN_WITH_LATEST_ORDERABLE = "   JOIN (SELECT id, MAX(versionid) AS versionid"
       + "       FROM referencedata.orderables GROUP BY id) AS latest"
       + "     ON o.id = latest.id AND o.versionid = latest.versionid";
-  
+  static final String ORDER_BY_PAGEABLE = " ORDER BY ?#{#pageable}";
+
   private RepositoryConstants() {}
 }

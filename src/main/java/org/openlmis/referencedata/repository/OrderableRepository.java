@@ -17,6 +17,7 @@ package org.openlmis.referencedata.repository;
 
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,7 +58,12 @@ public interface OrderableRepository extends
       + FROM_ORDERABLES_CLAUSE
       + JOIN_WITH_LATEST_ORDERABLE
       + " WHERE o.id in :ids"
-      + " ORDER BY ?#{#pageable}",
+      + ORDER_BY_PAGEABLE,
+      countQuery = "SELECT COUNT(1)"
+      + FROM_ORDERABLES_CLAUSE
+      + JOIN_WITH_LATEST_ORDERABLE
+      + " WHERE o.id in :ids"
+      + ORDER_BY_PAGEABLE,
       nativeQuery = true
   )
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
@@ -80,7 +86,7 @@ public interface OrderableRepository extends
   @Query(value = "SELECT o.*"
       + FROM_ORDERABLES_CLAUSE
       + JOIN_WITH_LATEST_ORDERABLE
-      + " ORDER BY ?#{#pageable}",
+      + ORDER_BY_PAGEABLE,
       nativeQuery = true
   )
   Page<Orderable> findAllLatest(Pageable pageable);
@@ -99,7 +105,7 @@ public interface OrderableRepository extends
       + "ON CAST(o.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
       + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
       + "    )\n"
-      + " ORDER BY ?#{#pageable}",
+      + ORDER_BY_PAGEABLE,
       nativeQuery = true)
   Page<Orderable> findAllWithoutSnapshots(Pageable pageable);
 }
