@@ -15,13 +15,15 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +33,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.PageRequest;
@@ -57,12 +60,21 @@ public final class FacilityTypeApprovedProductSearchParams implements
    */
   @JsonIgnore
   public Set<Pair<UUID, Long>> getIdentityPairs() {
-    return Optional
+    List<VersionIdentityDto> list = Optional
         .ofNullable(identities)
-        .orElse(Collections.emptyList())
-        .stream()
-        .map(identity -> ImmutablePair.of(identity.getId(), identity.getVersionId()))
-        .collect(Collectors.toSet());
+        .orElse(Collections.emptyList());
+
+    Set<Pair<UUID, Long>> set = Sets.newHashSet();
+
+    for (VersionIdentityDto identity : list) {
+      if (null == identity.getId() || null == identity.getVersionId()) {
+        throw new ValidationMessageException(ERROR_INVALID_VERSION_IDENTITY);
+      }
+
+      set.add(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+    }
+
+    return set;
   }
 
   /**

@@ -24,4 +24,6 @@ public abstract class FacilityTypeApprovedProductMessageKeys extends MessageKeys
   public static final String ERROR_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
   public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
   public static final String ERROR_ID_PROVIDED = join(ERROR, ID, PROVIDED);
+  public static final String ERROR_INVALID_VERSION_IDENTITY =
+      join(ERROR, SEARCH, "invalidVersionIdentity");
 }

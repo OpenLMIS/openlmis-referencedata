@@ -23,12 +23,19 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductSearchParamsDataBuilder;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 
 public class FacilityTypeApprovedProductSearchParamsTest {
+
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   @Test
   public void equalsContract() {
@@ -62,5 +69,35 @@ public class FacilityTypeApprovedProductSearchParamsTest {
     for (VersionIdentityDto identity : searchParams.getIdentities()) {
       assertThat(pairs).contains(ImmutablePair.of(identity.getId(), identity.getVersionId()));
     }
+  }
+
+  @Test
+  public void shouldThrowExceptionIfVersionIdentityDoesNotHaveIdField() {
+    // given
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_VERSION_IDENTITY);
+
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(null, 1L)
+            .build();
+
+    // when
+    searchParams.getIdentityPairs();
+  }
+
+  @Test
+  public void shouldThrowExceptionIfVersionIdentityDoesNotHaveVersionIdField() {
+    // given
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_VERSION_IDENTITY);
+
+    FacilityTypeApprovedProductSearchParams searchParams =
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withIdentity(UUID.randomUUID(), null)
+            .build();
+
+    // when
+    searchParams.getIdentityPairs();
   }
 }
