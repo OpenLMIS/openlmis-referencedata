@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
@@ -56,6 +55,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String NATIVE_SELECT_FACILITY_TYPE_ID = "SELECT ft.id AS type_id"
       + " FROM referencedata.facility_types AS ft"
       + " INNER JOIN referencedata.facilities f ON f.typeId = ft.id AND f.id = '%s'";
+
+  private static final String NATIVE_COUNT_FTAPS = "SELECT COUNT(*)"
+      + " FROM referencedata.facility_type_approved_products AS ftap";
 
   private static final String NATIVE_SELECT_FTAP_IDENTITIES = "SELECT DISTINCT"
       + "   ftap.id AS id,"
@@ -84,6 +86,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
           + "   ON ftap.id = latest.id AND ftap.versionId = latest.versionId";
   private static final String NATIVE_FTAP_ACTIVE_FLAG = " ftap.active = :active";
 
+  private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
+
   private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*"
       + " FROM referencedata.facility_type_approved_products AS ftap";
 
@@ -105,18 +109,38 @@ public class FacilityTypeApprovedProductRepositoryImpl
     profiler.start("SEARCH_FACILITY_TYPE_ID");
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
+    Query countNativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
+        active, true, pageable);
+
+    int total = executeCountQuery(countNativeQuery);
+
+    if (total <= 0) {
+      return Pagination.getPage(Collections.emptyList());
+    }
+
     Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
-        active);
+        active, false, pageable);
     Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
-    return retrieveFtaps(identities, pageable);
+    List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
+
+    return Pagination.getPage(ftaps, pageable, total);
   }
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(SearchParams searchParams,
       Pageable pageable) {
-    Query nativeQuery = prepareNativeQuery(searchParams);
-    Set<Pair<UUID, Long>> foundIdentities = executeNativeQuery(nativeQuery);
-    return retrieveFtaps(foundIdentities, pageable);
+    Query countNativeQuery = prepareNativeQuery(searchParams, true, pageable);
+    int total = executeCountQuery(countNativeQuery);
+
+    if (total <= 0) {
+      return Pagination.getPage(Collections.emptyList());
+    }
+
+    Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
+    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
+
+    return Pagination.getPage(ftaps, pageable, total);
   }
 
   private UUID getFacilityTypeId(UUID facilityId, Profiler profiler) {
@@ -135,8 +159,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
   }
 
   private Query prepareNativeQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
-      List<UUID> orderableIds, Boolean active) {
-    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDENTITIES);
+      List<UUID> orderableIds, Boolean active, boolean count, Pageable pageable) {
+    String startNativeQuery = count ? NATIVE_COUNT_FTAPS : NATIVE_SELECT_FTAP_IDENTITIES;
+    StringBuilder builder = new StringBuilder(startNativeQuery);
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
@@ -169,11 +194,16 @@ public class FacilityTypeApprovedProductRepositoryImpl
         .append(NATIVE_FTAP_ACTIVE_FLAG);
     params.put("active", null == active || active);
 
-    return createNativeQuery(builder, params);
+    if (!count) {
+      setPagination(builder, params, pageable);
+    }
+
+    return createNativeQuery(builder, params, count);
   }
 
-  private Query prepareNativeQuery(SearchParams searchParams) {
-    StringBuilder builder = new StringBuilder(NATIVE_SELECT_FTAP_IDENTITIES);
+  private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {
+    String startNativeQuery = count ? NATIVE_COUNT_FTAPS : NATIVE_SELECT_FTAP_IDENTITIES;
+    StringBuilder builder = new StringBuilder(startNativeQuery);
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
@@ -215,18 +245,41 @@ public class FacilityTypeApprovedProductRepositoryImpl
           .append(String.join(AND, where));
     }
 
-    return createNativeQuery(builder, params);
+    if (!count) {
+      setPagination(builder, params, pageable);
+    }
+
+    return createNativeQuery(builder, params, count);
   }
 
-  private Query createNativeQuery(StringBuilder builder, Map<String, Object> params) {
+  private void setPagination(StringBuilder builder, Map<String, Object> params, Pageable pageable) {
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    Integer limit = maxAndFirst.getLeft();
+    Integer offset = maxAndFirst.getRight();
+
+    if (limit > 0) {
+      builder.append(NATIVE_PAGEABLE);
+      params.put("limit", limit);
+      params.put("offset", offset);
+    }
+  }
+
+  private Query createNativeQuery(StringBuilder builder, Map<String, Object> params,
+      boolean count) {
     Query nativeQuery = entityManager.createNativeQuery(builder.toString());
     params.forEach(nativeQuery::setParameter);
 
-    SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
-    sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
-    sqlQuery.addScalar("versionId", LongType.INSTANCE);
+    if (!count) {
+      SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
+      sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
+      sqlQuery.addScalar("versionId", LongType.INSTANCE);
+    }
 
     return nativeQuery;
+  }
+
+  private int executeCountQuery(Query nativeQuery) {
+    return ((Number) nativeQuery.getSingleResult()).intValue();
   }
 
   private Set<Pair<UUID, Long>> executeNativeQuery(Query nativeQuery) {
@@ -240,30 +293,17 @@ public class FacilityTypeApprovedProductRepositoryImpl
         .collect(Collectors.toSet());
   }
 
-  private Page<FacilityTypeApprovedProduct> retrieveFtaps(Collection<Pair<UUID, Long>> identities,
-      Pageable pageable) {
-    if (CollectionUtils.isEmpty(identities)) {
-      return Pagination.getPage(Collections.emptyList(), pageable, 0);
-    }
-
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-    Integer limit = maxAndFirst.getLeft();
-    Integer offset = maxAndFirst.getRight();
-
+  // appropriate class has been passed in the EntityManager.createNativeQuery method
+  @SuppressWarnings("unchecked")
+  private List<FacilityTypeApprovedProduct> retrieveFtaps(Collection<Pair<UUID, Long>> identities) {
     String hql = NATIVE_SELECT_FTAPS_BY_IDENTITES + WHERE + identities
         .stream()
         .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
         .collect(Collectors.joining(OR));
 
-    // appropriate class has been passed in the createNativeQuery method
-    @SuppressWarnings("unchecked")
-    List<FacilityTypeApprovedProduct> resultList = entityManager
+    return entityManager
         .createNativeQuery(hql, FacilityTypeApprovedProduct.class)
-        .setFirstResult(offset)
-        .setMaxResults(limit)
         .getResultList();
-
-    return Pagination.getPage(resultList, pageable, identities.size());
   }
 
 }
