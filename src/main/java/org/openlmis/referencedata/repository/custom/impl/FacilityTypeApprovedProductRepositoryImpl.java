@@ -56,13 +56,15 @@ public class FacilityTypeApprovedProductRepositoryImpl
       + " FROM referencedata.facility_types AS ft"
       + " INNER JOIN referencedata.facilities f ON f.typeId = ft.id AND f.id = '%s'";
 
-  private static final String NATIVE_COUNT_FTAPS = "SELECT COUNT(*)"
-      + " FROM referencedata.facility_type_approved_products AS ftap";
+  private static final String FROM_FTAP_TABLE =
+      " FROM referencedata.facility_type_approved_products AS ftap";
+
+  private static final String NATIVE_COUNT_FTAPS = "SELECT COUNT(*)" + FROM_FTAP_TABLE;
 
   private static final String NATIVE_SELECT_FTAP_IDENTITIES = "SELECT DISTINCT"
       + "   ftap.id AS id,"
       + "   ftap.versionId AS versionId"
-      + " FROM referencedata.facility_type_approved_products AS ftap";
+      + FROM_FTAP_TABLE;
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
   private static final String NATIVE_ORDERABLE_INNER_JOIN =
@@ -88,8 +90,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
-  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*"
-      + " FROM referencedata.facility_type_approved_products AS ftap";
+  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*" + FROM_FTAP_TABLE;
 
   private static final String NATIVE_IDENTITY = "(ftap.id = '%s' AND ftap.versionId = %d)";
   private static final String WHERE = " WHERE ";
