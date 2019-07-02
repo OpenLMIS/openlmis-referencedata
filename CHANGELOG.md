@@ -17,6 +17,7 @@ New functionality added in a backwards-compatible manner:
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
 * [OLMIS-6306](https://openlmis.atlassian.net/browse/OLMIS-6306): Fixed exception in /orderableFulfills endpoint (added countQuery)
+* [OLMIS-6403](https://openlmis.atlassian.net/browse/OLMIS-6403): Fixed error message for Start Date before Expiry Date in system notifications.
 
 Improvements:
 * [OLMIS-6127](https://openlmis.atlassian.net/browse/OLMIS-6127): Introduced second-level caching for Orderable.
