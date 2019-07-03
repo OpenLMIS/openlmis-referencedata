@@ -110,37 +110,52 @@ public class FacilityTypeApprovedProductRepositoryImpl
     profiler.start("SEARCH_FACILITY_TYPE_ID");
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
+    profiler.start("CALCULATE_FULL_LIST_SIZE");
     Query countNativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
         active, true, pageable);
 
     int total = executeCountQuery(countNativeQuery);
 
     if (total <= 0) {
+      profiler.stop().log();
       return Pagination.getPage(Collections.emptyList());
     }
 
+    profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
         active, false, pageable);
     Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+
+    profiler.start("RETRIEVE_FTAPS");
     List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
 
+    profiler.stop().log();
     return Pagination.getPage(ftaps, pageable, total);
   }
 
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(SearchParams searchParams,
       Pageable pageable) {
+    Profiler profiler = new Profiler("FTAP_REPOSITORY_SEARCH_BY_PARAMS");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("CALCULATE_FULL_LIST_SIZE");
     Query countNativeQuery = prepareNativeQuery(searchParams, true, pageable);
     int total = executeCountQuery(countNativeQuery);
 
     if (total <= 0) {
+      profiler.stop().log();
       return Pagination.getPage(Collections.emptyList());
     }
 
+    profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
     Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+
+    profiler.start("RETRIEVE_FTAPS");
     List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
 
+    profiler.stop().log();
     return Pagination.getPage(ftaps, pageable, total);
   }
 
