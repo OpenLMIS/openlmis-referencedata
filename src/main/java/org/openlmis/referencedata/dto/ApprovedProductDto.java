@@ -108,11 +108,13 @@ public final class ApprovedProductDto
   }
 
   @Override
+  @JsonIgnore
   public void setVersionId(Long versionId) {
     meta.setVersionId(versionId.toString());
   }
 
   @Override
+  @JsonIgnore
   public Long getVersionId() {
     return Optional
         .ofNullable(meta)
@@ -123,6 +125,7 @@ public final class ApprovedProductDto
   }
 
   @Override
+  @JsonIgnore
   public void setLastUpdated(ZonedDateTime lastUpdated) {
     meta.setLastUpdated(lastUpdated);
   }
