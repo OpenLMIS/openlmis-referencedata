@@ -68,12 +68,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
   private static final String NATIVE_ORDERABLE_INNER_JOIN =
-      " INNER JOIN referencedata.orderables AS o"
-          + " ON o.id = ftap.orderableId"
-          + " AND o.versionId IN ("
-          + "   SELECT MAX(versionId)"
-          + "   FROM referencedata.orderables"
-          + "   WHERE id = o.id)";
+      " INNER JOIN (SELECT id, MAX(versionId) AS versionId"
+          + "   FROM referencedata.orderables GROUP BY id) AS o"
+          + "   ON o.id = ftap.orderableId";
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
       " INNER JOIN referencedata.program_orderables AS po"
           + " ON o.id = po.orderableId"
