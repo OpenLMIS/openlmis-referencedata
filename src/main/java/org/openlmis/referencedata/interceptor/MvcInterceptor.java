@@ -18,40 +18,41 @@ package org.openlmis.referencedata.interceptor;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.openlmis.referencedata.errorhandling.RefDataErrorHandling;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.OrderableDisplayCategoryMessageKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.openlmis.referencedata.util.PageableRequestContext;
+import org.openlmis.referencedata.validate.PageableValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-
+@Service
 public class MvcInterceptor extends HandlerInterceptorAdapter {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(RefDataErrorHandling.class);
-  public static final String SIZE_PARAM = "size";
-  public static final String PAGE_PARAM = "page";
+  private static final String SIZE_PARAM = "size";
+  private static final String PAGE_PARAM = "page";
+  private static final String PAGEABLE_CONTEXT = "pageableContext";
+
+  @Autowired
+  private PageableValidator pageableValidator;
 
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                            Object handler) throws Exception {
     Map<String, String[]> params = request.getParameterMap();
-    Integer size = extractIntegerParam(params, SIZE_PARAM);
-    Integer page = extractIntegerParam(params, PAGE_PARAM);
-    LOGGER.debug("jestem tu");
 
-    if (page != null) {
-      if (size == null) {
-        throw new ValidationMessageException(new Message(
-            OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND_WITH_ID,
-            "Size must be provided for page"));
-      }
-      if (size < 1) {
-        throw new ValidationMessageException(new Message(
-            OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND_WITH_ID,
-            "Size must be provided for page"));
-      }
+    PageableRequestContext context = new PageableRequestContext(
+        extractIntegerParam(params, SIZE_PARAM),
+        extractIntegerParam(params, PAGE_PARAM));
+
+    Errors errors = new BeanPropertyBindingResult(context, PAGEABLE_CONTEXT);
+    pageableValidator.validate(context, errors);
+
+    if (errors.getErrorCount() > 0) {
+      throw new ValidationMessageException(new Message(errors.getFieldError().getCode(),
+          errors.getFieldError().getArguments()));
     }
 
     return true;

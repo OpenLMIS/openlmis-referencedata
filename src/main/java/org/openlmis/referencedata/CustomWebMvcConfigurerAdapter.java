@@ -18,6 +18,7 @@ package org.openlmis.referencedata;
 import java.util.List;
 import org.openlmis.referencedata.interceptor.MvcInterceptor;
 import org.openlmis.referencedata.util.Pagination;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,9 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
 
   @Value("${service.url}")
   private String serviceUrl;
+
+  @Autowired
+  private MvcInterceptor mvcInterceptor;
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
@@ -63,6 +67,6 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new MvcInterceptor());
+    registry.addInterceptor(mvcInterceptor);
   }
 }
