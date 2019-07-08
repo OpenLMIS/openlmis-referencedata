@@ -16,15 +16,12 @@
 package org.openlmis.referencedata;
 
 import java.util.List;
-import org.openlmis.referencedata.interceptor.MvcInterceptor;
 import org.openlmis.referencedata.util.Pagination;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -34,9 +31,6 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
 
   @Value("${service.url}")
   private String serviceUrl;
-
-  @Autowired
-  private MvcInterceptor mvcInterceptor;
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
@@ -63,10 +57,5 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
             Pagination.NO_PAGINATION));
     argumentResolvers.add(resolver);
     super.addArgumentResolvers(argumentResolvers);
-  }
-
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(mvcInterceptor);
   }
 }
