@@ -15,18 +15,22 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import lombok.ToString;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.MultiValueMap;
 
 @ToString
-public class OrderableSearchParams {
+public class OrderableSearchParams implements OrderableRepositoryCustom.SearchParams {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
@@ -49,12 +53,13 @@ public class OrderableSearchParams {
    * @return String value of code or null if params doesn't contain "code" param. Empty string
    *         for null request param value.
    */
+  @Override
   public String getCode() {
     if (!queryParams.containsKey(CODE)) {
       return null;
     }
-    Object code = queryParams.getFirst(CODE);
-    return code == null ? "" : String.valueOf(code);
+
+    return defaultIfBlank(queryParams.getFirst(CODE), EMPTY);
   }
 
   /**
@@ -63,12 +68,13 @@ public class OrderableSearchParams {
    * @return String value of name or null if params doesn't contain "name" param. Empty string
    *         for null request param value.
    */
+  @Override
   public String getName() {
     if (!queryParams.containsKey(NAME)) {
       return null;
     }
-    Object name = queryParams.getFirst(NAME);
-    return name == null ? "" : String.valueOf(name);
+
+    return defaultIfBlank(queryParams.getFirst(NAME), EMPTY);
   }
 
   /**
@@ -77,12 +83,13 @@ public class OrderableSearchParams {
    * @return {@link Code} value of program code or null if params doesn't contain "programCode"
    *                      param. Empty Code for request param that has no value.
    */
-  public Code getProgramCode() {
+  @Override
+  public String getProgramCode() {
     if (!queryParams.containsKey(PROGRAM_CODE)) {
       return null;
     }
-    Object programCode = queryParams.getFirst(PROGRAM_CODE);
-    return programCode == null ? Code.code("") : Code.code(String.valueOf(programCode));
+
+    return defaultIfBlank(queryParams.getFirst(PROGRAM_CODE), EMPTY);
   }
 
   /**

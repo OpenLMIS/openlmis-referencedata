@@ -18,7 +18,6 @@ package org.openlmis.referencedata.service;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
@@ -66,11 +65,14 @@ public class OrderableService {
       return orderableRepository.findAllLatestByIds(ids, pageable);
     }
 
-    String code = queryMap.getCode();
-    String name = queryMap.getName();
-    Code programCode = queryMap.getProgramCode();
+    if (LOGGER.isInfoEnabled()) {
+      String code = queryMap.getCode();
+      String name = queryMap.getName();
+      String programCode = queryMap.getProgramCode();
 
-    LOGGER.info("search by code {}, name {}, and program code {}", code, name, programCode);
-    return orderableRepository.search(code, name, programCode, pageable);
+      LOGGER.info("search by code {}, name {}, and program code {}", code, name, programCode);
+    }
+
+    return orderableRepository.search(queryMap, pageable);
   }
 }

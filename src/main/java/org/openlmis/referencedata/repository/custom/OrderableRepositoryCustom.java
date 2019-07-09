@@ -15,11 +15,21 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface OrderableRepositoryCustom {
-  Page<Orderable> search(String code, String name, Code programCode, Pageable pageable);
+
+  Page<Orderable> search(SearchParams searchParams, Pageable pageable);
+
+  interface SearchParams {
+
+    String getCode();
+
+    String getName();
+
+    String getProgramCode();
+
+  }
 }

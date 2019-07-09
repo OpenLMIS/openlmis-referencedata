@@ -38,6 +38,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +50,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
@@ -100,7 +104,7 @@ public class OrderableRepositoryIntegrationTest {
   Orderable generateInstance(Code productCode) {
     return generateInstance(productCode, 1L);
   }
-  
+
   Orderable generateInstance(Code productCode, Long versionId) {
     return new OrderableDataBuilder()
         .withProductCode(productCode)
@@ -339,7 +343,8 @@ public class OrderableRepositoryIntegrationTest {
     repository.save(validOrderable);
 
     // when
-    Page<Orderable> foundOrderables = repository.search("something", "something", null, null);
+    Page<Orderable> foundOrderables = repository
+        .search(new TestSearchParams("something", "something", null), null);
 
     // then
     assertEquals(0, foundOrderables.getTotalElements());
@@ -355,7 +360,8 @@ public class OrderableRepositoryIntegrationTest {
     createOrderableWithSupportedProgram("invalid-code");
 
     // when
-    Page<Orderable> foundOrderables = repository.search(null, null, Code.code(programCode),
+    Page<Orderable> foundOrderables = repository.search(
+        new TestSearchParams(null, null, programCode),
         null);
 
     // then
@@ -413,9 +419,9 @@ public class OrderableRepositoryIntegrationTest {
     repository.save(orderableWithCode);
 
     // when
-    Page<Orderable> foundOrderables = repository.search(validOrderable.getProductCode().toString(),
-        NAME,
-        validProgram.getCode(),
+    Page<Orderable> foundOrderables = repository.search(
+        new TestSearchParams(
+            validOrderable.getProductCode().toString(), NAME, validProgram.getCode().toString()),
         null);
 
     // then
@@ -465,7 +471,7 @@ public class OrderableRepositoryIntegrationTest {
   public void findAllLatestShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given
     createOrderableWithTwoVersions();
-    
+
     // when
     Page<Orderable> actual = repository.findAllLatest(null);
 
@@ -486,7 +492,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void searchShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
-    Page<Orderable> actual = repository.search(null, null, null, null);
+    Page<Orderable> actual = repository.search(new TestSearchParams(), null);
 
     // then
     assertNotNull(actual);
@@ -503,7 +509,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Pageable pageable = new PageRequest(1, 2);
-    Page<Orderable> actual = repository.search(null, null, null, pageable);
+    Page<Orderable> actual = repository.search(new TestSearchParams(), pageable);
 
     // then
     assertNotNull(actual);
@@ -513,14 +519,14 @@ public class OrderableRepositoryIntegrationTest {
     assertEquals(10, actual.getTotalElements());
     assertEquals(2, actual.getContent().size());
   }
-  
+
   @Test
   public void searchShouldOnlyFindLatestVersionsIfMultipleOrderables() {
     // given
     createOrderableWithTwoVersions();
 
     // when
-    Page<Orderable> actual = repository.search(SOME_CODE, null, null, null);
+    Page<Orderable> actual = repository.search(new TestSearchParams(SOME_CODE, null, null), null);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), 2L);
@@ -552,7 +558,7 @@ public class OrderableRepositoryIntegrationTest {
     assertThat(orderables.get(0).getId(), is(orderable2.getId()));
     assertThat(orderables.get(0).getCommodityTypeIdentifier(), is(identifierValue2));
   }
-  
+
   @Test
   public void findAllLatestByIdentifierShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given
@@ -587,9 +593,10 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
-                                               Orderable orderable, int expectedSize) {
-    Code programCode = null == program ? null : program.getCode();
-    Page<Orderable> foundOrderables = repository.search(code, name, programCode, null);
+      Orderable orderable, int expectedSize) {
+    String programCode = null == program ? null : program.getCode().toString();
+    Page<Orderable> foundOrderables = repository
+        .search(new TestSearchParams(code, name, programCode), null);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
@@ -635,7 +642,7 @@ public class OrderableRepositoryIntegrationTest {
     programRepository.save(program);
     return program;
   }
-  
+
   private Orderable createOrderableWithTwoVersions() {
     Code productCode = Code.code(SOME_CODE);
     Orderable orderable = generateInstance(productCode, 1L);
@@ -644,11 +651,22 @@ public class OrderableRepositoryIntegrationTest {
     orderableNewVersion.setId(orderable.getId());
     return repository.save(orderableNewVersion);
   }
-  
+
   private void checkSingleResultOrderableVersion(List<Orderable> result, Long versionId) {
     assertNotNull(result);
     assertEquals(1, result.size());
     Orderable orderable = result.get(0);
     assertEquals(versionId, orderable.getVersionId());
+  }
+
+  @Getter
+  @NoArgsConstructor
+  @AllArgsConstructor
+  private static final class TestSearchParams implements SearchParams {
+
+    private String code;
+    private String name;
+    private String programCode;
+
   }
 }

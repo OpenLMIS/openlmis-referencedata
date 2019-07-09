@@ -375,7 +375,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableSearchParams value = searchParamsArgumentCaptor.getValue();
     assertEquals(code, value.getCode());
     assertEquals(name, value.getName());
-    assertEquals(Code.code(programCode), value.getProgramCode());
+    assertEquals(programCode, value.getProgramCode());
     assertEquals(new HashSet<>(Arrays.asList(orderableId, orderableId2)), value.getIds());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());

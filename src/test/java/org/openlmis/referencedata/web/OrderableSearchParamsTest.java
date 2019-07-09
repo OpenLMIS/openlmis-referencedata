@@ -100,7 +100,7 @@ public class OrderableSearchParamsTest {
     queryMap.add("program", null);
     OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
 
-    assertEquals("", orderableSearchParams.getProgramCode().toString());
+    assertEquals("", orderableSearchParams.getProgramCode());
   }
 
 }

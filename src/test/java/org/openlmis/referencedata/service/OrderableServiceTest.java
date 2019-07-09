@@ -37,10 +37,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.OrderableSearchParams;
 import org.springframework.data.domain.Page;
@@ -146,9 +146,7 @@ public class OrderableServiceTest {
     final String name = "Orderable";
 
     given(orderableRepository.search(
-        any(String.class),
-        any(String.class),
-        any(Code.class),
+        any(SearchParams.class),
         any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2)));
 
@@ -156,16 +154,14 @@ public class OrderableServiceTest {
     searchParams.add(NAME, name);
     searchParams.add(PROGRAM_CODE, programCode);
 
+    OrderableSearchParams queryMap = new OrderableSearchParams(searchParams);
+
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(new OrderableSearchParams(searchParams), pageable);
+        orderableService.searchOrderables(queryMap, pageable);
 
     //then
-    verify(orderableRepository).search(
-        code,
-        name,
-        Code.code(programCode),
-        pageable);
+    verify(orderableRepository).search(queryMap, pageable);
 
     assertEquals(2, actual.getTotalElements());
     assertThat(actual, hasItem(orderable1));
