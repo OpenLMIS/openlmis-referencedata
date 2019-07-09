@@ -122,6 +122,8 @@ schemas:
 
   - orderablePage: !include schemas/orderablePage.json
 
+  - orderableSearchQuery: !include schemas/orderableSearchQuery.json
+
   - processingPeriod: !include schemas/processingPeriod.json
 
   - processingPeriodPage: !include schemas/processingPeriodPage.json
@@ -786,6 +788,24 @@ resourceTypes:
 
       /{id}/auditLog:
           type: instanceAuditLog
+
+      /search:
+          post:
+              is: [ secured ]
+              description: Return a page of orderables by search criteria.
+              body:
+                  application/json:
+                      schema: orderableSearchQuery
+              responses:
+                200:
+                    description: The request is valid and a page of orderables will be returned.
+                    body:
+                        application/json:
+                            schema: orderablePage
+                401:
+                    description: The request does not contain a token or the token might be invalid.
+                    body:
+                        application/json:
 
   /tradeItems:
       displayName: Trade Item

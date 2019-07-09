@@ -43,6 +43,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -143,9 +144,35 @@ public class OrderableController extends BaseController {
 
     profiler.start("ORDERABLE_SERVICE_SEARCH");
     Page<Orderable> orderablesPage =
-        orderableService.searchOrderables(new OrderableSearchParams(queryParams), pageable);
+        orderableService.searchOrderables(new QueryOrderableSearchParams(queryParams), pageable);
 
     profiler.start("ORDERABLE_PAGINATION");
+    Page<OrderableDto> page = Pagination.getPage(
+        OrderableDto.newInstance(orderablesPage.getContent()),
+        pageable,
+        orderablesPage.getTotalElements());
+
+    profiler.stop().log();
+    XLOGGER.exit(page);
+    return page;
+  }
+
+  /**
+   * Search orderables by search criteria.
+   *
+   * @param body - specify criteria for orderables.
+   * @return a page of orderables matching the criteria
+   */
+  @PostMapping(RESOURCE_PATH + "/search")
+  public Page<OrderableDto> searchOrderables(@RequestBody OrderableSearchParams body) {
+    Profiler profiler = new Profiler("ORDERABLES_SEARCH_POST");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("SEARCH_ORDERABLES");
+    Pageable pageable = body.getPageable();
+    Page<Orderable> orderablesPage = repository.search(body, pageable);
+
+    profiler.start("EXPORT_TO_DTO");
     Page<OrderableDto> page = Pagination.getPage(
         OrderableDto.newInstance(orderablesPage.getContent()),
         pageable,

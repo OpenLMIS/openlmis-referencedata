@@ -32,6 +32,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -49,7 +50,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-
+import org.apache.http.HttpStatus;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -66,6 +67,7 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -80,6 +82,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/orderables";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SEARCH_URL = RESOURCE_URL + "/search";
+
   private static final String UNIT = "unit";
   private static final String NAME = "name";
   private static final String CODE = "code";
@@ -88,7 +92,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String VERSION_ID = "versionId";
 
   @Captor
-  public ArgumentCaptor<OrderableSearchParams> searchParamsArgumentCaptor;
+  public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
 
   private Orderable orderable;
   private OrderableDto orderableDto = new OrderableDto();
@@ -192,7 +196,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void updateShouldReturnBadRequestIfUrlAndDtoIdsDoNotMatch() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    
+
     checkBadRequestBody(orderableDto, ERROR_ID_MISMATCH,
         String.join("/", RESOURCE_URL, UUID.randomUUID().toString()));
   }
@@ -215,7 +219,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-  
+
   @Test
   public void shouldCreateNewOrderableWithProgramOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
@@ -323,7 +327,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveAllOrderables() {
     final List<Orderable> items = Collections.singletonList(orderable);
-    when(orderableService.searchOrderables(any(OrderableSearchParams.class), any(Pageable.class)))
+    when(orderableService
+        .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(items));
 
     PageImplRepresentation response = restAssured
@@ -350,7 +355,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UUID orderableId2 = UUID.randomUUID();
 
-    when(orderableService.searchOrderables(any(OrderableSearchParams.class), any(Pageable.class)))
+    when(orderableService
+        .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(items));
 
     PageImplRepresentation response = restAssured
@@ -370,9 +376,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     checkIfEquals(response, OrderableDto.newInstance(items));
 
-    verify(orderableService).searchOrderables(
-        searchParamsArgumentCaptor.capture(), any(Pageable.class));
-    OrderableSearchParams value = searchParamsArgumentCaptor.getValue();
+    verify(orderableService)
+        .searchOrderables(searchParamsArgumentCaptor.capture(), any(Pageable.class));
+
+    QueryOrderableSearchParams value = searchParamsArgumentCaptor.getValue();
     assertEquals(code, value.getCode());
     assertEquals(name, value.getName());
     assertEquals(programCode, value.getProgramCode());
@@ -386,7 +393,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final List<Orderable> items = Collections.singletonList(orderable);
 
     Pageable page = new PageRequest(0, 10);
-    when(orderableService.searchOrderables(any(OrderableSearchParams.class), eq(page)))
+    when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
         .thenReturn(Pagination.getPage(items, page));
 
     PageImplRepresentation response = restAssured
@@ -450,6 +457,51 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  // POST /orderables/search
+
+  @Test
+  public void shouldPostSearchOrderables() {
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        orderableDto.getProductCode(), orderableDto.getFullProductName(),
+        orderable.getProductCode().toString(),
+        Lists.newArrayList(new VersionIdentityDto(
+            orderableDto.getId(), orderableDto.getVersionId())),
+        0, 10);
+
+    given(orderableRepository
+        .search(eq(searchParams), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(searchParams)
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .extract()
+        .as(PageImplRepresentation.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(orderableDto.getId().toString(),
+        ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
+  }
+
+  @Test
+  public void shouldReturnUnauthorizedIfTokenWasNotProvidedInPostSearchEndpoint() {
+    restAssured.given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(new OrderableSearchParams())
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_UNAUTHORIZED);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     doNothing()
@@ -509,22 +561,22 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private void simulateAsyncCreateRequestAndLogToQueue(Queue<String> queue,
-                                                       ExecutorService executorService,
-                                                       int requestNumber) throws Exception {
+      ExecutorService executorService,
+      int requestNumber) throws Exception {
     String requestIndex = String.valueOf(requestNumber);
 
     Future future = executorService.submit(() -> {
       orderableDto.setDescription(requestIndex);
       restAssured
-              .given()
-              .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-              .contentType(MediaType.APPLICATION_JSON_VALUE)
-              .body(orderableDto)
-              .when()
-              .put(RESOURCE_URL)
-              .then()
-              .statusCode(200)
-              .extract().as(OrderableDto.class);
+          .given()
+          .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .body(orderableDto)
+          .when()
+          .put(RESOURCE_URL)
+          .then()
+          .statusCode(200)
+          .extract().as(OrderableDto.class);
       queue.add(requestIndex);
     });
 
@@ -539,7 +591,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     when(orderableRepository.save(any(Orderable.class))).then((invocation) -> {
       Orderable orderable = (Orderable) invocation.getArguments()[0];
       TimeUnit.MILLISECONDS.sleep(10 * requestCount
-              - requestCount * Integer.valueOf(orderable.getDescription()));
+          - requestCount * Integer.valueOf(orderable.getDescription()));
       return orderable;
     });
   }

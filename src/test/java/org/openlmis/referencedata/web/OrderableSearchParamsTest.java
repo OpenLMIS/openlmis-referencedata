@@ -15,92 +15,91 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.common.collect.Lists;
+import java.util.Set;
+import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.util.LinkedMultiValueMap;
+import org.junit.rules.ExpectedException;
+import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 
 public class OrderableSearchParamsTest {
 
-  private static final String VALUE = "test";
+  @Rule
+  public ExpectedException exception = ExpectedException.none();
 
   @Test
-  public void getCodeShouldReturnValueForKeyCode() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("code", VALUE);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
-
-    assertEquals(VALUE, orderableSearchParams.getCode());
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(OrderableSearchParams.class)
+        .suppress(Warning.NONFINAL_FIELDS)
+        .verify();
   }
 
   @Test
-  public void getCodeShouldReturnNullIfMapDoesNotContainKeyCode() {
-    OrderableSearchParams orderableSearchParams =
-        new OrderableSearchParams(new LinkedMultiValueMap<>());
+  public void shouldImplementToString() {
+    OrderableSearchParams searchParams = new OrderableSearchParams();
 
-    assertNull(orderableSearchParams.getCode());
+    ToStringTestUtils.verify(OrderableSearchParams.class, searchParams);
   }
 
   @Test
-  public void getCodeShouldReturnEmptyStringIfValueForRequestParamIsNull() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("code", null);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
+  public void shouldConvertIdentitiesToPairs() {
+    // given
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        null, null, null,
+        Lists.newArrayList(
+            new VersionIdentityDto(UUID.randomUUID(), 1L),
+            new VersionIdentityDto(UUID.randomUUID(), 2L)),
+        null, null
+    );
 
-    assertEquals("", orderableSearchParams.getCode());
+    // when
+    Set<Pair<UUID, Long>> pairs = searchParams.getIdentityPairs();
+
+    // then
+    for (VersionIdentityDto identity : searchParams.getIdentities()) {
+      assertThat(pairs).contains(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+    }
   }
 
   @Test
-  public void getNameShouldReturnValueForKeyName() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("name", VALUE);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
+  public void shouldThrowExceptionIfVersionIdentityDoesNotHaveIdField() {
+    // given
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(OrderableMessageKeys.ERROR_INVALID_VERSION_IDENTITY);
 
-    assertEquals(VALUE, orderableSearchParams.getName());
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        null, null, null,
+        Lists.newArrayList(new VersionIdentityDto(null, 1L)),
+        null, null);
+
+    // when
+    searchParams.getIdentityPairs();
   }
 
   @Test
-  public void getNameShouldReturnNullIfMapDoesNotContainKeyName() {
-    OrderableSearchParams orderableSearchParams =
-        new OrderableSearchParams(new LinkedMultiValueMap<>());
+  public void shouldThrowExceptionIfVersionIdentityDoesNotHaveVersionIdField() {
+    // given
+    exception.expect(ValidationMessageException.class);
+    exception.expectMessage(OrderableMessageKeys.ERROR_INVALID_VERSION_IDENTITY);
 
-    assertNull(orderableSearchParams.getName());
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        null, null, null,
+        Lists.newArrayList(new VersionIdentityDto(UUID.randomUUID(), null)),
+        null, null
+    );
+
+    // when
+    searchParams.getIdentityPairs();
   }
-
-  @Test
-  public void getNameShouldReturnEmptyStringIfValueForRequestParamIsNull() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("name", null);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
-
-    assertEquals("", orderableSearchParams.getName());
-  }
-
-  @Test
-  public void getProgramCodeShouldReturnValueForKeyProgram() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("program", VALUE);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
-
-    assertEquals(VALUE, orderableSearchParams.getProgramCode().toString());
-  }
-
-  @Test
-  public void getProgramShouldReturnNullIfMapDoesNotContainKeyProgram() {
-    OrderableSearchParams orderableSearchParams =
-        new OrderableSearchParams(new LinkedMultiValueMap<>());
-
-    assertNull(orderableSearchParams.getProgramCode());
-  }
-
-  @Test
-  public void getProgramShouldReturnEmptyStringIfValueForRequestParamIsNull() {
-    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("program", null);
-    OrderableSearchParams orderableSearchParams = new OrderableSearchParams(queryMap);
-
-    assertEquals("", orderableSearchParams.getProgramCode());
-  }
-
 }

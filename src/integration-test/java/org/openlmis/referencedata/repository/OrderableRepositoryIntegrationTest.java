@@ -17,8 +17,10 @@ package org.openlmis.referencedata.repository;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,12 +38,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -50,6 +56,8 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.VersionIdentity;
+import org.openlmis.referencedata.domain.Versionable;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
@@ -96,25 +104,6 @@ public class OrderableRepositoryIntegrationTest {
     return this.instanceNumber.incrementAndGet();
   }
 
-  Orderable generateInstance() {
-    int instanceNumber = getNextInstanceNumber();
-    return generateInstance(Code.code(CODE + instanceNumber));
-  }
-
-  Orderable generateInstance(Code productCode) {
-    return generateInstance(productCode, 1L);
-  }
-
-  Orderable generateInstance(Code productCode, Long versionId) {
-    return new OrderableDataBuilder()
-        .withProductCode(productCode)
-        .withIdentifier("cSys", "cSysId")
-        .withDispensable(Dispensable.createNew(EACH))
-        .withFullProductName(NAME)
-        .withVersionId(versionId)
-        .buildAsNew();
-  }
-
   @Test
   public void shouldNotAllowForDuplicatedActiveProgramOrderables() {
     // given
@@ -122,7 +111,7 @@ public class OrderableRepositoryIntegrationTest {
     OrderableDisplayCategory orderableDisplayCategory2 =
         createOrderableDisplayCategory("some-other-code");
     Program program = createProgram(SOME_CODE);
-    Orderable orderable = generateInstance();
+    Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
         .withOrderabeDisplayCategory(orderableDisplayCategory)
@@ -153,7 +142,7 @@ public class OrderableRepositoryIntegrationTest {
     OrderableDisplayCategory orderableDisplayCategory2 =
         createOrderableDisplayCategory("some-other-code");
     Program program = createProgram(SOME_CODE);
-    Orderable orderable = generateInstance();
+    Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
         .withOrderabeDisplayCategory(orderableDisplayCategory)
@@ -180,13 +169,11 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestByIdsShouldFindOnlyMatchingIds() {
     // given orderables I want
-    Orderable orderable = generateInstance();
-    orderable = repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    orderable2 = repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    Orderable orderable2 = saveAndGetOrderable();
 
     // given an orderable I don't
-    repository.save(generateInstance());
+    saveAndGetOrderable();
 
     // when
     Set<UUID> ids = newHashSet(orderable.getId(), orderable2.getId());
@@ -199,10 +186,8 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestByIdsWithPageableShouldFindOnlyMatchingIds() {
     //given
-    Orderable orderable = generateInstance();
-    orderable = repository.save(orderable);
-
-    repository.save(generateInstance());
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     // when
     Set<UUID> ids = newHashSet(orderable.getId());
@@ -216,22 +201,20 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestByIdsShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given orderables I want
-    Orderable orderable = createOrderableWithTwoVersions();
+    Orderable orderable = saveAndGetOrderable();
 
     // when
     Set<UUID> ids = newHashSet(orderable.getId());
     Page<Orderable> actual = repository.findAllLatestByIds(ids, null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), 2L);
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
   }
 
   @Test
   public void shouldFindOrderablesWithSimilarCode() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(orderable.getProductCode().toString(),
         null, null, orderable, 1);
@@ -239,10 +222,8 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldNotFindOrderablesWithSimilarCodeWhenProgramCodeIsBlank() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(orderable.getProductCode().toString(),
         null, new Program(""), orderable, 0);
@@ -250,7 +231,7 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldFindOrderablesWithSimilarCodeIgnoringCase() {
-    Orderable orderable = generateInstance();
+    Orderable orderable = saveAndGetOrderable();
     repository.save(orderable);
 
     searchOrderablesAndCheckResults(orderable.getProductCode().toString().toUpperCase(),
@@ -263,15 +244,14 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldFindOrderablesWithSimilarName() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
+    Orderable orderable = saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(null, "Ab", null, orderable, 1);
   }
 
   @Test
   public void shouldFindOrderablesByEmptyName() {
-    Orderable orderable = generateInstance();
+    Orderable orderable = saveAndGetOrderable();
     ReflectionTestUtils.setField(orderable, "fullProductName", "");
     repository.save(orderable);
 
@@ -280,16 +260,14 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldNotFindOrderablesWithSimilarNameWhenProgramCodeIsBlank() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
+    Orderable orderable = saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(null, "Ab", new Program(""), orderable, 0);
   }
 
   @Test
   public void shouldFindOrderablesWithSimilarNameIgnoringCase() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
+    Orderable orderable = saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(null, ORDERABLE_NAME, null, orderable, 1);
     searchOrderablesAndCheckResults(null, "ABC", null, orderable, 1);
@@ -299,30 +277,24 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldFindOrderablesWithSimilarCodeAndName() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, null, orderable, 2);
   }
 
   @Test
   public void shouldNotFindOrderablesWithSimilarCodeAndNameWhenProgramCodeIsBlank() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, new Program(""), orderable, 0);
   }
 
   @Test
   public void shouldFindOrderablesWithSimilarCodeAndNameIgnoringCase() {
-    Orderable orderable = generateInstance();
-    repository.save(orderable);
-    Orderable orderable2 = generateInstance();
-    repository.save(orderable2);
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetOrderable();
 
     searchOrderablesAndCheckResults(CODE, ORDERABLE_NAME, null, orderable, 2);
     searchOrderablesAndCheckResults("ABCD", "ABC", null, orderable, 2);
@@ -335,8 +307,10 @@ public class OrderableRepositoryIntegrationTest {
     // given a program and an orderable in that program
     Program validProgram = new ProgramDataBuilder().build();
     programRepository.save(validProgram);
+
     List<ProgramOrderable> programOrderables = new ArrayList<>();
-    Orderable validOrderable = generateInstance();
+
+    Orderable validOrderable = saveAndGetOrderable();
     validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
@@ -344,7 +318,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams("something", "something", null), null);
+        .search(new TestSearchParams("something", "something", null, null), null);
 
     // then
     assertEquals(0, foundOrderables.getTotalElements());
@@ -361,7 +335,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, programCode),
+        new TestSearchParams(null, null, programCode, null),
         null);
 
     // then
@@ -376,15 +350,14 @@ public class OrderableRepositoryIntegrationTest {
 
     // given an orderable in that program
     List<ProgramOrderable> programOrderables = new ArrayList<>();
-    Orderable validOrderable = generateInstance();
+    Orderable validOrderable = saveAndGetOrderable();
     validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     repository.save(validOrderable);
 
     // given an orderable not in that program
-    Orderable orderableWithCode = generateInstance();
-    repository.save(orderableWithCode);
+    saveAndGetOrderable();
 
     // when & then
     searchOrderablesAndCheckResults(null,
@@ -407,7 +380,7 @@ public class OrderableRepositoryIntegrationTest {
   public void shouldFindOrderablesByAllParams() {
     // given an orderable in a program
     List<ProgramOrderable> programOrderables = new ArrayList<>();
-    Orderable validOrderable = generateInstance();
+    Orderable validOrderable = saveAndGetOrderable();
     validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     Program validProgram = createProgram("some-test-code");
@@ -415,13 +388,13 @@ public class OrderableRepositoryIntegrationTest {
     repository.save(validOrderable);
 
     // given some other orderable
-    Orderable orderableWithCode = generateInstance();
-    repository.save(orderableWithCode);
+    saveAndGetOrderable();
 
     // when
     Page<Orderable> foundOrderables = repository.search(
         new TestSearchParams(
-            validOrderable.getProductCode().toString(), NAME, validProgram.getCode().toString()),
+            validOrderable.getProductCode().toString(), NAME,
+            validProgram.getCode().toString(), null),
         null);
 
     // then
@@ -431,7 +404,7 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test
   public void shouldFindByProductCode() throws Exception {
-    Orderable orderable = generateInstance();
+    Orderable orderable = new OrderableDataBuilder().buildAsNew();
     Code productCode = orderable.getProductCode();
 
     assertNull(repository.findByProductCode(productCode));
@@ -445,10 +418,11 @@ public class OrderableRepositoryIntegrationTest {
 
   @Test(expected = PersistenceException.class)
   public void shouldNotAllowDuplicates() {
-    Code productCode = Code.code("test_product_code");
-
-    Orderable orderable1 = generateInstance(productCode);
-    Orderable orderable2 = generateInstance(productCode);
+    Orderable orderable1 = new OrderableDataBuilder()
+        .buildAsNew();
+    Orderable orderable2 = new OrderableDataBuilder()
+        .withProductCode(orderable1.getProductCode())
+        .buildAsNew();
 
     repository.save(orderable1);
     repository.save(orderable2);
@@ -470,13 +444,13 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given
-    createOrderableWithTwoVersions();
+    Orderable orderable = saveAndGetOrderable();
 
     // when
     Page<Orderable> actual = repository.findAllLatest(null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), 2L);
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
   }
 
   @Test
@@ -503,8 +477,7 @@ public class OrderableRepositoryIntegrationTest {
   public void searchShouldPaginate() {
     // given
     for (int i = 0; i < 10; ++i) {
-      Orderable orderable = generateInstance();
-      repository.save(orderable);
+      saveAndGetOrderable();
     }
 
     // when
@@ -523,13 +496,65 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void searchShouldOnlyFindLatestVersionsIfMultipleOrderables() {
     // given
-    createOrderableWithTwoVersions();
+    Orderable orderable = saveAndGetOrderable(Code.code(SOME_CODE));
 
     // when
-    Page<Orderable> actual = repository.search(new TestSearchParams(SOME_CODE, null, null), null);
+    Page<Orderable> actual = repository
+        .search(new TestSearchParams(SOME_CODE, null, null, null), null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), 2L);
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
+  }
+
+  @Test
+  public void shouldFindResourcesByIdVersionIdPairs() {
+    Orderable orderable1 = saveAndGetOrderable();
+    Orderable orderable2 = saveAndGetOrderable();
+    Orderable orderable3 = saveAndGetOrderable();
+    Orderable orderable4 = saveAndGetOrderable();
+
+    Page<Orderable> actual = repository.search(
+        new TestSearchParams(null, null, null,
+            Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionId()),
+                Pair.of(orderable2.getId(), orderable2.getVersionId()))),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(2));
+
+    Set<VersionIdentity> identities = actual
+        .getContent()
+        .stream()
+        .map(Versionable::getVersionIdentity)
+        .collect(Collectors.toSet());
+
+    assertThat(identities,
+        hasItems(orderable1.getVersionIdentity(), orderable2.getVersionIdentity()));
+    assertThat(identities,
+        not(hasItems(orderable3.getVersionIdentity(), orderable4.getVersionIdentity())));
+  }
+
+  @Test
+  public void shouldFindPreviousVersions() {
+    Orderable orderable = saveAndGetOrderable();
+
+    // current version
+    Page<Orderable> actual = repository.search(
+        new TestSearchParams(null, null, null,
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionId()))),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(1));
+    assertThat(actual.getContent().get(0).getVersionIdentity(), is(orderable.getVersionIdentity()));
+
+    // previous version
+    actual = repository.search(
+        new TestSearchParams(null, null, null,
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionId() - 1))),
+        null);
+
+    assertThat(actual.getNumberOfElements(), is(1));
+    assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(orderable.getId()));
+    assertThat(actual.getContent().get(0).getVersionId(), is(orderable.getVersionId() - 1));
   }
 
   @Test
@@ -562,7 +587,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestByIdentifierShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given
-    Orderable orderable = createOrderableWithTwoVersions();
+    Orderable orderable = saveAndGetOrderable();
 
     String identifierValue1 = UUID.randomUUID().toString();
     Map<String, String> identifiers = new HashMap<>();
@@ -574,13 +599,13 @@ public class OrderableRepositoryIntegrationTest {
     List<Orderable> orderables = repository.findAllLatestByIdentifier(TRADE_ITEM, identifierValue1);
 
     // then
-    checkSingleResultOrderableVersion(orderables, 2L);
+    checkSingleResultOrderableVersion(orderables, orderable.getVersionId());
   }
 
   @Test
   public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
     // given
-    Orderable newestOrderable = createOrderableWithTwoVersions();
+    Orderable newestOrderable = saveAndGetOrderable();
 
     // when
     Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(
@@ -588,7 +613,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // then
     assertEquals(newestOrderable, foundOrderable);
-    assertEquals(2L, foundOrderable.getVersionId().longValue());
+    assertEquals(newestOrderable.getVersionId(), foundOrderable.getVersionId());
 
   }
 
@@ -596,7 +621,7 @@ public class OrderableRepositoryIntegrationTest {
       Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams(code, name, programCode), null);
+        .search(new TestSearchParams(code, name, programCode, null), null);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
@@ -627,7 +652,7 @@ public class OrderableRepositoryIntegrationTest {
   private Orderable createOrderableWithSupportedProgram(String programCode) {
     Program validProgram = createProgram(programCode);
     List<ProgramOrderable> programOrderables = new ArrayList<>();
-    Orderable validOrderable = generateInstance();
+    Orderable validOrderable = saveAndGetOrderable();
     validOrderable.setProgramOrderables(programOrderables);
     repository.save(validOrderable);
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
@@ -643,12 +668,29 @@ public class OrderableRepositoryIntegrationTest {
     return program;
   }
 
-  private Orderable createOrderableWithTwoVersions() {
-    Code productCode = Code.code(SOME_CODE);
-    Orderable orderable = generateInstance(productCode, 1L);
+  private Orderable saveAndGetOrderable() {
+    int instanceNumber = getNextInstanceNumber();
+    return saveAndGetOrderableWithTwoVersions(Code.code(CODE + instanceNumber));
+  }
+
+  private Orderable saveAndGetOrderable(Code productCode) {
+    return saveAndGetOrderableWithTwoVersions(productCode);
+  }
+
+  private Orderable saveAndGetOrderableWithTwoVersions(Code productCode) {
+    Long versionId = ThreadLocalRandom.current().nextLong(0, 1000);
+    OrderableDataBuilder builder = new OrderableDataBuilder()
+        .withProductCode(productCode)
+        .withIdentifier("cSys", "cSysId")
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName(NAME);
+
+    Orderable orderable = builder.withVersionId(versionId).buildAsNew();
     orderable = repository.save(orderable);
-    Orderable orderableNewVersion = generateInstance(productCode, 2L);
+
+    Orderable orderableNewVersion = builder.withVersionId(versionId + 1).buildAsNew();
     orderableNewVersion.setId(orderable.getId());
+
     return repository.save(orderableNewVersion);
   }
 
@@ -667,6 +709,7 @@ public class OrderableRepositoryIntegrationTest {
     private String code;
     private String name;
     private String programCode;
+    private Set<Pair<UUID, Long>> identityPairs;
 
   }
 }

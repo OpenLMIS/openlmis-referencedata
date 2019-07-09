@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
@@ -123,8 +124,6 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     StringBuilder builder = new StringBuilder(startNativeQuery);
     Map<String, Object> params = Maps.newHashMap();
 
-    builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
-
     if (null != searchParams.getProgramCode()) {
       builder
           .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN)
@@ -135,6 +134,16 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
 
     List<String> where = Lists.newArrayList();
+
+    if (isEmpty(searchParams.getIdentityPairs())) {
+      builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
+    } else {
+      where.add(searchParams
+          .getIdentityPairs()
+          .stream()
+          .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
+          .collect(Collectors.joining(OR)));
+    }
 
     if (isNotBlank(searchParams.getCode())) {
       where.add(NATIVE_PRODUCT_CODE);

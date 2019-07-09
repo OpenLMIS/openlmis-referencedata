@@ -22,7 +22,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
-import org.openlmis.referencedata.web.OrderableSearchParams;
+import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class OrderableService {
    * @param pageable the page to get, or one page with all if null.
    * @return the Page of orderables found, or an empty page.
    */
-  public Page<Orderable> searchOrderables(@NotNull OrderableSearchParams queryMap,
+  public Page<Orderable> searchOrderables(@NotNull QueryOrderableSearchParams queryMap,
       Pageable pageable) {
     LOGGER.info("search orderable query params: {}", queryMap);
 

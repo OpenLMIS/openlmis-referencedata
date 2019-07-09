@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.repository.custom;
 
+import java.util.Set;
+import java.util.UUID;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Orderable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +33,8 @@ public interface OrderableRepositoryCustom {
     String getName();
 
     String getProgramCode();
+
+    Set<Pair<UUID, Long>> getIdentityPairs();
 
   }
 }

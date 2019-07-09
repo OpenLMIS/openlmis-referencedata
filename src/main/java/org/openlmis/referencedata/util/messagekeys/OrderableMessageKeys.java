@@ -33,4 +33,7 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
   public static final String ERROR_PROGRAMS_DUPLICATED =
       join(ERROR, "programOrderable", DUPLICATED);
+
+  public static final String ERROR_INVALID_VERSION_IDENTITY =
+      join(ERROR, SEARCH, "invalidVersionIdentity");
 }

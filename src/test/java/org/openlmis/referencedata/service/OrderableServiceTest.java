@@ -42,7 +42,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.web.OrderableSearchParams;
+import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.LinkedMultiValueMap;
@@ -86,14 +86,14 @@ public class OrderableServiceTest {
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProgramCodeAndNameNotProvidedForSearch() {
     searchParams.add("some-parameter", false);
-    orderableService.searchOrderables(new OrderableSearchParams(searchParams), null);
+    orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProvidedAnyNotSupportedParameter() {
     searchParams.add("some-parameter", false);
     searchParams.add("code", "123");
-    orderableService.searchOrderables(new OrderableSearchParams(searchParams), null);
+    orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test
@@ -104,7 +104,7 @@ public class OrderableServiceTest {
     searchParams.add(CODE, "-1");
     searchParams.add(NAME, "-1");
     searchParams.add(PROGRAM_CODE, "program-code");
-    orderableService.searchOrderables(new OrderableSearchParams(searchParams), null);
+    orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test
@@ -115,7 +115,7 @@ public class OrderableServiceTest {
         .thenReturn(thePage);
 
     // when
-    Page<Orderable> actual = orderableService.searchOrderables(new OrderableSearchParams(
+    Page<Orderable> actual = orderableService.searchOrderables(new QueryOrderableSearchParams(
         searchParams), null);
 
     // then
@@ -132,7 +132,7 @@ public class OrderableServiceTest {
 
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(new OrderableSearchParams(null), null);
+        orderableService.searchOrderables(new QueryOrderableSearchParams(null), null);
 
     // then
     verify(orderableRepository).findAllLatest(isNull(Pageable.class));
@@ -154,7 +154,7 @@ public class OrderableServiceTest {
     searchParams.add(NAME, name);
     searchParams.add(PROGRAM_CODE, programCode);
 
-    OrderableSearchParams queryMap = new OrderableSearchParams(searchParams);
+    QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
     // when
     final Page<Orderable> actual =
@@ -180,7 +180,7 @@ public class OrderableServiceTest {
 
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(new OrderableSearchParams(searchParams), pageable);
+        orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), pageable);
 
     // then
     verify(orderableRepository).findAllLatestByIds(

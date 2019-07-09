@@ -15,101 +15,78 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
 
-import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.referencedata.domain.Code;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.openlmis.referencedata.dto.VersionIdentityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
-import org.openlmis.referencedata.util.UuidUtil;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.util.MultiValueMap;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class OrderableSearchParams implements OrderableRepositoryCustom.SearchParams {
+@EqualsAndHashCode
+public final class OrderableSearchParams implements OrderableRepositoryCustom.SearchParams {
 
-  private static final String CODE = "code";
-  private static final String NAME = "name";
-  private static final String PROGRAM_CODE = "program";
-  private static final String ID = "id";
+  private String code;
+  private String name;
+  private String programCode;
 
-  private SearchParams queryParams;
+  private List<VersionIdentityDto> identities;
 
-  /**
-   * Wraps map of query params into an object. Remove parameters that should be managed by
-   * {@link Pageable}
-   */
-  public OrderableSearchParams(MultiValueMap<String, Object> queryMap) {
-    queryParams = new SearchParams(queryMap);
-  }
+  private Integer page;
+  private Integer size;
 
   /**
-   * Gets code.
-   *
-   * @return String value of code or null if params doesn't contain "code" param. Empty string
-   *         for null request param value.
+   * Retrieve identifiers as a set of id-versionId pairs.
    */
-  @Override
-  public String getCode() {
-    if (!queryParams.containsKey(CODE)) {
-      return null;
+  @JsonIgnore
+  public Set<Pair<UUID, Long>> getIdentityPairs() {
+    List<VersionIdentityDto> list = Optional
+        .ofNullable(identities)
+        .orElse(Collections.emptyList());
+
+    Set<Pair<UUID, Long>> set = Sets.newHashSet();
+
+    for (VersionIdentityDto identity : list) {
+      if (null == identity.getId() || null == identity.getVersionId()) {
+        throw new ValidationMessageException(ERROR_INVALID_VERSION_IDENTITY);
+      }
+
+      set.add(ImmutablePair.of(identity.getId(), identity.getVersionId()));
     }
 
-    return defaultIfBlank(queryParams.getFirst(CODE), EMPTY);
+    return set;
   }
 
   /**
-   * Gets name.
-   *
-   * @return String value of name or null if params doesn't contain "name" param. Empty string
-   *         for null request param value.
+   * Retrieve a {@link Pageable} instance with correct page and size parameters.
    */
-  @Override
-  public String getName() {
-    if (!queryParams.containsKey(NAME)) {
-      return null;
-    }
-
-    return defaultIfBlank(queryParams.getFirst(NAME), EMPTY);
-  }
-
-  /**
-   * Gets program code.
-   *
-   * @return {@link Code} value of program code or null if params doesn't contain "programCode"
-   *                      param. Empty Code for request param that has no value.
-   */
-  @Override
-  public String getProgramCode() {
-    if (!queryParams.containsKey(PROGRAM_CODE)) {
-      return null;
-    }
-
-    return defaultIfBlank(queryParams.getFirst(PROGRAM_CODE), EMPTY);
-  }
-
-  /**
-   * Gets and collection of {@link UUID} for "ids" key from params.
-   */
-  public Set<UUID> getIds() {
-    return UuidUtil.getIds(queryParams.asMultiValueMap());
-  }
-
-  /**
-   * Checks if query params are valid. Returns false if any provided param is not on supported
-   * list.
-   */
-  public boolean isValid() {
-    return Collections.unmodifiableList(Arrays.asList(ID, CODE, NAME, PROGRAM_CODE))
-        .containsAll(queryParams.keySet());
-  }
-
-  public boolean isEmpty() {
-    return queryParams.isEmpty();
+  @JsonIgnore
+  public Pageable getPageable() {
+    return new PageRequest(
+        Optional.ofNullable(page).orElse(Pagination.DEFAULT_PAGE_NUMBER),
+        Optional.ofNullable(size).orElse(Pagination.NO_PAGINATION)
+    );
   }
 
 }
