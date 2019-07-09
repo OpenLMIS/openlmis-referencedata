@@ -42,6 +42,7 @@ public class FacilityTypeApprovedProductSearchParamsTest {
     EqualsVerifier
         .forClass(FacilityTypeApprovedProductSearchParams.class)
         .suppress(Warning.NONFINAL_FIELDS)
+        .withRedefinedSuperclass()
         .verify();
   }
 

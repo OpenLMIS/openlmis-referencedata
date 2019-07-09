@@ -16,16 +16,22 @@
 package org.openlmis.referencedata.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.Sets;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
-import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 
 @Getter
 @Setter
@@ -33,28 +39,39 @@ import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public final class OrderableSearchParams
-    extends VersionableResourceSearchParams
-    implements OrderableRepositoryCustom.SearchParams {
+public abstract class VersionableResourceSearchParams extends PageableSearchParams {
 
-  private String code;
-  private String name;
-  private String programCode;
+  private List<VersionIdentityDto> identities;
+
+  public VersionableResourceSearchParams(List<VersionIdentityDto> identities, Integer page,
+      Integer size) {
+    super(page, size);
+    this.identities = identities;
+  }
+
+  @JsonIgnore
+  abstract String getInvalidVersionIdentityErrorMessage();
 
   /**
-   * Default constructor to set all available parameters.
+   * Retrieve identifiers as a set of id-versionId pairs.
    */
-  public OrderableSearchParams(String code, String name, String programCode,
-      List<VersionIdentityDto> identities, Integer page, Integer size) {
-    super(identities, page, size);
-    this.code = code;
-    this.name = name;
-    this.programCode = programCode;
+  @JsonIgnore
+  public Set<Pair<UUID, Long>> getIdentityPairs() {
+    List<VersionIdentityDto> list = Optional
+        .ofNullable(identities)
+        .orElse(Collections.emptyList());
+
+    Set<Pair<UUID, Long>> set = Sets.newHashSet();
+
+    for (VersionIdentityDto identity : list) {
+      if (null == identity.getId() || null == identity.getVersionId()) {
+        throw new ValidationMessageException(getInvalidVersionIdentityErrorMessage());
+      }
+
+      set.add(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+    }
+
+    return set;
   }
 
-  @Override
-  @JsonIgnore
-  String getInvalidVersionIdentityErrorMessage() {
-    return OrderableMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
-  }
 }

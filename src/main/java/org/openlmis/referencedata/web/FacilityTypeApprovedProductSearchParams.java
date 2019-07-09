@@ -15,77 +15,47 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.Sets;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
-import org.openlmis.referencedata.util.Pagination;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-@EqualsAndHashCode
-public final class FacilityTypeApprovedProductSearchParams implements
-    FacilityTypeApprovedProductRepositoryCustom.SearchParams {
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public final class FacilityTypeApprovedProductSearchParams
+    extends VersionableResourceSearchParams
+    implements FacilityTypeApprovedProductRepositoryCustom.SearchParams {
 
   private List<String> facilityTypeCodes;
   private String programCode;
   private Boolean active;
-  private List<VersionIdentityDto> identities;
-  private Integer page;
-  private Integer size;
 
   /**
-   * Retrieve identifiers as a set of id-versionId pairs.
+   * Default constructor to set all available parameters.
    */
-  @JsonIgnore
-  public Set<Pair<UUID, Long>> getIdentityPairs() {
-    List<VersionIdentityDto> list = Optional
-        .ofNullable(identities)
-        .orElse(Collections.emptyList());
-
-    Set<Pair<UUID, Long>> set = Sets.newHashSet();
-
-    for (VersionIdentityDto identity : list) {
-      if (null == identity.getId() || null == identity.getVersionId()) {
-        throw new ValidationMessageException(ERROR_INVALID_VERSION_IDENTITY);
-      }
-
-      set.add(ImmutablePair.of(identity.getId(), identity.getVersionId()));
-    }
-
-    return set;
+  public FacilityTypeApprovedProductSearchParams(List<String> facilityTypeCodes, String programCode,
+      Boolean active, List<VersionIdentityDto> identities, Integer page, Integer size) {
+    super(identities, page, size);
+    this.facilityTypeCodes = facilityTypeCodes;
+    this.programCode = programCode;
+    this.active = active;
   }
 
-  /**
-   * Retrieve a {@link Pageable} instance with correct page and size parameters.
-   */
   @JsonIgnore
-  public Pageable getPageable() {
-    return new PageRequest(
-        Optional.ofNullable(page).orElse(Pagination.DEFAULT_PAGE_NUMBER),
-        Optional.ofNullable(size).orElse(Pagination.NO_PAGINATION)
-    );
+  @Override
+  String getInvalidVersionIdentityErrorMessage() {
+    return FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
   }
 
 }

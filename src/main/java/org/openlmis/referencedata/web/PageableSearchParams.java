@@ -16,45 +16,36 @@
 package org.openlmis.referencedata.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.referencedata.dto.VersionIdentityDto;
-import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public final class OrderableSearchParams
-    extends VersionableResourceSearchParams
-    implements OrderableRepositoryCustom.SearchParams {
-
-  private String code;
-  private String name;
-  private String programCode;
+@ToString
+@EqualsAndHashCode
+public abstract class PageableSearchParams {
+  private Integer page;
+  private Integer size;
 
   /**
-   * Default constructor to set all available parameters.
+   * Retrieve a {@link Pageable} instance with correct page and size parameters.
    */
-  public OrderableSearchParams(String code, String name, String programCode,
-      List<VersionIdentityDto> identities, Integer page, Integer size) {
-    super(identities, page, size);
-    this.code = code;
-    this.name = name;
-    this.programCode = programCode;
+  @JsonIgnore
+  public Pageable getPageable() {
+    return new PageRequest(
+        Optional.ofNullable(page).orElse(Pagination.DEFAULT_PAGE_NUMBER),
+        Optional.ofNullable(size).orElse(Pagination.NO_PAGINATION)
+    );
   }
 
-  @Override
-  @JsonIgnore
-  String getInvalidVersionIdentityErrorMessage() {
-    return OrderableMessageKeys.ERROR_INVALID_VERSION_IDENTITY;
-  }
 }

@@ -42,6 +42,7 @@ public class OrderableSearchParamsTest {
     EqualsVerifier
         .forClass(OrderableSearchParams.class)
         .suppress(Warning.NONFINAL_FIELDS)
+        .withRedefinedSuperclass()
         .verify();
   }
 
