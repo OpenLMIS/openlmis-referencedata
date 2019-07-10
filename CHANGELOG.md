@@ -13,6 +13,9 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-6361](https://openlmis.atlassian.net/browse/OLMIS-6361): Added expand pattern to GET /api/systemNotifications endpoint.
 * [OLMIS-6388](https://openlmis.atlassian.net/browse/OLMIS-6388): Added setting isDisplayed flag in system notification based on startDate, expiryDate and active flag.
 * [OLMIS-6358](https://openlmis.atlassian.net/browse/OLMIS-6358): Added versioning to Facility Type Approved Product resource.
+* [OLMIS-6430](https://openlmis.atlassian.net/browse/OLMIS-6430): Added ability to search orderables by identities.
+  * To use this feature please use the new `POST /api/orderables/search` endpoint
+  * For now, both `id` and `versionId` fields must be provided in the request body to find an orderable
 
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.
