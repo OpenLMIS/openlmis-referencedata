@@ -1,7 +1,7 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
-    scenario: get-supervisory-node
+#  - concurrency: ${__P(scenario-concurrency,1)}
+#    hold-for: ${__P(scenario-duration,60)}
+#    scenario: get-supervisory-node
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: get-all-supervisory-nodes
@@ -43,6 +43,6 @@ scenarios:
 reporting:
   - module: passfail
     criteria:
-      Get Supervisory Node too slow: p90 of GetSupervisoryNode>15000ms
+#      Get Supervisory Node too slow: p90 of GetSupervisoryNode>15000ms
       Get All Supervisory Nodes too slow: p90 of GetAllSupervisoryNodes>60000ms
       Get Page of Ten Supervisory Nodes too slow: p90 of GetPageOfTenSupervisoryNodes>60000ms

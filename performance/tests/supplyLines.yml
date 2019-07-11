@@ -2,9 +2,9 @@ execution:
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: get-supply-line
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
-    scenario: get-all-supply-lines
+#  - concurrency: ${__P(scenario-concurrency,1)}
+#    hold-for: ${__P(scenario-duration,60)}
+#    scenario: get-all-supply-lines
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
     scenario: get-all-supply-lines-expand
@@ -100,7 +100,7 @@ reporting:
   - module: passfail
     criteria:
       Get Supply Line too slow: p90 of GetSupplyLine>60000ms
-      Get All Supply Lines too slow: p90 of GetAll1000SupplyLines>1000ms
+#      Get All Supply Lines too slow: p90 of GetAll1000SupplyLines>1000ms
       Get All Supply Lines with expand too slow: p90 of GetAll1000SupplyLinesExpand>1000ms
       Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>1000ms
       Get Page of Ten Supply Lines with expand too slow: p90 of GetPageOfTenSupplyLinesExpand>1000ms
