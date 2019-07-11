@@ -217,7 +217,7 @@ reporting:
         Get User Programs too slow: p90 of GetUserPrograms>250ms
         Get User Supported Programs too slow: p90 of GetUserSupportedPrograms>500ms
         Get User Facilities too slow: p90 of GetUserFacilities>500ms
-        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>40000ms
+        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>125000ms
         Get User Role Assignments too slow: p90 of GetUserRoleAssignments>20000ms
         Create User too slow: p90 of CreateUser>500ms
         Delete User too slow: p90 of DeleteUser>500ms
