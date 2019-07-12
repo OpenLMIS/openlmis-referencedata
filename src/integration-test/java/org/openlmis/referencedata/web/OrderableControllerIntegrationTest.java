@@ -423,7 +423,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final List<Orderable> items = Collections.singletonList(orderable);
 
     Pageable page = new PageRequest(0, 0);
-    when(orderableService.searchOrderables(any(OrderableSearchParams.class), eq(page)))
+    when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
         .thenReturn(Pagination.getPage(items, page));
 
     restAssured
@@ -443,7 +443,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final List<Orderable> items = Collections.singletonList(orderable);
 
     Pageable page = new PageRequest(0, 0);
-    when(orderableService.searchOrderables(any(OrderableSearchParams.class), eq(page)))
+    when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
         .thenReturn(Pagination.getPage(items, page));
 
     restAssured
