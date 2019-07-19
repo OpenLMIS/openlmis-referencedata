@@ -418,6 +418,45 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldNotAllowPaginationWithZeroSize() {
+    final List<Orderable> items = Collections.singletonList(orderable);
+
+    Pageable page = new PageRequest(0, 0);
+    when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
+        .thenReturn(Pagination.getPage(items, page));
+
+    restAssured
+        .given()
+        .queryParam("page", page.getPageNumber())
+        .queryParam("size", page.getPageSize())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void shouldNotAllowPaginationWithoutSize() {
+    final List<Orderable> items = Collections.singletonList(orderable);
+
+    Pageable page = new PageRequest(0, 0);
+    when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
+        .thenReturn(Pagination.getPage(items, page));
+
+    restAssured
+        .given()
+        .queryParam("page", page.getPageNumber())
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(400);
+  }
+
   @Test
   public void shouldFindOrderableByIdentityId() {
     OrderableDto response = restAssured

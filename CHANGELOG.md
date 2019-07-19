@@ -31,6 +31,7 @@ Improvements:
 * [OLMIS-6374](https://openlmis.atlassian.net/browse/OLMIS-6374): Add new profile for audit logging.
 * [OLMIS-6363](https://openlmis.atlassian.net/browse/OLMIS-6363): Update product names and codes for demo data to be more meaningful.
 * [OLMIS-6414](https://openlmis.atlassian.net/browse/OLMIS-6414): Added missing FTAPs to demo data.
+* [OLMIS-6408](https://openlmis.atlassian.net/browse/OLMIS-6408): Added pageable validator.
 
 13.0.0 / 2019-05-27
 ==================
