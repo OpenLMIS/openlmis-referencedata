@@ -316,7 +316,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
 
     Orderable orderable = orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(ftap.getOrderableId());
 
     ProgramOrderable programOrderable = orderable.getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
@@ -355,7 +355,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
 
     Orderable orderable = orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(ftap.getOrderableId());
 
     ProgramOrderable programOrderable = orderable.getProgramOrderable(program);
     assertEquals(program.getId(), programOrderable.getProgram().getId());
@@ -429,7 +429,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   @Test
   public void shouldNotFindInactiveFtapWhenNoInactiveFtapSaved() {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
-        .withVersionId(1)
+        .withVersionNumber(1L)
         .withActive(true)
         .withMaxPeriodsOfStock(5)
         .withFacilityType(facilityType1)
@@ -578,7 +578,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindResourcesByIdVersionIdPairs() {
+  public void shouldFindResourcesByIdVersionNumberPairs() {
     FacilityTypeApprovedProduct ftap1 = saveAndGetProduct(facilityType1, true);
     FacilityTypeApprovedProduct ftap2 = saveAndGetProduct(facilityType2, false);
     FacilityTypeApprovedProduct ftap3 = saveAndGetProduct(facilityType1, false);
@@ -586,8 +586,8 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
-            .withIdentity(ftap1.getId(), ftap1.getVersionId())
-            .withIdentity(ftap2.getId(), ftap2.getVersionId())
+            .withIdentity(ftap1.getId(), ftap1.getVersionNumber())
+            .withIdentity(ftap2.getId(), ftap2.getVersionNumber())
             .build(),
         null);
 
@@ -610,7 +610,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     // current version
     Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
-            .withIdentity(ftap.getId(), ftap.getVersionId())
+            .withIdentity(ftap.getId(), ftap.getVersionNumber())
             .build(),
         null);
 
@@ -620,13 +620,13 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     // previous version
     actual = ftapRepository.searchProducts(
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
-            .withIdentity(ftap.getId(), ftap.getVersionId() - 1)
+            .withIdentity(ftap.getId(), ftap.getVersionNumber() - 1)
             .build(),
         null);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(ftap.getId()));
-    assertThat(actual.getContent().get(0).getVersionId(), is(ftap.getVersionId() - 1));
+    assertThat(actual.getContent().get(0).getVersionNumber(), is(ftap.getVersionNumber() - 1));
   }
 
   @Test
@@ -660,7 +660,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(activeProduct.getId());
 
     //then
     Assert.assertTrue(savedProduct.getActive());
@@ -673,7 +673,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(activeProduct.getId());
 
     //then
     Assert.assertTrue(savedProduct.getActive());
@@ -686,7 +686,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     //when
     FacilityTypeApprovedProduct savedProduct = ftapRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(activeProduct.getId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(activeProduct.getId());
 
     //then
     Assert.assertFalse(savedProduct.getActive());
@@ -707,17 +707,17 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   }
 
   @Test
-  public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
+  public void findFirstByIdentityIdOrderByIdentityVersionNumberDescShouldReturnNewestVersion() {
     // given
     FacilityTypeApprovedProduct newestFtap = saveAndGetProduct(facilityType1, true);
 
     // when
     FacilityTypeApprovedProduct foundFtap = ftapRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(newestFtap.getId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(newestFtap.getId());
 
     // then
     assertEquals(newestFtap, foundFtap);
-    assertEquals(newestFtap.getVersionId(), foundFtap.getVersionId());
+    assertEquals(newestFtap.getVersionNumber(), foundFtap.getVersionNumber());
   }
 
   @Test
@@ -727,11 +727,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     // when
     FacilityTypeApprovedProduct foundFtap = ftapRepository
-        .findByIdentityIdAndIdentityVersionId(newestFtap.getId(), newestFtap.getVersionId());
+        .findByIdentityIdAndIdentityVersionNumber(newestFtap.getId(),
+            newestFtap.getVersionNumber());
 
     // then
     assertEquals(newestFtap, foundFtap);
-    assertEquals(newestFtap.getVersionId(), foundFtap.getVersionId());
+    assertEquals(newestFtap.getVersionNumber(), foundFtap.getVersionNumber());
   }
 
   @Test
@@ -762,7 +763,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(facility.getType().getId(), ftap.getFacilityType().getId());
 
     Orderable orderable = orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(ftap.getOrderableId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(ftap.getOrderableId());
 
     assertTrue(orderable.getProgramOrderable(program).isFullSupply());
     assertTrue(orderable.getProgramOrderable(program).isActive());
@@ -794,10 +795,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
   private FacilityTypeApprovedProduct saveAndGetProductWithTwoVersions(FacilityType facilityType,
       Program program, Orderable orderable, Boolean active) {
-    Long versionId = ThreadLocalRandom.current().nextLong(0, 1000);
+    Long versionNumber = ThreadLocalRandom.current().nextLong(0, 1000);
 
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
-        .withVersionId(versionId)
+        .withVersionNumber(versionNumber)
         .withActive(false)
         .withMaxPeriodsOfStock(5)
         .withFacilityType(facilityType)
@@ -808,7 +809,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     FacilityTypeApprovedProduct ftapNewVersion = new FacilityTypeApprovedProductsDataBuilder()
         .withId(ftap.getId())
-        .withVersionId(versionId + 1)
+        .withVersionNumber(versionNumber + 1)
         .withActive(active)
         .withMaxPeriodsOfStock(5.26)
         .withFacilityType(facilityType)

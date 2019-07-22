@@ -64,11 +64,11 @@ public abstract class VersionableResourceSearchParams extends PageableSearchPara
     Set<Pair<UUID, Long>> set = Sets.newHashSet();
 
     for (VersionIdentityDto identity : list) {
-      if (null == identity.getId() || null == identity.getVersionId()) {
+      if (null == identity.getId() || null == identity.getVersionNumber()) {
         throw new ValidationMessageException(getInvalidVersionIdentityErrorMessage());
       }
 
-      set.add(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+      set.add(ImmutablePair.of(identity.getId(), identity.getVersionNumber()));
     }
 
     return set;

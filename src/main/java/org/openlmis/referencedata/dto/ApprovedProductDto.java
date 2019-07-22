@@ -26,7 +26,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -109,18 +108,16 @@ public final class ApprovedProductDto
 
   @Override
   @JsonIgnore
-  public void setVersionId(Long versionId) {
-    meta.setVersionId(versionId.toString());
+  public void setVersionNumber(Long versionNumber) {
+    meta.setVersionNumber(versionNumber);
   }
 
   @Override
   @JsonIgnore
-  public Long getVersionId() {
+  public Long getVersionNumber() {
     return Optional
         .ofNullable(meta)
-        .map(MetadataDto::getVersionId)
-        .filter(StringUtils::isNotBlank)
-        .map(Long::valueOf)
+        .map(MetadataDto::getVersionNumber)
         .orElse(null);
   }
 

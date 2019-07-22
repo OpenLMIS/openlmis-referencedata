@@ -140,19 +140,19 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
     profiler.start("GET_PREVIOUS_FTAP");
     FacilityTypeApprovedProduct currentVersion = repository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeApprovedProductId);
-    long versionId = 1;
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(facilityTypeApprovedProductId);
+    long versionNumber = 1;
 
     if (null != currentVersion) {
       profiler.start("DEACTIVATE_PREVIOUS_FTAP_VERSIONS");
       repository.deactivatePreviousVersions(facilityTypeApprovedProductId);
 
-      versionId = currentVersion.getVersionId() + 1;
+      versionNumber = currentVersion.getVersionNumber() + 1;
     }
 
     profiler.start("BUILD_FTAP_FROM_DTO");
     ApprovedProductDto data = new ApprovedProductDto(approvedProductDto);
-    data.setVersionId(versionId);
+    data.setVersionNumber(versionNumber);
 
     FacilityTypeApprovedProduct newVersion = facilityTypeApprovedProductBuilder.build(data);
 
@@ -169,25 +169,26 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * Get chosen facilityTypeApprovedProduct.
    *
    * @param id UUID of facilityTypeApprovedProduct which we want to get
-   * @param versionId specify which version should be returned. If null provided, the latest version
-   *                  will be returned.
+   * @param versionNumber specify which version should be returned. If null provided, the latest
+   *                  version will be returned.
    * @return the FacilityTypeApprovedProduct.
    */
   @GetMapping("/{id}")
   public ApprovedProductDto getFacilityTypeApprovedProduct(@PathVariable("id") UUID id,
-      @RequestParam(name = "versionId", required = false) Long versionId) {
+      @RequestParam(name = "versionNumber", required = false) Long versionNumber) {
     Profiler profiler = new Profiler("GET_FACILITY_TYPE_APPROVED_PRODUCT");
     profiler.setLogger(XLOGGER);
 
     FacilityTypeApprovedProduct facilityTypeApprovedProduct;
 
-    if (null == versionId) {
+    if (null == versionNumber) {
       profiler.start("FIND_FTAP_BY_ID");
       facilityTypeApprovedProduct = repository
-          .findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+          .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(id);
     } else {
-      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_ID");
-      facilityTypeApprovedProduct = repository.findByIdentityIdAndIdentityVersionId(id, versionId);
+      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_NAME");
+      facilityTypeApprovedProduct =
+          repository.findByIdentityIdAndIdentityVersionNumber(id, versionNumber);
     }
 
     if (facilityTypeApprovedProduct == null) {
@@ -260,18 +261,18 @@ public class FacilityTypeApprovedProductController extends BaseController {
    * Allows deleting facilityTypeApprovedProduct.
    *
    * @param id UUID of facilityTypeApprovedProduct which we want to delete.
-   * @param versionId Specify what version of the resource should be deleted.
+   * @param versionNumber Specify what version of the resource should be deleted.
    */
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityTypeApprovedProduct(@PathVariable("id") UUID id,
-      @RequestParam(name = "versionId", required = false) Long versionId) {
+      @RequestParam(name = "versionNumber", required = false) Long versionNumber) {
     Profiler profiler = new Profiler("DELETE_FACILITY_TYPE_APPROVED_PRODUCT");
     profiler.setLogger(XLOGGER);
 
     checkAdminRight(FACILITY_APPROVED_ORDERABLES_MANAGE, profiler);
 
-    if (null == versionId) {
+    if (null == versionNumber) {
       profiler.start("FIND_ALL_FTAPS_BY_ID");
       List<FacilityTypeApprovedProduct> facilityTypeApprovedProducts = repository
           .findByIdentityId(id);
@@ -283,9 +284,9 @@ public class FacilityTypeApprovedProductController extends BaseController {
       profiler.start("DELETE_ALL_VERSIONS");
       repository.delete(facilityTypeApprovedProducts);
     } else {
-      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_ID");
+      profiler.start("FIND_FTAP_BY_ID_AND_VERSION_NAME");
       FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
-          .findByIdentityIdAndIdentityVersionId(id, versionId);
+          .findByIdentityIdAndIdentityVersionNumber(id, versionNumber);
 
       if (facilityTypeApprovedProduct == null) {
         throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
@@ -323,7 +324,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
 
     //Return a 404 if the specified instance can't be found
     FacilityTypeApprovedProduct instance = repository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(id);
 
     if (instance == null) {
       throw new NotFoundException(FacilityTypeApprovedProductMessageKeys.ERROR_NOT_FOUND);
@@ -341,7 +342,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
     prod.export(productDto);
 
     Orderable orderable = orderableRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(prod.getOrderableId());
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(prod.getOrderableId());
 
     productDto.setOrderable(orderable);
 

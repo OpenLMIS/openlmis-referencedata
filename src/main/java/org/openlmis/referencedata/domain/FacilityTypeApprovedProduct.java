@@ -126,7 +126,7 @@ public class FacilityTypeApprovedProduct implements Versionable {
    */
   public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(
-        importer.getId(), importer.getVersionId(), importer.getOrderableId(),
+        importer.getId(), importer.getVersionNumber(), importer.getOrderableId(),
         null, null, importer.getMaxPeriodsOfStock(), importer.getActive()
     );
     ftap.setMinPeriodsOfStock(importer.getMinPeriodsOfStock());
@@ -141,8 +141,8 @@ public class FacilityTypeApprovedProduct implements Versionable {
   }
 
   @Override
-  public Long getVersionId() {
-    return identity.getVersionId();
+  public Long getVersionNumber() {
+    return identity.getVersionNumber();
   }
 
   @PrePersist
@@ -164,7 +164,7 @@ public class FacilityTypeApprovedProduct implements Versionable {
     exporter.setProgram(program);
     exporter.setFacilityType(facilityType);
     exporter.setActive(active);
-    exporter.setVersionId(identity.getVersionId());
+    exporter.setVersionNumber(identity.getVersionNumber());
     exporter.setLastUpdated(lastUpdated);
   }
 

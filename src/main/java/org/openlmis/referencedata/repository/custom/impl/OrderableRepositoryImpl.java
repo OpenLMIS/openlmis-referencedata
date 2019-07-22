@@ -54,21 +54,21 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   private static final String NATIVE_SELECT_ORDERABLES_IDENTITIES = "SELECT DISTINCT"
       + "   o.id AS id,"
-      + "   o.versionId AS versionId"
+      + "   o.versionNumber AS versionNumber"
       + FROM_ORDERABLES_TABLE;
 
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
       " INNER JOIN referencedata.program_orderables AS po"
-          + "  ON o.id = po.orderableId AND o.versionId = po.orderableVersionId";
+          + "  ON o.id = po.orderableId AND o.versionNumber = po.orderableVersionNumber";
 
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p"
           + "  ON p.id = po.programId";
 
   private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX(versionId) AS versionId"
+      " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
           + "   FROM referencedata.orderables GROUP BY id) AS latest"
-          + "   ON o.id = latest.id AND o.versionId = latest.versionId";
+          + "   ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
 
   private static final String NATIVE_SELECT_ORDERABLES_BY_IDENTITES = "SELECT o.*"
       + FROM_ORDERABLES_TABLE;
@@ -78,7 +78,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String NATIVE_PRODUCT_CODE = "LOWER(o.code) LIKE :orderableCode";
   private static final String NATIVE_PRODUCT_NAME = "LOWER(o.fullProductName) LIKE :orderableName";
   private static final String NATIVE_PROGRAM_CODE = "LOWER(p.code) LIKE :programCode";
-  private static final String NATIVE_IDENTITY = "(o.id = '%s' AND o.versionId = %d)";
+  private static final String NATIVE_IDENTITY = "(o.id = '%s' AND o.versionNumber = %d)";
 
   private static final String WHERE = " WHERE ";
   private static final String OR = " OR ";
@@ -171,7 +171,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     if (!count) {
       SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
       sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
-      sqlQuery.addScalar("versionId", LongType.INSTANCE);
+      sqlQuery.addScalar("versionNumber", LongType.INSTANCE);
     }
 
     return nativeQuery;

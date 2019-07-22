@@ -56,7 +56,7 @@ public class VersionIdentityTest {
     // given
     VersionIdentity ident = new VersionIdentity();
     VersionIdentity identDifferentId = new VersionIdentity(ident.getId(),
-        ident.getVersionId() + 1);
+        ident.getVersionNumber() + 1);
 
     // when
     boolean isEqual = ident.equals(identDifferentId);
@@ -73,7 +73,7 @@ public class VersionIdentityTest {
 
     // then
     assertThat(identity.getId()).isNotNull();
-    assertThat(identity.getVersionId()).isEqualTo(1L);
+    assertThat(identity.getVersionNumber()).isEqualTo(1L);
   }
 
   @Test
@@ -87,6 +87,6 @@ public class VersionIdentityTest {
 
     // then
     assertThat(identity.getId()).isEqualTo(id);
-    assertThat(identity.getVersionId()).isEqualTo(versionId);
+    assertThat(identity.getVersionNumber()).isEqualTo(versionId);
   }
 }

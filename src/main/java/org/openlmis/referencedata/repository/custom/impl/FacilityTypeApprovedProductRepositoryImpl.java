@@ -63,33 +63,33 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String NATIVE_SELECT_FTAP_IDENTITIES = "SELECT DISTINCT"
       + "   ftap.id AS id,"
-      + "   ftap.versionId AS versionId"
+      + "   ftap.versionNumber AS versionNumber"
       + FROM_FTAP_TABLE;
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
   private static final String NATIVE_ORDERABLE_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX(versionId) AS versionId"
+      " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
           + "   FROM referencedata.orderables GROUP BY id) AS o"
           + "   ON o.id = ftap.orderableId";
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
       " INNER JOIN referencedata.program_orderables AS po"
           + " ON o.id = po.orderableId"
-          + " AND o.versionId = po.orderableVersionId"
+          + " AND o.versionNumber = po.orderableVersionNumber"
           + " AND p.id = po.programId"
           + " AND po.active IS TRUE";
   private static final String NATIVE_FACILITY_TYPE_INNER_JOIN =
       " INNER JOIN referencedata.facility_types AS ft ON ft.id = ftap.facilityTypeId";
   private static final String NATIVE_LATEST_FTAPS_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX(versionId) AS versionId"
+      " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
           + "   FROM referencedata.facility_type_approved_products GROUP BY id) AS latest"
-          + "   ON ftap.id = latest.id AND ftap.versionId = latest.versionId";
+          + "   ON ftap.id = latest.id AND ftap.versionNumber = latest.versionNumber";
   private static final String NATIVE_FTAP_ACTIVE_FLAG = " ftap.active = :active";
 
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
   private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*" + FROM_FTAP_TABLE;
 
-  private static final String NATIVE_IDENTITY = "(ftap.id = '%s' AND ftap.versionId = %d)";
+  private static final String NATIVE_IDENTITY = "(ftap.id = '%s' AND ftap.versionNumber = %d)";
   private static final String WHERE = " WHERE ";
   private static final String OR = " OR ";
   private static final String AND = " AND ";
@@ -285,7 +285,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     if (!count) {
       SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
       sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
-      sqlQuery.addScalar("versionId", LongType.INSTANCE);
+      sqlQuery.addScalar("versionNumber", LongType.INSTANCE);
     }
 
     return nativeQuery;

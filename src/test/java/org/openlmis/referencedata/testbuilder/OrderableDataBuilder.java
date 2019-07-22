@@ -41,7 +41,7 @@ public class OrderableDataBuilder {
   private List<ProgramOrderable> programOrderables;
   private Map<String, String> identifiers;
   private Map<String, Object> extraData;
-  private Long versionId;
+  private Long versionNumber;
   private ZonedDateTime lastUpdated;
 
   /**
@@ -61,7 +61,7 @@ public class OrderableDataBuilder {
     programOrderables = new ArrayList<>();
     identifiers = new HashMap<>();
     extraData = new HashMap<>();
-    versionId = 1L;
+    versionNumber = 1L;
     lastUpdated = ZonedDateTime.now();
   }
 
@@ -85,8 +85,8 @@ public class OrderableDataBuilder {
     return this;
   }
 
-  public OrderableDataBuilder withVersionId(Long versionId) {
-    this.versionId = versionId;
+  public OrderableDataBuilder withVersionNumber(Long versionNumber) {
+    this.versionNumber = versionNumber;
     return this;
   }
 
@@ -119,7 +119,7 @@ public class OrderableDataBuilder {
    */
   public Orderable buildAsNew() {
     Orderable orderable = new Orderable(productCode, dispensable, netContent, packRoundingTreshold,
-        roundToZero, null, versionId);
+        roundToZero, null, versionNumber);
     orderable.setFullProductName(fullProductName);
     orderable.setDescription(description);
     orderable.setProgramOrderables(programOrderables);

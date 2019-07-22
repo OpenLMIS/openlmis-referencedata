@@ -1,4 +1,4 @@
-id,versionId,facilitytypeid,programid,orderableid,maxperiodsofstock,minperiodsofstock,emergencyorderpoint,active
+id,versionNumber,facilitytypeid,programid,orderableid,maxperiodsofstock,minperiodsofstock,emergencyorderpoint,active
 c5d4427b-7427-4209-ae35-1d5bd92ef3b8,1,ac1d268b-ce10-455f-bf87-9c667da8f060,10845cb9-d365-4aaa-badd-b4fa39c6a26a,2400e410-b8dd-4954-b1c0-80d8a8e785fc,3,1.5,1,true
 1125d62f-f9f3-40b8-8327-5204b64315ed,1,ac1d268b-ce10-455f-bf87-9c667da8f060,10845cb9-d365-4aaa-badd-b4fa39c6a26a,c9e65f02-f84f-4ba2-85f7-e2cb6f0989af,3,1.5,1,true
 b2ebdcbc-662c-4467-846a-af5f0068d1ca,1,ac1d268b-ce10-455f-bf87-9c667da8f060,dce17f2e-af3e-40ad-8e00-3496adef44c3,d602d0c6-4052-456c-8ccd-61b4ad77bece,3,1.5,1,true

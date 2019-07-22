@@ -32,7 +32,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @Table(name = "orderable_children", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(
         name = "unq_orderable_parent_id",
-        columnNames = {"orderableid", "orderableVersionId", "parentid", "parentVersionId"})
+        columnNames = {"orderableid", "orderableVersionNumber", "parentid", "parentVersionNumber"})
 )
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,7 +43,8 @@ public class OrderableChild extends BaseEntity {
   @ManyToOne
   @JoinColumns({
       @JoinColumn(name = "parentid", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "parentVersionId", referencedColumnName = "versionId", nullable = false)
+      @JoinColumn(name = "parentVersionNumber", referencedColumnName = "versionNumber",
+          nullable = false)
   })
   @Getter
   @Setter
@@ -52,7 +53,7 @@ public class OrderableChild extends BaseEntity {
   @ManyToOne
   @JoinColumns({
       @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId",
+      @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber",
           nullable = false),
   })
   @Getter

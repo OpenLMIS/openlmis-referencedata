@@ -111,7 +111,7 @@ public class OrderableController extends BaseController {
 
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
-    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(id);
+    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(id);
 
     if (null == foundOrderable) {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
@@ -192,17 +192,17 @@ public class OrderableController extends BaseController {
   @GetMapping(RESOURCE_PATH + "/{id}")
   public OrderableDto getChosenOrderable(
       @PathVariable("id") UUID productId,
-      @RequestParam(required = false, value = "versionId") Long versionId) {
+      @RequestParam(required = false, value = "versionNumber") Long versionId) {
     Profiler profiler = new Profiler("GET_ORDERABLE");
     profiler.setLogger(XLOGGER);
 
     Orderable orderable;
     if (null == versionId) {
       profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID");
-      orderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(productId);
+      orderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(productId);
     } else {
-      profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID_AND_VERSION_ID");
-      orderable = repository.findByIdentityIdAndIdentityVersionId(productId, versionId);
+      profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID_AND_VERSION_NAME");
+      orderable = repository.findByIdentityIdAndIdentityVersionNumber(productId, versionId);
     }
 
     if (orderable == null) {

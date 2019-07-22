@@ -24,7 +24,7 @@ import org.openlmis.referencedata.domain.Program;
 public class FacilityTypeApprovedProductsDataBuilder {
 
   private UUID id;
-  private Long versionId;
+  private Long versionNumber;
   private UUID orderableId;
   private Program program;
   private FacilityType facilityType;
@@ -39,7 +39,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
    */
   public FacilityTypeApprovedProductsDataBuilder() {
     id = UUID.randomUUID();
-    versionId = 1L;
+    versionNumber = 1L;
     orderableId = UUID.randomUUID();
     program = new ProgramDataBuilder().build();
     facilityType = new FacilityTypeDataBuilder().build();
@@ -55,8 +55,8 @@ public class FacilityTypeApprovedProductsDataBuilder {
     return this;
   }
 
-  public FacilityTypeApprovedProductsDataBuilder withVersionId(Number versionId) {
-    this.versionId = versionId.longValue();
+  public FacilityTypeApprovedProductsDataBuilder withVersionNumber(Long versionNumber) {
+    this.versionNumber = versionNumber;
     return this;
   }
 
@@ -89,7 +89,7 @@ public class FacilityTypeApprovedProductsDataBuilder {
    * Builds instance of {@link FacilityTypeApprovedProduct}.
    */
   public FacilityTypeApprovedProduct build() {
-    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(id, versionId,
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(id, versionNumber,
         orderableId, program, facilityType, maxPeriodsOfStock, active);
     ftap.setMinPeriodsOfStock(minPeriodsOfStock);
     ftap.setEmergencyOrderPoint(emergencyOrderPoint);

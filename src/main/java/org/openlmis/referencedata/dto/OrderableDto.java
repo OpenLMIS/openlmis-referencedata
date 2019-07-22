@@ -109,19 +109,19 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   @Override
   @JsonIgnore
-  public Long getVersionId() {
+  public Long getVersionNumber() {
     if (null == orderableRepository) {
       return 1L;
     } else {
       Orderable latestOrderable = orderableRepository
-          .findFirstByIdentityIdOrderByIdentityVersionIdDesc(getId());
-      return latestOrderable.getVersionId();
+          .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(getId());
+      return latestOrderable.getVersionNumber();
     }
   }
 
   @Override
-  public void setVersionId(Long versionId) {
-    meta.setVersionId(versionId.toString());
+  public void setVersionNumber(Long versionId) {
+    meta.setVersionNumber(versionId);
   }
 
   @Override

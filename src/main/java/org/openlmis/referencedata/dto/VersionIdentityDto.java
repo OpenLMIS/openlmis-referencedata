@@ -30,11 +30,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public final class VersionIdentityDto extends BaseDto {
-  private Long versionId;
+  private Long versionNumber;
 
-  public VersionIdentityDto(UUID id, Long versionId) {
+  public VersionIdentityDto(UUID id, Long versionNumber) {
     super(id);
-    this.versionId = versionId;
+    this.versionNumber = versionNumber;
   }
 
 }

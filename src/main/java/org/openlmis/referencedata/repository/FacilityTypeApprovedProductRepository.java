@@ -32,9 +32,9 @@ public interface FacilityTypeApprovedProductRepository extends
 
   List<FacilityTypeApprovedProduct> findByIdentityId(UUID id);
 
-  FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
+  FacilityTypeApprovedProduct findFirstByIdentityIdOrderByIdentityVersionNumberDesc(UUID id);
 
-  FacilityTypeApprovedProduct findByIdentityIdAndIdentityVersionId(UUID id, Long versionId);
+  FacilityTypeApprovedProduct findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
 
   @Query("UPDATE FacilityTypeApprovedProduct SET active = false WHERE identity.id = :id")
   @Modifying(flushAutomatically = true, clearAutomatically = true)
@@ -53,8 +53,8 @@ public interface FacilityTypeApprovedProductRepository extends
       + "       INNER JOIN referencedata.jv_global_id g"
       + "         ON (CAST(ftap.id AS varchar) = SUBSTRING("
       + "           CAST(CAST(g.local_id AS json)->'id' AS varchar), 2, 36))"
-      + "         AND (CAST(ftap.versionId AS varchar) ="
-      + "           CAST(CAST(g.local_id AS json)->'versionId' AS varchar))"
+      + "         AND (CAST(ftap.versionNumber AS varchar) ="
+      + "           CAST(CAST(g.local_id AS json)->'versionNumber' AS varchar))"
       + "       INNER JOIN referencedata.jv_snapshot s ON g.global_id_pk = s.global_id_fk)"
       + " ORDER BY ?#{#pageable}",
       nativeQuery = true)

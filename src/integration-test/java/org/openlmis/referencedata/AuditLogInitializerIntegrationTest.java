@@ -178,15 +178,15 @@ public class AuditLogInitializerIntegrationTest {
   public void shouldCreateSnapshotsForFtap() {
     //given
     UUID ftapId = UUID.randomUUID();
-    Long versionId = 1000L;
+    Long versionNumber = 1000L;
     FacilityType facilityType = addNewFacilityType();
     Program program = addNewProgram();
     Orderable orderable = addNewOrderable();
-    addFtap(ftapId, versionId, program.getId(), orderable.getId(), facilityType.getId());
+    addFtap(ftapId, versionNumber, program.getId(), orderable.getId(), facilityType.getId());
 
     // create an instance to get version identity required for audit log
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProduct(
-        ftapId, versionId, null, null, null, null, null);
+        ftapId, versionNumber, null, null, null, null, null);
 
     executeTest(ftap.getVersionIdentity(), FacilityTypeApprovedProduct.class);
   }
@@ -532,12 +532,12 @@ public class AuditLogInitializerIntegrationTest {
         .executeUpdate();
   }
 
-  private void addFtap(UUID id, Long versionId, UUID programId, UUID orderableId, UUID typeId) {
+  private void addFtap(UUID id, Long versionNumber, UUID programId, UUID orderableId, UUID typeId) {
     entityManager.flush();
     entityManager
         .createNativeQuery(SqlInsert.INSERT_FTAP_SQL)
         .setParameter(1, id)
-        .setParameter(2, versionId) // versionId
+        .setParameter(2, versionNumber) // versionNumber
         .setParameter(3, 8.23) // emergency order point
         .setParameter(4, 9.23) // max periods of stock
         .setParameter(5, 7) // min period of stock

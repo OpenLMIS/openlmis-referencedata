@@ -44,7 +44,7 @@ public interface OrderableRepository extends
   <S extends Orderable> S findByProductCode(Code code);
 
   // DATAJPA-1130
-  @Query(value = "SELECT o.id, o.versionid"
+  @Query(value = "SELECT o.id, o.versionNumber"
       + FROM_ORDERABLES_CLAUSE
       + " WHERE o.id = ?1"
       + " LIMIT 1",
@@ -72,16 +72,16 @@ public interface OrderableRepository extends
       + FROM_ORDERABLES_CLAUSE
       + JOIN_WITH_LATEST_ORDERABLE
       + "   JOIN referencedata.orderable_identifiers oi" 
-      + "     ON oi.orderableid = o.id AND oi.orderableversionid = o.versionid" 
+      + "     ON oi.orderableid = o.id AND oi.orderableversionnumber = o.versionnumber"
       + " WHERE oi.key = :key" 
       + "   AND oi.value = :value",
       nativeQuery = true
   )
   List<Orderable> findAllLatestByIdentifier(@Param("key") String key, @Param("value") String value);
   
-  Orderable findFirstByIdentityIdOrderByIdentityVersionIdDesc(UUID id);
+  Orderable findFirstByIdentityIdOrderByIdentityVersionNumberDesc(UUID id);
   
-  Orderable findByIdentityIdAndIdentityVersionId(UUID id, Long versionId);
+  Orderable findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
   
   @Query(value = "SELECT o.*"
       + FROM_ORDERABLES_CLAUSE

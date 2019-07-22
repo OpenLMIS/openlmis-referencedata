@@ -37,29 +37,29 @@ public class VersionIdentity implements Serializable {
   @Type(type = UUID_TYPE)
   private UUID id;
 
-  private Long versionId;
+  private Long versionNumber;
 
   VersionIdentity() {
     this(null, null);
   }
 
-  VersionIdentity(UUID id, Long versionId) {
+  VersionIdentity(UUID id, Long versionNumber) {
     // it seems like we can't use @GeneratedValue and @GenericGenerator annotations
     // in the @Embeddable class like this one. That is why we generate a value for
     // the id field manually but only if the passed value is null.
     this.id = Optional.ofNullable(id).orElseGet(UUID::randomUUID);
-    this.versionId = Optional.ofNullable(versionId).orElse(1L);
+    this.versionNumber = Optional.ofNullable(versionNumber).orElse(1L);
   }
 
   interface VersionExporter {
 
-    void setVersionId(Long versionId);
+    void setVersionNumber(Long versionNumber);
 
   }
 
   interface VersionImporter {
 
-    Long getVersionId();
+    Long getVersionNumber();
 
   }
 

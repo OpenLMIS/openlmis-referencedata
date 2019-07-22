@@ -39,22 +39,22 @@ public class OrderableDtoTest {
   }
   
   @Test
-  public void getVersionIdShouldGetInitialVersionIfRepositoryIsNotSet() {
-    assertEquals(1L, orderableDto.getVersionId().longValue());
+  public void getVersionNumberShouldGetInitialVersionIfRepositoryIsNotSet() {
+    assertEquals(1L, orderableDto.getVersionNumber().longValue());
   }
   
   @Test
-  public void getVersionIdShouldGetLatestVersionFromRepositoryIfSet() {
+  public void getVersionNumberShouldGetLatestVersionFromRepositoryIfSet() {
     //given
     Orderable orderable = mock(Orderable.class);
     OrderableRepository orderableRepository = mock(OrderableRepository.class);
-    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class)))
+    when(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(any(UUID.class)))
         .thenReturn(orderable);
-    when(orderable.getVersionId()).thenReturn(2L);
+    when(orderable.getVersionNumber()).thenReturn(2L);
     orderableDto.setOrderableRepository(orderableRepository);
 
     //then
-    assertEquals(2L, orderableDto.getVersionId().longValue());
+    assertEquals(2L, orderableDto.getVersionNumber().longValue());
   }
 
   @Test

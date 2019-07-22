@@ -67,7 +67,7 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @TypeName("Orderable")
 @Table(name = "orderables", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
-        columnNames = {"code", "versionid"}))
+        columnNames = {"code", "versionnumber"}))
 @NoArgsConstructor
 @Cacheable
 @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
@@ -126,7 +126,7 @@ public class Orderable implements Versionable {
       name = "orderable_identifiers",
       joinColumns = {
           @JoinColumn(name = "orderableId", referencedColumnName = "id"),
-          @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId")})
+          @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber")})
   @Setter
   private Map<String, String> identifiers;
 
@@ -172,7 +172,7 @@ public class Orderable implements Versionable {
   public static Orderable updateFrom(Orderable persistedOrderable, Importer importer) {
     Orderable orderable = newInstance(importer);
     orderable.identity = new VersionIdentity(persistedOrderable.getId(),
-        persistedOrderable.getVersionId() + 1);
+        persistedOrderable.getVersionNumber() + 1);
     return orderable;
   }
 
@@ -199,7 +199,7 @@ public class Orderable implements Versionable {
     orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
     orderable.extraData.updateFrom(importer.getExtraData());
 
-    orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionId());
+    orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionNumber());
     orderable.lastUpdated = ZonedDateTime.now();
     return orderable;
   }
@@ -220,8 +220,8 @@ public class Orderable implements Versionable {
   }
 
   @Override
-  public Long getVersionId() {
-    return identity.getVersionId();
+  public Long getVersionNumber() {
+    return identity.getVersionNumber();
   }
 
   /**
@@ -318,7 +318,7 @@ public class Orderable implements Versionable {
     extraData = ExtraDataEntity.defaultEntity(extraData);
     extraData.export(exporter);
 
-    exporter.setVersionId(identity.getVersionId());
+    exporter.setVersionNumber(identity.getVersionNumber());
     exporter.setLastUpdated(lastUpdated);
   }
 

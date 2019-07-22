@@ -36,8 +36,8 @@ import org.joda.money.Money;
 @Entity
 @Table(name = "program_orderables", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(
-        name = "unq_programid_orderableid_orderableversionid",
-        columnNames = {"programid", "orderableid", "orderableversionid"})
+        name = "unq_programid_orderableid_orderableversionnumber",
+        columnNames = {"programid", "orderableid", "orderableversionnumber"})
     )
 @NoArgsConstructor
 @AllArgsConstructor
@@ -53,7 +53,8 @@ public class ProgramOrderable extends BaseEntity {
   @ManyToOne
   @JoinColumns({
       @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "orderableVersionId", referencedColumnName = "versionId", nullable = false)
+      @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber",
+          nullable = false)
       })
   @Getter
   @Setter

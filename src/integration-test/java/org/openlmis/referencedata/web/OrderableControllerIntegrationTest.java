@@ -89,7 +89,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
-  private static final String VERSION_ID = "versionId";
+  private static final String VERSION_NAME = "versionNumber";
 
   @Captor
   public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
@@ -98,7 +98,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private OrderableDto orderableDto = new OrderableDto();
 
   private UUID orderableId = UUID.randomUUID();
-  private Long orderableVersionId = 1L;
+  private Long orderableVersionNumber = 1L;
 
   @Before
   @Override
@@ -106,14 +106,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     super.setUp();
 
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
-        10, 5, false, orderableId, orderableVersionId);
+        10, 5, false, orderableId, orderableVersionNumber);
     orderable.setProgramOrderables(Collections.emptyList());
     orderable.setLastUpdated(ZonedDateTime.now(ZoneId.of("UTC")));
     orderable.export(orderableDto);
 
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);
-    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
-        .willReturn(orderable);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
+        orderable.getId())).willReturn(orderable);
   }
 
   @Test
@@ -204,8 +204,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void updateShouldReturnNotFoundIfOrderableNotFound() {
     mockUserHasRight(ORDERABLES_MANAGE);
-    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
-        .willReturn(null);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
+        orderable.getId())).willReturn(null);
 
     restAssured
         .given()
@@ -475,15 +475,15 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldFindOrderableByIdentityIdAndVersionId() {
-    when(orderableRepository.findByIdentityIdAndIdentityVersionId(
-        orderable.getId(), orderableVersionId)).thenReturn(orderable);
+  public void shouldFindOrderableByIdentityIdAndVersionNumber() {
+    when(orderableRepository.findByIdentityIdAndIdentityVersionNumber(
+        orderable.getId(), orderableVersionNumber)).thenReturn(orderable);
 
     OrderableDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .pathParam(ID, orderableId)
-        .queryParam(VERSION_ID, orderableVersionId)
+        .queryParam(VERSION_NAME, orderableVersionNumber)
         .when()
         .get(ID_URL)
         .then()
@@ -491,7 +491,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableId, response.getId());
-    assertEquals(orderableVersionId, orderable.getVersionId());
+    assertEquals(orderableVersionNumber, orderable.getVersionNumber());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -504,7 +504,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         orderableDto.getProductCode(), orderableDto.getFullProductName(),
         orderable.getProductCode().toString(),
         Lists.newArrayList(new VersionIdentityDto(
-            orderableDto.getId(), orderableDto.getVersionId())),
+            orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
 
     given(orderableRepository

@@ -42,7 +42,7 @@ final class SqlInsert {
   };
 
   private static final String[] FTAP_FIELDS = {
-      "id", "versionId", "emergencyorderpoint", "maxperiodsofstock", "minperiodsofstock",
+      "id", "versionNumber", "emergencyorderpoint", "maxperiodsofstock", "minperiodsofstock",
       "facilitytypeid", "orderableid", PROGRAM_ID
   };
 
@@ -69,7 +69,7 @@ final class SqlInsert {
 
   private static final String[] ORDERABLE_FIELDS = {
       "id", "fullproductname", "packroundingthreshold", "netcontent", CODE,
-      "roundtozero", DESCRIPTION, "dispensableid", "versionid", "lastupdated"
+      "roundtozero", DESCRIPTION, "dispensableid", "versionNumber", "lastupdated"
   };
 
   private static final String[] PROCESSING_PERIOD_FIELDS = {

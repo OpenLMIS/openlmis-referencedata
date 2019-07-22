@@ -109,8 +109,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         });
 
     // used in deserialization
-    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(orderable.getId()))
-        .willReturn(orderable);
+    given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
+        orderable.getId())).willReturn(orderable);
     given(orderableRepository
         .findAllLatestByIds(Collections.singleton(orderable.getId()), new PageRequest(0, 1)))
         .willReturn(new PageImpl<>(Collections.singletonList(orderable)));
@@ -174,10 +174,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturnNotFoundForNonExistingResourceVersionInDeleteEndpoint() {
-    Long versionId = 1000L;
+    Long versionNumber = 1000L;
 
     given(facilityTypeApprovedProductRepository
-        .findByIdentityIdAndIdentityVersionId(facilityTypeAppProdId, versionId))
+        .findByIdentityIdAndIdentityVersionNumber(facilityTypeAppProdId, versionNumber))
         .willReturn(null);
 
     restAssured
@@ -185,7 +185,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
-        .queryParam("versionId", versionId)
+        .queryParam("versionNumber", versionNumber)
         .when()
         .delete(ID_URL)
         .then()
@@ -276,8 +276,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     facilityTypeAppProd.setMaxPeriodsOfStock(9.00);
     facilityTypeAppProd.export(ftapDto);
 
+    Long versionNumber = original.getVersionNumber() + 1;
+
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(facilityTypeAppProdId))
         .willReturn(original);
 
     ApprovedProductDto response = restAssured
@@ -290,7 +292,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .put(ID_URL)
         .then()
         .statusCode(200)
-        .body("meta.versionId", is(Long.toString(original.getVersionId() + 1)))
+        .body("meta.versionNumber", is(versionNumber.intValue()))
         .extract()
         .as(ApprovedProductDto.class);
 
@@ -351,7 +353,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
   @Test
   public void shouldGetFacilityTypeApprovedProduct() {
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(facilityTypeAppProdId))
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(facilityTypeAppProdId))
         .willReturn(facilityTypeAppProd);
 
     ApprovedProductDto response = restAssured
@@ -385,10 +387,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldReturnNotFoundForNonExistingResourceVersionInGetFacilityTypeApprovedProduct() {
-    Long versionId = 1000L;
+    Long versionNumber = 1000L;
 
     given(facilityTypeApprovedProductRepository
-        .findByIdentityIdAndIdentityVersionId(facilityTypeAppProdId, versionId))
+        .findByIdentityIdAndIdentityVersionNumber(facilityTypeAppProdId, versionNumber))
         .willReturn(null);
 
     restAssured
@@ -396,7 +398,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .pathParam("id", facilityTypeAppProdId)
-        .queryParam("versionId", versionId)
+        .queryParam("versionNumber", versionNumber)
         .when()
         .get(ID_URL)
         .then()
@@ -467,7 +469,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
         .withFacilityTypeCode(facilityType1.getCode())
         .withProgramCode(program.getCode().toString())
-        .withIdentity(facilityTypeAppProd.getId(), facilityTypeAppProd.getVersionId())
+        .withIdentity(facilityTypeAppProd.getId(), facilityTypeAppProd.getVersionNumber())
         .build();
 
     given(facilityTypeApprovedProductRepository
@@ -513,7 +515,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class)))
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(any(UUID.class)))
         .willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -527,7 +529,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class))).willReturn(null);
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -540,7 +542,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .when(rightService)
         .checkAdminRight(RightName.FACILITY_APPROVED_ORDERABLES_MANAGE);
     given(facilityTypeApprovedProductRepository
-        .findFirstByIdentityIdOrderByIdentityVersionIdDesc(any(UUID.class)))
+        .findFirstByIdentityIdOrderByIdentityVersionNumberDesc(any(UUID.class)))
         .willReturn(facilityTypeAppProd);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -558,7 +560,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(expected.getFacilityType().getId(), response.getFacilityType().getId());
     assertEquals(expected.getProgram().getId(), response.getProgram().getId());
     assertEquals(expected.getOrderable().getId(), response.getOrderable().getId());
-    assertEquals(expected.getOrderable().getVersionId(), response.getOrderable().getVersionId());
+    assertEquals(expected.getOrderable().getVersionNumber(),
+        response.getOrderable().getVersionNumber());
   }
 
 }

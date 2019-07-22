@@ -8,13 +8,13 @@
       "type": "string",
       "title": "id"
     },
-    "versionId": {
-      "type": "integer",
-      "title": "versionId"
+    "versionNumber": {
+      "type": "number",
+      "title": "versionNumber"
     }
   },
   "required": [
     "id",
-    "versionId"
+    "versionNumber"
   ]
 }

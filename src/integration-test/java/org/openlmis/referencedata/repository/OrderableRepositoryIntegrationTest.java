@@ -132,7 +132,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // then
     Assertions.assertThat(thrown).hasMessageContaining(
-        "unq_programid_orderableid_orderableversionid");
+        "unq_programid_orderableid_orderableversionnumber");
   }
 
   @Test
@@ -208,7 +208,7 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> actual = repository.findAllLatestByIds(ids, null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
   }
 
   @Test
@@ -450,7 +450,7 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> actual = repository.findAllLatest(null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
   }
 
   @Test
@@ -503,11 +503,11 @@ public class OrderableRepositoryIntegrationTest {
         .search(new TestSearchParams(SOME_CODE, null, null, null), null);
 
     // then
-    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionId());
+    checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
   }
 
   @Test
-  public void shouldFindResourcesByIdVersionIdPairs() {
+  public void shouldFindResourcesByIdersionNumberPairs() {
     Orderable orderable1 = saveAndGetOrderable();
     Orderable orderable2 = saveAndGetOrderable();
     Orderable orderable3 = saveAndGetOrderable();
@@ -515,8 +515,8 @@ public class OrderableRepositoryIntegrationTest {
 
     Page<Orderable> actual = repository.search(
         new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionId()),
-                Pair.of(orderable2.getId(), orderable2.getVersionId()))),
+            Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
+                Pair.of(orderable2.getId(), orderable2.getVersionNumber()))),
         null);
 
     assertThat(actual.getNumberOfElements(), is(2));
@@ -540,7 +540,7 @@ public class OrderableRepositoryIntegrationTest {
     // current version
     Page<Orderable> actual = repository.search(
         new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionId()))),
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber()))),
         null);
 
     assertThat(actual.getNumberOfElements(), is(1));
@@ -549,12 +549,12 @@ public class OrderableRepositoryIntegrationTest {
     // previous version
     actual = repository.search(
         new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionId() - 1))),
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber() - 1))),
         null);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(orderable.getId()));
-    assertThat(actual.getContent().get(0).getVersionId(), is(orderable.getVersionId() - 1));
+    assertThat(actual.getContent().get(0).getVersionNumber(), is(orderable.getVersionNumber() - 1));
   }
 
   @Test
@@ -599,21 +599,21 @@ public class OrderableRepositoryIntegrationTest {
     List<Orderable> orderables = repository.findAllLatestByIdentifier(TRADE_ITEM, identifierValue1);
 
     // then
-    checkSingleResultOrderableVersion(orderables, orderable.getVersionId());
+    checkSingleResultOrderableVersion(orderables, orderable.getVersionNumber());
   }
 
   @Test
-  public void findFirstByIdentityIdOrderByIdentityVersionIdDescShouldReturnNewestVersion() {
+  public void findFirstByIdentityIdOrderByIdentityersionNumberDescShouldReturnNewestVersion() {
     // given
     Orderable newestOrderable = saveAndGetOrderable();
 
     // when
-    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionIdDesc(
+    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
         newestOrderable.getId());
 
     // then
     assertEquals(newestOrderable, foundOrderable);
-    assertEquals(newestOrderable.getVersionId(), foundOrderable.getVersionId());
+    assertEquals(newestOrderable.getVersionNumber(), foundOrderable.getVersionNumber());
 
   }
 
@@ -678,27 +678,27 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   private Orderable saveAndGetOrderableWithTwoVersions(Code productCode) {
-    Long versionId = ThreadLocalRandom.current().nextLong(0, 1000);
+    Long versionNumber = ThreadLocalRandom.current().nextLong(0, 1000);
     OrderableDataBuilder builder = new OrderableDataBuilder()
         .withProductCode(productCode)
         .withIdentifier("cSys", "cSysId")
         .withDispensable(Dispensable.createNew(EACH))
         .withFullProductName(NAME);
 
-    Orderable orderable = builder.withVersionId(versionId).buildAsNew();
+    Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
     orderable = repository.save(orderable);
 
-    Orderable orderableNewVersion = builder.withVersionId(versionId + 1).buildAsNew();
+    Orderable orderableNewVersion = builder.withVersionNumber(versionNumber + 1).buildAsNew();
     orderableNewVersion.setId(orderable.getId());
 
     return repository.save(orderableNewVersion);
   }
 
-  private void checkSingleResultOrderableVersion(List<Orderable> result, Long versionId) {
+  private void checkSingleResultOrderableVersion(List<Orderable> result, Long versionNumber) {
     assertNotNull(result);
     assertEquals(1, result.size());
     Orderable orderable = result.get(0);
-    assertEquals(versionId, orderable.getVersionId());
+    assertEquals(versionNumber, orderable.getVersionNumber());
   }
 
   @Getter

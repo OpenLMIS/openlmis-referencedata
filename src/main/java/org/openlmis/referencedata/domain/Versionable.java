@@ -17,10 +17,10 @@ package org.openlmis.referencedata.domain;
 
 public interface Versionable extends Identifiable {
 
-  Long getVersionId();
+  Long getVersionNumber();
 
   default VersionIdentity getVersionIdentity() {
-    return new VersionIdentity(getId(), getVersionId());
+    return new VersionIdentity(getId(), getVersionNumber());
   }
 
 }

@@ -109,7 +109,7 @@ public class OrderableBuilderTest {
   public void shouldCreateOrderableWithVersion1() {
     Orderable orderable = createOrderable();
 
-    assertThat(orderable.getVersionId(), is(1L));
+    assertThat(orderable.getVersionNumber(), is(1L));
   }
 
   @Test
@@ -119,7 +119,7 @@ public class OrderableBuilderTest {
     OrderableDto orderableDto = createOrderableDto();
 
     Orderable updatedOrderable = Orderable.updateFrom(orderable, orderableDto);
-    assertThat(updatedOrderable.getVersionId(), is(2L));
+    assertThat(updatedOrderable.getVersionNumber(), is(2L));
   }
 
   private Program createProgram(String code) {

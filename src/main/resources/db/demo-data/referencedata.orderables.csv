@@ -1,4 +1,4 @@
-id,code,dispensableid,fullproductname,netcontent,packroundingthreshold,roundtozero,description,extradata,versionid
+id,code,dispensableid,fullproductname,netcontent,packroundingthreshold,roundtozero,description,extradata,versionnumber
 7f7b83db-580d-4269-88d2-7f9c80a591a9,C300,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Depo-Estradiol,5,2,false,Product description goes here.,,1
 bfde33c3-83f1-4feb-a27c-842852f66b71,C400,b6eb78c8-3c62-427e-87a8-e16615f9683d,Male Condom,1,0,false,Product description goes here.,,1
 7b9b66e0-f008-4c38-93ec-7a5f4868cca9,C600,daf071e6-2394-4ac9-b5a1-97a433d49160,Levonorgestrel,1,0,false,Product description goes here.,,1

@@ -737,9 +737,9 @@ resourceTypes:
                   repeat: false
           get:
               is: [ secured ]
-              description: Get chosen orderable. If versionId is omitted, returns newest version.
+              description: Get chosen orderable. If versionNumber is omitted, returns newest version.
               queryParameters:
-                  versionId:
+                  versionNumber:
                       displayName: Version ID
                       type: integer
                       description: Version of orderable
@@ -761,7 +761,7 @@ resourceTypes:
           put:
             is: [secured]
             description: >
-              Creates a new version of an orderable with an incremented versionId.
+              Creates a new version of an orderable with an incremented versionNumber.
 
               WARNING! Versioned orderables may not be fully supported by all consuming services.
               Using this rest-api to update orderables may break some functionality in downstream services.
@@ -2449,12 +2449,12 @@ resourceTypes:
                 is: [ secured ]
                 description: Get chosen facility type approved product.
                 queryParameters:
-                  versionId:
+                  versionNumber:
                       description: >
                         Specify which version of the resource should be returned. Please be advised
                         that if the given version does not exist, the endpoint will return
                         the Not Found error message.
-                      displayName: versionId
+                      displayName: versionNumber
                       type: integer
                       required: false
                       repeat: false
@@ -2479,12 +2479,12 @@ resourceTypes:
                   WARNING! Deprecated. [AVOID USING] Completely removes facility type approved
                   product. This action is not recoverable.
                 queryParameters:
-                    versionId:
+                    versionNumber:
                         description: >
                           Specify which version of the resource should be deleted. Please be advised
                           that if the given version does not exist, the endpoint will return
                           the Not Found error message.
-                        displayName: versionId
+                        displayName: versionNumber
                         type: integer
                         required: false
                         repeat: false

@@ -68,7 +68,7 @@ public class FacilityTypeApprovedProductSearchParamsTest {
 
     // then
     for (VersionIdentityDto identity : searchParams.getIdentities()) {
-      assertThat(pairs).contains(ImmutablePair.of(identity.getId(), identity.getVersionId()));
+      assertThat(pairs).contains(ImmutablePair.of(identity.getId(), identity.getVersionNumber()));
     }
   }
 

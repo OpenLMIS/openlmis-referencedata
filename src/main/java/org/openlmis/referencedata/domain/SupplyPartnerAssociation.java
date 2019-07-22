@@ -64,7 +64,7 @@ public final class SupplyPartnerAssociation extends BaseEntity {
       joinColumns = @JoinColumn(name = "supplyPartnerAssociationId", nullable = false),
       inverseJoinColumns = {
           @JoinColumn(name = "orderableId", nullable = false),
-          @JoinColumn(name = "orderableVersionId", nullable = false)
+          @JoinColumn(name = "orderableVersionNumber", nullable = false)
       })
   @BatchSize(size = 25)
   private Set<Orderable> orderables = Sets.newHashSet();
