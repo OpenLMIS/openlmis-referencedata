@@ -192,17 +192,17 @@ public class OrderableController extends BaseController {
   @GetMapping(RESOURCE_PATH + "/{id}")
   public OrderableDto getChosenOrderable(
       @PathVariable("id") UUID productId,
-      @RequestParam(required = false, value = "versionNumber") Long versionId) {
+      @RequestParam(required = false, value = "versionNumber") Long versionNumber) {
     Profiler profiler = new Profiler("GET_ORDERABLE");
     profiler.setLogger(XLOGGER);
 
     Orderable orderable;
-    if (null == versionId) {
+    if (null == versionNumber) {
       profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID");
       orderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(productId);
     } else {
       profiler.start("FIND_ORDERABLE_BY_IDENTITY_ID_AND_VERSION_NAME");
-      orderable = repository.findByIdentityIdAndIdentityVersionNumber(productId, versionId);
+      orderable = repository.findByIdentityIdAndIdentityVersionNumber(productId, versionNumber);
     }
 
     if (orderable == null) {

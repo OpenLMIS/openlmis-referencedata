@@ -98,8 +98,8 @@ public class FacilityTypeApprovedProduct implements Versionable {
    *
    * @param id - the resource's UUID. The random UUID will be generated if the null value was
    *             passed.
-   * @param versionId - the resource's version number. The 1 value will be used if the null value
-   *                    was passed.
+   * @param versionNumber - the resource's version number. The 1 value will be used if the null
+   *                        value was passed.
    * @param orderableId - the {@link Orderable} UUID.
    * @param program - the {@link Program} instance.
    * @param facilityType - The {@link FacilityType} instance.
@@ -107,9 +107,9 @@ public class FacilityTypeApprovedProduct implements Versionable {
    * @param active - true if this resource should be active; otherwise false. The true value will be
    *                 used if the null value was passed.
    */
-  public FacilityTypeApprovedProduct(UUID id, Long versionId, UUID orderableId,
+  public FacilityTypeApprovedProduct(UUID id, Long versionNumber, UUID orderableId,
       Program program, FacilityType facilityType, Double maxPeriodsOfStock, Boolean active) {
-    this.identity = new VersionIdentity(id, versionId);
+    this.identity = new VersionIdentity(id, versionNumber);
     this.orderableId = orderableId;
     this.program = program;
     this.facilityType = facilityType;

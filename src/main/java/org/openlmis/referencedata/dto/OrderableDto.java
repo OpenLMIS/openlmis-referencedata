@@ -120,8 +120,8 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
   }
 
   @Override
-  public void setVersionNumber(Long versionId) {
-    meta.setVersionNumber(versionId);
+  public void setVersionNumber(Long versionNumber) {
+    meta.setVersionNumber(versionNumber);
   }
 
   @Override

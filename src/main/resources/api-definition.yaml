@@ -740,7 +740,7 @@ resourceTypes:
               description: Get chosen orderable. If versionNumber is omitted, returns newest version.
               queryParameters:
                   versionNumber:
-                      displayName: Version ID
+                      displayName: Version Number
                       type: integer
                       description: Version of orderable
                       example: 1

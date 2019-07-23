@@ -149,16 +149,16 @@ public class Orderable implements Versionable {
    * @param packRoundingThreshold pack rounding threshold
    * @param roundToZero round to zero
    * @param id id
-   * @param versionId version id
+   * @param versionNumber version number
    */
   public Orderable(Code productCode, Dispensable dispensable, long netContent,
-      long packRoundingThreshold, boolean roundToZero, UUID id, Long versionId) {
+      long packRoundingThreshold, boolean roundToZero, UUID id, Long versionNumber) {
     this.productCode = productCode;
     this.dispensable = dispensable;
     this.netContent = netContent;
     this.packRoundingThreshold = packRoundingThreshold;
     this.roundToZero = roundToZero;
-    this.identity = new VersionIdentity(id, versionId);
+    this.identity = new VersionIdentity(id, versionNumber);
     this.lastUpdated = ZonedDateTime.now();
   }
 
