@@ -60,9 +60,6 @@ public final class QueryFacilityTypeApprovedProductSearchParams implements
    */
   @Override
   public Set<String> getFacilityTypeCodes() {
-    if (!queryParams.containsKey(FACILITY_TYPE)) {
-      return null;
-    }
     return queryParams.getStrings(FACILITY_TYPE);
   }
 
