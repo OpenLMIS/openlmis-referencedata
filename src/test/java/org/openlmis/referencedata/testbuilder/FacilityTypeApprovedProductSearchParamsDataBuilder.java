@@ -16,24 +16,33 @@
 package org.openlmis.referencedata.testbuilder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.assertj.core.util.Lists;
+import org.assertj.core.util.Sets;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.FacilityTypeApprovedProductSearchParams;
 
 public class FacilityTypeApprovedProductSearchParamsDataBuilder {
 
-  private List<String> facilityTypeCodes = Lists.newArrayList();
+  private Set<String> facilityTypeCodes = Sets.newHashSet();
   private String programCode;
   private Boolean active;
   private List<VersionIdentityDto> identities = Lists.newArrayList();
+  private Set<UUID> orderableIds = Sets.newHashSet();
   private int page = Pagination.DEFAULT_PAGE_NUMBER;
   private int size = Pagination.NO_PAGINATION;
 
   public FacilityTypeApprovedProductSearchParamsDataBuilder withFacilityTypeCode(
       String facilityTypeCode) {
     this.facilityTypeCodes.add(facilityTypeCode);
+    return this;
+  }
+
+  public FacilityTypeApprovedProductSearchParamsDataBuilder withOrderableIds(
+      Set<UUID> orderableIds) {
+    this.orderableIds.addAll(orderableIds);
     return this;
   }
 
@@ -64,6 +73,6 @@ public class FacilityTypeApprovedProductSearchParamsDataBuilder {
 
   public FacilityTypeApprovedProductSearchParams build() {
     return new FacilityTypeApprovedProductSearchParams(
-        facilityTypeCodes, programCode, active, identities, page, size);
+        facilityTypeCodes, programCode, active, identities, orderableIds, page, size);
   }
 }

@@ -17,13 +17,11 @@ package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
 import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_LACK_PARAMS;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,8 +38,10 @@ public final class QueryFacilityTypeApprovedProductSearchParams implements
   private static final String FACILITY_TYPE = "facilityType";
   private static final String PROGRAM = "program";
   private static final String ACTIVE = "active";
+  private static final String ORDERABLE_ID = "orderableId";
 
-  private static final List<String> ALL_PARAMETERS = asList(FACILITY_TYPE, PROGRAM, ACTIVE);
+  private static final List<String> ALL_PARAMETERS =
+      asList(FACILITY_TYPE, PROGRAM, ACTIVE, ORDERABLE_ID);
 
   private SearchParams queryParams;
 
@@ -57,15 +57,23 @@ public final class QueryFacilityTypeApprovedProductSearchParams implements
    * Gets {@link List} of {@link String} for "facilityType" key from params.
    *
    * @return list of string values of facility type codes
-   * @throws ValidationMessageException if params doesn't contain at least one "facilityType" key.
    */
   @Override
-  public List<String> getFacilityTypeCodes() {
-    return queryParams
-        .get(FACILITY_TYPE)
-        .stream()
-        .map(String::valueOf)
-        .collect(Collectors.toList());
+  public Set<String> getFacilityTypeCodes() {
+    if (!queryParams.containsKey(FACILITY_TYPE)) {
+      return null;
+    }
+    return queryParams.getStrings(FACILITY_TYPE);
+  }
+
+  /**
+   * Gets {@link Set} of {@link UUID} for "orderableId" key from params.
+   *
+   * @return List of orderable ids from params, empty if there is no "orderableId" param
+   */
+  @Override
+  public Set<UUID> getOrderableIds() {
+    return queryParams.getUuids(ORDERABLE_ID);
   }
 
   /**
@@ -106,10 +114,6 @@ public final class QueryFacilityTypeApprovedProductSearchParams implements
   public void validate() {
     if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
       throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
-    }
-
-    if (!queryParams.containsKey(FACILITY_TYPE)) {
-      throw new ValidationMessageException(ERROR_LACK_PARAMS);
     }
   }
 }

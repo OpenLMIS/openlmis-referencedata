@@ -149,8 +149,8 @@ public class SupplyPartnerBuilderTest {
 
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(
-            Collections.singletonList(facility.getType().getCode()),
-            program.getCode().toString(), null, null, DEFAULT_PAGE_NUMBER, NO_PAGINATION);
+            Sets.newHashSet(facility.getType().getCode()),
+            program.getCode().toString(), null, null, null,  DEFAULT_PAGE_NUMBER, NO_PAGINATION);
 
     when(facilityTypeApprovedProductRepository
         .searchProducts(eq(searchParams), any(Pageable.class)))

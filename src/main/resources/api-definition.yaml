@@ -2380,6 +2380,11 @@ resourceTypes:
               type: boolean
               required: false
               repeat: false
+            orderableId:
+              displayName: orderable ID
+              type: string
+              required: false
+              repeat: true
           responses:
             200:
                 description: The request is valid and a page of facility type approved products will be returned.

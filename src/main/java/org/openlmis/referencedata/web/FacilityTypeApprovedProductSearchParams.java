@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.web;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,19 +39,22 @@ public final class FacilityTypeApprovedProductSearchParams
     extends VersionableResourceSearchParams
     implements FacilityTypeApprovedProductRepositoryCustom.SearchParams {
 
-  private List<String> facilityTypeCodes;
+  private Set<String> facilityTypeCodes;
   private String programCode;
   private Boolean active;
+  private Set<UUID> orderableIds;
 
   /**
    * Default constructor to set all available parameters.
    */
-  public FacilityTypeApprovedProductSearchParams(List<String> facilityTypeCodes, String programCode,
-      Boolean active, List<VersionIdentityDto> identities, Integer page, Integer size) {
+  public FacilityTypeApprovedProductSearchParams(Set<String> facilityTypeCodes, String programCode,
+      Boolean active, List<VersionIdentityDto> identities, Set<UUID> orderableIds, Integer page,
+      Integer size) {
     super(identities, page, size);
     this.facilityTypeCodes = facilityTypeCodes;
     this.programCode = programCode;
     this.active = active;
+    this.orderableIds = orderableIds;
   }
 
   @JsonIgnore

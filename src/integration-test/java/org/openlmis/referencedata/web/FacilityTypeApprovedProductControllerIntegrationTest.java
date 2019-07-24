@@ -67,6 +67,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   private static final String FACILITY_TYPE_PARAM = "facilityType";
   private static final String PROGRAM_PARAM = "program";
+  private static final String ORDERABLE_PARAM = "orderableId";
 
   private Program program;
   private Orderable orderable;
@@ -423,6 +424,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .queryParam(FACILITY_TYPE_PARAM, facilityType1.getCode())
         .queryParam(PROGRAM_PARAM, program.getCode().toString())
+        .queryParam(ORDERABLE_PARAM, orderable.getId())
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -433,20 +435,6 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     assertEquals(1, response.getContent().size());
     assertEquals(ftapDto.getId().toString(),
         ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
-  }
-
-  @Test
-  public void shouldReturnBadRequestWhenInvalidSearchParamsAreProvidedInSearchEndpoint() {
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(HttpStatus.SC_BAD_REQUEST);
-
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test

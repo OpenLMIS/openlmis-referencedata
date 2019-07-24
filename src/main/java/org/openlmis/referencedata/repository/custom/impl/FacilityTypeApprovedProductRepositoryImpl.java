@@ -225,8 +225,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("programCode", searchParams.getProgramCode());
     }
 
+    builder.append(NATIVE_ORDERABLE_INNER_JOIN);
+    if (!isEmpty(searchParams.getOrderableIds())) {
+      builder.append(" AND o.id in (:orderableIds)");
+      params.put("orderableIds", searchParams.getOrderableIds());
+    }
+
     builder
-        .append(NATIVE_ORDERABLE_INNER_JOIN)
         .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN)
         .append(NATIVE_FACILITY_TYPE_INNER_JOIN);
 

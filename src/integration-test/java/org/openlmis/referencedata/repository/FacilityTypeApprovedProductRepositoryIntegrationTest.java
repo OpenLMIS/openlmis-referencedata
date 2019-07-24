@@ -32,6 +32,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -427,6 +428,21 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   }
 
   @Test
+  public void shouldSearchByOrderableIds() {
+    FacilityTypeApprovedProduct ftap1 = saveAndGetProduct(orderableFullSupply);
+    FacilityTypeApprovedProduct ftap2 = saveAndGetProduct(orderableNonFullSupply);
+
+    Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
+        new FacilityTypeApprovedProductSearchParamsDataBuilder()
+            .withOrderableIds(
+                Sets.newHashSet(orderableFullSupply.getId(), orderableNonFullSupply.getId()))
+            .build(),
+        null);
+    assertEquals(2, result.getContent().size());
+    assertTrue(result.getContent().containsAll(Lists.newArrayList(ftap1, ftap2)));
+  }
+
+  @Test
   public void shouldNotFindInactiveFtapWhenNoInactiveFtapSaved() {
     FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
         .withVersionNumber(1L)
@@ -772,6 +788,10 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
   private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,
                                                       boolean fullSupply) {
     return saveAndGetProduct(facilityType, fullSupply, program, true);
+  }
+
+  private FacilityTypeApprovedProduct saveAndGetProduct(Orderable orderable) {
+    return saveAndGetProduct(facilityType1, program, orderable);
   }
 
   private FacilityTypeApprovedProduct saveAndGetProduct(FacilityType facilityType,

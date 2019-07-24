@@ -174,18 +174,17 @@ public class SupplyPartnerBuilder
    */
   private void validateOrderables(Program program, Collection<Facility> facilities,
       Collection<Orderable> orderables) {
-    List<String> facilityTypeCodes = facilities
+    Set<String> facilityTypeCodes = facilities
         .stream()
         .map(Facility::getType)
         .map(FacilityType::getCode)
-        .distinct()
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
 
     String programCode = program.getCode().toString();
 
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(facilityTypeCodes, programCode, null, null,
-            DEFAULT_PAGE_NUMBER, NO_PAGINATION);
+            null, DEFAULT_PAGE_NUMBER, NO_PAGINATION);
 
     Set<UUID> approvedProductIds = facilityTypeApprovedProductRepository
         .searchProducts(searchParams, searchParams.getPageable())

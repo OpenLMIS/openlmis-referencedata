@@ -32,13 +32,15 @@ public interface FacilityTypeApprovedProductRepositoryCustom {
 
   interface SearchParams {
 
-    List<String> getFacilityTypeCodes();
+    Set<String> getFacilityTypeCodes();
 
     String getProgramCode();
 
     Boolean getActive();
 
     Set<Pair<UUID, Long>> getIdentityPairs();
+
+    Set<UUID> getOrderableIds();
 
   }
 }

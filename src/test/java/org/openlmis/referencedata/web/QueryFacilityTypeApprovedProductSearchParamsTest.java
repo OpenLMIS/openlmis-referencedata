@@ -16,9 +16,10 @@
 package org.openlmis.referencedata.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.javers.common.collections.Sets.asSet;
 import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_INVALID_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys.ERROR_LACK_PARAMS;
 
+import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Before;
@@ -37,6 +38,7 @@ public class QueryFacilityTypeApprovedProductSearchParamsTest {
   private static final String FACILITY_TYPE = "facilityType";
   private static final String PROGRAM = "program";
   private static final String ACTIVE = "active";
+  private static final String ORDERABLE_ID = "orderableId";
 
   private LinkedMultiValueMap<String, Object> queryMap;
 
@@ -57,22 +59,24 @@ public class QueryFacilityTypeApprovedProductSearchParamsTest {
   }
 
   @Test
-  public void shouldThrowExceptionIfMapHasNoFacilityTypeProperty() {
-    queryMap.clear();
-
-    exception.expect(ValidationMessageException.class);
-    exception.expectMessage(ERROR_LACK_PARAMS);
-
-    new QueryFacilityTypeApprovedProductSearchParams(queryMap);
-  }
-
-  @Test
   public void shouldGetProgramValueFromParameters() {
     queryMap.add(PROGRAM, "name");
     QueryFacilityTypeApprovedProductSearchParams params
         = new QueryFacilityTypeApprovedProductSearchParams(queryMap);
 
     assertThat(params.getProgramCode()).isEqualTo("name");
+  }
+
+  @Test
+  public void shouldGetOrderableIdsValueFromParameters() {
+    UUID firstOrderableId = UUID.randomUUID();
+    UUID secondOrderableId = UUID.randomUUID();
+    queryMap.add(ORDERABLE_ID,firstOrderableId.toString());
+    queryMap.add(ORDERABLE_ID, secondOrderableId.toString());
+    QueryFacilityTypeApprovedProductSearchParams params
+        = new QueryFacilityTypeApprovedProductSearchParams(queryMap);
+
+    assertThat(params.getOrderableIds()).isEqualTo(asSet(firstOrderableId, secondOrderableId));
   }
 
   @Test
@@ -116,6 +120,6 @@ public class QueryFacilityTypeApprovedProductSearchParamsTest {
         = new QueryFacilityTypeApprovedProductSearchParams(queryMap);
 
     ToStringTestUtils.verify(QueryFacilityTypeApprovedProductSearchParams.class, params,
-        "FACILITY_TYPE", "PROGRAM", "ACTIVE", "ALL_PARAMETERS");
+        "FACILITY_TYPE", "PROGRAM", "ACTIVE", "ALL_PARAMETERS", "ORDERABLE_ID");
   }
 }
