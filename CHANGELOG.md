@@ -17,6 +17,7 @@ New functionality added in a backwards-compatible manner:
   * To use this feature please use the new `POST /api/orderables/search` endpoint
   * For now, both `id` and `versionNumber` fields must be provided in the request body to find an orderable
 * [OLMIS-6463](https://openlmis.atlassian.net/browse/OLMIS-6463): Updated GET /facilityTypeApproveProducts to enable searching by orderableId.
+* [OLMIS-6471](https://openlmis.atlassian.net/browse/OLMIS-6471): Added new LOTS_MANAGE right. Assigned to System Administrator role by default.
 
 Bug fixes:
 * [OLMIS-6188](https://openlmis.atlassian.net/browse/OLMIS-6188): Added validation for name when creating a processing period.

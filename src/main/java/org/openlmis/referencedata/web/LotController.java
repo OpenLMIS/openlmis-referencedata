@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.domain.RightName.LOTS_MANAGE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +80,7 @@ public class LotController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   @ResponseBody
   public LotDto createLot(@RequestBody LotDto lotDto, BindingResult bindingResult) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
+    rightService.checkAdminRight(LOTS_MANAGE);
 
     validator.validate(lotDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
@@ -105,7 +105,7 @@ public class LotController extends BaseController {
   @ResponseBody
   public LotDto updateLot(@RequestBody LotDto lotDto, @PathVariable("id") UUID lotId,
                        BindingResult bindingResult) {
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
+    rightService.checkAdminRight(LOTS_MANAGE);
 
     Lot existingLot = lotRepository.findOne(lotId);
     if (existingLot == null) {
@@ -195,7 +195,7 @@ public class LotController extends BaseController {
           boolean returnJson,
       Pageable page) {
 
-    rightService.checkAdminRight(ORDERABLES_MANAGE);
+    rightService.checkAdminRight(LOTS_MANAGE);
 
     //Return a 404 if the specified instance can't be found
     Lot instance = lotRepository.findOne(id);
