@@ -32,7 +32,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
+import static org.openlmis.referencedata.domain.RightName.LOTS_MANAGE;
 import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_LOT_CODE_REQUIRED;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -92,7 +92,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldCreateNewLot() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+    mockUserHasRight(LOTS_MANAGE);
 
     given(lotRepository.search(null, null, lot.getLotCode(), null, null))
         .willReturn(Pagination.getPage(Collections.emptyList()));
@@ -119,7 +119,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectCreateNewLotIfUserHasNoRight() {
-    mockUserHasNoRight(ORDERABLES_MANAGE);
+    mockUserHasNoRight(LOTS_MANAGE);
 
     restAssured
             .given()
@@ -136,7 +136,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectCreateNewLotIfLotCodeIsEmpty() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+    mockUserHasRight(LOTS_MANAGE);
 
     lotDto.setLotCode("");
     String messageKey = restAssured
@@ -157,7 +157,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldUpdateLot() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+    mockUserHasRight(LOTS_MANAGE);
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
     given(lotRepository.search(null, null, lot.getLotCode(), null, null))
@@ -186,7 +186,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnNotFoundIfUpdatedLotDoesNotExist() {
-    mockUserHasRight(ORDERABLES_MANAGE);
+    mockUserHasRight(LOTS_MANAGE);
     when(lotRepository.findOne(lotId)).thenReturn(null);
 
     restAssured
@@ -205,7 +205,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRejectUpdateLotIfUserHasNoRight() {
-    mockUserHasNoRight(ORDERABLES_MANAGE);
+    mockUserHasNoRight(LOTS_MANAGE);
     when(lotRepository.findOne(lotId)).thenReturn(lot);
 
     restAssured
@@ -338,7 +338,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+        .checkAdminRight(RightName.LOTS_MANAGE);
     given(lotRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -350,7 +350,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+        .checkAdminRight(RightName.LOTS_MANAGE);
     given(lotRepository.findOne(any(UUID.class))).willReturn(null);
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
@@ -362,7 +362,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetAuditLog() {
     doNothing()
         .when(rightService)
-        .checkAdminRight(RightName.ORDERABLES_MANAGE);
+        .checkAdminRight(RightName.LOTS_MANAGE);
     given(lotRepository.findOne(any(UUID.class))).willReturn(lot);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
