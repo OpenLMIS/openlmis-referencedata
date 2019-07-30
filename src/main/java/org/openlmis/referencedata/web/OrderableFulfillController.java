@@ -22,8 +22,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.UuidUtil;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -52,6 +57,12 @@ public class OrderableFulfillController extends BaseController {
   @Autowired
   private OrderableFulfillFactory orderableFulfillFactory;
 
+  @Autowired
+  private TradeItemRepository tradeItemRepository;
+
+  @Autowired
+  private CommodityTypeRepository commodityTypeRepository;
+
   /**
    * Gets orderable fulfills.
    */
@@ -65,9 +76,12 @@ public class OrderableFulfillController extends BaseController {
     Set<UUID> ids = UuidUtil.getIds(requestParams);
     Map<UUID, OrderableFulfill> map = Maps.newHashMap();
 
+    Iterable<TradeItem> tradeItems = tradeItemRepository.findAll();
+    Iterable<CommodityType> commodityTypes = commodityTypeRepository.findAll();
+
     handlePage(
         pageable -> getOrderables(ids, profiler, pageable),
-        orderable -> addEntry(map, orderable)
+        orderable -> addEntry(map, orderable, tradeItems, commodityTypes)
     );
 
     profiler.stop().log();
@@ -81,9 +95,10 @@ public class OrderableFulfillController extends BaseController {
         : orderableRepository.findAllLatestByIds(ids, pageable);
   }
 
-  private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable) {
+  private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable,
+                        Iterable<TradeItem> tradeItems, Iterable<CommodityType> commodityTypes) {
     Optional
-        .ofNullable(orderableFulfillFactory.createFor(orderable))
+        .ofNullable(orderableFulfillFactory.createFor(orderable, tradeItems, commodityTypes))
         .ifPresent(resource -> map.put(orderable.getId(), resource));
   }
 
