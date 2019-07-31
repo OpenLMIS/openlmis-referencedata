@@ -35,7 +35,7 @@ Improvements:
 * [OLMIS-6414](https://openlmis.atlassian.net/browse/OLMIS-6414): Added missing FTAPs to demo data.
 * [OLMIS-6408](https://openlmis.atlassian.net/browse/OLMIS-6408): Added pageable validator.
 * [OLMIS-6402](https://openlmis.atlassian.net/browse/OLMIS-6402): Renamed versionId field to versionNumber.
-* [OLMIS-6474](https://openlmis.atlassian.net/browse/OLMIS-6474): Extracted fetching commodity types and trade items above the loop.
+* [OLMIS-6474](https://openlmis.atlassian.net/browse/OLMIS-6474): Performance improvements of `GET /api/orderableFulfills` endpoint. 
 
 13.0.0 / 2019-05-27
 ==================
