@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -35,6 +36,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
@@ -46,6 +48,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -190,9 +193,11 @@ public class OrderableController extends BaseController {
    * @return chosen product
    */
   @GetMapping(RESOURCE_PATH + "/{id}")
-  public OrderableDto getChosenOrderable(
+  public ResponseEntity<OrderableDto> getChosenOrderable(
       @PathVariable("id") UUID productId,
-      @RequestParam(required = false, value = "versionNumber") Long versionNumber) {
+      @RequestParam(required = false, value = "versionNumber") Long versionNumber,
+      @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+          String ifModifiedDate) {
     Profiler profiler = new Profiler("GET_ORDERABLE");
     profiler.setLogger(XLOGGER);
 
@@ -205,12 +210,18 @@ public class OrderableController extends BaseController {
       orderable = repository.findByIdentityIdAndIdentityVersionNumber(productId, versionNumber);
     }
 
+    profiler.stop().log();
     if (orderable == null) {
-      profiler.stop().log();
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     } else {
-      profiler.stop().log();
-      return OrderableDto.newInstance(orderable);
+      return (ifModifiedDate == null
+          || orderable.wasModifiedSince(parseHttpDateToZonedDateTime(ifModifiedDate)))
+          ? ResponseEntity.ok()
+              .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+              .body(OrderableDto.newInstance(orderable))
+          : ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+              .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+              .build();
     }
   }
 
@@ -245,4 +256,11 @@ public class OrderableController extends BaseController {
 
     return getAuditLogResponse(Orderable.class, id, author, changedPropertyName, page, returnJson);
   }
+
+  private HttpHeaders buildLastModifiedHeader(ZonedDateTime lastUpdated) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLastModified(lastUpdated.toInstant().toEpochMilli());
+    return headers;
+  }
+
 }

@@ -280,6 +280,17 @@ public class Orderable implements Versionable {
   }
 
   /**
+   * Checks whether this resource was modified since the provided date. If date is null,
+   * this method will always return true.
+   *
+   * @param date date to check against, can be null
+   * @return true if resource was modified since the provided date, false otherwise
+   */
+  public boolean wasModifiedSince(ZonedDateTime date) {
+    return date == null || lastUpdated.isAfter(date);
+  }
+
+  /**
    * Determines equality based on product codes.
    *
    * @param object another Orderable, ideally.

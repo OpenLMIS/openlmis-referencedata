@@ -30,6 +30,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
+import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -99,6 +100,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private UUID orderableId = UUID.randomUUID();
   private Long orderableVersionNumber = 1L;
+  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of("UTC"));
 
   @Before
   @Override
@@ -108,7 +110,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
         10, 5, false, orderableId, orderableVersionNumber);
     orderable.setProgramOrderables(Collections.emptyList());
-    orderable.setLastUpdated(ZonedDateTime.now(ZoneId.of("UTC")));
+    orderable.setLastUpdated(modifiedDate);
     orderable.export(orderableDto);
 
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);
@@ -467,6 +469,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ID_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableId, response.getId());
@@ -488,6 +491,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ID_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableId, response.getId());
@@ -496,8 +500,46 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  // POST /orderables/search
+  @Test
+  public void shouldReturnOrderableIfResourceWasModified() {
+    OrderableDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MODIFIED_SINCE, modifiedDate.minusHours(1).format(RFC_7231_FORMAT))
+        .pathParam(ID, orderableId)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
+        .extract().as(OrderableDto.class);
 
+    assertEquals(orderableId, response.getId());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotModifiedAndNoResponseBodyWhenResourceWasNotModified() {
+    when(orderableRepository.findByIdentityIdAndIdentityVersionNumber(
+        orderable.getId(), orderableVersionNumber)).thenReturn(orderable);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MODIFIED_SINCE, modifiedDate.format(RFC_7231_FORMAT))
+        .pathParam(ID, orderableId)
+        .queryParam(VERSION_NAME, orderableVersionNumber)
+        .when()
+        .get(ID_URL)
+        .then()
+        .statusCode(304)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  // POST /orderables/search
   @Test
   public void shouldPostSearchOrderables() {
     OrderableSearchParams searchParams = new OrderableSearchParams(

@@ -19,6 +19,9 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_INCORRECT_FILE_FORMAT;
 import static org.openlmis.referencedata.web.BaseController.API_PATH;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -50,6 +53,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping(API_PATH)
 public abstract class BaseController {
 
+  public static final DateTimeFormatter RFC_7231_FORMAT =
+      DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z").withZone(ZoneId.of("GMT"));
   public static final String API_PATH = "/api";
 
   @Autowired
@@ -180,6 +185,10 @@ public abstract class BaseController {
 
   protected void expandDto(Object dto, BaseEntity entity, Set<String> expands) {
     objectReferenceExpander.expandDto(dto, entity, expands);
+  }
+
+  protected ZonedDateTime parseHttpDateToZonedDateTime(String httpDate) {
+    return ZonedDateTime.parse(httpDate, RFC_7231_FORMAT);
   }
 
   void validateCsvFile(MultipartFile csvFile) {

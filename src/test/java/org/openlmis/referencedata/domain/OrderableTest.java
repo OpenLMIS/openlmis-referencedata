@@ -16,12 +16,16 @@
 package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.UUID;
 import org.joda.money.CurrencyUnit;
 import org.junit.Test;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class OrderableTest {
   private static final String IBUPROFEN = "ibuprofen";
   private static final String EACH = "each";
@@ -131,5 +135,46 @@ public class OrderableTest {
 
     packsToOrder = product.packsToOrder(251);
     assertEquals(3, packsToOrder);
+  }
+
+  @Test
+  public void shouldIndicateResourceWasModifiedIfCheckedDateIsNull() {
+    Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), 10, 7,
+        true, UUID.randomUUID(), 1L);
+
+    assertTrue(product.wasModifiedSince(null));
+  }
+
+  @Test
+  public void shouldIndicateResourceWasModifiedIfDateIsBeforeModificationDate() {
+    Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), 10, 7,
+        true, UUID.randomUUID(), 1L);
+
+    ZonedDateTime now = ZonedDateTime.now();
+    product.setLastUpdated(now);
+
+    assertTrue(product.wasModifiedSince(now.minusMinutes(1)));
+  }
+
+  @Test
+  public void shouldIndicateResourceWasNotModifiedIfDatesAreTheSame() {
+    Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), 10, 7,
+        true, UUID.randomUUID(), 1L);
+
+    ZonedDateTime now = ZonedDateTime.now();
+    product.setLastUpdated(now);
+
+    assertFalse(product.wasModifiedSince(now));
+  }
+
+  @Test
+  public void shouldIndicateResourceWasNotModifiedIfDateIsAfterModificationDate() {
+    Orderable product = new Orderable(Code.code(IBUPROFEN), Dispensable.createNew(EACH), 10, 7,
+        true, UUID.randomUUID(), 1L);
+
+    ZonedDateTime now = ZonedDateTime.now();
+    product.setLastUpdated(now);
+
+    assertFalse(product.wasModifiedSince(now.plusDays(1)));
   }
 }

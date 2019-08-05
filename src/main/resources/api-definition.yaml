@@ -750,6 +750,8 @@ resourceTypes:
                       body:
                         application/json:
                             schema: orderable
+                  "304":
+                      description: Returned with no response body if resource was not modified since date provided in the If-Modified-Since request header.
                   "401":
                       body:
                         application/json:
