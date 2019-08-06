@@ -18,6 +18,9 @@ reporting:
   - module: passfail
     criteria:
     - failures>0%, stop as failed
+  - module: junit-xml
+    filename: /tmp/artifacts/xunit.xml
+    data-source: sample-labels
 # the following scenarios are common for all performance tests
 # scenarios related with one of available resources should be
 # put in separate file in `tests` directory
