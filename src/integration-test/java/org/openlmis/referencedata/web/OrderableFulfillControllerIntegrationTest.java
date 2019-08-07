@@ -20,10 +20,13 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.ValidatableResponse;
+
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +53,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldCreateResourceForTradeItem() {
     orderable.setId(tradeItemOrderableId);
-    given(factory.createFor(orderable))
+    given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofTradeItem(commodityTypeOrderableId));
 
     String canFulfillForMeField = tradeItemOrderableId + ".canFulfillForMe";
@@ -65,7 +68,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldCreateResourceForCommodityType() {
     orderable.setId(commodityTypeOrderableId);
-    given(factory.createFor(orderable))
+    given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
 
     String canBeFulfilledByMeField = commodityTypeOrderableId + ".canBeFulfilledByMe";

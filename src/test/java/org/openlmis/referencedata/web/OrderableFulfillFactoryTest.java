@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -23,9 +24,11 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
-import static org.openlmis.referencedata.util.Pagination.DEFAULT_PAGE_NUMBER;
 
 import com.google.common.collect.Lists;
+
+import java.util.ArrayList;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -40,10 +43,6 @@ import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableFulfillFactoryTest {
@@ -73,17 +72,15 @@ public class OrderableFulfillFactoryTest {
       .withIdentifier(COMMODITY_TYPE, commodityType.getId())
       .build();
 
-  private Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
-
   @Test
   public void shouldCreateResourceForTradeItem() {
     when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
-    when(commodityTypeRepository.findAll(pageable)).thenReturn(getPage(commodityType));
     when(orderableRepository.findAllLatestByIdentifier(
         COMMODITY_TYPE, commodityType.getId().toString()))
         .thenReturn(Lists.newArrayList(commodityTypeOrderable));
 
-    OrderableFulfill response = factory.createFor(tradeItemOrderable);
+    OrderableFulfill response = factory.createFor(tradeItemOrderable, new ArrayList<>(),
+            singletonList(commodityType));
     assertThat(response.getCanFulfillForMe(), hasSize(0));
     assertThat(response.getCanBeFulfilledByMe(), hasSize(1));
     assertThat(response.getCanBeFulfilledByMe(), hasItem(commodityTypeOrderable.getId()));
@@ -92,11 +89,11 @@ public class OrderableFulfillFactoryTest {
   @Test
   public void shouldCreateResourceForCommodityType() {
     when(commodityTypeRepository.findOne(commodityType.getId())).thenReturn(commodityType);
-    when(tradeItemRepository.findAll(pageable)).thenReturn(getPage(tradeItem));
     when(orderableRepository.findAllLatestByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
         .thenReturn(Lists.newArrayList(tradeItemOrderable));
 
-    OrderableFulfill response = factory.createFor(commodityTypeOrderable);
+    OrderableFulfill response = factory.createFor(commodityTypeOrderable, singletonList(tradeItem),
+            new ArrayList<>());
     assertThat(response.getCanFulfillForMe(), hasSize(1));
     assertThat(response.getCanFulfillForMe(), hasItem(tradeItemOrderable.getId()));
     assertThat(response.getCanBeFulfilledByMe(), hasSize(0));
@@ -104,12 +101,8 @@ public class OrderableFulfillFactoryTest {
 
   @Test
   public void shouldNotCreateResourceIfThereAreNoIdentifiers() {
-    OrderableFulfill response = factory.createFor(new OrderableDataBuilder().build());
+    OrderableFulfill response = factory.createFor(new OrderableDataBuilder().build(),
+            new ArrayList<>(), new ArrayList<>());
     assertThat(response, is(nullValue()));
-  }
-
-  @SafeVarargs
-  private final <T> Page<T> getPage(T... instance) {
-    return new PageImpl<>(Lists.newArrayList(instance));
   }
 }
