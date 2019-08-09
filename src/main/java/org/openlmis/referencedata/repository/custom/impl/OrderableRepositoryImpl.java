@@ -73,6 +73,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String NATIVE_SELECT_ORDERABLES_BY_IDENTITES = "SELECT o.*"
       + FROM_ORDERABLES_TABLE;
 
+  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
+      + " DESC LIMIT 1";
+
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
   private static final String NATIVE_PRODUCT_CODE = "LOWER(o.code) LIKE :orderableCode";
@@ -113,10 +116,42 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("RETRIEVE_ORDERABLES");
-    List<Orderable> orderables = retrieveOrderables(identities);
+    List<Orderable> orderables = retrieveOrderables(identities, false);
 
     profiler.stop().log();
     return Pagination.getPage(orderables, pageable, total);
+  }
+
+  /**
+   * This method is supposed to get the latest last update date from the retrieved orderables
+   * based on params passed to the request.
+   *
+   * @return ZonedDateTime of the latest last updated orderable.
+   */
+  @Override
+  public List<Orderable> findOrderablesWithLatestModifiedDate(SearchParams searchParams,
+      Pageable pageable) {
+    Profiler profiler = new Profiler("ORDERABLE_REPOSITORY_SEARCH_LATEST_DATE_BY_PARAMS");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("CALCULATE_FULL_LIST_SIZE");
+    Query countNativeQuery = prepareNativeQuery(searchParams, true, pageable);
+    int total = ((Number) countNativeQuery.getSingleResult()).intValue();
+
+    if (total <= 0) {
+      profiler.stop().log();
+      return Collections.emptyList();
+    }
+
+    profiler.start("GET_VERSION_IDENTITY");
+    Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
+    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+
+    profiler.start("GET_ORDERABLE_WITH_LATEST_LAST_UPDATE_DATE_FROM_ORDERABLES");
+    List<Orderable> orderables = retrieveOrderables(identities, true);
+
+    profiler.stop().log();
+    return orderables;
   }
 
   private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {
@@ -202,14 +237,20 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   // appropriate class has been passed in the EntityManager.createNativeQuery method
   @SuppressWarnings("unchecked")
-  private List<Orderable> retrieveOrderables(Collection<Pair<UUID, Long>> identities) {
+  private List<Orderable> retrieveOrderables(Collection<Pair<UUID, Long>> identities,
+      Boolean date) {
     String hql = NATIVE_SELECT_ORDERABLES_BY_IDENTITES + WHERE + identities
         .stream()
         .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
         .collect(Collectors.joining(OR));
 
+    if (date) {
+      hql += ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
+    }
+
     return entityManager
         .createNativeQuery(hql, Orderable.class)
         .getResultList();
   }
+
 }

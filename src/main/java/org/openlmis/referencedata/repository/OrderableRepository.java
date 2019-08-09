@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository;
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +35,7 @@ import org.springframework.data.repository.query.Param;
 /**
  * Persistence repository for saving/finding {@link Orderable}.
  */
+@SuppressWarnings({"PMD.TooManyMethods"})
 public interface OrderableRepository extends
     JpaRepository<Orderable, VersionIdentity>, OrderableRepositoryCustom,
     BaseAuditableRepository<Orderable, VersionIdentity> {
@@ -67,6 +69,37 @@ public interface OrderableRepository extends
       nativeQuery = true
   )
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
+
+  @Query(value = SELECT_ORDERABLE
+      + FROM_ORDERABLES_CLAUSE
+      + JOIN_WITH_LATEST_ORDERABLE
+      + " JOIN"
+      + " (SELECT MAX(lastupdated) AS lastUpdated"
+      + " FROM ("
+      + SELECT_ORDERABLE
+      + FROM_ORDERABLES_CLAUSE
+      + " WHERE o.id IN :ids)"
+      + " AS passedOrderables"
+      + " ) AS maxLastUpdated"
+      + " ON o.lastupdated = maxLastUpdated.lastupdated"
+      + ORDER_BY_PAGEABLE,
+      nativeQuery = true
+  )
+  List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids,
+      Pageable pageable);
+
+  @Query(value = SELECT_ORDERABLE
+      + FROM_ORDERABLES_CLAUSE
+      + JOIN_WITH_LATEST_ORDERABLE
+      + " JOIN"
+      + " (SELECT MAX(lastupdated) AS lastUpdated"
+      + FROM_ORDERABLES_CLAUSE
+      + " ) AS maxLastUpdated"
+      + " ON o.lastupdated = maxLastUpdated.lastupdated"
+      + ORDER_BY_PAGEABLE,
+      nativeQuery = true
+  )
+  List<Orderable> findOrderableWithLatestModifiedDateOfAllOrderables(Pageable pageable);
 
   @Query(value = "SELECT o.*"
       + FROM_ORDERABLES_CLAUSE

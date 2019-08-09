@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +51,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableServiceTest {
 
   private static final String CODE = "code";
@@ -72,6 +75,7 @@ public class OrderableServiceTest {
   private String programCode = "program-code";
   private List<Orderable> orderableList;
   private MultiValueMap<String, Object> searchParams = new LinkedMultiValueMap<>();
+  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of("UTC")).withNano(0);
 
   @InjectMocks
   private OrderableService orderableService = new OrderableService();
@@ -81,6 +85,8 @@ public class OrderableServiceTest {
     MockitoAnnotations.initMocks(this);
     orderableList = Lists.newArrayList(orderable1, orderable2);
     when(orderable2.getId()).thenReturn(orderableId);
+    when(orderable1.getLastUpdated()).thenReturn(modifiedDate.minusHours(1));
+    when(orderable2.getLastUpdated()).thenReturn(modifiedDate);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -105,6 +111,19 @@ public class OrderableServiceTest {
     searchParams.add(NAME, "-1");
     searchParams.add(PROGRAM_CODE, "program-code");
     orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfProgramCodeAndNameNotProvidedForGettingLastUpdatedDate() {
+    searchParams.add("parameter", false);
+    orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfProvidedAnyNotSupportedParameterWhenGettingLastUpdatedDate() {
+    searchParams.add("parameter", false);
+    searchParams.add("code", "123");
+    orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test
@@ -188,5 +207,85 @@ public class OrderableServiceTest {
 
     assertEquals(1, actual.getTotalElements());
     assertThat(actual, hasItem(orderable2));
+  }
+
+  @Test
+  public void shouldReturnLatestModifiedDateOfAllElementsIfNoSearchCriteriaProvided() {
+    // given
+    when(orderableRepository.findOrderableWithLatestModifiedDateOfAllOrderables(
+        any(Pageable.class))).thenReturn(Lists.newArrayList(orderable2));
+
+    // when
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+        new QueryOrderableSearchParams(searchParams), null);
+
+    // then
+    verify(orderableRepository).findOrderableWithLatestModifiedDateOfAllOrderables(
+        isNull(Pageable.class));
+    assertEquals(orderable2.getLastUpdated(), lastUpdated);
+  }
+
+  @Test
+  public void shouldReturnLatestModifiedDateOfAllElementsIfQueryMapIsNull() {
+    // given
+    when(orderableRepository.findOrderableWithLatestModifiedDateOfAllOrderables(
+        any(Pageable.class))).thenReturn(Lists.newArrayList(orderable2));
+
+    // when
+    final ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+        new QueryOrderableSearchParams(null), null);
+
+    // then
+    verify(orderableRepository).findOrderableWithLatestModifiedDateOfAllOrderables(
+        isNull(Pageable.class));
+    assertEquals(orderable2.getLastUpdated(), lastUpdated);
+  }
+
+  @Test
+  public void shouldReturnLatestModifiedDateWhenSearchingForOrderablesWithParams() {
+    // given
+    final String code = "ORD1";
+    final String name = "Orderable";
+
+    given(orderableRepository.findOrderablesWithLatestModifiedDate(
+        any(SearchParams.class),
+        any(Pageable.class)))
+        .willReturn(Lists.newArrayList(orderable2));
+
+    searchParams.add(CODE, code);
+    searchParams.add(NAME, name);
+    searchParams.add(PROGRAM_CODE, programCode);
+
+    QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
+
+    // when
+    final ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(queryMap, pageable);
+
+    //then
+    verify(orderableRepository).findOrderablesWithLatestModifiedDate(queryMap, pageable);
+
+    assertEquals(orderable2.getLastUpdated(), lastUpdated);
+  }
+
+  @Test
+  public void shouldFindLatestModifiedDateByOrderableIds() {
+    // given
+    given(orderableRepository.findOrderableWithLatestModifiedDateByIds(
+        anySetOf(UUID.class), any(Pageable.class)))
+        .willReturn(Lists.newArrayList(orderable2));
+
+    searchParams.add(ID, orderableId.toString());
+    UUID orderableId2 = UUID.randomUUID();
+    searchParams.add(ID, orderableId2.toString());
+
+    // when
+    final ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+        new QueryOrderableSearchParams(searchParams), pageable);
+
+    // then
+    verify(orderableRepository).findOrderableWithLatestModifiedDateByIds(
+        new HashSet<>(Arrays.asList(orderableId, orderableId2)), pageable);
+
+    assertEquals(orderable2.getLastUpdated(), lastUpdated);
   }
 }

@@ -724,6 +724,8 @@ resourceTypes:
                   body:
                     application/json:
                         schema: orderablePage
+              "304":
+                description: Returned with no response body if no resource was modified since date provided in the If-Modified-Since request header.
               "400":
                   body:
                     application/json:
@@ -804,6 +806,8 @@ resourceTypes:
                     body:
                         application/json:
                             schema: orderablePage
+                "304":
+                  description: Returned with no response body if no resource was modified since date provided in the If-Modified-Since request header.
                 401:
                     description: The request does not contain a token or the token might be invalid.
                     body:

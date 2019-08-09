@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,6 +26,9 @@ import org.springframework.data.domain.Pageable;
 public interface OrderableRepositoryCustom {
 
   Page<Orderable> search(SearchParams searchParams, Pageable pageable);
+
+  List<Orderable> findOrderablesWithLatestModifiedDate(SearchParams searchParams,
+      Pageable pageable);
 
   interface SearchParams {
 

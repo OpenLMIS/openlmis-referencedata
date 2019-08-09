@@ -137,27 +137,46 @@ public class OrderableController extends BaseController {
    * @return a page of orderables
    */
   @GetMapping(RESOURCE_PATH)
-  public Page<OrderableDto> findAll(@RequestParam MultiValueMap<String, Object> queryParams,
+  public ResponseEntity<Page<OrderableDto>> findAll(
+      @RequestParam MultiValueMap<String, Object> queryParams,
+      @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false) String ifModifiedDate,
       Pageable pageable) {
     XLOGGER.entry(queryParams, pageable);
     Profiler profiler = new Profiler("ORDERABLES_SEARCH");
     profiler.setLogger(XLOGGER);
 
-    XLOGGER.info("search orderable query params: {}", queryParams);
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryParams);
 
-    profiler.start("ORDERABLE_SERVICE_SEARCH");
-    Page<Orderable> orderablesPage =
-        orderableService.searchOrderables(new QueryOrderableSearchParams(queryParams), pageable);
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
+    ZonedDateTime lastUpdated = orderableService
+        .getLatestLastUpdatedDate(searchParams, pageable);
 
-    profiler.start("ORDERABLE_PAGINATION");
-    Page<OrderableDto> page = Pagination.getPage(
-        OrderableDto.newInstance(orderablesPage.getContent()),
-        pageable,
-        orderablesPage.getTotalElements());
+    if (ifModifiedDate == null
+        || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
+      XLOGGER.info("search orderable query params: {}", queryParams);
 
-    profiler.stop().log();
-    XLOGGER.exit(page);
-    return page;
+      profiler.start("ORDERABLE_SERVICE_SEARCH");
+      Page<Orderable> orderablesPage =
+          orderableService.searchOrderables(searchParams, pageable);
+
+      profiler.start("ORDERABLE_PAGINATION");
+      Page<OrderableDto> page = Pagination.getPage(
+          OrderableDto.newInstance(orderablesPage.getContent()),
+          pageable,
+          orderablesPage.getTotalElements());
+
+      profiler.stop().log();
+      XLOGGER.exit(page);
+      return ResponseEntity.ok()
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .body(page);
+    } else {
+      profiler.stop().log();
+      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .build();
+    }
+
   }
 
   /**
@@ -167,23 +186,42 @@ public class OrderableController extends BaseController {
    * @return a page of orderables matching the criteria
    */
   @PostMapping(RESOURCE_PATH + "/search")
-  public Page<OrderableDto> searchOrderables(@RequestBody OrderableSearchParams body) {
+  public ResponseEntity<Page<OrderableDto>> searchOrderables(
+      @RequestBody OrderableSearchParams body,
+      @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+          String ifModifiedDate) {
     Profiler profiler = new Profiler("ORDERABLES_SEARCH_POST");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("SEARCH_ORDERABLES");
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
     Pageable pageable = body.getPageable();
-    Page<Orderable> orderablesPage = repository.search(body, pageable);
+    ZonedDateTime lastUpdated = repository.findOrderablesWithLatestModifiedDate(body, pageable)
+        .get(0)
+        .getLastUpdated();
 
-    profiler.start("EXPORT_TO_DTO");
-    Page<OrderableDto> page = Pagination.getPage(
-        OrderableDto.newInstance(orderablesPage.getContent()),
-        pageable,
-        orderablesPage.getTotalElements());
+    if (ifModifiedDate == null
+        || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
+      profiler.start("SEARCH_ORDERABLES");
+      Page<Orderable> orderablesPage = repository.search(body, pageable);
 
-    profiler.stop().log();
-    XLOGGER.exit(page);
-    return page;
+      profiler.start("EXPORT_TO_DTO");
+      Page<OrderableDto> page = Pagination.getPage(
+          OrderableDto.newInstance(orderablesPage.getContent()),
+          pageable,
+          orderablesPage.getTotalElements());
+
+      profiler.stop().log();
+      XLOGGER.exit(page);
+      return ResponseEntity.ok()
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .body(page);
+    } else {
+      profiler.stop().log();
+      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .build();
+    }
+
   }
 
   /**
@@ -261,6 +299,10 @@ public class OrderableController extends BaseController {
     HttpHeaders headers = new HttpHeaders();
     headers.setLastModified(lastUpdated.toInstant().toEpochMilli());
     return headers;
+  }
+
+  public boolean wasModifiedSince(ZonedDateTime lastUpdated, ZonedDateTime date) {
+    return date == null || lastUpdated.isAfter(date);
   }
 
 }
