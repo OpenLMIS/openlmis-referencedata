@@ -627,6 +627,9 @@ public class OrderableRepositoryIntegrationTest {
     orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
     orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
     orderable3.setLastUpdated(ZonedDateTime.now());
+    repository.save(orderable1);
+    repository.save(orderable2);
+    repository.save(orderable3);
 
     //when
     Set<UUID> ids = newHashSet(orderable1.getId(), orderable2.getId(), orderable3.getId());
@@ -647,6 +650,9 @@ public class OrderableRepositoryIntegrationTest {
     orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
     orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
     orderable3.setLastUpdated(ZonedDateTime.now());
+    repository.save(orderable1);
+    repository.save(orderable2);
+    repository.save(orderable3);
 
     //when
     ZonedDateTime lastUpdated = repository.findOrderableWithLatestModifiedDateOfAllOrderables(null)
@@ -666,6 +672,9 @@ public class OrderableRepositoryIntegrationTest {
     orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
     orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
     orderable3.setLastUpdated(ZonedDateTime.now());
+    repository.save(orderable1);
+    repository.save(orderable2);
+    repository.save(orderable3);
 
     //when
     ZonedDateTime latestModifiedDate = repository.findOrderablesWithLatestModifiedDate(
