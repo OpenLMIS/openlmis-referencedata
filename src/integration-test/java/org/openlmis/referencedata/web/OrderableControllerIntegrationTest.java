@@ -131,6 +131,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableDto, response);
@@ -151,6 +152,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     response1.setNetContent(11L);
@@ -164,6 +166,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(String.join("/", RESOURCE_URL, response1.getId().toString()))
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(response1.getId(), response2.getId());
@@ -246,6 +249,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableDto, response);
@@ -270,6 +274,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(orderableDto, response);

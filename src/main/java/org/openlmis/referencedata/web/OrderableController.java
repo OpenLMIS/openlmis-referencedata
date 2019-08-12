@@ -19,6 +19,7 @@ import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
+
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -81,15 +82,25 @@ public class OrderableController extends BaseController {
    */
   @Transactional(isolation = Isolation.SERIALIZABLE)
   @PutMapping(RESOURCE_PATH)
-  public OrderableDto create(@RequestBody OrderableDto orderableDto,
+  public ResponseEntity<OrderableDto> create(
+      @RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
+
     rightService.checkAdminRight(ORDERABLES_MANAGE);
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
+    Profiler profiler = new Profiler("SAVE_ORDERABLE");
+    profiler.setLogger(XLOGGER);
 
-    return OrderableDto.newInstance(repository.save(orderable));
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
+    repository.save(orderable);
+
+    profiler.stop().log();
+
+    return ResponseEntity.ok()
+            .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+            .body(OrderableDto.newInstance(orderable));
   }
 
   /**
@@ -102,7 +113,8 @@ public class OrderableController extends BaseController {
    */
   @Transactional(isolation = Isolation.SERIALIZABLE)
   @PutMapping(RESOURCE_PATH + "/{id}")
-  public OrderableDto update(@PathVariable("id") UUID id,
+  public ResponseEntity<OrderableDto> update(
+      @PathVariable("id") UUID id,
       @RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
 
@@ -121,10 +133,13 @@ public class OrderableController extends BaseController {
     }
 
     Orderable savedOrderable = repository
-        .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
+            .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
     XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
-        id);
-    return OrderableDto.newInstance(savedOrderable);
+            id);
+
+    return ResponseEntity.ok()
+            .headers(buildLastModifiedHeader(savedOrderable.getLastUpdated()))
+            .body(OrderableDto.newInstance(savedOrderable));
   }
 
   /**
