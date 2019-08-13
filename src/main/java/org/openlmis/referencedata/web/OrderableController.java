@@ -81,15 +81,25 @@ public class OrderableController extends BaseController {
    */
   @Transactional(isolation = Isolation.SERIALIZABLE)
   @PutMapping(RESOURCE_PATH)
-  public OrderableDto create(@RequestBody OrderableDto orderableDto,
+  public ResponseEntity<OrderableDto> create(
+      @RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
+
     rightService.checkAdminRight(ORDERABLES_MANAGE);
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
+    Profiler profiler = new Profiler("SAVE_ORDERABLE");
+    profiler.setLogger(XLOGGER);
 
-    return OrderableDto.newInstance(repository.save(orderable));
+    Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
+    repository.save(orderable);
+
+    profiler.stop().log();
+
+    return ResponseEntity.ok()
+            .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+            .body(OrderableDto.newInstance(orderable));
   }
 
   /**
@@ -102,7 +112,8 @@ public class OrderableController extends BaseController {
    */
   @Transactional(isolation = Isolation.SERIALIZABLE)
   @PutMapping(RESOURCE_PATH + "/{id}")
-  public OrderableDto update(@PathVariable("id") UUID id,
+  public ResponseEntity<OrderableDto> update(
+      @PathVariable("id") UUID id,
       @RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
 
@@ -124,7 +135,10 @@ public class OrderableController extends BaseController {
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
     XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
         id);
-    return OrderableDto.newInstance(savedOrderable);
+
+    return ResponseEntity.ok()
+            .headers(buildLastModifiedHeader(savedOrderable.getLastUpdated()))
+            .body(OrderableDto.newInstance(savedOrderable));
   }
 
   /**

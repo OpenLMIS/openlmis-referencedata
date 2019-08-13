@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -123,17 +124,30 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
 
     OrderableDto response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderableDto)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(OrderableDto.class);
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(orderableDto)
+            .when()
+            .put(RESOURCE_URL)
+            .then()
+            .statusCode(200)
+            .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
+            .extract().as(OrderableDto.class);
 
-    assertEquals(orderableDto, response);
+    assertEquals(orderableDto.getProductCode(), response.getProductCode());
+    assertEquals(orderableDto.getDispensable(), response.getDispensable());
+    assertEquals(orderableDto.getFullProductName(), response.getFullProductName());
+    assertEquals(orderableDto.getDescription(), response.getDescription());
+    assertEquals(orderableDto.getNetContent(), response.getNetContent());
+    assertEquals(orderableDto.getPackRoundingThreshold(), response.getPackRoundingThreshold());
+    assertEquals(orderableDto.getRoundToZero(), response.getRoundToZero());
+    assertEquals(orderableDto.getPrograms(), response.getPrograms());
+    assertEquals(orderableDto.getChildren(), response.getChildren());
+    assertEquals(orderableDto.getIdentifiers(), response.getIdentifiers());
+    assertEquals(orderableDto.getExtraData(), response.getExtraData());
+    assertEquals(orderableDto.getOrderableRepository(), response.getOrderableRepository());
+    assertEquals(orderableDto.getVersionNumber(), response.getVersionNumber());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -164,9 +178,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(String.join("/", RESOURCE_URL, response1.getId().toString()))
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
     assertEquals(response1.getId(), response2.getId());
+    assertNotEquals(response1, response2);
     assertEquals(11L, response2.getNetContent().longValue());
   }
 
@@ -246,9 +262,21 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
-    assertEquals(orderableDto, response);
+    assertEquals(orderableDto.getProductCode(), response.getProductCode());
+    assertEquals(orderableDto.getDispensable(), response.getDispensable());
+    assertEquals(orderableDto.getFullProductName(), response.getFullProductName());
+    assertEquals(orderableDto.getDescription(), response.getDescription());
+    assertEquals(orderableDto.getNetContent(), response.getNetContent());
+    assertEquals(orderableDto.getPackRoundingThreshold(), response.getPackRoundingThreshold());
+    assertEquals(orderableDto.getRoundToZero(), response.getRoundToZero());
+    assertEquals(orderableDto.getChildren(), response.getChildren());
+    assertEquals(orderableDto.getIdentifiers(), response.getIdentifiers());
+    assertEquals(orderableDto.getExtraData(), response.getExtraData());
+    assertEquals(orderableDto.getOrderableRepository(), response.getOrderableRepository());
+    assertEquals(orderableDto.getVersionNumber(), response.getVersionNumber());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -270,9 +298,22 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(RESOURCE_URL)
         .then()
         .statusCode(200)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(OrderableDto.class);
 
-    assertEquals(orderableDto, response);
+    assertEquals(orderableDto.getProductCode(), response.getProductCode());
+    assertEquals(orderableDto.getDispensable(), response.getDispensable());
+    assertEquals(orderableDto.getFullProductName(), response.getFullProductName());
+    assertEquals(orderableDto.getDescription(), response.getDescription());
+    assertEquals(orderableDto.getNetContent(), response.getNetContent());
+    assertEquals(orderableDto.getPackRoundingThreshold(), response.getPackRoundingThreshold());
+    assertEquals(orderableDto.getRoundToZero(), response.getRoundToZero());
+    assertEquals(orderableDto.getPrograms(), response.getPrograms());
+    assertEquals(orderableDto.getChildren(), response.getChildren());
+    assertEquals(orderableDto.getIdentifiers(), response.getIdentifiers());
+    assertEquals(orderableDto.getExtraData(), response.getExtraData());
+    assertEquals(orderableDto.getOrderableRepository(), response.getOrderableRepository());
+    assertEquals(orderableDto.getVersionNumber(), response.getVersionNumber());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
