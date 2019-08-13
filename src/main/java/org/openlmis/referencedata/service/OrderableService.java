@@ -93,7 +93,7 @@ public class OrderableService {
     }
 
     if (queryMap.isEmpty()) {
-      return orderableRepository.findOrderableWithLatestModifiedDateOfAllOrderables(pageable)
+      return orderableRepository.findOrderablesWithLatestModifiedDate(null, pageable)
           .get(0)
           .getLastUpdated();
     }

@@ -212,7 +212,7 @@ public class OrderableServiceTest {
   @Test
   public void shouldReturnLatestModifiedDateOfAllElementsIfNoSearchCriteriaProvided() {
     // given
-    when(orderableRepository.findOrderableWithLatestModifiedDateOfAllOrderables(
+    when(orderableRepository.findOrderablesWithLatestModifiedDate(any(SearchParams.class),
         any(Pageable.class))).thenReturn(Lists.newArrayList(orderable2));
 
     // when
@@ -220,7 +220,7 @@ public class OrderableServiceTest {
         new QueryOrderableSearchParams(searchParams), null);
 
     // then
-    verify(orderableRepository).findOrderableWithLatestModifiedDateOfAllOrderables(
+    verify(orderableRepository).findOrderablesWithLatestModifiedDate(isNull(SearchParams.class),
         isNull(Pageable.class));
     assertEquals(orderable2.getLastUpdated(), lastUpdated);
   }
@@ -228,7 +228,7 @@ public class OrderableServiceTest {
   @Test
   public void shouldReturnLatestModifiedDateOfAllElementsIfQueryMapIsNull() {
     // given
-    when(orderableRepository.findOrderableWithLatestModifiedDateOfAllOrderables(
+    when(orderableRepository.findOrderablesWithLatestModifiedDate(any(SearchParams.class),
         any(Pageable.class))).thenReturn(Lists.newArrayList(orderable2));
 
     // when
@@ -236,7 +236,7 @@ public class OrderableServiceTest {
         new QueryOrderableSearchParams(null), null);
 
     // then
-    verify(orderableRepository).findOrderableWithLatestModifiedDateOfAllOrderables(
+    verify(orderableRepository).findOrderablesWithLatestModifiedDate(isNull(SearchParams.class),
         isNull(Pageable.class));
     assertEquals(orderable2.getLastUpdated(), lastUpdated);
   }

@@ -88,22 +88,6 @@ public interface OrderableRepository extends
   List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids,
       Pageable pageable);
 
-  @Query(value = SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + " JOIN"
-      + " (SELECT MAX(lastupdated) AS lastUpdated"
-      + " FROM ("
-      + SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + ORDER_BY_PAGEABLE
-      + ") AS allOrderables"
-      + ") AS maxLastUpdated"
-      + " ON o.lastupdated = maxLastUpdated.lastupdated",
-      nativeQuery = true
-  )
-  List<Orderable> findOrderableWithLatestModifiedDateOfAllOrderables(Pageable pageable);
-
   @Query(value = "SELECT o.*"
       + FROM_ORDERABLES_CLAUSE
       + JOIN_WITH_LATEST_ORDERABLE

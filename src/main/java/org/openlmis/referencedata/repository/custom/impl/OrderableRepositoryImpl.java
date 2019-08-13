@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -54,7 +55,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   private static final String NATIVE_SELECT_ORDERABLES_IDENTITIES = "SELECT DISTINCT"
       + "   o.id AS id,"
-      + "   o.versionNumber AS versionNumber"
+      + "   o.versionNumber AS versionNumber,"
+      + "   o.fullProductName AS fullProductName"
       + FROM_ORDERABLES_TABLE;
 
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
@@ -75,6 +77,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
       + " DESC LIMIT 1";
+  private static final String GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME =
+      " GROUP BY o.id, o.versionNumber, o.fullProductName";
 
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
@@ -86,6 +90,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String WHERE = " WHERE ";
   private static final String OR = " OR ";
   private static final String AND = " AND ";
+  private static final String ORDER_BY = " ORDER BY ";
+  private static final String ASC_SORT = " o.fullProductName ASC ";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -158,36 +164,39 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     String startNativeQuery = count ? NATIVE_COUNT_ORDERABLES : NATIVE_SELECT_ORDERABLES_IDENTITIES;
     StringBuilder builder = new StringBuilder(startNativeQuery);
     Map<String, Object> params = Maps.newHashMap();
-
-    if (null != searchParams.getProgramCode()) {
-      builder
-          .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN)
-          .append(NATIVE_PROGRAM_INNER_JOIN)
-          .append(AND)
-          .append(NATIVE_PROGRAM_CODE);
-      params.put("programCode", searchParams.getProgramCode().toLowerCase());
-    }
-
     List<String> where = Lists.newArrayList();
 
-    if (isEmpty(searchParams.getIdentityPairs())) {
-      builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
+    if (null != searchParams) {
+      if (null != searchParams.getProgramCode()) {
+        builder
+            .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN)
+            .append(NATIVE_PROGRAM_INNER_JOIN)
+            .append(AND)
+            .append(NATIVE_PROGRAM_CODE);
+        params.put("programCode", searchParams.getProgramCode().toLowerCase());
+      }
+
+      if (isEmpty(searchParams.getIdentityPairs())) {
+        builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
+      } else {
+        where.add(searchParams
+            .getIdentityPairs()
+            .stream()
+            .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
+            .collect(Collectors.joining(OR)));
+      }
+
+      if (isNotBlank(searchParams.getCode())) {
+        where.add(NATIVE_PRODUCT_CODE);
+        params.put("orderableCode", "%" + searchParams.getCode().toLowerCase() + "%");
+      }
+
+      if (isNotBlank(searchParams.getName())) {
+        where.add(NATIVE_PRODUCT_NAME);
+        params.put("orderableName", "%" + searchParams.getName().toLowerCase() + "%");
+      }
     } else {
-      where.add(searchParams
-          .getIdentityPairs()
-          .stream()
-          .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
-          .collect(Collectors.joining(OR)));
-    }
-
-    if (isNotBlank(searchParams.getCode())) {
-      where.add(NATIVE_PRODUCT_CODE);
-      params.put("orderableCode", "%" + searchParams.getCode().toLowerCase() + "%");
-    }
-
-    if (isNotBlank(searchParams.getName())) {
-      where.add(NATIVE_PRODUCT_NAME);
-      params.put("orderableName", "%" + searchParams.getName().toLowerCase() + "%");
+      builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
     }
 
     if (!where.isEmpty()) {
@@ -197,6 +206,10 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
 
     if (!count) {
+      Optional.ofNullable(pageable).ifPresent(p -> builder
+            .append(GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME)
+            .append(ORDER_BY)
+            .append(PageableUtil.getOrderPredicate(p, "o.", ASC_SORT)));
       setPagination(builder, params, pageable);
     }
 
