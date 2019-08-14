@@ -85,14 +85,19 @@ public class OrderableController extends BaseController {
       @RequestBody OrderableDto orderableDto,
       BindingResult bindingResult) {
 
+    Profiler profiler = new Profiler("ORDERABLES_CREATE_PUT");
+    profiler.setLogger(XLOGGER);
+
     rightService.checkAdminRight(ORDERABLES_MANAGE);
+
+    profiler.start("VALIDATE_ORDERABLE");
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    Profiler profiler = new Profiler("SAVE_ORDERABLE");
-    profiler.setLogger(XLOGGER);
-
+    profiler.start("BUILD_ORDERABLE");
     Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
+
+    profiler.start("SAVE_ORDERABLE");
     repository.save(orderable);
 
     profiler.stop().log();
