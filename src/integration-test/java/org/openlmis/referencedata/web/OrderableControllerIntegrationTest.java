@@ -128,22 +128,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    OrderableDto response = restAssured
-            .given()
-            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(orderableDto)
-            .when()
-            .put(RESOURCE_URL)
-            .then()
-            .statusCode(200)
-            .extract().as(OrderableDto.class);
-
-    assertOrderablesDtoParams(orderableDto, response);
-    assertEquals(orderableDto.getPrograms(), response.getPrograms());
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-
-    Response resp = restAssured
+    Response response = restAssured
             .given()
             .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -154,7 +139,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             .statusCode(200)
             .extract().response();
 
-    assertThat(resp.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    OrderableDto orderableDtoResponse = response.as(OrderableDto.class);
+    assertOrderablesDtoParams(orderableDto, orderableDtoResponse);
+    assertEquals(orderableDto.getPrograms(), orderableDtoResponse.getPrograms());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertThat(response.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
 
   @Test
@@ -162,35 +151,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(ORDERABLES_MANAGE);
     when(orderableRepository.save(any(Orderable.class))).thenAnswer(i -> i.getArguments()[0]);
 
-    OrderableDto response1 = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(orderableDto)
-        .when()
-        .put(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(OrderableDto.class);
-
-    response1.setNetContent(11L);
-
-    OrderableDto response2 = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(response1)
-        .when()
-        .put(String.join("/", RESOURCE_URL, response1.getId().toString()))
-        .then()
-        .statusCode(200)
-        .extract().as(OrderableDto.class);
-
-    assertEquals(response1.getId(), response2.getId());
-    assertNotEquals(response1, response2);
-    assertEquals(11L, response2.getNetContent().longValue());
-
-    Response resp1 = restAssured
+    Response response1 = restAssured
             .given()
             .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -201,19 +162,27 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             .statusCode(200)
             .extract().response();
 
-    Response resp2 = restAssured
+    OrderableDto orderableDto1 = response1.as(OrderableDto.class);
+    orderableDto1.setNetContent(11L);
+
+    Response response2 = restAssured
             .given()
             .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(orderableDto)
+            .body(orderableDto1)
             .when()
-            .put(String.join("/", RESOURCE_URL, orderableDto.getId().toString()))
+            .put(String.join("/", RESOURCE_URL, orderableDto1.getId().toString()))
             .then()
             .statusCode(200)
             .extract().response();
 
-    assertThat(resp1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-    assertThat(resp2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    OrderableDto orderableDto2 = response2.as(OrderableDto.class);
+
+    assertEquals(11L, orderableDto2.getNetContent().longValue());
+    assertEquals(orderableDto1.getId(), orderableDto2.getId());
+    assertNotEquals(orderableDto1, orderableDto2);
+    assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertThat(response2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
 
   @Test
