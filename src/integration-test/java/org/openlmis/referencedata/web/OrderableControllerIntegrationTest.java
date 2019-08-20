@@ -142,6 +142,19 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertOrderablesDtoParams(orderableDto, response);
     assertEquals(orderableDto.getPrograms(), response.getPrograms());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+
+    Response resp = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(orderableDto)
+            .when()
+            .put(RESOURCE_URL)
+            .then()
+            .statusCode(200)
+            .extract().response();
+
+    assertThat(resp.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
 
   @Test
@@ -176,6 +189,31 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(response1.getId(), response2.getId());
     assertNotEquals(response1, response2);
     assertEquals(11L, response2.getNetContent().longValue());
+
+    Response resp1 = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(orderableDto)
+            .when()
+            .put(RESOURCE_URL)
+            .then()
+            .statusCode(200)
+            .extract().response();
+
+    Response resp2 = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(orderableDto)
+            .when()
+            .put(String.join("/", RESOURCE_URL, orderableDto.getId().toString()))
+            .then()
+            .statusCode(200)
+            .extract().response();
+
+    assertThat(resp1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertThat(resp2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
 
   @Test
@@ -765,40 +803,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void checkIfLastModifiedHeaderExistsInOrderablesPutResponses() {
-    mockUserHasRight(ORDERABLES_MANAGE);
-
-    when(orderableRepository.findByIdentityIdAndIdentityVersionNumber(
-            orderable.getId(), orderableVersionNumber)).thenReturn(orderable);
-
-    Response response1 = restAssured
-            .given()
-            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(orderableDto)
-            .when()
-            .put(RESOURCE_URL)
-            .then()
-            .statusCode(200)
-            .extract().response();
-
-    Response response2 = restAssured
-            .given()
-            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .body(orderableDto)
-            .when()
-            .put(String.join("/", RESOURCE_URL, orderableDto.getId().toString()))
-            .then()
-            .statusCode(200)
-            .extract().response();
-
-    assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-    assertThat(response2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-
   }
 
   private ProgramOrderableDto generateProgramOrderable() {
