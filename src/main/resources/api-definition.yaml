@@ -699,11 +699,11 @@ resourceTypes:
             Get all Orderable Products if no search params provided. Otherwise returns a paginated
             list of Orderables given either an Orderable Ids, a Program Code, a Name or a Code.
           queryParameters:
-              ids:
+              id:
                   displayName: orderable ID
                   type: string
                   required: false
-                  repeat: false
+                  repeat: true
               code:
                   displayName: orderable code
                   type: string
