@@ -169,4 +169,15 @@ public class SupervisoryNodeDataBuilder {
     this.description = description;
     return this;
   }
+
+  /**
+   * Sets id for new {@link SupervisoryNode}.
+   *
+   * @param id the name to be set
+   * @return the builder instance
+   */
+  public SupervisoryNodeDataBuilder withId(UUID id) {
+    this.id = id;
+    return this;
+  }
 }

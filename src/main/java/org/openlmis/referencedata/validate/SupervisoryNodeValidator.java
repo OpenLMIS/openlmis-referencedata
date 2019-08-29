@@ -17,6 +17,7 @@ package org.openlmis.referencedata.validate;
 
 import java.util.Set;
 import java.util.UUID;
+
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
@@ -78,7 +79,6 @@ public class SupervisoryNodeValidator implements BaseValidator {
     if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
       rejectValue(errors,CODE,
               SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
-
     }
     Set<SupervisoryNode> storedSupervisoryNode =
             repository.findByNameIgnoreCaseContaining(
@@ -87,14 +87,14 @@ public class SupervisoryNodeValidator implements BaseValidator {
       rejectValue(errors,NAME,
               SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
     }
-    if (null != node.getId() && null == node.getRequisitionGroup()) {
-      rejectValue(errors, REQUISITION_GROUP,
-          SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
-    }
     SupervisoryNode existingNode = repository.findOne(nodeId);
     if (isRequisitionGroupChanged(existingNode, node)) {
       rejectValue(errors, REQUISITION_GROUP,
           SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_SAVE_FAILED);
+    }
+    if (isRequisitionGroupInExistingNodeButNotOnUpdate(existingNode, node)) {
+      rejectValue(errors, REQUISITION_GROUP,
+          SupervisoryNodeMessageKeys.ERROR_REQUISITION_GROUP_REQUIRED);
     }
   }
 
@@ -102,6 +102,12 @@ public class SupervisoryNodeValidator implements BaseValidator {
     return null != existing && null != dto.getRequisitionGroup()
         && null != existing.getRequisitionGroup()
         && !existing.getRequisitionGroup().getId().equals(dto.getRequisitionGroup().getId());
+  }
+
+  private boolean isRequisitionGroupInExistingNodeButNotOnUpdate(
+          SupervisoryNode existingNode, SupervisoryNodeDto dto) {
+    return null != existingNode && null == dto.getRequisitionGroup()
+        && null != existingNode.getRequisitionGroup();
   }
 
   private UUID getId(UUID id) {

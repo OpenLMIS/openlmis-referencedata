@@ -22,6 +22,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -417,9 +419,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
-    builder.withName("Updated Name");
     supervisoryNodeDto = new SupervisoryNodeDto();
     builder
+        .withName("Updated Name")
         .build()
         .export(supervisoryNodeDto);
 
@@ -439,35 +441,72 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
-  public void shouldRejectPutSupervisoryNodeIfRequisitionGroupIsMissing() {
+  public void shouldRejectPutSupervisoryNodeIfRequisitionGroupIsNotOnUpdateOnly() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder();
+
+    SupervisoryNodeDto dto = new SupervisoryNodeDto();
+    builder
+        .withName("Updated Name")
+        .withId(supervisoryNodeId)
+        .withoutRequisitionGroup()
+        .build()
+        .export(dto);
+
+    restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", supervisoryNodeId)
+            .body(dto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(400);
+
+    assertEquals(supervisoryNodeDto.getId(), dto.getId());
+    assertNotNull(dto.getId());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldAcceptPutSupervisoryNodeIfRequisitionGroupIsNotOnBothUpdateAndExistingNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
-        .withFacility(supervisoryNode.getFacility())
-        .withParentNode(supervisoryNode.getParentNode())
-        .withRequisitionGroup(new RequisitionGroupDataBuilder().buildAsNew());
+            .withFacility(supervisoryNode.getFacility())
+            .withoutRequisitionGroup()
+            .withId(supervisoryNodeId)
+            .withParentNode(supervisoryNode.getParentNode());
 
     SupervisoryNode existing = builder.build();
 
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
-    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
+    assertNull(existing.getRequisitionGroup());
+    assertEquals(existing.getId(), supervisoryNodeId);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
     builder
-        .withRequisitionGroup(null)
-        .build()
-        .export(supervisoryNodeDto);
+            .withName("Updated Name")
+            .withoutRequisitionGroup()
+            .withId(supervisoryNodeId)
+            .build()
+            .export(supervisoryNodeDto);
+
+    assertEquals(supervisoryNodeDto.getId(), existing.getId());
+    assertNotNull(supervisoryNodeDto.getId());
 
     restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNodeDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(400);
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", supervisoryNodeId)
+            .body(supervisoryNodeDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(200);
+
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

@@ -28,6 +28,7 @@ Bug fixes:
 * [OLMIS-6403](https://openlmis.atlassian.net/browse/OLMIS-6403): Fixed error message for Start Date before Expiry Date in system notifications.
 * [OLMIS-6438](https://openlmis.atlassian.net/browse/OLMIS-6438): Fixed searching for orderables in API console.
 * [OLMIS-6528](https://openlmis.atlassian.net/browse/OLMIS-6528): Fixed Internal Server Error after searching for orderables with null or malformed id.
+* [OLMIS-6470](https://openlmis.atlassian.net/browse/OLMIS-6470): Fixed creating and updating Supervisory Node without Requisition Group and added validation. Fixed creating and updating Supervisory Node without Requisition Group and added validation.
 
 Improvements:
 * [OLMIS-6127](https://openlmis.atlassian.net/browse/OLMIS-6127): Introduced second-level caching for Orderable.
