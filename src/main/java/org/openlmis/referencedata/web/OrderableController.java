@@ -18,6 +18,8 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -166,10 +168,18 @@ public class OrderableController extends BaseController {
 
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryParams);
 
-    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
-    ZonedDateTime lastUpdated = orderableService
+    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
+    List<Orderable> orderables = orderableService
         .getLatestLastUpdatedDate(searchParams, pageable);
 
+    if (orderables.isEmpty()) {
+      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
+      return ResponseEntity.ok()
+          .body(emptyPage);
+    }
+
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
+    ZonedDateTime lastUpdated = orderables.get(0).getLastUpdated();
     if (ifModifiedDate == null
         || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
       XLOGGER.info("search orderable query params: {}", queryParams);
@@ -212,12 +222,18 @@ public class OrderableController extends BaseController {
     Profiler profiler = new Profiler("ORDERABLES_SEARCH_POST");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
     Pageable pageable = body.getPageable();
-    ZonedDateTime lastUpdated = repository.findOrderablesWithLatestModifiedDate(body, pageable)
-        .get(0)
-        .getLastUpdated();
+    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
+    List<Orderable> orderables = repository.findOrderablesWithLatestModifiedDate(body, pageable);
 
+    if (orderables.isEmpty()) {
+      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
+      return ResponseEntity.ok()
+          .body(emptyPage);
+    }
+
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
+    ZonedDateTime lastUpdated = orderables.get(0).getLastUpdated();
     if (ifModifiedDate == null
         || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
       profiler.start("SEARCH_ORDERABLES");
@@ -240,7 +256,6 @@ public class OrderableController extends BaseController {
           .headers(buildLastModifiedHeader(lastUpdated))
           .build();
     }
-
   }
 
   /**

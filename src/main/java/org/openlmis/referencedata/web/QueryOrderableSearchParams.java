@@ -26,7 +26,6 @@ import lombok.ToString;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
-import org.openlmis.referencedata.util.UuidUtil;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.MultiValueMap;
 
@@ -102,7 +101,10 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
    * Gets and collection of {@link UUID} for "ids" key from params.
    */
   public Set<UUID> getIds() {
-    return UuidUtil.getIds(queryParams.asMultiValueMap());
+    if (!queryParams.containsKey(ID)) {
+      return Collections.emptySet();
+    }
+    return queryParams.getUuids(ID);
   }
 
   /**

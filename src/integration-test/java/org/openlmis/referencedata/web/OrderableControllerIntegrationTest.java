@@ -36,7 +36,6 @@ import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZoneId;
@@ -55,7 +54,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
-
 import org.apache.http.HttpStatus;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -351,7 +349,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(modifiedDate);
+        .thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -378,7 +376,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(modifiedDate);
+        .thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -398,6 +396,27 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldReturnEmptyPageIfNoOrderableWithLastUpdatedDateWasFound() {
+    when(orderableService
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
+        .thenReturn(Collections.emptyList());
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .extract().as(PageImplRepresentation.class);
+
+    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldReturnNotModifiedAndNoResponseBodyIfNoOrderableWasModified() {
     final List<Orderable> items = Collections.singletonList(orderable);
     when(orderableService
@@ -406,7 +425,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(modifiedDate);
+        .thenReturn(items);
 
     restAssured
         .given()
@@ -437,7 +456,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(modifiedDate);
+        .thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -479,7 +498,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(modifiedDate);
+        .thenReturn(items);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -722,6 +741,35 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(HttpStatus.SC_NOT_MODIFIED)
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void postSearchShouldReturnEmptyPageWhenNoOrderablesFound() {
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        orderableDto.getProductCode(), orderableDto.getFullProductName(),
+        orderable.getProductCode().toString(),
+        Lists.newArrayList(new VersionIdentityDto(
+            orderableDto.getId(), orderableDto.getVersionNumber())),
+        0, 10);
+
+    given(orderableRepository
+        .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
+        .willReturn(Collections.emptyList());
+
+    PageImplRepresentation response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(searchParams)
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .extract().as(PageImplRepresentation.class);
+
+    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

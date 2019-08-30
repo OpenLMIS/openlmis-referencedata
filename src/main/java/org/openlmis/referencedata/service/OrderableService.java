@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.service;
 
-import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -84,7 +84,7 @@ public class OrderableService {
    * @param pageable the page to get, or one page with all if null.
    * @return the ZonedDateTime of latest last updated date.
    */
-  public ZonedDateTime getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryMap,
+  public List<Orderable> getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryMap,
       Pageable pageable) {
 
     if (!queryMap.isValid()) {
@@ -93,21 +93,15 @@ public class OrderableService {
     }
 
     if (queryMap.isEmpty()) {
-      return orderableRepository.findOrderablesWithLatestModifiedDate(null, pageable)
-          .get(0)
-          .getLastUpdated();
+      return orderableRepository.findOrderablesWithLatestModifiedDate(null, pageable);
     }
 
     Set<UUID> ids = queryMap.getIds();
     if (!ids.isEmpty()) {
-      return orderableRepository.findOrderableWithLatestModifiedDateByIds(ids, pageable)
-          .get(0)
-          .getLastUpdated();
+      return orderableRepository.findOrderableWithLatestModifiedDateByIds(ids, pageable);
     }
 
-    return orderableRepository.findOrderablesWithLatestModifiedDate(queryMap, pageable)
-        .get(0)
-        .getLastUpdated();
+    return orderableRepository.findOrderablesWithLatestModifiedDate(queryMap, pageable);
   }
 
 }
