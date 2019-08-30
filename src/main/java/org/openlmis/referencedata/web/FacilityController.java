@@ -307,6 +307,7 @@ public class FacilityController extends BaseController {
     Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
         .searchProducts(facilityId, programId, fullSupply, orderablesId, active, pageable);
 
+    profiler.start("CONVERT_APPROVED_PRODUCT_TO_DTO");
     Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 
     profiler.stop().log();
