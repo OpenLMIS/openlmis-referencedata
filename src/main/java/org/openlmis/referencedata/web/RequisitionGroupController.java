@@ -23,10 +23,12 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.RequisitionGroup;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.RequisitionGroupService;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.util.Pagination;
@@ -77,6 +79,9 @@ public class RequisitionGroupController extends BaseController {
 
   @Autowired
   private RightAssignmentService rightAssignmentService;
+
+  @Autowired
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   /**
    * Allows creating new requisition group. If the id is specified, it will be ignored.
@@ -196,7 +201,11 @@ public class RequisitionGroupController extends BaseController {
 
       profiler.start("IMPORT_REQUISITION_GROUP_FROM_DTO");
       requisitionGroupToUpdate.updateFrom(
-          RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
+              RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
+
+      profiler.start("UPDATE_SUPERVISORY_NODE_FROM_REQUISITION_GROUP_DTO");
+      SupervisoryNode updated = getUpdatedSupervisoryNode(requisitionGroupDto);
+      requisitionGroupToUpdate.setSupervisoryNode(updated);
 
       profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
@@ -314,5 +323,18 @@ public class RequisitionGroupController extends BaseController {
     List<RequisitionGroupDto> list = page.getContent().stream()
         .map(this::exportToDto).collect(Collectors.toList());
     return Pagination.getPage(list, pageable, page.getTotalElements());
+  }
+
+  private SupervisoryNode getUpdatedSupervisoryNode(RequisitionGroupDto dto) {
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository
+            .findOne(dto.getSupervisoryNode().getId());
+    if (null != supervisoryNode) {
+      supervisoryNode = SupervisoryNode.newSupervisoryNode(dto.getSupervisoryNode());
+      supervisoryNodeRepository.saveAndFlush(supervisoryNode);
+    } else {
+      LOGGER.info("Supervisory Node was not present in requisitionGroup update with id: {}",
+              dto.getId());
+    }
+    return supervisoryNodeRepository.findOne(dto.getSupervisoryNode().getId());
   }
 }
