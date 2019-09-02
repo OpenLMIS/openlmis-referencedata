@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -342,31 +344,40 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
-        .withFacility(facility)
-        .build();
+            .withFacility(facility)
+            .withName("Updated SN Name")
+            .build();
+
+    assertNotEquals(supervisoryNode, supervisoryNode1);
+
+    assertNotNull(supervisoryNode);
+    assertNotNull(supervisoryNode1);
 
     requisitionGroup.setSupervisoryNode(supervisoryNode1);
     given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
-        .willReturn(requisitionGroup);
+            .willReturn(requisitionGroup);
 
     requisitionGroupDto = new RequisitionGroupDto();
     requisitionGroup.export(requisitionGroupDto);
 
     RequisitionGroupDto response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", requisitionGroupId)
-        .body(requisitionGroupDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200)
-        .extract().as(RequisitionGroupDto.class);
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", requisitionGroupId)
+            .body(requisitionGroupDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(200)
+            .extract().as(RequisitionGroupDto.class);
 
     assertEquals(requisitionGroupDto, response);
+    assertEquals(requisitionGroup.getId(), requisitionGroupDto.getId());
+    assertNotNull(requisitionGroupDto.getSupervisoryNode().getId());
     assertEquals(requisitionGroupDto.getSupervisoryNode().getId(), supervisoryNode1.getId());
+    assertEquals(requisitionGroupDto.getSupervisoryNode().getName(), "Updated SN Name");
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
