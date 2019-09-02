@@ -87,7 +87,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
-  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*" + FROM_FTAP_TABLE;
+  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*, ft.*, p.*"
+      + FROM_FTAP_TABLE;
 
   private static final String NATIVE_IDENTITY = "(ftap.id = '%s' AND ftap.versionNumber = %d)";
   private static final String WHERE = " WHERE ";
@@ -314,7 +315,10 @@ public class FacilityTypeApprovedProductRepositoryImpl
   // appropriate class has been passed in the EntityManager.createNativeQuery method
   @SuppressWarnings("unchecked")
   private List<FacilityTypeApprovedProduct> retrieveFtaps(Collection<Pair<UUID, Long>> identities) {
-    String hql = NATIVE_SELECT_FTAPS_BY_IDENTITES + WHERE + identities
+    String hql = NATIVE_SELECT_FTAPS_BY_IDENTITES
+        + NATIVE_PROGRAM_INNER_JOIN
+        + NATIVE_FACILITY_TYPE_INNER_JOIN
+        + WHERE + identities
         .stream()
         .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
         .collect(Collectors.joining(OR));
