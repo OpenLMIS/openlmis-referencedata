@@ -83,7 +83,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           + "   FROM referencedata.orderables GROUP BY id) AS latest"
           + "   ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
 
-  private static final String NATIVE_SELECT_ORDERABLES_BY_IDENTITES = "SELECT o.*"
+  private static final String NATIVE_SELECT_ORDERABLES_BY_IDENTITES = "SELECT o.*, po.*, p.*"
       + FROM_ORDERABLES_TABLE;
 
   private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
