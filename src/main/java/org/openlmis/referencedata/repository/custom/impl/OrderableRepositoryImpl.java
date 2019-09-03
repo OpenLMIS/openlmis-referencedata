@@ -34,6 +34,7 @@ import javax.persistence.Query;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Orderable;
@@ -59,13 +60,23 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
       + "   o.fullProductName AS fullProductName"
       + FROM_ORDERABLES_TABLE;
 
-  private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
-      " INNER JOIN referencedata.program_orderables AS po"
+  private static final String NATIVE_PROGRAM_ORDERABLE_JOIN =
+      " JOIN referencedata.program_orderables AS po"
           + "  ON o.id = po.orderableId AND o.versionNumber = po.orderableVersionNumber";
 
-  private static final String NATIVE_PROGRAM_INNER_JOIN =
-      " INNER JOIN referencedata.programs AS p"
+  private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
+      " INNER" + NATIVE_PROGRAM_ORDERABLE_JOIN;
+  private static final String NATIVE_PROGRAM_ORDERABLE_LEFT_JOIN =
+      " LEFT" + NATIVE_PROGRAM_ORDERABLE_JOIN;
+
+  private static final String NATIVE_PROGRAM_JOIN =
+      " JOIN referencedata.programs AS p"
           + "  ON p.id = po.programId";
+
+  private static final String NATIVE_PROGRAM_INNER_JOIN =
+      " INNER" + NATIVE_PROGRAM_JOIN;
+  private static final String NATIVE_PROGRAM_LEFT_JOIN =
+      " LEFT" + NATIVE_PROGRAM_JOIN;
 
   private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
       " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
@@ -252,7 +263,10 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   @SuppressWarnings("unchecked")
   private List<Orderable> retrieveOrderables(Collection<Pair<UUID, Long>> identities,
       Boolean date) {
-    String hql = NATIVE_SELECT_ORDERABLES_BY_IDENTITES + WHERE + identities
+    String hql = NATIVE_SELECT_ORDERABLES_BY_IDENTITES
+        + NATIVE_PROGRAM_ORDERABLE_LEFT_JOIN
+        + NATIVE_PROGRAM_LEFT_JOIN
+        + WHERE + identities
         .stream()
         .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
         .collect(Collectors.joining(OR));
@@ -263,7 +277,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     return entityManager
         .createNativeQuery(hql, Orderable.class)
-        .getResultList();
+        .unwrap(SQLQuery.class)
+        .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
+        .list();
   }
 
 }
