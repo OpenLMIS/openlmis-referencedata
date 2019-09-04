@@ -223,19 +223,10 @@ public class OrderableController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     Pageable pageable = body.getPageable();
-    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
-    List<Orderable> orderables = repository.findOrderablesWithLatestModifiedDate(body, pageable);
 
-    if (orderables.isEmpty()) {
-      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
-      return ResponseEntity.ok()
-          .body(emptyPage);
-    }
-
-    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
-    ZonedDateTime lastUpdated = orderables.get(0).getLastUpdated();
     if (ifModifiedDate == null
-        || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
+        || wasModifiedSince(getLastUpdateDate(body, profiler),
+        parseHttpDateToZonedDateTime(ifModifiedDate))) {
       profiler.start("SEARCH_ORDERABLES");
       Page<Orderable> orderablesPage = repository.search(body, pageable);
 
@@ -247,14 +238,10 @@ public class OrderableController extends BaseController {
 
       profiler.stop().log();
       XLOGGER.exit(page);
-      return ResponseEntity.ok()
-          .headers(buildLastModifiedHeader(lastUpdated))
-          .body(page);
+      return ResponseEntity.ok().body(page);
     } else {
       profiler.stop().log();
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
-          .headers(buildLastModifiedHeader(lastUpdated))
-          .build();
+      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
     }
   }
 
@@ -336,7 +323,18 @@ public class OrderableController extends BaseController {
   }
 
   public boolean wasModifiedSince(ZonedDateTime lastUpdated, ZonedDateTime date) {
-    return date == null || lastUpdated.isAfter(date);
+    return date == null || lastUpdated == null || lastUpdated.isAfter(date);
   }
 
+  private ZonedDateTime getLastUpdateDate(OrderableSearchParams body, Profiler profiler) {
+    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
+    List<Orderable> orderables =
+        repository.findOrderablesWithLatestModifiedDate(body, body.getPageable());
+
+    if (orderables.isEmpty()) {
+      return null;
+    }
+
+    return orderables.get(0).getLastUpdated();
+  }
 }

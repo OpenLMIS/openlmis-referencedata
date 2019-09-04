@@ -435,8 +435,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .when()
         .get(RESOURCE_URL)
         .then()
-        .statusCode(HttpStatus.SC_NOT_MODIFIED)
-        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT));
+        .statusCode(HttpStatus.SC_NOT_MODIFIED);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -668,7 +667,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract()
         .as(PageImplRepresentation.class);
 
@@ -704,7 +702,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract()
         .as(PageImplRepresentation.class);
 
@@ -739,8 +736,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .body(searchParams)
         .post(SEARCH_URL)
         .then()
-        .statusCode(HttpStatus.SC_NOT_MODIFIED)
-        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT));
+        .statusCode(HttpStatus.SC_NOT_MODIFIED);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -757,6 +753,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     given(orderableRepository
         .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
         .willReturn(Collections.emptyList());
+
+    given(orderableRepository
+        .search(eq(searchParams), any(Pageable.class)))
+        .willReturn(Pagination.getPage(Lists.newArrayList()));
 
     PageImplRepresentation response = restAssured
         .given()
