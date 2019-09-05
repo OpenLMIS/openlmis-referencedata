@@ -332,9 +332,9 @@ public class RequisitionGroupController extends BaseController {
       supervisoryNode = SupervisoryNode.newSupervisoryNode(dto.getSupervisoryNode());
       supervisoryNodeRepository.saveAndFlush(supervisoryNode);
     } else {
-      LOGGER.info("Supervisory Node was not present in requisitionGroup update with id: {}",
-              dto.getId());
+      LOGGER.info("RequisitionGroup update with id: {} did not contain a SupervisoryNode"
+          + "already present in a database", dto.getId());
     }
-    return supervisoryNodeRepository.findOne(dto.getSupervisoryNode().getId());
+    return supervisoryNode;
   }
 }
