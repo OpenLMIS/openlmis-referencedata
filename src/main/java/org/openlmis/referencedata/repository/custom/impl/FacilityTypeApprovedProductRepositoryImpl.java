@@ -20,22 +20,26 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -87,13 +91,14 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
 
-  private static final String NATIVE_SELECT_FTAPS_BY_IDENTITES = "SELECT ftap.*, ft.*, p.*"
-      + FROM_FTAP_TABLE;
-
   private static final String NATIVE_IDENTITY = "(ftap.id = '%s' AND ftap.versionNumber = %d)";
   private static final String WHERE = " WHERE ";
   private static final String OR = " OR ";
   private static final String AND = " AND ";
+  private static final String IDENTITY = "identity";
+
+  // HQL queries are running into issues with bigger number of identities at once
+  private static final Integer MAX_IDENTITIES_SIZE = 3000;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -122,10 +127,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
     profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
         active, false, pageable);
-    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("RETRIEVE_FTAPS");
-    List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
+    List<FacilityTypeApprovedProduct> ftaps = new ArrayList<>();
+    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+      ftaps.addAll(retrieveFtaps(partition));
+    }
 
     profiler.stop().log();
     return Pagination.getPage(ftaps, pageable, total);
@@ -148,10 +156,13 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
-    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("RETRIEVE_FTAPS");
-    List<FacilityTypeApprovedProduct> ftaps = retrieveFtaps(identities);
+    List<FacilityTypeApprovedProduct> ftaps = new ArrayList<>();
+    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+      ftaps.addAll(retrieveFtaps(partition));
+    }
 
     profiler.stop().log();
     return Pagination.getPage(ftaps, pageable, total);
@@ -301,31 +312,28 @@ public class FacilityTypeApprovedProductRepositoryImpl
     return ((Number) nativeQuery.getSingleResult()).intValue();
   }
 
-  private Set<Pair<UUID, Long>> executeNativeQuery(Query nativeQuery) {
+  private List<VersionIdentity> executeNativeQuery(Query nativeQuery) {
     // appropriate configuration has been set in the native query
     @SuppressWarnings("unchecked")
     List<Object[]> identities = nativeQuery.getResultList();
 
     return identities
         .stream()
-        .map(identity -> ImmutablePair.of((UUID) identity[0], (Long) identity[1]))
-        .collect(Collectors.toSet());
+        .map(identity -> new VersionIdentity((UUID) identity[0], (Long) identity[1]))
+        .collect(Collectors.toList());
   }
 
   // appropriate class has been passed in the EntityManager.createNativeQuery method
   @SuppressWarnings("unchecked")
-  private List<FacilityTypeApprovedProduct> retrieveFtaps(Collection<Pair<UUID, Long>> identities) {
-    String hql = NATIVE_SELECT_FTAPS_BY_IDENTITES
-        + NATIVE_PROGRAM_INNER_JOIN
-        + NATIVE_FACILITY_TYPE_INNER_JOIN
-        + WHERE + identities
-        .stream()
-        .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
-        .collect(Collectors.joining(OR));
+  private List<FacilityTypeApprovedProduct> retrieveFtaps(Collection<VersionIdentity> identities) {
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<FacilityTypeApprovedProduct> criteriaQuery =
+        criteriaBuilder.createQuery(FacilityTypeApprovedProduct.class);
+    Root<FacilityTypeApprovedProduct> root = criteriaQuery.from(FacilityTypeApprovedProduct.class);
+    criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
 
     return entityManager
-        .createNativeQuery(hql, FacilityTypeApprovedProduct.class)
+        .createQuery(criteriaQuery)
         .getResultList();
   }
-
 }
