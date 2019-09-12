@@ -221,6 +221,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldPostSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
+    assertNotNull(supervisoryNodeDto.getRequisitionGroup());
+
     ValidatableResponse response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -232,7 +234,110 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .statusCode(201);
 
     assertResponseBody(response, is(notNullValue(String.class)));
+    assertEquals(supervisoryNodeDto.getId(), supervisoryNodeId);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPostSupervisoryNodeWithoutRequisitionGroup() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+            .withoutId()
+            .withFacility(supervisoryNode.getFacility())
+            .withoutRequisitionGroup()
+            .withParentNode(supervisoryNode.getParentNode());
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+            .build()
+            .export(supervisoryNodeDto);
+
+    SupervisoryNodeDto response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(supervisoryNodeDto)
+            .when()
+            .post(RESOURCE_URL)
+            .then()
+            .statusCode(201)
+            .extract().as(SupervisoryNodeDto.class);
+
+    assertNull(supervisoryNodeDto.getId());
+    assertNull(supervisoryNodeDto.getRequisitionGroup());
+    assertNull(response.getRequisitionGroup());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldPostSupervisoryNodeWithRequisitionGroup() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+            .withoutId()
+            .withFacility(supervisoryNode.getFacility())
+            .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+            .withParentNode(supervisoryNode.getParentNode());
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+            .build()
+            .export(supervisoryNodeDto);
+
+    SupervisoryNodeDto response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(supervisoryNodeDto)
+            .when()
+            .post(RESOURCE_URL)
+            .then()
+            .statusCode(201)
+            .extract().as(SupervisoryNodeDto.class);
+
+    assertNull(supervisoryNodeDto.getId());
+    assertNotNull(response.getRequisitionGroup());
+    assertEquals(supervisoryNodeDto.getRequisitionGroupId(), response.getRequisitionGroupId());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldAddRequisitionGroupToExistingSupervisoryNode() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+            .withId(supervisoryNodeId)
+            .withFacility(supervisoryNode.getFacility())
+            .withoutRequisitionGroup()
+            .withParentNode(supervisoryNode.getParentNode());
+
+    SupervisoryNode existing = builder.build();
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
+
+    supervisoryNodeDto = new SupervisoryNodeDto();
+    builder
+            .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+            .build()
+            .export(supervisoryNodeDto);
+
+    SupervisoryNodeDto response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", supervisoryNodeId)
+            .body(supervisoryNodeDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(200)
+            .extract().as(SupervisoryNodeDto.class);
+
+    assertEquals(supervisoryNodeDto.getRequisitionGroupId(), response.getRequisitionGroupId());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    assertNotNull(supervisoryNodeRepository.findOne(supervisoryNodeId).getRequisitionGroup());
   }
 
   @Test
@@ -324,18 +429,17 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
 
     ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNodeDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200);
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", supervisoryNodeId)
+            .body(supervisoryNodeDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(200);
 
     assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
@@ -404,13 +508,13 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldUpdateSupervisoryNode() {
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
-        .withFacility(supervisoryNode.getFacility())
-        .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
-        .withParentNode(supervisoryNode.getParentNode());
+            .withFacility(supervisoryNode.getFacility())
+            .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
+            .withParentNode(supervisoryNode.getParentNode());
 
     supervisoryNode
-        .getChildNodes()
-        .forEach(builder::withChildNode);
+            .getChildNodes()
+            .forEach(builder::withChildNode);
 
     SupervisoryNode existing = builder.build();
 
@@ -421,20 +525,19 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     supervisoryNodeDto = new SupervisoryNodeDto();
     builder
-        .withName("Updated Name")
-        .build()
-        .export(supervisoryNodeDto);
+            .build()
+            .export(supervisoryNodeDto);
 
     ValidatableResponse response = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("id", supervisoryNodeId)
-        .body(supervisoryNodeDto)
-        .when()
-        .put(ID_URL)
-        .then()
-        .statusCode(200);
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .pathParam("id", supervisoryNodeId)
+            .body(supervisoryNodeDto)
+            .when()
+            .put(ID_URL)
+            .then()
+            .statusCode(200);
 
     assertResponseBody(response, is(supervisoryNodeDto.getId().toString()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -448,7 +551,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNodeDto dto = new SupervisoryNodeDto();
     builder
-        .withName("Updated Name")
         .withId(supervisoryNodeId)
         .withoutRequisitionGroup()
         .build()
@@ -472,29 +574,25 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldAcceptPutSupervisoryNodeIfRequisitionGroupIsNotOnBothUpdateAndExistingNode() {
-    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+            //.withName("Existing Name")
             .withFacility(supervisoryNode.getFacility())
             .withoutRequisitionGroup()
-            .withId(supervisoryNodeId)
             .withParentNode(supervisoryNode.getParentNode());
 
     SupervisoryNode existing = builder.build();
 
-    assertNull(existing.getRequisitionGroup());
-    assertEquals(existing.getId(), supervisoryNodeId);
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+
+    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
     builder
-            .withName("Updated Name")
+            //.withName("New Name")
             .withoutRequisitionGroup()
-            .withId(supervisoryNodeId)
             .build()
             .export(supervisoryNodeDto);
-
-    assertEquals(supervisoryNodeDto.getId(), existing.getId());
-    assertNotNull(supervisoryNodeDto.getId());
 
     restAssured
             .given()
@@ -506,7 +604,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
             .put(ID_URL)
             .then()
             .statusCode(200);
-
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

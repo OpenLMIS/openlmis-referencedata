@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
@@ -35,6 +36,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -99,6 +101,9 @@ public class SupervisoryNodeController extends BaseController {
   @Autowired
   private SupervisoryNodeBuilder builder;
 
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
+
   @Value("${service.url}")
   private String serviceUrl;
 
@@ -124,6 +129,17 @@ public class SupervisoryNodeController extends BaseController {
     SupervisoryNode supervisoryNode = builder.build(supervisoryNodeDto);
     supervisoryNodeRepository.save(supervisoryNode);
     LOGGER.info("Created new supervisoryNode with id: {}", supervisoryNode.getId());
+
+    if (null != supervisoryNodeDto.getRequisitionGroupId()) {
+      RequisitionGroup requisitionGroup =
+              requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
+      requisitionGroup.setSupervisoryNode(supervisoryNodeRepository
+              .findOne(supervisoryNode.getId()));
+      requisitionGroupRepository.saveAndFlush(requisitionGroup);
+      LOGGER.info("SupervisoryNode with id: {} was added to requisitionGroup with id: {}",
+              supervisoryNode.getId(), requisitionGroup.getId());
+    }
+
     return exportToDto(supervisoryNode);
   }
 
@@ -195,6 +211,16 @@ public class SupervisoryNodeController extends BaseController {
 
     profiler.start("SAVE_SUPERVISORY_NODE");
     supervisoryNodeRepository.saveAndFlush(supervisoryNodeToUpdate);
+
+    profiler.start("CHECK_IF_REQUISITION_GROUP_IS_ADDED");
+    if (null != supervisoryNodeDto.getRequisitionGroupId()) {
+      RequisitionGroup requisitionGroup =
+              requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
+      requisitionGroup.setSupervisoryNode(supervisoryNodeRepository.findOne(supervisoryNodeId));
+      requisitionGroupRepository.saveAndFlush(requisitionGroup);
+      LOGGER.info("Updated supervisoryNode with id: {} with requisitionGroup with id: {}",
+              supervisoryNodeId, requisitionGroup.getId());
+    }
 
     profiler.start("DELETE_UPDATED_SUPERVISORY_NODE_FROM_CACHE");
     if (AvailableFeatures.REDIS_CACHING.isActive()) {
