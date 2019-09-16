@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeBaseDto;
@@ -102,7 +103,7 @@ public class RequisitionGroupValidator implements BaseValidator {
 
     if (!errors.hasErrors()) {
       verifyCode(group.getId(), group.getCode(), errors);
-      verifySupervisoryNode(group.getSupervisoryNode(), errors);
+      verifySupervisoryNode(group, errors);
       verifyFacilities(Optional.ofNullable(group.getMemberFacilities())
           .orElse(Collections.emptySet()).stream().map(facility -> (FacilityDto) facility)
           .collect(Collectors.toList()), errors);
@@ -149,14 +150,25 @@ public class RequisitionGroupValidator implements BaseValidator {
     }
   }
 
-  private void verifySupervisoryNode(SupervisoryNodeBaseDto supervisoryNode, Errors errors) {
+  private void verifySupervisoryNode(RequisitionGroupBaseDto group, Errors errors) {
     // supervisory node matches a defined supervisory node
+    SupervisoryNodeBaseDto supervisoryNode = group.getSupervisoryNode();
+    SupervisoryNode existing = supervisoryNodes.findOne(supervisoryNode.getId());
     if (null == supervisoryNode.getId()) {
       rejectValue(errors, SUPERVISORY_NODE,
           RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
-    } else if (null == supervisoryNodes.findOne(supervisoryNode.getId())) {
+    } else if (null == existing) {
       rejectValue(errors, SUPERVISORY_NODE,
           RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_NON_EXISTENT);
+    } else if (null != group.getId() && null != existing.getRequisitionGroup()
+          && null != existing.getRequisitionGroup().getId()
+          && !(existing.getRequisitionGroup().getId().equals(group.getId()))) {
+      rejectValue(errors, SUPERVISORY_NODE,
+          RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ASSIGNED);
+    } else if (null == group.getId() && null != existing.getRequisitionGroup()
+          && null != existing.getRequisitionGroup().getId()) {
+      rejectValue(errors, SUPERVISORY_NODE,
+          RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ASSIGNED);
     }
   }
 

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.CODE;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.DESCRIPTION;
 import static org.openlmis.referencedata.validate.RequisitionGroupValidator.MEMBER_FACILITIES;
@@ -146,6 +147,43 @@ public class RequisitionGroupValidatorTest {
 
     assertErrorMessage(errors, SUPERVISORY_NODE,
         RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
+  }
+
+  @Test
+  public void shouldRejectIfSupervisoryIsAlreadyAssignedOnCreate() throws Exception {
+    RequisitionGroup oldGroup = new RequisitionGroup();
+    oldGroup.setId(UUID.randomUUID());
+    oldGroup.setCode(RandomStringUtils.randomAlphanumeric(50));
+    oldGroup.setName(RandomStringUtils.randomAlphanumeric(50));
+    oldGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
+    oldGroup.setSupervisoryNode(supervisoryNode);
+
+    when(supervisoryNodes.findOne(supervisoryNode.getId()).getRequisitionGroup())
+            .thenReturn(oldGroup);
+
+    requisitionGroupDto.setId(null);
+
+    validator.validate(requisitionGroupDto, errors);
+
+    assertErrorMessage(errors, SUPERVISORY_NODE,
+            RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ASSIGNED);
+  }
+
+  @Test
+  public void shouldNotRejectIfSupervisoryIsValidOnUpdate() {
+    RequisitionGroup oldGroup = new RequisitionGroup();
+    oldGroup.setId(requisitionGroupDto.getId());
+    oldGroup.setCode(RandomStringUtils.randomAlphanumeric(50));
+    oldGroup.setName(RandomStringUtils.randomAlphanumeric(50));
+    oldGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
+    oldGroup.setSupervisoryNode(supervisoryNode);
+
+    when(supervisoryNodes.findOne(supervisoryNode.getId()).getRequisitionGroup())
+            .thenReturn(oldGroup);
+
+    validator.validate(requisitionGroupDto, errors);
+
+    assertThat(errors.getErrorCount(), is(equalTo(0)));
   }
 
   @Test

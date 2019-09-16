@@ -72,6 +72,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @Transactional
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class SupervisoryNodeController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisoryNodeController.class);
@@ -132,10 +133,7 @@ public class SupervisoryNodeController extends BaseController {
 
     if (null != supervisoryNodeDto.getRequisitionGroupId()) {
       RequisitionGroup requisitionGroup =
-              requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
-      requisitionGroup.setSupervisoryNode(supervisoryNodeRepository
-              .findOne(supervisoryNode.getId()));
-      requisitionGroupRepository.saveAndFlush(requisitionGroup);
+              updateRequisitionGroup(supervisoryNode, supervisoryNodeDto);
       LOGGER.info("SupervisoryNode with id: {} was added to requisitionGroup with id: {}",
               supervisoryNode.getId(), requisitionGroup.getId());
     }
@@ -215,9 +213,7 @@ public class SupervisoryNodeController extends BaseController {
     profiler.start("CHECK_IF_REQUISITION_GROUP_IS_ADDED");
     if (null != supervisoryNodeDto.getRequisitionGroupId()) {
       RequisitionGroup requisitionGroup =
-              requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
-      requisitionGroup.setSupervisoryNode(supervisoryNodeRepository.findOne(supervisoryNodeId));
-      requisitionGroupRepository.saveAndFlush(requisitionGroup);
+              updateRequisitionGroup(supervisoryNodeToUpdate, supervisoryNodeDto);
       LOGGER.info("Updated supervisoryNode with id: {} with requisitionGroup with id: {}",
               supervisoryNodeId, requisitionGroup.getId());
     }
@@ -480,5 +476,15 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     return userDto;
+  }
+
+  private RequisitionGroup updateRequisitionGroup(SupervisoryNode existing,
+      SupervisoryNodeDto supervisoryNodeDto) {
+    RequisitionGroup requisitionGroup =
+            requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
+    requisitionGroup.setSupervisoryNode(supervisoryNodeRepository
+            .findOne(existing.getId()));
+    requisitionGroupRepository.saveAndFlush(requisitionGroup);
+    return requisitionGroup;
   }
 }
