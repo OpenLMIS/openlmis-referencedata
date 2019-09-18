@@ -29,7 +29,7 @@ Bug fixes:
 * [OLMIS-6438](https://openlmis.atlassian.net/browse/OLMIS-6438): Fixed searching for orderables in API console.
 * [OLMIS-6528](https://openlmis.atlassian.net/browse/OLMIS-6528): Fixed Internal Server Error after searching for orderables with null or malformed id.
 * [OLMIS-6470](https://openlmis.atlassian.net/browse/OLMIS-6470): Fix for SupervisoryNodes and RequisitionGroups: creating and updating SN with and without RG + validation; updating SN via PUT api/requisitionGroups/{id}; validation when creating RG with already assigned SN
-* [OLMIS-6564](https://openlmis.atlassian.net/browse/OLMIS-6564): Fixed responses compression in th referencedata service.
+* [OLMIS-6564](https://openlmis.atlassian.net/browse/OLMIS-6564): Fixed responses compression in the referencedata service.
 
 Improvements:
 * [OLMIS-6127](https://openlmis.atlassian.net/browse/OLMIS-6127): Introduced second-level caching for Orderable.
