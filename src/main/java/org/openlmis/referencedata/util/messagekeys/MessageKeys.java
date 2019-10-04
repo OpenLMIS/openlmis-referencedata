@@ -86,6 +86,7 @@ public abstract class MessageKeys {
   protected static final String PRODUCT = "product";
   protected static final String FACILITY = "facility";
   protected static final String ORDERABLE = "orderable";
+  protected static final String ORDERABLE_FULFILL = "orderableFulFill";
   protected static final String TRADE_ITEM = "tradeItem";
   protected static final String SUPPLY_LINE = "supplyLine";
   protected static final String FACILITY_TYPE = "facilityType";
