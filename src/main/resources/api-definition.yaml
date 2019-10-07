@@ -3321,10 +3321,25 @@ resourceTypes:
               the canFulfillForMe property should be empty
           queryParameters:
               id:
-                  description: Orderable id
+                  description: >
+                      Orderable id. Cannot be provided together with facilityId and programId.
                   type: string
                   required: false
                   repeat: true
+              facilityId:
+                  description: >
+                      Facility Id. This param allows filtering the result. If provided, the
+                      programId param also must be provided.
+                  type: string
+                  required: false
+                  repeat: false
+              programId:
+                  description: >
+                      Program Id. This param allows filtering the result. If provided, the
+                      facilityId param also must be provided.
+                  type: string
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:
