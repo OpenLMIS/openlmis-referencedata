@@ -22,15 +22,22 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.jayway.restassured.response.ValidatableResponse;
-
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
+import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,7 +45,12 @@ import org.springframework.http.HttpHeaders;
 
 public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegrationTest {
 
+  private static final String CAN_BE_FULFILLED_BY_ME = ".canBeFulfilledByMe";
+  private static final String CAN_FULFILL_FOR_ME_FIELD_NAME = ".canFulfillForMe";
+
   private Orderable orderable = new OrderableDataBuilder().build();
+  private UUID facilityId = UUID.randomUUID();
+  private UUID programId = UUID.randomUUID();
 
   private UUID tradeItemOrderableId = UUID.randomUUID();
   private UUID commodityTypeOrderableId = UUID.randomUUID();
@@ -47,7 +59,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   @Before
   public void setUp() {
     super.setUp();
-    given(orderableRepository.findAllLatest(pageable)).willReturn(getPage(orderable));
+    given(orderableRepository.findAllLatest(any())).willReturn(getPage(orderable));
   }
 
   @Test
@@ -56,10 +68,10 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofTradeItem(commodityTypeOrderableId));
 
-    String canFulfillForMeField = tradeItemOrderableId + ".canFulfillForMe";
-    String canBeFulfilledByMeField = tradeItemOrderableId + ".canBeFulfilledByMe";
+    String canFulfillForMeField = tradeItemOrderableId + CAN_FULFILL_FOR_ME_FIELD_NAME;
+    String canBeFulfilledByMeField = tradeItemOrderableId + CAN_BE_FULFILLED_BY_ME;
 
-    ValidatableResponse response = doRequest();
+    ValidatableResponse response = doRequest(null);
     response.body(canFulfillForMeField, hasSize(0));
     response.body(canBeFulfilledByMeField, hasSize(1));
     response.body(canBeFulfilledByMeField, hasItem(commodityTypeOrderableId.toString()));
@@ -71,10 +83,10 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
 
-    String canBeFulfilledByMeField = commodityTypeOrderableId + ".canBeFulfilledByMe";
-    String canFulfillForMeField = commodityTypeOrderableId + ".canFulfillForMe";
+    String canBeFulfilledByMeField = commodityTypeOrderableId + CAN_BE_FULFILLED_BY_ME;
+    String canFulfillForMeField = commodityTypeOrderableId + CAN_FULFILL_FOR_ME_FIELD_NAME;
 
-    ValidatableResponse response = doRequest();
+    ValidatableResponse response = doRequest(null);
     response.body(canBeFulfilledByMeField, hasSize(0));
     response.body(canFulfillForMeField, hasSize(1));
     response.body(canFulfillForMeField, hasItem(tradeItemOrderableId.toString()));
@@ -82,10 +94,56 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
 
   @Test
   public void shouldReturnEmptyListIfThereAreNoOrderables() {
-    given(orderableRepository.findAllLatest(pageable)).willReturn(new PageImpl<>(emptyList()));
+    given(orderableRepository.findAllLatest(any())).willReturn(new PageImpl<>(emptyList()));
 
-    doRequest().body("isEmpty()", is(true));
+    doRequest(null).body("isEmpty()", is(true));
     verifyZeroInteractions(factory);
+  }
+
+  @Test
+  public void shouldCreateResourceBasingOnIds() {
+    orderable.setId(commodityTypeOrderableId);
+
+    given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
+    given(factory.createFor(eq(orderable), any(), any()))
+        .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
+
+    String canFulfillForMeField = commodityTypeOrderableId + CAN_FULFILL_FOR_ME_FIELD_NAME;
+
+    HashMap<String, Object> params = Maps.newHashMap();
+    params.put("id", commodityTypeOrderableId);
+
+    ValidatableResponse response = doRequest(params);
+    response.body(canFulfillForMeField, hasItem(tradeItemOrderableId.toString()));
+
+    verify(orderableRepository, times(0)).findAllLatest(any());
+  }
+
+  @Test
+  public void shouldCreateResourceBasingOnFacilityIdAndProgramIdParams() {
+    orderable.setId(commodityTypeOrderableId);
+    FacilityTypeApprovedProduct ftap = new FacilityTypeApprovedProductsDataBuilder()
+        .withOrderableId(commodityTypeOrderableId).build();
+
+    given(facilityTypeApprovedProductRepository
+        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any()))
+        .willReturn(getPage(ftap));
+    given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
+    given(factory.createFor(eq(orderable), any(), any()))
+        .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
+
+    String canFulfillForMeField = commodityTypeOrderableId + CAN_FULFILL_FOR_ME_FIELD_NAME;
+
+    HashMap<String, Object> params = Maps.newHashMap();
+    params.put("facilityId", facilityId);
+    params.put("programId", programId);
+
+    ValidatableResponse response = doRequest(params);
+    response.body(canFulfillForMeField, hasItem(tradeItemOrderableId.toString()));
+
+    verify(orderableRepository, times(0)).findAllLatest(any());
+    verify(facilityTypeApprovedProductRepository)
+        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any());
   }
 
   @SafeVarargs
@@ -93,10 +151,11 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     return new PageImpl<>(Lists.newArrayList(instance));
   }
 
-  private ValidatableResponse doRequest() {
+  private ValidatableResponse doRequest(Map<String, ?> params) {
     return restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
+        .queryParams(params != null ? params : Collections.emptyMap())
         .get("/api/orderableFulfills")
         .then()
         .statusCode(200);

@@ -25,14 +25,28 @@ public class EntityCollection<T extends BaseEntity> {
 
   private Map<UUID, T> collection = Maps.newHashMap();
 
+  /**
+   * Builds instance of {@link EntityCollection} with collection passed in parameter.
+   */
   public EntityCollection(Iterable<T> entities) {
-    entities.forEach(e -> collection.put(e.getId(), e));
+    if (entities != null) {
+      entities.forEach(e -> collection.put(e.getId(), e));
+    }
   }
 
+  /**
+   * Gets an entity from collection based on id. Returns null if entity is not found.
+   * @param id the id of getting entry.
+   * @return the found entity.
+   */
   public T getById(UUID id) {
     return collection.get(id);
   }
 
+  /**
+   * Gets all values.
+   * @return all entities.
+   */
   public Collection<T> values() {
     return collection.values();
   }
