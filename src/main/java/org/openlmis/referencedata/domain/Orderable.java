@@ -31,7 +31,6 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
@@ -44,10 +43,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.domain.BaseEntity.BaseExporter;
@@ -72,6 +70,8 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @Cacheable
 @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
 public class Orderable implements Versionable {
+
+  private static final int FETCH_SIZE = 1000;
 
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
@@ -104,23 +104,24 @@ public class Orderable implements Versionable {
   @Getter(AccessLevel.PACKAGE)
   private boolean roundToZero;
 
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true,
-      fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = FETCH_SIZE)
   @DiffIgnore
   @Setter
   @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
   private List<ProgramOrderable> programOrderables;
 
-  @LazyCollection(LazyCollectionOption.FALSE)
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @BatchSize(size = FETCH_SIZE)
   @DiffIgnore
   @Setter
   @Getter
   @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
   private Set<OrderableChild> children;
 
-  @ElementCollection(fetch = FetchType.EAGER)
+  @ElementCollection
   @MapKeyColumn(name = "key")
+  @BatchSize(size = FETCH_SIZE)
   @Column(name = "value")
   @CollectionTable(
       name = "orderable_identifiers",
