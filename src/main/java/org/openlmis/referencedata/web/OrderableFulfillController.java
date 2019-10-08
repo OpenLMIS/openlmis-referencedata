@@ -123,7 +123,7 @@ public class OrderableFulfillController extends BaseController {
   }
 
   private Set<UUID> getOrderableIds(OrderableFulfillSearchParams queryMap, Profiler profiler) {
-    if (queryMap.getFacilityId() != null && queryMap.getProgramId() != null) {
+    if (queryMap.isSearchByFacilityIdAndProgramId()) {
       profiler.start("GET_ORDERABLES_IDS_BY_FACILITY_AND_PROGRAM");
       return ftapRepository
           .searchProducts(queryMap.getFacilityId(), queryMap.getProgramId(), null, null, true, null)

@@ -50,6 +50,7 @@ public class OrderableFulfillFactory {
                                     EntityCollection<CommodityType> commodityTypes) {
     Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL");
     profiler.setLogger(XLOGGER);
+    profiler.start("GET_IDENTIFIERS");
     String tradeItemId = orderable.getTradeItemIdentifier();
     String commodityTypeId = orderable.getCommodityTypeIdentifier();
 

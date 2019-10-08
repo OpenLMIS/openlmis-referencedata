@@ -34,7 +34,7 @@ import org.springframework.util.MultiValueMap;
 
 @EqualsAndHashCode
 @ToString
-public class OrderableFulfillSearchParams {
+public final class OrderableFulfillSearchParams {
   public static final String ID = "id";
   public static final String FACILITY_ID = "facilityId";
   public static final String PROGRAM_ID = "programId";
@@ -88,10 +88,10 @@ public class OrderableFulfillSearchParams {
   }
 
   /**
-   * Check if all params are empty.
+   * Checks if provided params which allows to search by facilityId and programId.
    */
-  public boolean isEmpty() {
-    return queryParams.isEmpty();
+  public boolean isSearchByFacilityIdAndProgramId() {
+    return getFacilityId() != null && getProgramId() != null;
   }
 
   private void validate() {
