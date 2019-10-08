@@ -43,7 +43,8 @@ Improvements:
 * [OLMIS-6414](https://openlmis.atlassian.net/browse/OLMIS-6414): Added missing FTAPs to demo data.
 * [OLMIS-6408](https://openlmis.atlassian.net/browse/OLMIS-6408): Added pageable validator.
 * [OLMIS-6402](https://openlmis.atlassian.net/browse/OLMIS-6402): Renamed versionId field to versionNumber.
-* [OLMIS-6474](https://openlmis.atlassian.net/browse/OLMIS-6474): Performance improvements of `GET /api/orderableFulfills` endpoint. 
+* [OLMIS-6474](https://openlmis.atlassian.net/browse/OLMIS-6474): Performance improvements of `GET /api/orderableFulfills` endpoint.
+* [OLMIS-6614](https://openlmis.atlassian.net/browse/OLMIS-6614): Added serving of facilityId and programId params and reduced number of queries to DB made by `GET /api/orderableFulfills` endpoint.
 
 13.0.0 / 2019-05-27
 ==================
@@ -109,7 +110,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-5143](https://openlmis.atlassian.net/browse/OLMIS-5143): Added `extraData` field to supervisory node resource
 * [OLMIS-5614](https://openlmis.atlassian.net/browse/OLMIS-5614): Provided validation for supply partner resource
   * Added bidirectional relation between regular and partner nodes
-  
+
 Improvements:
 * [OLMIS-4295](https://openlmis.atlassian.net/browse/OLMIS-4295): Updated checkstyle to use newest google style.
 * [OLMIS-3078](https://openlmis.atlassian.net/browse/OLMIS-3078): Made Javers log initializer not iterate over all items, only those without logs.
@@ -133,7 +134,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-2245](https://openlmis.atlassian.net/browse/OLMIS-2245): Added user count to Role resource.
 * [OLMIS-4730](https://openlmis.atlassian.net/browse/OLMIS-4730): Allow to update basic information by user
   * added job title and phone number fields
-* [OLMIS-4908](https://openlmis.atlassian.net/browse/OLMIS-4908): Send user's contact details to the notification service  
+* [OLMIS-4908](https://openlmis.atlassian.net/browse/OLMIS-4908): Send user's contact details to the notification service
 * [OLMIS-4980](https://openlmis.atlassian.net/browse/OLMIS-4980): Add extra data to processing period model (for report only flag)
 * [OLMIS-4871](https://openlmis.atlassian.net/browse/OLMIS-4871): Move reference data to new demo data strategy.
 
@@ -244,7 +245,7 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 * [OLMIS-3209](https://openlmis.atlassian.net/browse/OLMIS-3209): Fixed problem with parsing orderable DTO when it contains several program orderables.
 * [OLMIS-3290](https://openlmis.atlassian.net/browse/OLMIS-3290): Fixed searching Orderables by code and name.
 * [OLMIS-3291](https://openlmis.atlassian.net/browse/OLMIS-3291): Fixed searching RequisitionGroups by supervisoryNode.
-* [OLMIS-3346](https://openlmis.atlassian.net/browse/OLMIS-3346): Decreased number of database calls to retrieve Facility Type Approved Products  
+* [OLMIS-3346](https://openlmis.atlassian.net/browse/OLMIS-3346): Decreased number of database calls to retrieve Facility Type Approved Products
 
 8.0.1 / 2017-09-05
 ==================
@@ -392,7 +393,7 @@ Dev and tooling updates made in a backwards-compatible manner:
 ==================
 
 Breaking changes:
-* [OLMIS-2143](https://openlmis.atlassian.net/browse/OLMIS-2143), 
+* [OLMIS-2143](https://openlmis.atlassian.net/browse/OLMIS-2143),
 [OLMIS-2202](https://openlmis.atlassian.net/browse/OLMIS-2202): Add pagination to the users search endpoint
 * [OLMIS-1776](https://openlmis.atlassian.net/browse/OLMIS-1776): Trade Item: rename manufacturer for GS1.
   * TradeItem.manufacturer => TradeItem.manufacturerOfTradeItem
@@ -402,7 +403,7 @@ Breaking changes:
 * Facility search endpoint now uses POST method instead of GET.
   * The parameters are passed in request body, similarly to /api/users/search endpoint.
   * The "zone" parameter was renamed to "zoneId"
-  
+
 New functionality added in a backwards-compatible manner:
 * [OLMIS-1779](https://openlmis.atlassian.net/browse/OLMIS-1779): Add validations on saving program
   * code can not be null
@@ -417,10 +418,10 @@ New functionality added in a backwards-compatible manner:
   * We do not allow saving with an empty list of supported programs
 * [OLMIS-1965](https://openlmis.atlassian.net/browse/OLMIS-1965): Add validation for existing products that are not a commodity type
 * [OLMIS-2027](https://openlmis.atlassian.net/browse/OLMIS-2027): Create unit and integration tests for repository/service/controller methods added during reporting rate/timeliness report development
-* [OLMIS-2148](https://openlmis.atlassian.net/browse/OLMIS-2148), 
+* [OLMIS-2148](https://openlmis.atlassian.net/browse/OLMIS-2148),
 [OLMIS-633](https://openlmis.atlassian.net/browse/OLMIS-633),
 [OLMIS-632](https://openlmis.atlassian.net/browse/OLMIS-632),
-[OLMIS-629](https://openlmis.atlassian.net/browse/OLMIS-629) 
+[OLMIS-629](https://openlmis.atlassian.net/browse/OLMIS-629)
 Add new rights for stock manager role:
   * STOCK_INVENTORIES_EDIT
   * STOCK_ADJUST

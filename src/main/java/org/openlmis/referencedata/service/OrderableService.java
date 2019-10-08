@@ -20,9 +20,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +48,6 @@ public class OrderableService {
       Pageable pageable) {
     LOGGER.info("search orderable query params: {}", queryMap);
 
-    if (!queryMap.isValid()) {
-      throw new ValidationMessageException(
-          OrderableMessageKeys.ERROR_INVALID_PARAMS);
-    }
     if (queryMap.isEmpty()) {
       LOGGER.info("find all");
       return orderableRepository.findAllLatest(pageable);
@@ -86,11 +80,6 @@ public class OrderableService {
    */
   public List<Orderable> getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryMap,
       Pageable pageable) {
-
-    if (!queryMap.isValid()) {
-      throw new ValidationMessageException(
-          OrderableMessageKeys.ERROR_INVALID_PARAMS);
-    }
 
     if (queryMap.isEmpty()) {
       return orderableRepository.findOrderablesWithLatestModifiedDate(null, pageable);

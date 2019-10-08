@@ -3321,10 +3321,31 @@ resourceTypes:
               the canFulfillForMe property should be empty
           queryParameters:
               id:
-                  description: Orderable id
+                  description: >
+                      Orderable id. Cannot be provided together with facilityId and programId.
                   type: string
                   required: false
                   repeat: true
+              facilityId:
+                  description: >
+                      Facility Id. This param allows filtering the result basing on FTAPs (it
+                      selects related orderables). Only active FTAPs are took into account. The
+                      filtration requires the support of FTAPs in OpenLMIS in otherwise the empty
+                      result will be returned. If facilityId is provided, the programId param also
+                      must be provided.
+                  type: string
+                  required: false
+                  repeat: false
+              programId:
+                  description: >
+                      Program Id. This param allows filtering the result basing on FTAPs (it
+                      selects related orderables). Only active FTAPs are took into account. The
+                      filtration requires the support of FTAPs in OpenLMIS in otherwise the empty
+                      result will be returned. If programId is provided, the facilityId param also
+                      must be provided.
+                  type: string
+                  required: false
+                  repeat: false
           responses:
               "200":
                   body:

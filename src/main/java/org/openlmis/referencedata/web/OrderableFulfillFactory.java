@@ -27,9 +27,8 @@ import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.util.EntityCollection;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -42,19 +41,13 @@ public class OrderableFulfillFactory {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableFulfillFactory.class);
 
   @Autowired
-  private TradeItemRepository tradeItemRepository;
-
-  @Autowired
-  private CommodityTypeRepository commodityTypeRepository;
-
-  @Autowired
   private OrderableRepository orderableRepository;
 
   /**
    * Create new instance of {@link OrderableFulfill} for the given orderable.
    */
-  public OrderableFulfill createFor(Orderable orderable, Iterable<TradeItem> tradeItems,
-                                    Iterable<CommodityType> commodityTypes) {
+  public OrderableFulfill createFor(Orderable orderable, EntityCollection<TradeItem> tradeItems,
+                                    EntityCollection<CommodityType> commodityTypes) {
     Profiler profiler = new Profiler("CREATE_ORDERABLE_FULFILL");
     profiler.setLogger(XLOGGER);
     String tradeItemId = orderable.getTradeItemIdentifier();
@@ -62,22 +55,25 @@ public class OrderableFulfillFactory {
 
     OrderableFulfill result = null;
     if (isNotBlank(tradeItemId)) {
-      result = createForTradeItem(commodityTypes, tradeItemId, orderable, profiler);
+      result = createForTradeItem(tradeItems, commodityTypes, tradeItemId, orderable, profiler);
     } else if (isNotBlank(commodityTypeId)) {
-      result = createForCommodityType(tradeItems, commodityTypeId, orderable, profiler);
+      result = createForCommodityType(tradeItems, commodityTypes, commodityTypeId, orderable,
+          profiler);
     }
 
     profiler.stop().log();
     return result;
   }
 
-  private OrderableFulfill createForTradeItem(Iterable<CommodityType> commodityTypes, String id,
-                                              Orderable tradeItemOrderable, Profiler profiler) {
-    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_TRADE_ITEM");
-    TradeItem tradeItem = tradeItemRepository.findOne(UUID.fromString(id));
+  private OrderableFulfill createForTradeItem(EntityCollection<TradeItem> tradeItems,
+      EntityCollection<CommodityType> commodityTypes, String id,
+      Orderable tradeItemOrderable, Profiler profiler) {
+    profiler.start("FETCH_TRADE_ITEM");
+    TradeItem tradeItem = tradeItems.getById(UUID.fromString(id));
 
+    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_TRADE_ITEM");
     List<UUID> canBeFulfilledByMe = Lists.newArrayList();
-    commodityTypes.forEach(
+    commodityTypes.values().forEach(
         commodityType -> {
           if (tradeItem.canFulfill(commodityType)) {
             addToListIfDispensableMatches(canBeFulfilledByMe, COMMODITY_TYPE, commodityType,
@@ -89,14 +85,15 @@ public class OrderableFulfillFactory {
     return OrderableFulfill.ofTradeItem(canBeFulfilledByMe);
   }
 
-  private OrderableFulfill createForCommodityType(Iterable<TradeItem> tradeItems, String id,
-                                                  Orderable commodityTypeOrderable,
-                                                  Profiler profiler) {
-    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_COMMODITY_TYPE");
-    CommodityType commodityType = commodityTypeRepository.findOne(UUID.fromString(id));
+  private OrderableFulfill createForCommodityType(EntityCollection<TradeItem> tradeItems,
+      EntityCollection<CommodityType> commodityTypes, String id,
+      Orderable commodityTypeOrderable, Profiler profiler) {
+    profiler.start("FETCH_COMMODITY_TYPE");
+    CommodityType commodityType = commodityTypes.getById(UUID.fromString(id));
 
+    profiler.start("CREATE_ORDERABLE_FULFILL_FOR_COMMODITY_TYPE");
     List<UUID> canFulfillForMe = Lists.newArrayList();
-    tradeItems.forEach(
+    tradeItems.values().forEach(
         tradeItem -> {
           if (tradeItem.canFulfill(commodityType)) {
             addToListIfDispensableMatches(canFulfillForMe, TRADE_ITEM, tradeItem,

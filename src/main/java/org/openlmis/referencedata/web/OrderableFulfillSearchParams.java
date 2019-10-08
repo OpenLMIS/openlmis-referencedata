@@ -15,34 +15,32 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.apache.commons.lang3.StringUtils.EMPTY;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
-import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_INVALID_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.OrderableFulFillMessageKeys.ERROR_IDS_CANNOT_BY_PROVIDED_TOGETHER_WITH_FACILITY_ID_AND_PROGRAM_ID;
+import static org.openlmis.referencedata.util.messagekeys.OrderableFulFillMessageKeys.ERROR_INVALID_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.OrderableFulFillMessageKeys.ERROR_PROVIDED_FACILITY_ID_WITHOUT_PROGRAM_ID;
+import static org.openlmis.referencedata.util.messagekeys.OrderableFulFillMessageKeys.ERROR_PROVIDED_PROGRAM_ID_WITHOUT_FACILITY_ID;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.apache.commons.lang3.tuple.Pair;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.MultiValueMap;
 
+@EqualsAndHashCode
 @ToString
-public class QueryOrderableSearchParams implements OrderableRepositoryCustom.SearchParams {
-
-  private static final String CODE = "code";
-  private static final String NAME = "name";
-  private static final String PROGRAM_CODE = "program";
-  private static final String ID = "id";
+public class OrderableFulfillSearchParams {
+  public static final String ID = "id";
+  public static final String FACILITY_ID = "facilityId";
+  public static final String PROGRAM_ID = "programId";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, CODE, NAME, PROGRAM_CODE));
+      FACILITY_ID, PROGRAM_ID, ID));
 
   private SearchParams queryParams;
 
@@ -50,59 +48,33 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
    * Wraps map of query params into an object. Remove parameters that should be managed by
    * {@link Pageable}
    */
-  public QueryOrderableSearchParams(MultiValueMap<String, Object> queryMap) {
+  public OrderableFulfillSearchParams(MultiValueMap<String, Object> queryMap) {
     queryParams = new SearchParams(queryMap);
     validate();
   }
 
   /**
-   * Gets code.
+   * Gets FacilityTypeId.
    *
-   * @return String value of code or null if params doesn't contain "code" param. Empty string
-   *         for null request param value.
+   * @return UUID value of facilityId or null if params doesn't contain "facilityId" param.
    */
-  @Override
-  public String getCode() {
-    if (!queryParams.containsKey(CODE)) {
+  public UUID getFacilityId() {
+    if (!queryParams.containsKey(FACILITY_ID)) {
       return null;
     }
-
-    return defaultIfBlank(queryParams.getFirst(CODE), EMPTY);
+    return queryParams.getUuid(FACILITY_ID);
   }
 
   /**
-   * Gets name.
+   * Gets ProgramId.
    *
-   * @return String value of name or null if params doesn't contain "name" param. Empty string
-   *         for null request param value.
+   * @return UUID value of programId or null if params doesn't contain "programId" param.
    */
-  @Override
-  public String getName() {
-    if (!queryParams.containsKey(NAME)) {
+  public UUID getProgramId() {
+    if (!queryParams.containsKey(PROGRAM_ID)) {
       return null;
     }
-
-    return defaultIfBlank(queryParams.getFirst(NAME), EMPTY);
-  }
-
-  /**
-   * Gets program code.
-   *
-   * @return {@link Code} value of program code or null if params doesn't contain "programCode"
-   *                      param. Empty Code for request param that has no value.
-   */
-  @Override
-  public String getProgramCode() {
-    if (!queryParams.containsKey(PROGRAM_CODE)) {
-      return null;
-    }
-
-    return defaultIfBlank(queryParams.getFirst(PROGRAM_CODE), EMPTY);
-  }
-
-  @Override
-  public Set<Pair<UUID, Long>> getIdentityPairs() {
-    return Collections.emptySet();
+    return queryParams.getUuid(PROGRAM_ID);
   }
 
   /**
@@ -125,6 +97,19 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   private void validate() {
     if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
       throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
+    }
+    if (queryParams.containsKey(FACILITY_ID) && !queryParams.containsKey(PROGRAM_ID)) {
+      throw new ValidationMessageException(
+          new Message(ERROR_PROVIDED_FACILITY_ID_WITHOUT_PROGRAM_ID));
+    }
+    if (!queryParams.containsKey(FACILITY_ID) && queryParams.containsKey(PROGRAM_ID)) {
+      throw new ValidationMessageException(
+          new Message(ERROR_PROVIDED_PROGRAM_ID_WITHOUT_FACILITY_ID));
+    }
+    if (queryParams.containsKey(ID)
+        && (queryParams.containsKey(FACILITY_ID) || queryParams.containsKey(PROGRAM_ID))) {
+      throw new ValidationMessageException(
+          new Message(ERROR_IDS_CANNOT_BY_PROVIDED_TOGETHER_WITH_FACILITY_ID_AND_PROGRAM_ID));
     }
   }
 }

@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -26,9 +25,7 @@ import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
 import com.google.common.collect.Lists;
-
-import java.util.ArrayList;
-
+import java.util.Collections;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -37,24 +34,17 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.CommodityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
+import org.openlmis.referencedata.util.EntityCollection;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableFulfillFactoryTest {
 
   @Mock
   private OrderableRepository orderableRepository;
-
-  @Mock
-  private TradeItemRepository tradeItemRepository;
-
-  @Mock
-  private CommodityTypeRepository commodityTypeRepository;
 
   @InjectMocks
   private OrderableFulfillFactory factory;
@@ -72,15 +62,19 @@ public class OrderableFulfillFactoryTest {
       .withIdentifier(COMMODITY_TYPE, commodityType.getId())
       .build();
 
+  private EntityCollection<TradeItem> tradeItems = new EntityCollection<>(
+      Collections.singletonList(tradeItem));
+
+  private EntityCollection<CommodityType> commodityTypes = new EntityCollection<>(
+      Collections.singletonList(commodityType));
+
   @Test
   public void shouldCreateResourceForTradeItem() {
-    when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
     when(orderableRepository.findAllLatestByIdentifier(
         COMMODITY_TYPE, commodityType.getId().toString()))
         .thenReturn(Lists.newArrayList(commodityTypeOrderable));
 
-    OrderableFulfill response = factory.createFor(tradeItemOrderable, new ArrayList<>(),
-            singletonList(commodityType));
+    OrderableFulfill response = factory.createFor(tradeItemOrderable, tradeItems, commodityTypes);
     assertThat(response.getCanFulfillForMe(), hasSize(0));
     assertThat(response.getCanBeFulfilledByMe(), hasSize(1));
     assertThat(response.getCanBeFulfilledByMe(), hasItem(commodityTypeOrderable.getId()));
@@ -88,12 +82,11 @@ public class OrderableFulfillFactoryTest {
 
   @Test
   public void shouldCreateResourceForCommodityType() {
-    when(commodityTypeRepository.findOne(commodityType.getId())).thenReturn(commodityType);
     when(orderableRepository.findAllLatestByIdentifier(TRADE_ITEM, tradeItem.getId().toString()))
         .thenReturn(Lists.newArrayList(tradeItemOrderable));
 
-    OrderableFulfill response = factory.createFor(commodityTypeOrderable, singletonList(tradeItem),
-            new ArrayList<>());
+    OrderableFulfill response = factory.createFor(commodityTypeOrderable,
+        tradeItems, commodityTypes);
     assertThat(response.getCanFulfillForMe(), hasSize(1));
     assertThat(response.getCanFulfillForMe(), hasItem(tradeItemOrderable.getId()));
     assertThat(response.getCanBeFulfilledByMe(), hasSize(0));
@@ -102,7 +95,7 @@ public class OrderableFulfillFactoryTest {
   @Test
   public void shouldNotCreateResourceIfThereAreNoIdentifiers() {
     OrderableFulfill response = factory.createFor(new OrderableDataBuilder().build(),
-            new ArrayList<>(), new ArrayList<>());
+        tradeItems, commodityTypes);
     assertThat(response, is(nullValue()));
   }
 }
