@@ -13,10 +13,7 @@ execution:
     scenario: orderables-get-10000-by-program
   - concurrency: ${__P(scenario-concurrency,1)}
     hold-for: ${__P(scenario-duration,60)}
-    scenario: orderables-search-1000-by-version-identities
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
-    scenario: orderables-search-9000-by-version-identities
+    scenario: orderables-search-10000-by-version-identities
 
 scenarios:
   orderables-get-first-10:
@@ -54,56 +51,50 @@ scenarios:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/orderables?program=PRG002
         method: GET
-        label: Get1000OrderablesByProgram
-        headers:
-          Authorization: Bearer ${access_token}
-          Content-Type: application/json
-
-  orderables-search-1000-by-version-identities:
-    requests:
-      - include-scenario: get-user-token
-      - url: ${__P(base-uri)}/api/orderables/search
-        method: POST
-        label: Search100OrderablesByVersionIdentities
+        label: Get10000OrderablesByProgram
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
         jsr223:
-          execute: before
           script-text: |
+            import groovy.json.JsonSlurper
             import groovy.json.JsonOutput
 
-            def identities = [];
-            for (def i=0; i<1000; i++) {
-              def identity = [
-                id: UUID.randomUUID(),
-                versionNumber: 1
-              ];
+            def response = prev.getResponseDataAsString()
+            def jsonSlurper = new JsonSlurper()
 
-              identities.add(identity);
+            def orderables = jsonSlurper.parseText(response)
+            def orderable_ids = []
+            orderables.content.each { orderable ->
+              orderable_ids.add(orderable.id)
             }
 
-            vars.put("identities", JsonOutput.toJson(identities));
-          body: ${identities}
+            vars.put("orderable_ids", JsonOutput.toJson(orderable_ids))
 
-  orderables-search-9000-by-version-identities:
+  orderables-search-10000-by-version-identities:
     requests:
       - include-scenario: get-user-token
+      - include-scenario: orderables-get-10000-by-program
       - url: ${__P(base-uri)}/api/orderables/search
         method: POST
-        label: Search900OrderablesByVersionIdentities
+        label: Search1000OrderablesByVersionIdentities
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
         jsr223:
           execute: before
           script-text: |
+            import groovy.json.JsonSlurper
             import groovy.json.JsonOutput
 
+            def jsonSlurper = new JsonSlurper()
+
             def identities = [];
-            for (def i=0; i<9000; i++) {
+            orderable_ids = jsonSlurper.parseText(vars.get("orderable_ids"))
+
+            orderable_ids.each { orderableId ->
               def identity = [
-                id: UUID.randomUUID(),
+                id: orderableId,
                 versionNumber: 1
               ];
 
@@ -119,6 +110,5 @@ reporting:
         Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>500ms
         Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>500ms
         Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>500ms
-        Get 10000 Orderables By Program too slow: p90 of Get1000OrderablesByProgram>50000ms
-        Get 1000 Orderables By Version Identities too slow: p90 of Search100OrderablesByVersionIdentities>2500ms
-        Get 9000 Orderables By Version Identities too slow: p90 of Search900OrderablesByVersionIdentities>50000ms
+        Get 10000 Orderables By Program too slow: p90 of Get10000OrderablesByProgram>50000ms
+        Get 10000 Orderables By Version Identities too slow: p90 of Search10000OrderablesByVersionIdentities>50000ms
