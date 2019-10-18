@@ -1,3 +1,10 @@
+14.0.0 / WIP
+==================
+
+Bug fixes:
+* [OLMIS-6575](https://openlmis.atlassian.net/browse/OLMIS-6575): Fixed Internal Server Error in supervisoryNodes endpoint.
+
+
 14.0.0 / 2019-10-17
 ==================
 

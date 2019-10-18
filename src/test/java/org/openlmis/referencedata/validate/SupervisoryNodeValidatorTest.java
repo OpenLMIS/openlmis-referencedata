@@ -41,6 +41,7 @@ import org.springframework.validation.Validator;
 public class SupervisoryNodeValidatorTest {
 
   private static final String CODE = "code";
+  private static final String NAME = "name";
   private static final String DC1 = "DC1";
   private static final String REQUISITION_GROUP = "requisitionGroup";
 
@@ -113,7 +114,6 @@ public class SupervisoryNodeValidatorTest {
     when(repository.findByCode(DC1)).thenReturn(existing);
 
     builder
-            .withName("Updated Name")
             .withCode("Updated Code")
             .withoutRequisitionGroup()
             .build()
@@ -138,7 +138,6 @@ public class SupervisoryNodeValidatorTest {
     when(repository.findByCode(DC1)).thenReturn(existing);
 
     builder
-            .withName("Updated Name")
             .withCode("Updated Code")
             .withoutRequisitionGroup()
             .build()
@@ -177,7 +176,6 @@ public class SupervisoryNodeValidatorTest {
     when(repository.findByCode(DC1)).thenReturn(existing);
 
     builder
-        .withName("Updated Name")
         .withCode("Updated Code")
         .build()
         .export(dto);
@@ -210,12 +208,12 @@ public class SupervisoryNodeValidatorTest {
   @Test
   public void shouldRejectIfNameIsNull() {
     new SupervisoryNodeDataBuilder()
-        .withoutCode()
+        .withoutName()
         .build()
         .export(dto);
 
     validator.validate(dto, errors);
 
-    assertErrorMessage(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_REQUIRED);
+    assertErrorMessage(errors, NAME, SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED);
   }
 }

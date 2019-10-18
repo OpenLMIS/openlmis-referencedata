@@ -69,24 +69,8 @@ public class SupervisoryNodeValidator implements BaseValidator {
 
     SupervisoryNodeDto node = (SupervisoryNodeDto) target;
     UUID nodeId = getId(node.getId());
-    SupervisoryNode existingWithCode = repository.findByCode(node.getCode());
-    if (null != existingWithCode && !existingWithCode.getId().equals(node.getId())) {
-      rejectValue(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
-    }
-    Set<SupervisoryNode> existingSupervisoryNode =
-            repository.findByCodeCaseInsensetive(
-                    node.getCode(), nodeId);
-    if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
-      rejectValue(errors,CODE,
-              SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
-    }
-    Set<SupervisoryNode> storedSupervisoryNode =
-            repository.findByNameIgnoreCaseContaining(
-                    node.getName(), nodeId);
-    if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
-      rejectValue(errors,NAME,
-              SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
-    }
+    verifyCode(node, nodeId, errors);
+    verifyName(node, nodeId, errors);
     SupervisoryNode existingNode = repository.findOne(nodeId);
     if (isRequisitionGroupChanged(existingNode, node)) {
       rejectValue(errors, REQUISITION_GROUP,
@@ -108,6 +92,34 @@ public class SupervisoryNodeValidator implements BaseValidator {
           SupervisoryNode existingNode, SupervisoryNodeDto dto) {
     return null != existingNode && null == dto.getRequisitionGroup()
         && null != existingNode.getRequisitionGroup();
+  }
+
+  private void verifyCode(SupervisoryNodeDto node, UUID nodeId, Errors errors) {
+    if (null != node.getCode()) {
+      SupervisoryNode existingWithCode = repository.findByCode(node.getCode());
+      if (null != existingWithCode && !existingWithCode.getId().equals(node.getId())) {
+        rejectValue(errors, CODE, SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+      }
+      Set<SupervisoryNode> existingSupervisoryNode =
+              repository.findByCodeCaseInsensetive(
+                      node.getCode(), nodeId);
+      if (null != existingSupervisoryNode && !existingSupervisoryNode.isEmpty()) {
+        rejectValue(errors, CODE,
+                SupervisoryNodeMessageKeys.ERROR_CODE_MUST_BE_UNIQUE);
+      }
+    }
+  }
+
+  private void verifyName(SupervisoryNodeDto node, UUID nodeId, Errors errors) {
+    if (null != node.getName()) {
+      Set<SupervisoryNode> storedSupervisoryNode =
+              repository.findByNameIgnoreCaseContaining(
+                      node.getName(), nodeId);
+      if (null != storedSupervisoryNode && !storedSupervisoryNode.isEmpty()) {
+        rejectValue(errors, NAME,
+                SupervisoryNodeMessageKeys.ERROR_NAME_MUST_BE_UNIQUE);
+      }
+    }
   }
 
   private UUID getId(UUID id) {

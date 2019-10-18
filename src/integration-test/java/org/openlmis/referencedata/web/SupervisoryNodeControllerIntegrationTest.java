@@ -34,6 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys.ERROR_NAME_REQUIRED;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.CODE_PARAM;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.FACILITY_ID;
 import static org.openlmis.referencedata.web.SupervisoryNodeSearchParams.NAME_PARAM;
@@ -403,6 +404,27 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   }
 
   @Test
+  public void shouldRejectPostSupervisoryNodeIfNameIsNull() {
+    mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+    supervisoryNodeDto.setName(null);
+
+    String messageKey = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(supervisoryNodeDto)
+            .when()
+            .post(RESOURCE_URL)
+            .then()
+            .statusCode(400)
+            .extract()
+            .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_NAME_REQUIRED)));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldNotRejectPostSupervisoryNodeIfRequisitionGroupIsMissing() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
@@ -575,7 +597,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldAcceptPutSupervisoryNodeIfRequisitionGroupIsNotOnBothUpdateAndExistingNode() {
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
-            //.withName("Existing Name")
             .withFacility(supervisoryNode.getFacility())
             .withoutRequisitionGroup()
             .withParentNode(supervisoryNode.getParentNode());
@@ -589,7 +610,6 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     supervisoryNodeDto = new SupervisoryNodeDto();
     builder
-            //.withName("New Name")
             .withoutRequisitionGroup()
             .build()
             .export(supervisoryNodeDto);
