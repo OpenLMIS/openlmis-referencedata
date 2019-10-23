@@ -64,12 +64,20 @@ scenarios:
             def jsonSlurper = new JsonSlurper()
 
             def orderables = jsonSlurper.parseText(response)
-            def orderable_ids = []
+            def identities = [];
+            def builder = new StringBuilder();
+            builder.append("{ \"identities\": ");
+
             orderables.content.each { orderable ->
-              orderable_ids.add(orderable.id)
+              def identity = [
+                id: orderable.id,
+                versionNumber: orderable.meta.versionNumber
+              ];
+              identities.add(identity);
             }
 
-            vars.put("orderable_ids", JsonOutput.toJson(orderable_ids))
+            builder.append(JsonOutput.toJson(identities) + "}");
+            vars.put("versionIdentities", builder.toString());
 
   orderables-search-10000-by-version-identities:
     requests:
@@ -81,28 +89,7 @@ scenarios:
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
-        jsr223:
-          execute: before
-          script-text: |
-            import groovy.json.JsonSlurper
-            import groovy.json.JsonOutput
-
-            def jsonSlurper = new JsonSlurper()
-
-            def identities = [];
-            orderable_ids = jsonSlurper.parseText(vars.get("orderable_ids"))
-
-            orderable_ids.each { orderableId ->
-              def identity = [
-                id: orderableId,
-                versionNumber: 1
-              ];
-
-              identities.add(identity);
-            }
-
-            vars.put("identities", JsonOutput.toJson(identities));
-          body: ${identities}
+        body: ${versionIdentities}
 
 reporting:
     - module: passfail
