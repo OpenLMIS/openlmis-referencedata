@@ -85,7 +85,7 @@ scenarios:
       - include-scenario: orderables-get-10000-by-program
       - url: ${__P(base-uri)}/api/orderables/search
         method: POST
-        label: Search1000OrderablesByVersionIdentities
+        label: Search10000OrderablesByVersionIdentities
         headers:
           Authorization: Bearer ${access_token}
           Content-Type: application/json
