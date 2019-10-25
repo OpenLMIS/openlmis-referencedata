@@ -49,6 +49,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Code;
@@ -69,6 +70,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -100,6 +102,9 @@ public class OrderableRepositoryIntegrationTest {
   private EntityManager entityManager;
 
   private AtomicInteger instanceNumber = new AtomicInteger(0);
+
+  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE, Sort.Direction.ASC,
+      "fullProductName");
 
   private int getNextInstanceNumber() {
     return this.instanceNumber.incrementAndGet();
@@ -178,7 +183,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Set<UUID> ids = newHashSet(orderable.getId(), orderable2.getId());
-    Page<Orderable> found = repository.findAllLatestByIds(ids, null);
+    Page<Orderable> found = repository.findAllLatestByIds(ids, pageable);
 
     // then
     assertEquals(2, found.getTotalElements());
@@ -206,7 +211,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Set<UUID> ids = newHashSet(orderable.getId());
-    Page<Orderable> actual = repository.findAllLatestByIds(ids, null);
+    Page<Orderable> actual = repository.findAllLatestByIds(ids, pageable);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
@@ -337,7 +342,7 @@ public class OrderableRepositoryIntegrationTest {
     // when
     Page<Orderable> foundOrderables = repository.search(
         new TestSearchParams(null, null, programCode, null),
-        null);
+        pageable);
 
     // then
     assertEquals(1, foundOrderables.getTotalElements());
@@ -396,7 +401,7 @@ public class OrderableRepositoryIntegrationTest {
         new TestSearchParams(
             validOrderable.getProductCode().toString(), NAME,
             validProgram.getCode().toString(), null),
-        null);
+        pageable);
 
     // then
     assertEquals(1, foundOrderables.getTotalElements());
@@ -448,7 +453,7 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = saveAndGetOrderable();
 
     // when
-    Page<Orderable> actual = repository.findAllLatest(null);
+    Page<Orderable> actual = repository.findAllLatest(pageable);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
@@ -457,7 +462,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void findAllLatestByIdsShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
-    Page<Orderable> actual = repository.findAllLatestByIds(newHashSet(UUID.randomUUID()), null);
+    Page<Orderable> actual = repository.findAllLatestByIds(newHashSet(UUID.randomUUID()), pageable);
 
     // then
     assertNotNull(actual);
@@ -467,7 +472,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void searchShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
-    Page<Orderable> actual = repository.search(new TestSearchParams(), null);
+    Page<Orderable> actual = repository.search(new TestSearchParams(), pageable);
 
     // then
     assertNotNull(actual);
@@ -501,7 +506,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> actual = repository
-        .search(new TestSearchParams(SOME_CODE, null, null, null), null);
+        .search(new TestSearchParams(SOME_CODE, null, null, null), pageable);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
@@ -518,7 +523,7 @@ public class OrderableRepositoryIntegrationTest {
         new TestSearchParams(null, null, null,
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
                 Pair.of(orderable2.getId(), orderable2.getVersionNumber()))),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(2));
 
@@ -542,7 +547,7 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> actual = repository.search(
         new TestSearchParams(null, null, null,
             Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber()))),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity(), is(orderable.getVersionIdentity()));
@@ -551,7 +556,7 @@ public class OrderableRepositoryIntegrationTest {
     actual = repository.search(
         new TestSearchParams(null, null, null,
             Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber() - 1))),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(orderable.getId()));
@@ -666,14 +671,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void shouldFindOrderableWithLatestVersionFromPaginatedOrderables() {
     //given
-    Long versionNumber = ThreadLocalRandom.current().nextLong(0, 1000);
-    OrderableDataBuilder builder = new OrderableDataBuilder();
-    Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
-    orderable = repository.save(orderable);
-
-    Orderable orderableNewVersion = builder.withVersionNumber(versionNumber + 1).buildAsNew();
-    orderableNewVersion.setId(orderable.getId());
-    repository.save(orderableNewVersion);
+    Orderable orderableNewVersion = saveAndGetOrderable();
 
     //when
     Orderable foundOrderable =
@@ -699,7 +697,7 @@ public class OrderableRepositoryIntegrationTest {
 
     //when
     ZonedDateTime lastUpdated = repository
-        .findOrderablesWithLatestModifiedDate(null, null)
+        .findOrderablesWithLatestModifiedDate(null, pageable)
         .get(0)
         .getLastUpdated();
 
@@ -726,7 +724,7 @@ public class OrderableRepositoryIntegrationTest {
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
                 Pair.of(orderable2.getId(), orderable2.getVersionNumber()),
                 Pair.of(orderable3.getId(), orderable3.getVersionNumber()))),
-        null).get(0).getLastUpdated();
+        pageable).get(0).getLastUpdated();
 
     //then
     assertEquals(latestModifiedDate, orderable3.getLastUpdated());
@@ -736,7 +734,7 @@ public class OrderableRepositoryIntegrationTest {
       Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams(code, name, programCode, null), null);
+        .search(new TestSearchParams(code, name, programCode, null), pageable);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
@@ -803,8 +801,14 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
     orderable = repository.save(orderable);
 
+    Program validProgram = new ProgramDataBuilder().build();
+    programRepository.save(validProgram);
+
     Orderable orderableNewVersion = builder.withVersionNumber(versionNumber + 1).buildAsNew();
+
     orderableNewVersion.setId(orderable.getId());
+    orderableNewVersion.setProgramOrderables(
+        Lists.newArrayList(createProgramOrderable(validProgram, orderableNewVersion)));
 
     return repository.save(orderableNewVersion);
   }
