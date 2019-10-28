@@ -35,6 +35,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import org.apache.commons.collections4.ListUtils;
+import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
@@ -256,7 +257,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     CriteriaQuery<Orderable> criteriaQuery =
         criteriaBuilder.createQuery(Orderable.class);
     Root<Orderable> root = criteriaQuery.from(Orderable.class);
-    criteriaQuery.select(root).distinct(true).where(root.get(IDENTITY).in(identities));
+    criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
 
     if (date) {
       criteriaQuery.orderBy(criteriaBuilder.desc(root.get("lastUpdated")));
@@ -264,7 +265,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     return entityManager
         .createQuery(criteriaQuery)
-        .getResultList();
+        .unwrap(org.hibernate.Query.class)
+        .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
+        .list();
   }
 
 }
