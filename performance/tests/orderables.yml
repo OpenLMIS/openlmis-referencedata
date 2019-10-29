@@ -97,5 +97,5 @@ reporting:
         Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>500ms
         Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>500ms
         Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>500ms
-        Get 10000 Orderables By Program too slow: p90 of Get10000OrderablesByProgram>50000ms
-        Get 10000 Orderables By Version Identities too slow: p90 of Search10000OrderablesByVersionIdentities>50000ms
+        Get 10000 Orderables By Program too slow: p90 of Get10000OrderablesByProgram>55000ms
+        Get 10000 Orderables By Version Identities too slow: p90 of Search10000OrderablesByVersionIdentities>55000ms
