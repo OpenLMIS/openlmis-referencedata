@@ -49,6 +49,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.domain.Code;
@@ -803,8 +804,14 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
     orderable = repository.save(orderable);
 
+    Program validProgram = new ProgramDataBuilder().build();
+    programRepository.save(validProgram);
+
     Orderable orderableNewVersion = builder.withVersionNumber(versionNumber + 1).buildAsNew();
+
     orderableNewVersion.setId(orderable.getId());
+    orderableNewVersion.setProgramOrderables(
+        Lists.newArrayList(createProgramOrderable(validProgram, orderableNewVersion)));
 
     return repository.save(orderableNewVersion);
   }

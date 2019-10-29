@@ -20,24 +20,28 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.slf4j.ext.XLogger;
@@ -66,8 +70,6 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
       " INNER" + NATIVE_PROGRAM_ORDERABLE_JOIN;
-  private static final String NATIVE_PROGRAM_ORDERABLE_LEFT_JOIN =
-      " LEFT" + NATIVE_PROGRAM_ORDERABLE_JOIN;
 
   private static final String NATIVE_PROGRAM_JOIN =
       " JOIN referencedata.programs AS p"
@@ -75,19 +77,12 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER" + NATIVE_PROGRAM_JOIN;
-  private static final String NATIVE_PROGRAM_LEFT_JOIN =
-      " LEFT" + NATIVE_PROGRAM_JOIN;
 
   private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
       " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
           + "   FROM referencedata.orderables GROUP BY id) AS latest"
           + "   ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
 
-  private static final String NATIVE_SELECT_ORDERABLES_BY_IDENTITES = "SELECT o.*, po.*, p.*"
-      + FROM_ORDERABLES_TABLE;
-
-  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
-      + " DESC LIMIT 1";
   private static final String GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME =
       " GROUP BY o.id, o.versionNumber, o.fullProductName";
 
@@ -103,6 +98,10 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String AND = " AND ";
   private static final String ORDER_BY = " ORDER BY ";
   private static final String ASC_SORT = " o.fullProductName ASC ";
+  private static final String IDENTITY = "identity";
+
+  // HQL queries are running into issues with bigger number of identities at once
+  private static final Integer MAX_IDENTITIES_SIZE = 1000;
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -130,10 +129,13 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
-    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("RETRIEVE_ORDERABLES");
-    List<Orderable> orderables = retrieveOrderables(identities, false);
+    List<Orderable> orderables = new ArrayList<>();
+    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+      orderables.addAll(retrieveOrderables(partition, false));
+    }
 
     profiler.stop().log();
     return Pagination.getPage(orderables, pageable, total);
@@ -162,10 +164,13 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
-    Set<Pair<UUID, Long>> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("GET_ORDERABLE_WITH_LATEST_LAST_UPDATE_DATE_FROM_ORDERABLES");
-    List<Orderable> orderables = retrieveOrderables(identities, true);
+    List<Orderable> orderables = new ArrayList<>();
+    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+      orderables.addAll(retrieveOrderables(partition, true));
+    }
 
     profiler.stop().log();
     return orderables;
@@ -248,36 +253,34 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
   }
 
-  private Set<Pair<UUID, Long>> executeNativeQuery(Query nativeQuery) {
+  private List<VersionIdentity> executeNativeQuery(Query nativeQuery) {
     // appropriate configuration has been set in the native query
     @SuppressWarnings("unchecked")
     List<Object[]> identities = nativeQuery.getResultList();
 
     return identities
         .stream()
-        .map(identity -> ImmutablePair.of((UUID) identity[0], (Long) identity[1]))
-        .collect(Collectors.toSet());
+        .map(identity -> new VersionIdentity((UUID) identity[0], (Long) identity[1]))
+        .collect(Collectors.toList());
   }
 
-  // appropriate class has been passed in the EntityManager.createNativeQuery method
+  // appropriate class has been passed in the EntityManager.createQuery method
   @SuppressWarnings("unchecked")
-  private List<Orderable> retrieveOrderables(Collection<Pair<UUID, Long>> identities,
+  private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities,
       Boolean date) {
-    String hql = NATIVE_SELECT_ORDERABLES_BY_IDENTITES
-        + NATIVE_PROGRAM_ORDERABLE_LEFT_JOIN
-        + NATIVE_PROGRAM_LEFT_JOIN
-        + WHERE + identities
-        .stream()
-        .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
-        .collect(Collectors.joining(OR));
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Orderable> criteriaQuery =
+        criteriaBuilder.createQuery(Orderable.class);
+    Root<Orderable> root = criteriaQuery.from(Orderable.class);
+    criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
 
     if (date) {
-      hql += ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
+      criteriaQuery.orderBy(criteriaBuilder.desc(root.get("lastUpdated")));
     }
 
     return entityManager
-        .createNativeQuery(hql, Orderable.class)
-        .unwrap(SQLQuery.class)
+        .createQuery(criteriaQuery)
+        .unwrap(org.hibernate.Query.class)
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
   }

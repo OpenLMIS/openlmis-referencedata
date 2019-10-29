@@ -16,9 +16,9 @@
 package org.openlmis.referencedata.repository;
 
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
-import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_LATEST_ORDERABLE;
 
 import java.util.List;
 import java.util.UUID;
@@ -46,56 +46,45 @@ public interface OrderableRepository extends
   <S extends Orderable> S findByProductCode(Code code);
 
   // DATAJPA-1130
-  @Query(value = "SELECT o.id, o.versionNumber"
+  @Query(value = "SELECT o.identity.id, o.identity.versionNumber"
       + FROM_ORDERABLES_CLAUSE
-      + " WHERE o.id = ?1"
-      + " LIMIT 1",
-      nativeQuery = true
+      + " WHERE o.identity.id = ?1"
   )
   boolean existsById(UUID id);
 
   boolean existsByProductCode(Code code);
   
-  @Query(value = "SELECT o.*"
+  @Query(value = SELECT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + " WHERE o.id in :ids"
+      + WHERE_LATEST_ORDERABLE
+      + " AND o.identity.id IN :ids"
       + ORDER_BY_PAGEABLE,
       countQuery = "SELECT COUNT(1)"
       + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + " WHERE o.id in :ids"
-      + ORDER_BY_PAGEABLE,
-      nativeQuery = true
+      + WHERE_LATEST_ORDERABLE
+      + " AND o.identity.id IN :ids"
+      + ORDER_BY_PAGEABLE
   )
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + " JOIN"
-      + " (SELECT MAX(lastupdated) AS lastUpdated"
-      + " FROM ("
-      + SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + " WHERE o.id IN :ids)"
-      + " AS passedOrderables"
-      + " ) AS maxLastUpdated"
-      + " ON o.lastupdated = maxLastUpdated.lastupdated"
-      + ORDER_BY_PAGEABLE,
-      nativeQuery = true
+      + WHERE_LATEST_ORDERABLE
+      + " AND o.lastUpdated = "
+      + " (SELECT MAX(lastUpdated)"
+      + " FROM Orderable"
+      + " WHERE identity.id IN :ids)"
+      + ORDER_BY_PAGEABLE
   )
   List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids,
       Pageable pageable);
 
-  @Query(value = "SELECT o.*"
+  @Query(value = SELECT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + "   JOIN referencedata.orderable_identifiers oi" 
-      + "     ON oi.orderableid = o.id AND oi.orderableversionnumber = o.versionnumber"
-      + " WHERE oi.key = :key" 
-      + "   AND oi.value = :value",
-      nativeQuery = true
+      + " JOIN o.identifiers oi"
+      + WHERE_LATEST_ORDERABLE
+      + " AND KEY(oi) = :key"
+      + " AND VALUE(oi) = :value"
   )
   List<Orderable> findAllLatestByIdentifier(@Param("key") String key, @Param("value") String value);
   
@@ -103,11 +92,10 @@ public interface OrderableRepository extends
   
   Orderable findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
   
-  @Query(value = "SELECT o.*"
+  @Query(value = SELECT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + ORDER_BY_PAGEABLE,
-      nativeQuery = true
+      + WHERE_LATEST_ORDERABLE
+      + ORDER_BY_PAGEABLE
   )
   Page<Orderable> findAllLatest(Pageable pageable);
 
