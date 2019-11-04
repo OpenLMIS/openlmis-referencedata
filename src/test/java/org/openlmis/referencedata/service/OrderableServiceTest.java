@@ -114,7 +114,6 @@ public class OrderableServiceTest {
     searchParams.add(ID, "null");
     orderableService.getLatestLastUpdatedDateTimestamp(
             new QueryOrderableSearchParams(searchParams), null);
-    //orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -122,7 +121,6 @@ public class OrderableServiceTest {
     searchParams.add(ID, "1234");
     orderableService.getLatestLastUpdatedDateTimestamp(
             new QueryOrderableSearchParams(searchParams), null);
-    //orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test
@@ -141,7 +139,6 @@ public class OrderableServiceTest {
     searchParams.add("parameter", false);
     orderableService.getLatestLastUpdatedDateTimestamp(
             new QueryOrderableSearchParams(searchParams), null);
-    //orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test(expected = ValidationMessageException.class)
@@ -150,7 +147,6 @@ public class OrderableServiceTest {
     searchParams.add("code", "123");
     orderableService.getLatestLastUpdatedDateTimestamp(
             new QueryOrderableSearchParams(searchParams), null);
-    //orderableService.getLatestLastUpdatedDate(new QueryOrderableSearchParams(searchParams), null);
   }
 
   @Test
