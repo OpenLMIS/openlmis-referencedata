@@ -17,10 +17,15 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -43,6 +48,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -167,19 +173,14 @@ public class OrderableController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryParams);
+    ZonedDateTime lastUpdated = getLastUpdatedDate(searchParams, profiler);
 
-    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
-    List<Orderable> orderables = orderableService
-        .getLatestLastUpdatedDate(searchParams, pageable);
-
-    if (orderables.isEmpty()) {
+    if (lastUpdated == null) {
       Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
       return ResponseEntity.ok()
-          .body(emptyPage);
+              .body(emptyPage);
     }
 
-    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
-    ZonedDateTime lastUpdated = orderables.get(0).getLastUpdated();
     if (ifModifiedDate == null
         || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
       XLOGGER.info("search orderable query params: {}", queryParams);
@@ -205,7 +206,6 @@ public class OrderableController extends BaseController {
           .headers(buildLastModifiedHeader(lastUpdated))
           .build();
     }
-
   }
 
   /**
@@ -224,9 +224,19 @@ public class OrderableController extends BaseController {
 
     Pageable pageable = body.getPageable();
 
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
+
+    ZonedDateTime lastUpdated = getLastUpdatedDate(
+            getQueryOrderableSearchParams(body), profiler);
+
+    if (lastUpdated == null) {
+      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
+      return ResponseEntity.ok()
+              .body(emptyPage);
+    }
+
     if (ifModifiedDate == null
-        || wasModifiedSince(getLastUpdateDate(body, profiler),
-        parseHttpDateToZonedDateTime(ifModifiedDate))) {
+        || wasModifiedSince(lastUpdated, parseHttpDateToZonedDateTime(ifModifiedDate))) {
       profiler.start("SEARCH_ORDERABLES");
       Page<Orderable> orderablesPage = repository.search(body, pageable);
 
@@ -238,10 +248,14 @@ public class OrderableController extends BaseController {
 
       profiler.stop().log();
       XLOGGER.exit(page);
-      return ResponseEntity.ok().body(page);
+      return ResponseEntity.ok()
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .body(page);
     } else {
       profiler.stop().log();
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
+          .headers(buildLastModifiedHeader(lastUpdated))
+          .build();
     }
   }
 
@@ -326,15 +340,38 @@ public class OrderableController extends BaseController {
     return date == null || lastUpdated == null || lastUpdated.isAfter(date);
   }
 
-  private ZonedDateTime getLastUpdateDate(OrderableSearchParams body, Profiler profiler) {
-    profiler.start("GET_ORDERABLES_WITH_LATEST_LAST_UPDATED_DATE");
-    List<Orderable> orderables =
-        repository.findOrderablesWithLatestModifiedDate(body, body.getPageable());
+  private ZonedDateTime getLastUpdatedDate(
+          QueryOrderableSearchParams searchParams, Profiler profiler) {
+    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
+    Timestamp timestamp = orderableService
+          .getLatestLastUpdatedDateTimestamp(searchParams, profiler);
 
-    if (orderables.isEmpty()) {
+    if (timestamp == null) {
       return null;
     }
 
-    return orderables.get(0).getLastUpdated();
+    return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of("GMT"));
+  }
+
+  private QueryOrderableSearchParams getQueryOrderableSearchParams(
+      OrderableSearchParams searchParams) {
+
+    Set<UUID> ids = searchParams.getIdentityPairs()
+            .stream()
+            .map(Pair::getKey)
+            .collect(Collectors.toSet());
+
+    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+
+    if (!ids.isEmpty()) {
+      for (UUID id : ids) {
+        queryMap.add("id", id.toString());
+      }
+    }
+    queryMap.add("name", searchParams.getName());
+    queryMap.add("code", searchParams.getCode());
+    queryMap.add("program", searchParams.getProgramCode());
+
+    return new QueryOrderableSearchParams(queryMap);
   }
 }

@@ -16,10 +16,15 @@
 package org.openlmis.referencedata.repository;
 
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_REFERENCEDATA_ORDERABLES_CLAUSE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_LAST_UPDATED;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_LATEST_ORDERABLE;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
@@ -116,4 +121,22 @@ public interface OrderableRepository extends
       + ORDER_BY_PAGEABLE,
       nativeQuery = true)
   Page<Orderable> findAllWithoutSnapshots(Pageable pageable);
+
+  @Query(value = SELECT_LAST_UPDATED
+      + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
+      + JOIN_WITH_LATEST_ORDERABLE
+      + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
+      nativeQuery = true
+  )
+  Timestamp findLatestModifiedDateOfAll();
+
+  @Query(value = SELECT_LAST_UPDATED
+      + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
+      + JOIN_WITH_LATEST_ORDERABLE
+      + " WHERE o.id IN :ids"
+      + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
+      nativeQuery = true
+  )
+  Timestamp findLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids);
+
 }

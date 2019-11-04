@@ -15,15 +15,17 @@
 
 package org.openlmis.referencedata.service;
 
-import java.util.List;
+import java.sql.Timestamp;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
+
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,23 +76,27 @@ public class OrderableService {
   /**
    * Method returns the latest last updated date out of all orderables with matched parameters.
    *
-   * @param queryMap request parameters (code, name, description, program).
-   * @param pageable the page to get, or one page with all if null.
-   * @return the ZonedDateTime of latest last updated date.
+   * @param queryParams request parameters (code, name, description, program).
+   * @return the Timestamp of latest last updated date.
    */
-  public List<Orderable> getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryMap,
-      Pageable pageable) {
+  public Timestamp getLatestLastUpdatedDateTimestamp(
+          @NotNull QueryOrderableSearchParams queryParams, Profiler profiler) {
 
-    if (queryMap.isEmpty()) {
-      return orderableRepository.findOrderablesWithLatestModifiedDate(null, pageable);
+    if (queryParams.isEmpty()) {
+      LOGGER.info("Find latest modified date out of all orderables");
+      profiler.start("SEARCH_NO_PARAMS_OR_IDS");
+      return orderableRepository.findLatestModifiedDateOfAll();
     }
 
-    Set<UUID> ids = queryMap.getIds();
+    Set<UUID> ids = queryParams.getIds();
     if (!ids.isEmpty()) {
-      return orderableRepository.findOrderableWithLatestModifiedDateByIds(ids, pageable);
+      LOGGER.info("Find latest modified date out of orderables from ids list");
+      profiler.start("SEARCH_IDS ONLY");
+      return orderableRepository.findLatestModifiedDateByIds(ids);
     }
 
-    return orderableRepository.findOrderablesWithLatestModifiedDate(queryMap, pageable);
+    LOGGER.info("Find latest modified date out of orderables from query params");
+    profiler.start("SEARCH_QUERY_PARAMS ONLY");
+    return orderableRepository.findLatestModifiedDateByParams(queryParams, profiler);
   }
-
 }

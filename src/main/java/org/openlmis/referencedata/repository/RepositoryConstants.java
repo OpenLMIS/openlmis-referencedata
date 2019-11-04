@@ -18,11 +18,17 @@ package org.openlmis.referencedata.repository;
 class RepositoryConstants {
 
   static final String FROM_ORDERABLES_CLAUSE = " FROM Orderable o";
+  static final String FROM_REFERENCEDATA_ORDERABLES_CLAUSE = " FROM referencedata.orderables o";
   static final String WHERE_LATEST_ORDERABLE = " WHERE (o.identity.id, o.identity.versionNumber)"
       + " IN (SELECT identity.id, MAX(identity.versionNumber)"
       + " FROM Orderable GROUP BY identity.id)";
+  static final String JOIN_WITH_LATEST_ORDERABLE = " JOIN (SELECT id, MAX(versionNumber)"
+          + " AS versionNumber FROM referencedata.orderables GROUP BY id) AS latest"
+          + " ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
   static final String ORDER_BY_PAGEABLE = " ORDER BY ?#{#pageable}";
   static final String SELECT_ORDERABLE = "Select o";
+  static final String SELECT_LAST_UPDATED = "SELECT o.lastupdated";
+  static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated DESC LIMIT 1";
 
   private RepositoryConstants() {}
 }

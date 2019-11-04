@@ -20,6 +20,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -44,9 +46,11 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -79,9 +83,14 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
       " INNER" + NATIVE_PROGRAM_JOIN;
 
   private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
-          + "   FROM referencedata.orderables GROUP BY id) AS latest"
-          + "   ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
+      " INNER JOIN (SELECT id, MAX (versionNumber) AS versionNumber"
+          + "  FROM referencedata.orderables GROUP BY id) AS latest"
+          + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
+
+  private static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated";
+
+  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
+      + " DESC LIMIT 1";
 
   private static final String GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME =
       " GROUP BY o.id, o.versionNumber, o.fullProductName";
@@ -176,6 +185,24 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return orderables;
   }
 
+  @Override
+  public Timestamp findLatestModifiedDateByParams(QueryOrderableSearchParams searchParams,
+      Profiler profiler) {
+    profiler.start("GET_LAST_UPDATED_QUERY_STRING");
+    String queryString = getLastUpdatedQueryString(searchParams);
+
+    profiler.start("CREATE_LAST_UPDATED_NATIVE_QUERY");
+    Query query = entityManager.createNativeQuery(queryString);
+
+    profiler.stop().log();
+
+    try {
+      return (Timestamp) query.getSingleResult();
+    } catch (EmptyResultDataAccessException | NoResultException e) {
+      return null;
+    }
+  }
+
   private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {
     String startNativeQuery = count ? NATIVE_COUNT_ORDERABLES : NATIVE_SELECT_ORDERABLES_IDENTITIES;
     StringBuilder builder = new StringBuilder(startNativeQuery);
@@ -239,6 +266,44 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
 
     return nativeQuery;
+  }
+
+  private String getLastUpdatedQueryString(QueryOrderableSearchParams searchParams) {
+    String hql = NATIVE_SELECT_LAST_UPDATED
+            + FROM_ORDERABLES_TABLE
+            + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
+    StringBuilder builder = new StringBuilder(hql);
+    List<String> wheres = Lists.newArrayList();
+    String queryCondition;
+
+    if (null != searchParams) {
+      if (null != searchParams.getProgramCode()) {
+        builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN + NATIVE_PROGRAM_INNER_JOIN);
+        queryCondition = "LOWER (p.code) LIKE '%"
+            + searchParams.getProgramCode().toLowerCase() + "%'";
+        wheres.add(queryCondition);
+      }
+
+      if (null != searchParams.getCode()) {
+        queryCondition = "LOWER (o.code) LIKE '%"
+            + searchParams.getCode().toLowerCase() + "%'";
+        wheres.add(queryCondition);
+      }
+
+      if (null != searchParams.getName()) {
+        queryCondition = "LOWER (o.fullproductname) LIKE '%"
+            + searchParams.getName().toLowerCase() + "%'";
+        wheres.add(queryCondition);
+      }
+
+      if (!wheres.isEmpty()) {
+        builder.append(WHERE).append(String.join(AND, wheres));
+      }
+    }
+
+    builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
+    XLOGGER.info("QueryParamString: " + builder.toString());
+    return builder.toString();
   }
 
   private void setPagination(StringBuilder builder, Map<String, Object> params, Pageable pageable) {

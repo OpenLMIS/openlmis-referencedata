@@ -4,6 +4,9 @@
 Bug fixes:
 * [OLMIS-6575](https://openlmis.atlassian.net/browse/OLMIS-6575): Fixed Internal Server Error in supervisoryNodes endpoint.
 
+Improvements:
+* [OLMIS-6611](https://openlmis.atlassian.net/browse/OLMIS-6611): Changed queries to retrieve only last update date instead of orderables collection to improve performance.
+
 14.0.0 / 2019-10-17
 ==================
 

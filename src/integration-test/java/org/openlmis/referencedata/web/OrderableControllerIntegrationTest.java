@@ -38,6 +38,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
+
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -76,6 +78,7 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -348,8 +351,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(items);
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -375,8 +379,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(items);
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -398,8 +403,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnEmptyPageIfNoOrderableWithLastUpdatedDateWasFound() {
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(Collections.emptyList());
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(null);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -424,8 +430,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(items);
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
 
     restAssured
         .given()
@@ -454,8 +461,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(items);
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -496,8 +504,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items, page));
 
     when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Pageable.class)))
-        .thenReturn(items);
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
 
     PageImplRepresentation response = restAssured
         .given()
@@ -658,6 +667,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
         .willReturn(Lists.newArrayList(orderable));
 
+    when(orderableService
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -667,12 +681,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract()
         .as(PageImplRepresentation.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(orderableDto.getId().toString(),
-        ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
+            ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
   }
 
   @Test
@@ -692,6 +707,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
         .willReturn(Lists.newArrayList(orderable));
 
+    when(orderableService
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -702,6 +722,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract()
         .as(PageImplRepresentation.class);
 
@@ -727,6 +748,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
         .willReturn(Lists.newArrayList(orderable));
 
+    when(orderableService
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -736,7 +762,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .body(searchParams)
         .post(SEARCH_URL)
         .then()
-        .statusCode(HttpStatus.SC_NOT_MODIFIED);
+        .statusCode(HttpStatus.SC_NOT_MODIFIED)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -758,6 +785,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .search(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList()));
 
+    when(orderableService
+        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
+                any(Profiler.class)))
+        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+
     PageImplRepresentation response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -767,6 +799,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
+        .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageImplRepresentation.class);
 
     checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
@@ -895,4 +928,5 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(orderableDto.getOrderableRepository(), response.getOrderableRepository());
     assertEquals(orderableDto.getVersionNumber(), response.getVersionNumber());
   }
+
 }
