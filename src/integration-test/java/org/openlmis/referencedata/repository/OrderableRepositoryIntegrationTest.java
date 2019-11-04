@@ -729,7 +729,7 @@ public class OrderableRepositoryIntegrationTest {
 
     Timestamp timestamp = repository.findLatestModifiedDateByIds(ids);
     ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of("Universal"));
+            ZoneId.of(ZoneId.systemDefault().toString()));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated());
@@ -751,7 +751,7 @@ public class OrderableRepositoryIntegrationTest {
     //when
     Timestamp timestamp = repository.findLatestModifiedDateOfAll();
     ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of("Universal"));
+            ZoneId.of(ZoneId.systemDefault().toString()));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated());
