@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.service;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
@@ -77,26 +79,39 @@ public class OrderableService {
    * Method returns the latest last updated date out of all orderables with matched parameters.
    *
    * @param queryParams request parameters (code, name, description, program).
-   * @return the Timestamp of latest last updated date.
+   * @return the ZonedDateTime of latest last updated date.
    */
-  public Timestamp getLatestLastUpdatedDateTimestamp(
-          @NotNull QueryOrderableSearchParams queryParams, Profiler profiler) {
+  public ZonedDateTime getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryParams,
+      Profiler profiler) {
 
     if (queryParams.isEmpty()) {
       LOGGER.info("Find latest modified date out of all orderables");
       profiler.start("SEARCH_NO_PARAMS_OR_IDS");
-      return orderableRepository.findLatestModifiedDateOfAll();
+      Timestamp timestamp = orderableRepository.findLatestModifiedDateOfAll();
+      return getZoneDateTime(timestamp);
     }
 
     Set<UUID> ids = queryParams.getIds();
     if (!ids.isEmpty()) {
       LOGGER.info("Find latest modified date out of orderables from ids list");
       profiler.start("SEARCH_IDS ONLY");
-      return orderableRepository.findLatestModifiedDateByIds(ids);
+      Timestamp timestamp = orderableRepository.findLatestModifiedDateByIds(ids);
+      return getZoneDateTime(timestamp);
     }
 
     LOGGER.info("Find latest modified date out of orderables from query params");
     profiler.start("SEARCH_QUERY_PARAMS ONLY");
-    return orderableRepository.findLatestModifiedDateByParams(queryParams, profiler);
+    return orderableRepository
+            .findLatestModifiedDateByParams(queryParams);
   }
+
+  private ZonedDateTime getZoneDateTime(Timestamp timestamp) {
+
+    if (null != timestamp) {
+      return ZonedDateTime.of(timestamp.toLocalDateTime(),
+              ZoneId.of(ZoneId.systemDefault().toString()));
+    }
+    return null;
+  }
+
 }

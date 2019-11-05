@@ -39,7 +39,6 @@ import com.google.common.collect.Lists;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 
-import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -97,7 +96,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
   private static final String VERSION_NAME = "versionNumber";
-  private static final String ZONE_ID = "UTC";
+  private static final String ZONE_ID = ZoneId.systemDefault().toString();
 
   @Captor
   public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
@@ -351,9 +350,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+        .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -379,9 +377,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -403,8 +400,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnEmptyPageIfNoOrderableWithLastUpdatedDateWasFound() {
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
         .thenReturn(null);
 
     PageImplRepresentation response = restAssured
@@ -430,9 +426,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     restAssured
         .given()
@@ -461,9 +456,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -504,9 +498,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenReturn(Pagination.getPage(items, page));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -668,9 +661,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(Lists.newArrayList(orderable));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class),
+                    any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -708,9 +701,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(Lists.newArrayList(orderable));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()
@@ -749,9 +741,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(Lists.newArrayList(orderable));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     restAssured
         .given()
@@ -786,9 +777,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .willReturn(Pagination.getPage(Lists.newArrayList()));
 
     when(orderableService
-        .getLatestLastUpdatedDateTimestamp(any(QueryOrderableSearchParams.class),
-                any(Profiler.class)))
-        .thenReturn(Timestamp.valueOf(modifiedDate.toLocalDateTime()));
+            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+            .thenReturn(modifiedDate);
 
     PageImplRepresentation response = restAssured
         .given()

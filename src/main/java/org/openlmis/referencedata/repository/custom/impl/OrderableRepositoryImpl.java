@@ -20,7 +20,10 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +49,6 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
-import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -186,19 +188,19 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   }
 
   @Override
-  public Timestamp findLatestModifiedDateByParams(QueryOrderableSearchParams searchParams,
-      Profiler profiler) {
-    profiler.start("GET_LAST_UPDATED_QUERY_STRING");
-    String queryString = getLastUpdatedQueryString(searchParams);
-
-    profiler.start("CREATE_LAST_UPDATED_NATIVE_QUERY");
-    Query query = entityManager.createNativeQuery(queryString);
-
-    profiler.stop().log();
+  public ZonedDateTime findLatestModifiedDateByParams(SearchParams searchParams) {
+    Profiler profiler = new Profiler("GET_ZONED_DATE_TIME_FROM_PARAMS");
+    profiler.setLogger(XLOGGER);
+    Query query = getLastUpdatedQuery(searchParams);
 
     try {
-      return (Timestamp) query.getSingleResult();
+      Timestamp timestamp = (Timestamp) query.getSingleResult();
+      profiler.stop().log();
+      return ZonedDateTime.of(timestamp.toLocalDateTime(),
+                ZoneId.of(ZoneId.systemDefault().toString()));
+
     } catch (EmptyResultDataAccessException | NoResultException e) {
+      XLOGGER.info("Error while getting query results : " + e.getMessage());
       return null;
     }
   }
@@ -268,7 +270,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return nativeQuery;
   }
 
-  private String getLastUpdatedQueryString(QueryOrderableSearchParams searchParams) {
+  private Query getLastUpdatedQuery(SearchParams searchParams) {
     String hql = NATIVE_SELECT_LAST_UPDATED
             + FROM_ORDERABLES_TABLE
             + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
@@ -303,7 +305,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
     XLOGGER.info("QueryParamString: " + builder.toString());
-    return builder.toString();
+    return entityManager.createNativeQuery(builder.toString());
   }
 
   private void setPagination(StringBuilder builder, Map<String, Object> params, Pageable pageable) {

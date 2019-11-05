@@ -17,8 +17,6 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
-import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Set;
@@ -343,14 +341,14 @@ public class OrderableController extends BaseController {
   private ZonedDateTime getLastUpdatedDate(
           QueryOrderableSearchParams searchParams, Profiler profiler) {
     profiler.start("GET_LATEST_LAST_UPDATED_DATE");
-    Timestamp timestamp = orderableService
-          .getLatestLastUpdatedDateTimestamp(searchParams, profiler);
+    ZonedDateTime zonedDateTime = orderableService
+          .getLatestLastUpdatedDate(searchParams, profiler);
 
-    if (timestamp == null) {
+    if (zonedDateTime == null) {
       return null;
     }
 
-    return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of("GMT"));
+    return zonedDateTime;
   }
 
   private QueryOrderableSearchParams getQueryOrderableSearchParams(

@@ -15,14 +15,12 @@
 
 package org.openlmis.referencedata.repository.custom;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.web.QueryOrderableSearchParams;
-import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -33,8 +31,7 @@ public interface OrderableRepositoryCustom {
   List<Orderable> findOrderablesWithLatestModifiedDate(SearchParams searchParams,
       Pageable pageable);
 
-  Timestamp findLatestModifiedDateByParams(QueryOrderableSearchParams queryParams,
-      Profiler profiler);
+  ZonedDateTime findLatestModifiedDateByParams(SearchParams searchParams);
 
   interface SearchParams {
 

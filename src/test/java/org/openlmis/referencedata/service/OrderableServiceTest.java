@@ -61,7 +61,7 @@ public class OrderableServiceTest {
   private static final String NAME = "name";
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
-  private static final String UTC = "UTC";
+  private static final String ZONE_ID = ZoneId.systemDefault().toString();
 
   @Mock
   private OrderableRepository orderableRepository;
@@ -82,7 +82,7 @@ public class OrderableServiceTest {
   private String programCode = "program-code";
   private List<Orderable> orderableList;
   private MultiValueMap<String, Object> searchParams = new LinkedMultiValueMap<>();
-  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(UTC)).withNano(0);
+  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(ZONE_ID)).withNano(0);
 
   @InjectMocks
   private OrderableService orderableService = new OrderableService();
@@ -112,15 +112,15 @@ public class OrderableServiceTest {
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProvidedIdParameterIsNull() {
     searchParams.add(ID, "null");
-    orderableService.getLatestLastUpdatedDateTimestamp(
-            new QueryOrderableSearchParams(searchParams), null);
+    orderableService.getLatestLastUpdatedDate(
+            new QueryOrderableSearchParams(searchParams),null);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProvidedIdParameterIsMalformed() {
     searchParams.add(ID, "1234");
-    orderableService.getLatestLastUpdatedDateTimestamp(
-            new QueryOrderableSearchParams(searchParams), null);
+    orderableService.getLatestLastUpdatedDate(
+            new QueryOrderableSearchParams(searchParams),null);
   }
 
   @Test
@@ -137,16 +137,16 @@ public class OrderableServiceTest {
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProgramCodeAndNameNotProvidedForGettingLastUpdatedDate() {
     searchParams.add("parameter", false);
-    orderableService.getLatestLastUpdatedDateTimestamp(
-            new QueryOrderableSearchParams(searchParams), null);
+    orderableService.getLatestLastUpdatedDate(
+            new QueryOrderableSearchParams(searchParams),null);
   }
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfProvidedAnyNotSupportedParameterWhenGettingLastUpdatedDate() {
     searchParams.add("parameter", false);
     searchParams.add("code", "123");
-    orderableService.getLatestLastUpdatedDateTimestamp(
-            new QueryOrderableSearchParams(searchParams), null);
+    orderableService.getLatestLastUpdatedDate(
+            new QueryOrderableSearchParams(searchParams),null);
   }
 
   @Test
@@ -239,10 +239,8 @@ public class OrderableServiceTest {
     when(orderableRepository.findLatestModifiedDateOfAll()).thenReturn(time);
 
     // when
-    Timestamp timestamp = orderableService.getLatestLastUpdatedDateTimestamp(
-            new QueryOrderableSearchParams(searchParams), profiler);
-    final ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(UTC));
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+              new QueryOrderableSearchParams(searchParams), profiler);
 
     // then
     verify(orderableRepository).findLatestModifiedDateOfAll();
@@ -256,10 +254,8 @@ public class OrderableServiceTest {
     when(orderableRepository.findLatestModifiedDateOfAll()).thenReturn(time);
 
     // when
-    Timestamp timestamp = orderableService.getLatestLastUpdatedDateTimestamp(
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
             new QueryOrderableSearchParams(null), profiler);
-    final ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(UTC));
 
     // then
     verify(orderableRepository).findLatestModifiedDateOfAll();
@@ -271,12 +267,10 @@ public class OrderableServiceTest {
     // given
     final String code = "ORD1";
     final String name = "Orderable";
-    Timestamp time = Timestamp.valueOf(orderable2.getLastUpdated().toLocalDateTime());
 
     given(orderableRepository.findLatestModifiedDateByParams(
-            any(QueryOrderableSearchParams.class),
-            any(Profiler.class)))
-            .willReturn(time);
+            any(QueryOrderableSearchParams.class)))
+            .willReturn(modifiedDate);
 
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
@@ -285,12 +279,11 @@ public class OrderableServiceTest {
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
     // when
-    Timestamp timestamp = orderableService.getLatestLastUpdatedDateTimestamp(queryMap, profiler);
-    final ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(UTC));
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+            queryMap, profiler);
 
     //then
-    verify(orderableRepository).findLatestModifiedDateByParams(queryMap, profiler);
+    verify(orderableRepository).findLatestModifiedDateByParams(queryMap);
     assertEquals(orderable2.getLastUpdated(), lastUpdated);
   }
 
@@ -307,9 +300,8 @@ public class OrderableServiceTest {
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
     // when
-    Timestamp timestamp = orderableService.getLatestLastUpdatedDateTimestamp(queryMap, profiler);
-    final ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(UTC));
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
+            queryMap, profiler);
 
     // then
     verify(orderableRepository).findLatestModifiedDateByIds(queryMap.getIds());

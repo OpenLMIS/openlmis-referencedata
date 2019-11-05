@@ -712,7 +712,7 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindLatestModifiedDateFromOrderablesRetrievedByIdsTimestamp() {
+  public void shouldFindLastUpdatedDateFromOrderablesRetrievedByIds() {
     //given
     Orderable orderable1 = saveAndGetOrderable();
     Orderable orderable2 = saveAndGetOrderable();
@@ -736,7 +736,7 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindLatestModifiedDateFromOrderablesRetrievedFromAllTimestamp() {
+  public void shouldFindLastUpdatedDateFromAllOrderables() {
     //given
     Orderable orderable1 = saveAndGetOrderable();
     Orderable orderable2 = saveAndGetOrderable();
@@ -752,6 +752,31 @@ public class OrderableRepositoryIntegrationTest {
     Timestamp timestamp = repository.findLatestModifiedDateOfAll();
     ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
             ZoneId.of(ZoneId.systemDefault().toString()));
+
+    //then
+    assertEquals(lastUpdated, orderable3.getLastUpdated());
+  }
+
+  @Test
+  public void shouldFindLastUpdatedDateFromOrderablesRetrievedByParams() {
+    //given
+    Orderable orderable1 = saveAndGetOrderable();
+    Orderable orderable2 = saveAndGetOrderable();
+    Orderable orderable3 = saveAndGetOrderable();
+    orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
+    orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
+    orderable3.setLastUpdated(ZonedDateTime.now());
+    repository.save(orderable1);
+    repository.save(orderable2);
+    repository.save(orderable3);
+
+    //when
+    ZonedDateTime lastUpdated = repository.findLatestModifiedDateByParams(
+        new TestSearchParams(orderable3.getProductCode().toString(),
+            orderable3.getFullProductName(), null,
+            Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
+              Pair.of(orderable2.getId(), orderable2.getVersionNumber()),
+              Pair.of(orderable3.getId(), orderable3.getVersionNumber()))));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated());
