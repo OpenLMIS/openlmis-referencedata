@@ -323,7 +323,11 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private List<VersionIdentity> executeNativeQuery(Query nativeQuery) {
     // appropriate configuration has been set in the native query
     @SuppressWarnings("unchecked")
-    List<Object[]> identities = nativeQuery.getResultList();
+    List<Object[]> identities = nativeQuery
+        .setHint("javax.persistence.fetchgraph",
+            entityManager.getEntityGraph("graph.Orderable.programOrderables"))
+        .unwrap(org.hibernate.Query.class)
+        .list();
 
     return identities
         .stream()
