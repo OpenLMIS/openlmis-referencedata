@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -52,7 +51,6 @@ import org.openlmis.referencedata.util.Pagination;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -89,7 +87,11 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
           + "  FROM referencedata.orderables GROUP BY id) AS latest"
           + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
 
-  private static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated";
+  private static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
+      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
+
+  private static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
+      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
 
   private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
       + " DESC LIMIT 1";
@@ -191,18 +193,22 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   public ZonedDateTime findLatestModifiedDateByParams(SearchParams searchParams) {
     Profiler profiler = new Profiler("GET_ZONED_DATE_TIME_FROM_PARAMS");
     profiler.setLogger(XLOGGER);
-    Query query = getLastUpdatedQuery(searchParams);
 
-    try {
-      Timestamp timestamp = (Timestamp) query.getSingleResult();
+    profiler.start("CALCULATE_FULL_LIST_SIZE_LAST_UPDATED");
+    Query countNativeQuery = getLastUpdatedQuery(searchParams, true);
+    int total = ((Number) countNativeQuery.getSingleResult()).intValue();
+
+    if (total <= 0) {
       profiler.stop().log();
-      return ZonedDateTime.of(timestamp.toLocalDateTime(),
-                ZoneId.of(ZoneId.systemDefault().toString()));
-
-    } catch (EmptyResultDataAccessException | NoResultException e) {
-      XLOGGER.info("Error while getting query results : " + e.getMessage());
       return null;
     }
+
+    profiler.start("GET_ZONED_DATE_TIME_QUERY");
+    Query query = getLastUpdatedQuery(searchParams, false);
+    Timestamp timestamp = (Timestamp) query.getSingleResult();
+    profiler.stop().log();
+    return ZonedDateTime.of(timestamp.toLocalDateTime(),
+                ZoneId.of(ZoneId.systemDefault().toString()));
   }
 
   private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {
@@ -270,11 +276,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return nativeQuery;
   }
 
-  private Query getLastUpdatedQuery(SearchParams searchParams) {
-    String hql = NATIVE_SELECT_LAST_UPDATED
-            + FROM_ORDERABLES_TABLE
-            + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
-    StringBuilder builder = new StringBuilder(hql);
+  private Query getLastUpdatedQuery(SearchParams searchParams, boolean count) {
+    String startNativeQuery = count ? NATIVE_COUNT_LAST_UPDATED : NATIVE_SELECT_LAST_UPDATED;
+    StringBuilder builder = new StringBuilder(startNativeQuery);
     List<String> wheres = Lists.newArrayList();
     String queryCondition;
 
@@ -303,7 +307,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
       }
     }
 
-    builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
+    if (!count) {
+      builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
+    }
     XLOGGER.info("QueryParamString: " + builder.toString());
     return entityManager.createNativeQuery(builder.toString());
   }
