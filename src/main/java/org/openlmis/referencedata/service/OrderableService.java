@@ -38,6 +38,8 @@ public class OrderableService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderableService.class);
 
+  private static final String GMT = "GMT";
+
   @Autowired
   private OrderableRepository orderableRepository;
 
@@ -109,7 +111,7 @@ public class OrderableService {
 
     if (null != timestamp) {
       return ZonedDateTime.of(timestamp.toLocalDateTime(),
-              ZoneId.of(ZoneId.systemDefault().toString()));
+              ZoneId.of(GMT));
     }
     return null;
   }

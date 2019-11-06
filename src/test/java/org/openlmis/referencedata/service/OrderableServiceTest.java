@@ -61,7 +61,7 @@ public class OrderableServiceTest {
   private static final String NAME = "name";
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
-  private static final String ZONE_ID = ZoneId.systemDefault().toString();
+  private static final String GMT = "GMT";
 
   @Mock
   private OrderableRepository orderableRepository;
@@ -82,7 +82,7 @@ public class OrderableServiceTest {
   private String programCode = "program-code";
   private List<Orderable> orderableList;
   private MultiValueMap<String, Object> searchParams = new LinkedMultiValueMap<>();
-  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(ZONE_ID)).withNano(0);
+  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(GMT)).withNano(0);
 
   @InjectMocks
   private OrderableService orderableService = new OrderableService();

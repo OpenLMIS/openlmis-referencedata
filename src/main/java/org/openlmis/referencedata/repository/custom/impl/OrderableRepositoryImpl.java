@@ -112,6 +112,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String ORDER_BY = " ORDER BY ";
   private static final String ASC_SORT = " o.fullProductName ASC ";
   private static final String IDENTITY = "identity";
+  private static final String GMT = "GMT";
 
   // HQL queries are running into issues with bigger number of identities at once
   private static final Integer MAX_IDENTITIES_SIZE = 1000;
@@ -207,8 +208,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     Query query = getLastUpdatedQuery(searchParams, false);
     Timestamp timestamp = (Timestamp) query.getSingleResult();
     profiler.stop().log();
-    return ZonedDateTime.of(timestamp.toLocalDateTime(),
-                ZoneId.of(ZoneId.systemDefault().toString()));
+    return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of(GMT));
   }
 
   private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {

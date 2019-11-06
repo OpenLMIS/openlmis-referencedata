@@ -340,7 +340,6 @@ public class OrderableController extends BaseController {
 
   private ZonedDateTime getLastUpdatedDate(
           QueryOrderableSearchParams searchParams, Profiler profiler) {
-    profiler.start("GET_LATEST_LAST_UPDATED_DATE");
     ZonedDateTime zonedDateTime = orderableService
           .getLatestLastUpdatedDate(searchParams, profiler);
 

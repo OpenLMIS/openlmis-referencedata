@@ -779,7 +779,7 @@ public class OrderableRepositoryIntegrationTest {
               Pair.of(orderable3.getId(), orderable3.getVersionNumber()))));
 
     //then
-    assertEquals(lastUpdated, orderable3.getLastUpdated());
+    assertEquals(lastUpdated, orderable3.getLastUpdated().withZoneSameLocal(ZoneId.of("GMT")));
   }
 
   @Test

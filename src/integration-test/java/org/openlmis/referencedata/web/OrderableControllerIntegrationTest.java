@@ -96,7 +96,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
   private static final String VERSION_NAME = "versionNumber";
-  private static final String ZONE_ID = ZoneId.systemDefault().toString();
+  private static final String GMT = "GMT";
 
   @Captor
   public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
@@ -106,7 +106,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private UUID orderableId = UUID.randomUUID();
   private Long orderableVersionNumber = 1L;
-  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(ZONE_ID)).withNano(0);
+  private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(GMT)).withNano(0);
 
   @Before
   @Override
