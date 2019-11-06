@@ -19,8 +19,6 @@ import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,23 +26,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hibernate.SQLQuery;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
-import org.hibernate.type.LongType;
-import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -59,14 +60,6 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
 
   private static final String FROM_ORDERABLES_TABLE = " FROM referencedata.orderables AS o";
-
-  private static final String NATIVE_COUNT_ORDERABLES = "SELECT COUNT(*)" + FROM_ORDERABLES_TABLE;
-
-  private static final String NATIVE_SELECT_ORDERABLES_IDENTITIES = "SELECT DISTINCT"
-      + "   o.id AS id,"
-      + "   o.versionNumber AS versionNumber,"
-      + "   o.fullProductName AS fullProductName"
-      + FROM_ORDERABLES_TABLE;
 
   private static final String NATIVE_PROGRAM_ORDERABLE_JOIN =
       " JOIN referencedata.program_orderables AS po"
@@ -96,23 +89,12 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
       + " DESC LIMIT 1";
 
-  private static final String GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME =
-      " GROUP BY o.id, o.versionNumber, o.fullProductName";
-
-  private static final String NATIVE_PAGEABLE = " LIMIT :limit OFFSET :offset";
-
-  private static final String NATIVE_PRODUCT_CODE = "LOWER(o.code) LIKE :orderableCode";
-  private static final String NATIVE_PRODUCT_NAME = "LOWER(o.fullProductName) LIKE :orderableName";
-  private static final String NATIVE_PROGRAM_CODE = "LOWER(p.code) LIKE :programCode";
-  private static final String NATIVE_IDENTITY = "(o.id = '%s' AND o.versionNumber = %d)";
-
   private static final String WHERE = " WHERE ";
-  private static final String OR = " OR ";
   private static final String AND = " AND ";
-  private static final String ORDER_BY = " ORDER BY ";
-  private static final String ASC_SORT = " o.fullProductName ASC ";
+  private static final String ID = "id";
   private static final String IDENTITY = "identity";
   private static final String GMT = "GMT";
+  private static final String VERSION_NUMBER = "versionNumber";
 
   // HQL queries are running into issues with bigger number of identities at once
   private static final Integer MAX_IDENTITIES_SIZE = 1000;
@@ -133,17 +115,41 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     profiler.setLogger(XLOGGER);
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
-    Query countNativeQuery = prepareNativeQuery(searchParams, true, pageable);
-    int total = ((Number) countNativeQuery.getSingleResult()).intValue();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Long total = 0L;
 
-    if (total <= 0) {
+    List<VersionIdentity> identityList = new ArrayList<>();
+    if (!isEmpty(searchParams.getIdentityPairs())) {
+      identityList.addAll(getVersionIdentityFromPair(searchParams.getIdentityPairs()));
+      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
+        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+        total += prepareNativeQuery(searchParams, countQuery, true, part, pageable)
+            .getSingleResult();
+      }
+    } else {
+      CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+      total += prepareNativeQuery(searchParams, countQuery, true, identityList, pageable)
+          .getSingleResult();
+    }
+
+    if (total < 1) {
       profiler.stop().log();
       return Pagination.getPage(Collections.emptyList(), pageable);
     }
 
     profiler.start("GET_VERSION_IDENTITY");
-    Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
-    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = new ArrayList<>();
+    if (!isEmpty(identityList)) {
+      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
+        CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
+        identities.addAll(prepareNativeQuery(searchParams, query, false, part, pageable)
+            .getResultList());
+      }
+    } else {
+      CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
+      identities.addAll(prepareNativeQuery(searchParams, query, false, identityList, pageable)
+          .getResultList());
+    }
 
     profiler.start("RETRIEVE_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
@@ -168,17 +174,23 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     profiler.setLogger(XLOGGER);
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
-    Query countNativeQuery = prepareNativeQuery(searchParams, true, pageable);
-    int total = ((Number) countNativeQuery.getSingleResult()).intValue();
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
-    if (total <= 0) {
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    Long total = prepareNativeQuery(searchParams, countQuery, true, null, pageable)
+        .getSingleResult();
+
+    if (total < 1) {
       profiler.stop().log();
       return Collections.emptyList();
     }
 
     profiler.start("GET_VERSION_IDENTITY");
-    Query nativeQuery = prepareNativeQuery(searchParams, false, pageable);
-    List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
+    List<VersionIdentity> identities = new ArrayList<>();
+
+    CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
+    identities.addAll(prepareNativeQuery(searchParams, query, false, null, pageable)
+        .getResultList());
 
     profiler.start("GET_ORDERABLE_WITH_LATEST_LAST_UPDATE_DATE_FROM_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
@@ -211,69 +223,89 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of(GMT));
   }
 
-  private Query prepareNativeQuery(SearchParams searchParams, boolean count, Pageable pageable) {
-    String startNativeQuery = count ? NATIVE_COUNT_ORDERABLES : NATIVE_SELECT_ORDERABLES_IDENTITIES;
-    StringBuilder builder = new StringBuilder(startNativeQuery);
-    Map<String, Object> params = Maps.newHashMap();
-    List<String> where = Lists.newArrayList();
+  private <T> TypedQuery<T> prepareNativeQuery(SearchParams searchParams, CriteriaQuery<T> query,
+      boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
+
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Root<Orderable> root = query.from(Orderable.class);
+    root.alias("orderable");
+
+    CriteriaQuery<T> newQuery;
+
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      newQuery = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    } else {
+      CriteriaQuery<VersionIdentity> typeQuery = (CriteriaQuery<VersionIdentity>) query;
+      newQuery = (CriteriaQuery<T>) typeQuery.select(root.get(IDENTITY));
+    }
+
+    Predicate where = builder.conjunction();
 
     if (null != searchParams) {
       if (null != searchParams.getProgramCode()) {
-        builder
-            .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN)
-            .append(NATIVE_PROGRAM_INNER_JOIN)
-            .append(AND)
-            .append(NATIVE_PROGRAM_CODE);
-        params.put("programCode", searchParams.getProgramCode().toLowerCase());
+        Join<Orderable, ProgramOrderable> poJoin = root.join("programOrderables", JoinType.INNER);
+        Join<ProgramOrderable, Program> programJoin = poJoin.join("program", JoinType.INNER);
+        where = builder.and(where, builder.equal(builder.lower(programJoin.get("code").get("code")),
+            searchParams.getProgramCode().toLowerCase()));
       }
 
-      if (isEmpty(searchParams.getIdentityPairs())) {
-        builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
+      if (isEmpty(identities)) {
+        Subquery<String> latestOrderablesQuery = createSubQuery(newQuery, builder);
+        where = builder.and(where, builder.in(builder.concat(
+            root.get(IDENTITY).get(ID).as(String.class),
+            root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
+            .value(latestOrderablesQuery));
       } else {
-        where.add(searchParams
-            .getIdentityPairs()
-            .stream()
-            .map(pair -> String.format(NATIVE_IDENTITY, pair.getLeft(), pair.getRight()))
-            .collect(Collectors.joining(OR)));
+        where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
 
       if (isNotBlank(searchParams.getCode())) {
-        where.add(NATIVE_PRODUCT_CODE);
-        params.put("orderableCode", "%" + searchParams.getCode().toLowerCase() + "%");
+        where = builder.and(where, builder.like(builder.lower(root.get("productCode").get("code")),
+            "%" + searchParams.getCode().toLowerCase() + "%"));
       }
 
       if (isNotBlank(searchParams.getName())) {
-        where.add(NATIVE_PRODUCT_NAME);
-        params.put("orderableName", "%" + searchParams.getName().toLowerCase() + "%");
+        where = builder.and(where, builder.like(builder.lower(root.get("fullProductName")),
+            "%" + searchParams.getName().toLowerCase() + "%"));
       }
     } else {
-      builder.append(NATIVE_LATEST_ORDERABLE_INNER_JOIN);
+      Subquery<String> latestOrderablesQuery = createSubQuery(newQuery, builder);
+      where = builder.and(where, builder.in(builder.concat(
+          root.get(IDENTITY).get(ID).as(String.class),
+          root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
+          .value(latestOrderablesQuery));
     }
 
-    if (!where.isEmpty()) {
-      builder
-          .append(WHERE)
-          .append(String.join(AND, where));
-    }
+    newQuery.where(where);
 
     if (!count) {
-      Optional.ofNullable(pageable).ifPresent(p -> builder
-            .append(GROUP_BY_ID_VERSION_NUMBER_AND_FULL_PRODUCT_NAME)
-            .append(ORDER_BY)
-            .append(PageableUtil.getOrderPredicate(p, "o.", ASC_SORT)));
-      setPagination(builder, params, pageable);
+      newQuery.groupBy(
+          root.get(IDENTITY).get(ID),
+          root.get(IDENTITY).get(VERSION_NUMBER),
+          root.get("fullProductName"));
+      newQuery.orderBy(builder.asc(root.get("fullProductName")));
+
+      return entityManager.createQuery(query)
+          .setMaxResults(pageable.getPageSize())
+          .setFirstResult(pageable.getOffset());
     }
 
-    Query nativeQuery = entityManager.createNativeQuery(builder.toString());
-    params.forEach(nativeQuery::setParameter);
+    return entityManager.createQuery(newQuery);
+  }
 
-    if (!count) {
-      SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
-      sqlQuery.addScalar("id", PostgresUUIDType.INSTANCE);
-      sqlQuery.addScalar("versionNumber", LongType.INSTANCE);
-    }
+  private Subquery<String> createSubQuery(CriteriaQuery query, CriteriaBuilder builder) {
+    Subquery<String> latestOrderablesQuery = query.subquery(String.class);
+    Root<Orderable> latestOrderablesRoot = latestOrderablesQuery.from(Orderable.class);
+    latestOrderablesRoot.alias("latest");
 
-    return nativeQuery;
+    latestOrderablesQuery.select(
+        builder.concat(
+            latestOrderablesRoot.get(IDENTITY).get(ID).as(String.class),
+            builder.max(latestOrderablesRoot.get(IDENTITY).get(VERSION_NUMBER)).as(String.class)));
+    latestOrderablesQuery.groupBy(latestOrderablesRoot.get(IDENTITY).get(ID));
+
+    return latestOrderablesQuery;
   }
 
   private Query getLastUpdatedQuery(SearchParams searchParams, boolean count) {
@@ -314,30 +346,15 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return entityManager.createNativeQuery(builder.toString());
   }
 
-  private void setPagination(StringBuilder builder, Map<String, Object> params, Pageable pageable) {
-    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
-    Integer limit = maxAndFirst.getLeft();
-    Integer offset = maxAndFirst.getRight();
+  private List<VersionIdentity> getVersionIdentityFromPair(Set<Pair<UUID, Long>> identities) {
 
-    if (limit > 0) {
-      builder.append(NATIVE_PAGEABLE);
-      params.put("limit", limit);
-      params.put("offset", offset);
+    if (identities.isEmpty()) {
+      return Collections.emptyList();
     }
-  }
-
-  private List<VersionIdentity> executeNativeQuery(Query nativeQuery) {
-    // appropriate configuration has been set in the native query
-    @SuppressWarnings("unchecked")
-    List<Object[]> identities = nativeQuery
-        .setHint("javax.persistence.fetchgraph",
-            entityManager.getEntityGraph("graph.Orderable.programOrderables"))
-        .unwrap(org.hibernate.Query.class)
-        .list();
 
     return identities
         .stream()
-        .map(identity -> new VersionIdentity((UUID) identity[0], (Long) identity[1]))
+        .map(identity -> new VersionIdentity(identity.getLeft(), identity.getRight()))
         .collect(Collectors.toList());
   }
 
