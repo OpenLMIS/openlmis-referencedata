@@ -95,6 +95,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
   private static final String IDENTITY = "identity";
   private static final String GMT = "GMT";
   private static final String VERSION_NUMBER = "versionNumber";
+  private static final String FULL_PRODUCT_NAME = "fullProductName";
 
   // HQL queries are running into issues with bigger number of identities at once
   private static final Integer MAX_IDENTITIES_SIZE = 1000;
@@ -266,7 +267,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
       }
 
       if (isNotBlank(searchParams.getName())) {
-        where = builder.and(where, builder.like(builder.lower(root.get("fullProductName")),
+        where = builder.and(where, builder.like(builder.lower(root.get(FULL_PRODUCT_NAME)),
             "%" + searchParams.getName().toLowerCase() + "%"));
       }
     } else {
@@ -283,8 +284,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
       newQuery.groupBy(
           root.get(IDENTITY).get(ID),
           root.get(IDENTITY).get(VERSION_NUMBER),
-          root.get("fullProductName"));
-      newQuery.orderBy(builder.asc(root.get("fullProductName")));
+          root.get(FULL_PRODUCT_NAME));
+      newQuery.orderBy(builder.asc(root.get(FULL_PRODUCT_NAME)));
 
       return entityManager.createQuery(query)
           .setMaxResults(pageable.getPageSize())
