@@ -2359,7 +2359,12 @@ resourceTypes:
 
       get:
           is: [ secured, paginated ]
-          description: Returns a page of approved products by search criteria
+          description: >
+                  Returns a page of approved products by search criteria.
+                  Returned FTAPs do not ensure that the ProgramOrderable for the Program is active or not.
+                  It does not guarantee that the Orderable may be currently ordered in that Program.
+                  FTAPs are returned based on the configuration for their latest versions.
+                  It is a client's decision whether any additional validation checks are needed.
           queryParameters:
             facilityType:
                 description: >
@@ -2409,7 +2414,12 @@ resourceTypes:
       /search:
             post:
                 is: [ secured ]
-                description: Return a page of approved products by search criteria.
+                description: >
+                  Return a page of approved products by search criteria.
+                  Returned FTAPs do not ensure that the ProgramOrderable for the Program is active or not.
+                  It does not guarantee that the Orderable may be currently ordered in that Program.
+                  FTAPs are returned based on the configuration for requested versions.
+                  It is a client's decision whether any additional validation checks are needed.
                 body:
                     application/json:
                         schema: approvedProductSearchQuery

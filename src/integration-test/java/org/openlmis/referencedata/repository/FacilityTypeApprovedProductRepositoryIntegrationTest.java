@@ -412,7 +412,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE_CODE)
             .withActive(true)
             .build(),
-        null);
+        pageable);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
 
@@ -420,7 +420,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
         .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .build(),
-        null);
+        pageable);
     assertEquals(2, result.getContent().size());
     for (FacilityTypeApprovedProduct ftap : result) {
       assertEquals(FACILITY_TYPE2_CODE, ftap.getFacilityType().getCode());
@@ -437,7 +437,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withOrderableIds(
                 Sets.newHashSet(orderableFullSupply.getId(), orderableNonFullSupply.getId()))
             .build(),
-        null);
+        pageable);
     assertEquals(2, result.getContent().size());
     assertTrue(result.getContent().containsAll(Lists.newArrayList(ftap1, ftap2)));
   }
@@ -478,7 +478,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .withActive(true)
             .build(),
-        null);
+        pageable);
     assertEquals(1, result.getContent().size());
 
     // only not active
@@ -488,7 +488,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .withActive(false)
             .build(),
-        null);
+        pageable);
     assertEquals(2, result.getContent().size());
 
     // all if not provided
@@ -497,7 +497,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE_CODE)
             .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .build(),
-        null);
+        pageable);
     assertEquals(3, result.getContent().size());
   }
 
@@ -510,7 +510,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE_CODE)
             .withProgramCode(PROGRAM_CODE)
             .build(),
-        null);
+        pageable);
     assertEquals(1, result.getContent().size());
     assertEquals(FACILITY_TYPE_CODE, result.iterator().next().getFacilityType().getCode());
     assertEquals(PROGRAM_CODE, result.iterator().next().getProgram().getCode().toString());
@@ -520,7 +520,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .withProgramCode("nonExistingCode")
             .build(),
-        null);
+        pageable);
     assertEquals(0, result.getContent().size());
   }
 
@@ -605,7 +605,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withIdentity(ftap1.getId(), ftap1.getVersionNumber())
             .withIdentity(ftap2.getId(), ftap2.getVersionNumber())
             .build(),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(2));
 
@@ -628,7 +628,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
             .withIdentity(ftap.getId(), ftap.getVersionNumber())
             .build(),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity(), is(ftap.getVersionIdentity()));
@@ -638,7 +638,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
             .withIdentity(ftap.getId(), ftap.getVersionNumber() - 1)
             .build(),
-        null);
+        pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
     assertThat(actual.getContent().get(0).getVersionIdentity().getId(), is(ftap.getId()));
