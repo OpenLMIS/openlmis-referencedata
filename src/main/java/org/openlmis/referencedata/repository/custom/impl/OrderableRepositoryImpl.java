@@ -121,15 +121,15 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     List<VersionIdentity> identityList = new ArrayList<>();
     if (!isEmpty(searchParams.getIdentityPairs())) {
-      identityList.addAll(getVersionIdentityFromPair(searchParams.getIdentityPairs()));
+      identityList.addAll(convertPairToVersionIdentity(searchParams.getIdentityPairs()));
       for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
         CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-        total += prepareNativeQuery(searchParams, countQuery, true, part, pageable)
+        total += prepareQuery(searchParams, countQuery, true, part, pageable)
             .getSingleResult();
       }
     } else {
       CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-      total += prepareNativeQuery(searchParams, countQuery, true, identityList, pageable)
+      total += prepareQuery(searchParams, countQuery, true, identityList, pageable)
           .getSingleResult();
     }
 
@@ -143,12 +143,12 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     if (!isEmpty(identityList)) {
       for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
         CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-        identities.addAll(prepareNativeQuery(searchParams, query, false, part, pageable)
+        identities.addAll(prepareQuery(searchParams, query, false, part, pageable)
             .getResultList());
       }
     } else {
       CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-      identities.addAll(prepareNativeQuery(searchParams, query, false, identityList, pageable)
+      identities.addAll(prepareQuery(searchParams, query, false, identityList, pageable)
           .getResultList());
     }
 
@@ -178,7 +178,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    Long total = prepareNativeQuery(searchParams, countQuery, true, null, pageable)
+    Long total = prepareQuery(searchParams, countQuery, true, null, pageable)
         .getSingleResult();
 
     if (total < 1) {
@@ -190,7 +190,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     List<VersionIdentity> identities = new ArrayList<>();
 
     CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-    identities.addAll(prepareNativeQuery(searchParams, query, false, null, pageable)
+    identities.addAll(prepareQuery(searchParams, query, false, null, pageable)
         .getResultList());
 
     profiler.start("GET_ORDERABLE_WITH_LATEST_LAST_UPDATE_DATE_FROM_ORDERABLES");
@@ -224,7 +224,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of(GMT));
   }
 
-  private <T> TypedQuery<T> prepareNativeQuery(SearchParams searchParams, CriteriaQuery<T> query,
+  private <T> TypedQuery<T> prepareQuery(SearchParams searchParams, CriteriaQuery<T> query,
       boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -347,7 +347,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return entityManager.createNativeQuery(builder.toString());
   }
 
-  private List<VersionIdentity> getVersionIdentityFromPair(Set<Pair<UUID, Long>> identities) {
+  private List<VersionIdentity> convertPairToVersionIdentity(Set<Pair<UUID, Long>> identities) {
 
     if (identities.isEmpty()) {
       return Collections.emptyList();
