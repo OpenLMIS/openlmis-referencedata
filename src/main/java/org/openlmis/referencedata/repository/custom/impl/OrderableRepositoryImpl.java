@@ -375,6 +375,8 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     return entityManager
         .createQuery(criteriaQuery)
+        .setHint("javax.persistence.loadgraph",
+            entityManager.getEntityGraphs(Orderable.class))
         .unwrap(org.hibernate.Query.class)
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
