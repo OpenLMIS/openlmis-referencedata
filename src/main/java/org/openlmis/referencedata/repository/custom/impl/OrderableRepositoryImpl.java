@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -48,6 +47,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
+import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.util.Pagination;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -55,7 +55,8 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
+public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
+    implements OrderableRepositoryCustom {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
 
@@ -117,21 +118,9 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    Long total = 0L;
-
     List<VersionIdentity> identityList = new ArrayList<>();
-    if (!isEmpty(searchParams.getIdentityPairs())) {
-      identityList.addAll(convertPairToVersionIdentity(searchParams.getIdentityPairs()));
-      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
-        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-        total += prepareQuery(searchParams, countQuery, true, part, pageable)
-            .getSingleResult();
-      }
-    } else {
-      CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-      total += prepareQuery(searchParams, countQuery, true, identityList, pageable)
-          .getSingleResult();
-    }
+    Set<Pair<UUID, Long>> identityPairs = searchParams.getIdentityPairs();
+    Long total = getTotal(searchParams, identityPairs, identityList, builder, pageable);
 
     if (total < 1) {
       profiler.stop().log();
@@ -139,18 +128,7 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
 
     profiler.start("GET_VERSION_IDENTITY");
-    List<VersionIdentity> identities = new ArrayList<>();
-    if (!isEmpty(identityList)) {
-      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
-        CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-        identities.addAll(prepareQuery(searchParams, query, false, part, pageable)
-            .getResultList());
-      }
-    } else {
-      CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-      identities.addAll(prepareQuery(searchParams, query, false, identityList, pageable)
-          .getResultList());
-    }
+    List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder, pageable);
 
     profiler.start("RETRIEVE_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
@@ -224,21 +202,22 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of(GMT));
   }
 
-  private <T> TypedQuery<T> prepareQuery(SearchParams searchParams, CriteriaQuery<T> query,
+  @Override
+  <E> TypedQuery<E> prepareQuery(SearchParams searchParams, CriteriaQuery<E> query,
       boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
     root.alias("orderable");
 
-    CriteriaQuery<T> newQuery;
+    CriteriaQuery<E> newQuery;
 
     if (count) {
       CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
-      newQuery = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+      newQuery = (CriteriaQuery<E>) countQuery.select(builder.count(root));
     } else {
       CriteriaQuery<VersionIdentity> typeQuery = (CriteriaQuery<VersionIdentity>) query;
-      newQuery = (CriteriaQuery<T>) typeQuery.select(root.get(IDENTITY));
+      newQuery = (CriteriaQuery<E>) typeQuery.select(root.get(IDENTITY));
     }
 
     Predicate where = builder.conjunction();
@@ -345,18 +324,6 @@ public class OrderableRepositoryImpl implements OrderableRepositoryCustom {
     }
     XLOGGER.info("QueryParamString: " + builder.toString());
     return entityManager.createNativeQuery(builder.toString());
-  }
-
-  private List<VersionIdentity> convertPairToVersionIdentity(Set<Pair<UUID, Long>> identities) {
-
-    if (identities.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    return identities
-        .stream()
-        .map(identity -> new VersionIdentity(identity.getLeft(), identity.getRight()))
-        .collect(Collectors.toList());
   }
 
   // appropriate class has been passed in the EntityManager.createQuery method

@@ -38,7 +38,6 @@ import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.SQLQuery;
@@ -52,6 +51,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom;
+import org.openlmis.referencedata.repository.custom.FacilityTypeApprovedProductRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.slf4j.ext.XLogger;
@@ -60,9 +60,8 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-@Slf4j
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class FacilityTypeApprovedProductRepositoryImpl
+public class FacilityTypeApprovedProductRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
     implements FacilityTypeApprovedProductRepositoryCustom {
 
   private static final XLogger XLOGGER =
@@ -160,21 +159,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
-    Long total = 0L;
-
     List<VersionIdentity> identityList = new ArrayList<>();
-    if (!isEmpty(searchParams.getIdentityPairs())) {
-      identityList.addAll(convertPairToVersionIdentity(searchParams.getIdentityPairs()));
-      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
-        CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-        total += prepareQuery(searchParams, countQuery, true, part, pageable)
-            .getSingleResult();
-      }
-    } else {
-      CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-      total += prepareQuery(searchParams, countQuery, true, identityList, pageable)
-          .getSingleResult();
-    }
+    Set<Pair<UUID, Long>> identityPairs = searchParams.getIdentityPairs();
+    Long total = getTotal(searchParams, identityPairs, identityList, builder, pageable);
 
     if (total <= 0) {
       profiler.stop().log();
@@ -182,18 +169,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
 
     profiler.start("GET_VERSION_IDENTITY");
-    List<VersionIdentity> identities = new ArrayList<>();
-    if (!isEmpty(identityList)) {
-      for (List<VersionIdentity> part : ListUtils.partition(identityList, MAX_IDENTITIES_SIZE)) {
-        CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-        identities.addAll(prepareQuery(searchParams, query, false, part, pageable)
-            .getResultList());
-      }
-    } else {
-      CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-      identities.addAll(prepareQuery(searchParams, query, false, identityList, pageable)
-          .getResultList());
-    }
+    List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder, pageable);
 
     profiler.start("RETRIEVE_FTAPS");
     List<FacilityTypeApprovedProduct> ftaps = new ArrayList<>();
@@ -220,7 +196,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
   }
 
-  private <E> TypedQuery<E> prepareQuery(SearchParams searchParams, CriteriaQuery<E> query,
+  @Override
+  <E> TypedQuery<E> prepareQuery(SearchParams searchParams, CriteriaQuery<E> query,
       boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -385,13 +362,6 @@ public class FacilityTypeApprovedProductRepositoryImpl
     latestFtapsQuery.groupBy(latestFtapsRoot.get(IDENTITY).get(ID));
 
     return latestFtapsQuery;
-  }
-
-  private List<VersionIdentity> convertPairToVersionIdentity(Set<Pair<UUID, Long>> identityPairs) {
-    return identityPairs
-        .stream()
-        .map(identity -> new VersionIdentity(identity.getLeft(), identity.getRight()))
-        .collect(Collectors.toList());
   }
 
   // appropriate class has been passed in the EntityManager.createNativeQuery method
