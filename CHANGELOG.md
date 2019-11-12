@@ -1,9 +1,9 @@
 15.0.0 / WIP
 ==================
 Breaking changes:
-* [OLMIS-6658](https://openlmis.atlassian.net/browse/OLMIS-6658): Improved performance of Requisition Update. To achieve it, the following actions were taken:
-  * Native query was changed to Criteria query in FTAPs Search by Params
-  * Join statements in search query that were used to check the Active flag of ProgramOrderable for FTAP's Program were removed in order to be able to retrieve FTAPs with a past version despite the ProgramOrderable being active or not.
+* [OLMIS-6658](https://openlmis.atlassian.net/browse/OLMIS-6658): Improved performance of FTAP and Orderable Search by Params. To achieve it, the following actions were taken:
+  * Native query was changed to Criteria query
+  * Active flag of ProgramOrderables does no longer impact FTAP endpoints
 
 Bug fixes:
 * [OLMIS-6575](https://openlmis.atlassian.net/browse/OLMIS-6575): Fixed Internal Server Error in supervisoryNodes endpoint.

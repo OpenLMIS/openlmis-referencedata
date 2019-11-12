@@ -61,7 +61,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
-public class FacilityTypeApprovedProductRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
+public class FacilityTypeApprovedProductRepositoryImpl
+    extends IdentitiesSearchableRepository<SearchParams>
     implements FacilityTypeApprovedProductRepositoryCustom {
 
   private static final XLogger XLOGGER =
@@ -107,9 +108,13 @@ public class FacilityTypeApprovedProductRepositoryImpl extends IdentitiesSearchU
   private static final String ID = "id";
   private static final String VERSION_NUMBER = "versionNumber";
   private static final String ACTIVE = "active";
-
-  // HQL queries are running into issues with bigger number of identities at once
-  private static final Integer MAX_IDENTITIES_SIZE = 500;
+  private static final String FTAP_ALIAS = "ftap";
+  private static final String PROGRAM = "program";
+  private static final String CODE = "code";
+  private static final String ORDERABLE_ID = "orderableId";
+  private static final String FACILITY_TYPE = "facilityType";
+  private static final String PROGRAM_ALIAS = "p";
+  private static final String FACILITY_TYPE_ALIAS = "ft";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -202,7 +207,7 @@ public class FacilityTypeApprovedProductRepositoryImpl extends IdentitiesSearchU
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<FacilityTypeApprovedProduct> root = query.from(FacilityTypeApprovedProduct.class);
-    root.alias("ftap");
+    root.alias(FTAP_ALIAS);
 
     CriteriaQuery<E> newQuery;
 
@@ -219,23 +224,23 @@ public class FacilityTypeApprovedProductRepositoryImpl extends IdentitiesSearchU
     String programCode = searchParams.getProgramCode();
     if (isNotBlank(programCode)) {
       Join<FacilityTypeApprovedProduct, Program> programsJoin =
-          root.join("program", JoinType.INNER);
-      programsJoin.alias("p");
-      predicate = builder.and(predicate, builder.equal(builder.lower(programsJoin.get("code")),
+          root.join(PROGRAM, JoinType.INNER);
+      programsJoin.alias(PROGRAM_ALIAS);
+      predicate = builder.and(predicate, builder.equal(builder.lower(programsJoin.get(CODE)),
           Code.code(programCode.toLowerCase())));
     }
 
     Set<UUID> orderableIds = searchParams.getOrderableIds();
     if (!isEmpty(orderableIds)) {
-      predicate = builder.and(predicate, root.get("orderableId")).in(orderableIds);
+      predicate = builder.and(predicate, root.get(ORDERABLE_ID)).in(orderableIds);
     }
 
     Set<String> facilityTypeCodes = searchParams.getFacilityTypeCodes();
     if (!isEmpty(facilityTypeCodes)) {
       Join<FacilityTypeApprovedProduct, FacilityType> facilityTypeJoin = root
-          .join("facilityType", JoinType.INNER);
-      facilityTypeJoin.alias("ft");
-      predicate = builder.and(predicate, facilityTypeJoin.get("code").in(facilityTypeCodes));
+          .join(FACILITY_TYPE, JoinType.INNER);
+      facilityTypeJoin.alias(FACILITY_TYPE_ALIAS);
+      predicate = builder.and(predicate, facilityTypeJoin.get(CODE).in(facilityTypeCodes));
     }
 
     if (!isEmpty(identities)) {

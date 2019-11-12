@@ -55,7 +55,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
+public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<SearchParams>
     implements OrderableRepositoryCustom {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
@@ -97,9 +97,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
   private static final String GMT = "GMT";
   private static final String VERSION_NUMBER = "versionNumber";
   private static final String FULL_PRODUCT_NAME = "fullProductName";
-
-  // HQL queries are running into issues with bigger number of identities at once
-  private static final Integer MAX_IDENTITIES_SIZE = 1000;
+  private static final String PROGRAM = "program";
+  private static final String CODE = "code";
+  private static final String PROGRAM_ORDERABLES = "programOrderables";
+  private static final String PRODUCT_CODE = "productCode";
+  private static final String LATEST_ORDERABLE_ALIAS = "latest";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -224,9 +226,9 @@ public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
 
     if (null != searchParams) {
       if (null != searchParams.getProgramCode()) {
-        Join<Orderable, ProgramOrderable> poJoin = root.join("programOrderables", JoinType.INNER);
-        Join<ProgramOrderable, Program> programJoin = poJoin.join("program", JoinType.INNER);
-        where = builder.and(where, builder.equal(builder.lower(programJoin.get("code").get("code")),
+        Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
+        Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
+        where = builder.and(where, builder.equal(builder.lower(programJoin.get(CODE).get(CODE)),
             searchParams.getProgramCode().toLowerCase()));
       }
 
@@ -241,7 +243,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
       }
 
       if (isNotBlank(searchParams.getCode())) {
-        where = builder.and(where, builder.like(builder.lower(root.get("productCode").get("code")),
+        where = builder.and(where, builder.like(builder.lower(root.get(PRODUCT_CODE).get(CODE)),
             "%" + searchParams.getCode().toLowerCase() + "%"));
       }
 
@@ -277,7 +279,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchUtil<SearchParams>
   private Subquery<String> createSubQuery(CriteriaQuery query, CriteriaBuilder builder) {
     Subquery<String> latestOrderablesQuery = query.subquery(String.class);
     Root<Orderable> latestOrderablesRoot = latestOrderablesQuery.from(Orderable.class);
-    latestOrderablesRoot.alias("latest");
+    latestOrderablesRoot.alias(LATEST_ORDERABLE_ALIAS);
 
     latestOrderablesQuery.select(
         builder.concat(

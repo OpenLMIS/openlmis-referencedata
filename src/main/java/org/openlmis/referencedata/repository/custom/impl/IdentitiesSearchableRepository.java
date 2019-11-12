@@ -32,9 +32,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.springframework.data.domain.Pageable;
 
-abstract class IdentitiesSearchUtil<T> {
+abstract class IdentitiesSearchableRepository<T> {
 
-  private static final Integer MAX_IDENTITIES_SIZE = 500;
+  static final Integer MAX_IDENTITIES_SIZE = 500;
 
   abstract <E> TypedQuery<E> prepareQuery(T searchParams, CriteriaQuery<E> query,
       boolean count, Collection<VersionIdentity> identities, Pageable pageable);
