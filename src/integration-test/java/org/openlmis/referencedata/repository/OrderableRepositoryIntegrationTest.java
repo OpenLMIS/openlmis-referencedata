@@ -31,7 +31,6 @@ import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
 import com.google.common.collect.Sets;
-
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -650,72 +649,6 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindLatestModifiedDateFromPaginatedOrderables() {
-    //given
-    Orderable orderable1 = saveAndGetOrderable();
-    Orderable orderable2 = saveAndGetOrderable();
-    Orderable orderable3 = saveAndGetOrderable();
-    orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
-    orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
-    orderable3.setLastUpdated(ZonedDateTime.now());
-    repository.save(orderable1);
-    repository.save(orderable2);
-    repository.save(orderable3);
-
-    ZonedDateTime lastUpdated =
-        repository.findOrderablesWithLatestModifiedDate(null, new PageRequest(0, 3))
-            .get(0)
-            .getLastUpdated();
-
-    //then
-    assertEquals(lastUpdated.withNano(0), orderable3.getLastUpdated().withNano(0));
-  }
-
-  @Test
-  public void shouldFindOrderableWithLatestVersionFromPaginatedOrderables() {
-    //given
-    Long versionNumber = ThreadLocalRandom.current().nextLong(0, 1000);
-    OrderableDataBuilder builder = new OrderableDataBuilder();
-    Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
-    orderable = repository.save(orderable);
-
-    Orderable orderableNewVersion = builder.withVersionNumber(versionNumber + 1).buildAsNew();
-    orderableNewVersion.setId(orderable.getId());
-    repository.save(orderableNewVersion);
-
-    //when
-    Orderable foundOrderable =
-        repository.findOrderablesWithLatestModifiedDate(null, new PageRequest(0, 1))
-        .get(0);
-
-    //then
-    assertEquals(foundOrderable, orderableNewVersion);
-  }
-
-  @Test
-  public void shouldFindLatestModifiedDateFromAllRetrievedOrderables() {
-    //given
-    Orderable orderable1 = saveAndGetOrderable();
-    Orderable orderable2 = saveAndGetOrderable();
-    Orderable orderable3 = saveAndGetOrderable();
-    orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
-    orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
-    orderable3.setLastUpdated(ZonedDateTime.now());
-    repository.save(orderable1);
-    repository.save(orderable2);
-    repository.save(orderable3);
-
-    //when
-    ZonedDateTime lastUpdated = repository
-        .findOrderablesWithLatestModifiedDate(null, pageable)
-        .get(0)
-        .getLastUpdated();
-
-    //then
-    assertEquals(lastUpdated, orderable3.getLastUpdated());
-  }
-
-  @Test
   public void shouldFindLastUpdatedDateFromOrderablesRetrievedByIds() {
     //given
     Orderable orderable1 = saveAndGetOrderable();
@@ -784,31 +717,6 @@ public class OrderableRepositoryIntegrationTest {
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated().withZoneSameLocal(ZoneId.of("GMT")));
-  }
-
-  @Test
-  public void shouldFindLatestModifiedDateFromRetrievedOrderablesFoundByIdVersionNumberPairs() {
-    //given
-    Orderable orderable1 = saveAndGetOrderable();
-    Orderable orderable2 = saveAndGetOrderable();
-    Orderable orderable3 = saveAndGetOrderable();
-    orderable1.setLastUpdated(ZonedDateTime.now().minusHours(1));
-    orderable2.setLastUpdated(ZonedDateTime.now().minusHours(2));
-    orderable3.setLastUpdated(ZonedDateTime.now());
-    repository.save(orderable1);
-    repository.save(orderable2);
-    repository.save(orderable3);
-
-    //when
-    ZonedDateTime latestModifiedDate = repository.findOrderablesWithLatestModifiedDate(
-        new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
-                Pair.of(orderable2.getId(), orderable2.getVersionNumber()),
-                Pair.of(orderable3.getId(), orderable3.getVersionNumber()))),
-        pageable).get(0).getLastUpdated();
-
-    //then
-    assertEquals(latestModifiedDate, orderable3.getLastUpdated());
   }
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,

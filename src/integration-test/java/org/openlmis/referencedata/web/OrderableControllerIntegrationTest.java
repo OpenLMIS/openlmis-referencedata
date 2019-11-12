@@ -38,7 +38,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -656,10 +655,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .search(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
 
-    given(orderableRepository
-        .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
-        .willReturn(Lists.newArrayList(orderable));
-
     when(orderableService
             .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class),
                     any(Profiler.class)))
@@ -695,10 +690,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
-
-    given(orderableRepository
-        .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
-        .willReturn(Lists.newArrayList(orderable));
 
     when(orderableService
             .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
@@ -736,10 +727,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .search(eq(searchParams), any(Pageable.class)))
         .willReturn(Pagination.getPage(Lists.newArrayList(orderable)));
 
-    given(orderableRepository
-        .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
-        .willReturn(Lists.newArrayList(orderable));
-
     when(orderableService
             .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
             .thenReturn(modifiedDate);
@@ -767,10 +754,6 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         Lists.newArrayList(new VersionIdentityDto(
             orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
-
-    given(orderableRepository
-        .findOrderablesWithLatestModifiedDate(eq(searchParams), any(Pageable.class)))
-        .willReturn(Collections.emptyList());
 
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))

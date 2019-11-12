@@ -99,6 +99,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   private static final String FULL_PRODUCT_NAME = "fullProductName";
   private static final String PROGRAM = "program";
   private static final String CODE = "code";
+  private static final String ORDERABLE = "orderable";
   private static final String PROGRAM_ORDERABLES = "programOrderables";
   private static final String PRODUCT_CODE = "productCode";
   private static final String LATEST_ORDERABLE_ALIAS = "latest";
@@ -135,7 +136,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     profiler.start("RETRIEVE_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
     for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
-      orderables.addAll(retrieveOrderables(partition, false));
+      orderables.addAll(retrieveOrderables(partition));
     }
 
     profiler.stop().log();
@@ -148,41 +149,6 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
    *
    * @return ZonedDateTime of the latest last updated orderable.
    */
-  @Override
-  public List<Orderable> findOrderablesWithLatestModifiedDate(SearchParams searchParams,
-      Pageable pageable) {
-    Profiler profiler = new Profiler("ORDERABLE_REPOSITORY_SEARCH_LATEST_DATE_BY_PARAMS");
-    profiler.setLogger(XLOGGER);
-
-    profiler.start("CALCULATE_FULL_LIST_SIZE");
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-
-    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    Long total = prepareQuery(searchParams, countQuery, true, null, pageable)
-        .getSingleResult();
-
-    if (total < 1) {
-      profiler.stop().log();
-      return Collections.emptyList();
-    }
-
-    profiler.start("GET_VERSION_IDENTITY");
-    List<VersionIdentity> identities = new ArrayList<>();
-
-    CriteriaQuery<VersionIdentity> query = builder.createQuery(VersionIdentity.class);
-    identities.addAll(prepareQuery(searchParams, query, false, null, pageable)
-        .getResultList());
-
-    profiler.start("GET_ORDERABLE_WITH_LATEST_LAST_UPDATE_DATE_FROM_ORDERABLES");
-    List<Orderable> orderables = new ArrayList<>();
-    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
-      orderables.addAll(retrieveOrderables(partition, true));
-    }
-
-    profiler.stop().log();
-    return orderables;
-  }
-
   @Override
   public ZonedDateTime findLatestModifiedDateByParams(SearchParams searchParams) {
     Profiler profiler = new Profiler("GET_ZONED_DATE_TIME_FROM_PARAMS");
@@ -210,7 +176,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
-    root.alias("orderable");
+    root.alias(ORDERABLE);
 
     CriteriaQuery<E> newQuery;
 
@@ -330,17 +296,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   // appropriate class has been passed in the EntityManager.createQuery method
   @SuppressWarnings("unchecked")
-  private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities,
-      Boolean date) {
+  private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Orderable> criteriaQuery =
         criteriaBuilder.createQuery(Orderable.class);
     Root<Orderable> root = criteriaQuery.from(Orderable.class);
     criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
-
-    if (date) {
-      criteriaQuery.orderBy(criteriaBuilder.desc(root.get("lastUpdated")));
-    }
 
     return entityManager
         .createQuery(criteriaQuery)
