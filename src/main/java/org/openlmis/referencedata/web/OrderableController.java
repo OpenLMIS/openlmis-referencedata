@@ -171,7 +171,7 @@ public class OrderableController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryParams);
-    ZonedDateTime lastUpdated = getLastUpdatedDate(searchParams, profiler);
+    ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(searchParams, profiler);
 
     if (lastUpdated == null) {
       Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
@@ -223,9 +223,8 @@ public class OrderableController extends BaseController {
     Pageable pageable = body.getPageable();
 
     profiler.start("GET_LATEST_LAST_UPDATED_DATE");
-
-    ZonedDateTime lastUpdated = getLastUpdatedDate(
-            getQueryOrderableSearchParams(body), profiler);
+    ZonedDateTime lastUpdated = orderableService
+            .getLatestLastUpdatedDate(getQueryOrderableSearchParams(body), profiler);
 
     if (lastUpdated == null) {
       Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
@@ -336,12 +335,6 @@ public class OrderableController extends BaseController {
 
   public boolean wasModifiedSince(ZonedDateTime lastUpdated, ZonedDateTime date) {
     return date == null || lastUpdated == null || lastUpdated.isAfter(date);
-  }
-
-  private ZonedDateTime getLastUpdatedDate(
-          QueryOrderableSearchParams searchParams, Profiler profiler) {
-
-    return orderableService.getLatestLastUpdatedDate(searchParams, profiler);
   }
 
   private QueryOrderableSearchParams getQueryOrderableSearchParams(
