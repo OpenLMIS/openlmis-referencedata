@@ -10,6 +10,7 @@ Bug fixes:
 
 Improvements:
 * [OLMIS-6611](https://openlmis.atlassian.net/browse/OLMIS-6611): Changed queries to retrieve only last update date instead of orderables collection to improve performance.
+* [OLMIS-6566](https://openlmis.atlassian.net/browse/OLMIS-6566): Refactored orderable query to avoid native and added entity graph.
 
 14.0.0 / 2019-10-17
 ==================
