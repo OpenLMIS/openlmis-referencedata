@@ -101,7 +101,7 @@ reporting:
     criteria:
       Get Supply Line too slow: p90 of GetSupplyLine>60000ms
 #      Get All Supply Lines too slow: p90 of GetAll1000SupplyLines>1000ms
-      Get All Supply Lines with expand too slow: p90 of GetAll1000SupplyLinesExpand>1000ms
+      Get All Supply Lines with expand too slow: p90 of GetAll1000SupplyLinesExpand>2000ms
       Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>1000ms
       Get Page of Ten Supply Lines with expand too slow: p90 of GetPageOfTenSupplyLinesExpand>1000ms
       Get Supply Lines by Supervisory Node too slow: p90 of GetSupplyLinesBySupervisoryNodeId>1000ms
