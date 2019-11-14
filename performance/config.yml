@@ -8,6 +8,7 @@ modules:
       # concurrency is in virtual users and duration is in seconds
       scenario-concurrency: 3
       scenario-duration: 30
+      long-scenario-duration: 300
     xml-jtl-flags:
       responseData: true
     memory-xmx: 4G

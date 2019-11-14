@@ -3,7 +3,7 @@ execution:
     hold-for: ${__P(scenario-duration,60)}
     scenario: full-supply-approved-products
   - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,300)}
+    hold-for: ${__P(long-scenario-duration,60)}
     scenario: non-full-supply-approved-products
 
 scenarios:
