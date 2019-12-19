@@ -1,5 +1,6 @@
-15.0.0 / WIP
+15.0.0 / 2019-12-19
 ==================
+
 Breaking changes:
 * [OLMIS-6658](https://openlmis.atlassian.net/browse/OLMIS-6658): Improved performance of FTAP and Orderable Search by Params. To achieve it, the following actions were taken:
   * Native query was changed to Criteria query
