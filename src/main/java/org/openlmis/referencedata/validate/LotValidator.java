@@ -74,17 +74,18 @@ public class LotValidator implements BaseValidator {
     if (!errors.hasErrors()) {
       LotDto lotDto = (LotDto) target;
       verifyTradeItem(lotDto, errors);
-      verifyCode(lotDto, errors);
     }
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
     List<Lot> lots = lotRepository.search(null, null, lot.getLotCode(), null, null).getContent()
         .stream()
-        .filter(l -> !l.getId().equals(lot.getId()))
+        .filter(l -> !l.getId().equals(lot.getId())
+            && l.getTradeItem().getId().equals(lot.getTradeItemId()))
         .collect(Collectors.toList());
     if (!lots.isEmpty()) {
-      rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
+      rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE, lot.getLotCode(),
+          String.valueOf(lot.getTradeItemId()));
     }
   }
 
@@ -97,6 +98,8 @@ public class LotValidator implements BaseValidator {
       if (tradeItem == null) {
         rejectValue(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
             String.valueOf(tradeItemId));
+      } else {
+        verifyCode(lot, errors);
       }
     }
   }

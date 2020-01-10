@@ -39,7 +39,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @AllArgsConstructor
 public class Lot extends BaseEntity {
 
-  @Column(nullable = false, unique = true, columnDefinition = "text")
+  @Column(nullable = false, columnDefinition = "text")
   private String lotCode;
 
   private LocalDate expirationDate;

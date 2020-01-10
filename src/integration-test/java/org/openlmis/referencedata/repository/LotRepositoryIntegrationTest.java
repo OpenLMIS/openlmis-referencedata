@@ -93,6 +93,26 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   @Test
+  public void shouldEnableAddingLotsWithSimilarCodeForDifferentTradeItems() {
+    Lot lotOne = lotRepository.save(generateInstance());
+    Lot lotTwo = generateInstance();
+    lotTwo.setLotCode(lotOne.getLotCode());
+    lotRepository.save(lotTwo);
+
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        lotOne.getLotCode(),
+        null,
+        null
+    );
+
+    assertEquals(2, lotPage.getNumberOfElements());
+    assertEquals(lotOne, lotPage.getContent().get(0));
+    assertEquals(lotTwo, lotPage.getContent().get(1));
+  }
+
+  @Test
   public void shouldFindLotsByExpirationDate() {
     Lot expected = generateInstance();
     expected.setExpirationDate(now);

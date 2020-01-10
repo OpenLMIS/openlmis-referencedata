@@ -37,6 +37,8 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.testbuilder.LotDataBuilder;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
@@ -48,6 +50,8 @@ import org.springframework.validation.Validator;
 @SuppressWarnings("PMD.TooManyMethods")
 public class LotValidatorTest {
 
+  private static final String CODE = "code";
+
   @Mock
   private TradeItemRepository tradeItemRepository;
 
@@ -58,18 +62,19 @@ public class LotValidatorTest {
   private Validator validator = new LotValidator();
 
   private LotDto lotDto;
+  private TradeItem tradeItem;
   private Errors errors;
 
   @Before
   public void setUp() throws Exception {
     lotDto = new LotDto();
-    lotDto.setLotCode("code");
+    lotDto.setLotCode(CODE);
     lotDto.setExpirationDate(LocalDate.now());
     lotDto.setManufactureDate(LocalDate.now());
     lotDto.setActive(true);
     lotDto.setId(UUID.randomUUID());
 
-    TradeItem tradeItem =
+    tradeItem =
         new TradeItem("manufacturer", null);
     tradeItem.setId(UUID.randomUUID());
     lotDto.setTradeItemId(tradeItem.getId());
@@ -119,7 +124,8 @@ public class LotValidatorTest {
   @Test
   public void shouldRejectWhenLotCodeAlreadyExist() {
     Lot lot = new Lot();
-    lot.setLotCode("code");
+    lot.setLotCode(CODE);
+    lot.setTradeItem(tradeItem);
     lot.setId(UUID.randomUUID());
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
@@ -135,8 +141,25 @@ public class LotValidatorTest {
   @Test
   public void shouldNotFindErrorsWhenLotCodeAlreadyExistButIsTheSameLot() throws Exception {
     Lot lot = new Lot();
-    lot.setLotCode("code");
+    lot.setLotCode(CODE);
     lot.setId(lotDto.getId());
+    List<Lot> lots = new ArrayList<>();
+    lots.add(lot);
+
+    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
+        .thenReturn(Pagination.getPage(lots));
+
+    validator.validate(lotDto, errors);
+
+    assertEquals(0, errors.getErrorCount());
+  }
+
+  @Test
+  public void shouldNotFindErrorsWhenLotCodeAlreadyExistButForDifferentTradeItem() throws Exception {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    Lot lot = new LotDataBuilder().build();
+    lot.setLotCode(CODE);
+    lot.setTradeItem(tradeItem);
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 

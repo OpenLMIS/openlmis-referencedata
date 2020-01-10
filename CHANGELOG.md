@@ -1,3 +1,9 @@
+15.0.1-SNAPSHOT / WIP
+=====================
+
+Bug fixes:
+* [OLMIS-6676](https://openlmis.atlassian.net/browse/OLMIS-6676): Enabled trade items to share lot codes.
+
 15.0.0 / 2019-12-19
 ==================
 
