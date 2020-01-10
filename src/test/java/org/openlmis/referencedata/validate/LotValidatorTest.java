@@ -155,7 +155,7 @@ public class LotValidatorTest {
   }
 
   @Test
-  public void shouldNotFindErrorsWhenLotCodeAlreadyExistButForDifferentTradeItem() throws Exception {
+  public void shouldNotFindErrorsWhenLotCodeExistsButForDifferentTradeItem() throws Exception {
     TradeItem tradeItem = new TradeItemDataBuilder().build();
     Lot lot = new LotDataBuilder().build();
     lot.setLotCode(CODE);
