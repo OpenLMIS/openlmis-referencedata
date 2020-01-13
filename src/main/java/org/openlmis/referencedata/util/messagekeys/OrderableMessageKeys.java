@@ -36,4 +36,32 @@ public abstract class OrderableMessageKeys extends MessageKeys {
 
   public static final String ERROR_INVALID_VERSION_IDENTITY =
       join(ERROR, SEARCH, "invalidVersionIdentity");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE =
+          join(ERROR, "minimumToleranceTemperature");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE =
+          join(ERROR, "maximumToleranceTemperature");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE, "temperatureMeasurementUnitCode");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE, "temperatureMeasurementUnitCode");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "notSupported");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "notSupported");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "required");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "required");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE, "value");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION =
+          join(ERROR, "inBoxCubeDimension");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE =
+          join(ERROR_IN_BOX_CUBE_DIMENSION, "measurementUnitCode");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE, "notSupported");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_REQUIRED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION, "required");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE =
+          join(ERROR_IN_BOX_CUBE_DIMENSION, "value");
 }

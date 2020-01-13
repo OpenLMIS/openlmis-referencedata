@@ -30,6 +30,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
+import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.repository.OrderableRepository;
 
 @Getter
@@ -64,6 +66,12 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
   private Map<String, Object> extraData;
 
   private MetadataDto meta = new MetadataDto();
+
+  private TemperatureMeasurement minimumToleranceTemperature = new TemperatureMeasurement();
+
+  private TemperatureMeasurement maximumToleranceTemperature = new TemperatureMeasurement();
+
+  private VolumeMeasurement inBoxCubeDimension = new VolumeMeasurement();
 
   @JsonIgnore
   private OrderableRepository orderableRepository;
@@ -129,4 +137,43 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
     meta.setLastUpdated(lastUpdated);
   }
 
+  @Override
+  public void setMinimumToleranceTemperature(
+          TemperatureMeasurement minimumToleranceTemperature) {
+    this.minimumToleranceTemperature.setTemperatureMeasurementUnitCode(
+            minimumToleranceTemperature.getTemperatureMeasurementUnitCode());
+    this.minimumToleranceTemperature.setValue(minimumToleranceTemperature.getValue());
+  }
+
+  @Override
+  public void setMaximumToleranceTemperature(
+          TemperatureMeasurement maximumToleranceTemperature) {
+    this.maximumToleranceTemperature
+            .setTemperatureMeasurementUnitCode(maximumToleranceTemperature
+                    .getTemperatureMeasurementUnitCode());
+    this.maximumToleranceTemperature.setValue(maximumToleranceTemperature.getValue());
+  }
+
+  @Override
+  public void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension) {
+    this.inBoxCubeDimension.setMeasurementUnitCode(
+            inBoxCubeDimension.getMeasurementUnitCode());
+    this.inBoxCubeDimension.setValue(
+            inBoxCubeDimension.getValue());
+  }
+
+  @Override
+  public TemperatureMeasurement getMinimumToleranceTemperature() {
+    return minimumToleranceTemperature;
+  }
+
+  @Override
+  public TemperatureMeasurement getMaximumToleranceTemperature() {
+    return maximumToleranceTemperature;
+  }
+
+  @Override
+  public VolumeMeasurement getInBoxCubeDimension() {
+    return inBoxCubeDimension;
+  }
 }
