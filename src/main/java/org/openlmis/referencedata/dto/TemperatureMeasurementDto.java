@@ -32,7 +32,6 @@ public class TemperatureMeasurementDto implements TemperatureMeasurement.Importe
   private String temperatureMeasurementUnitCode;
 
   @Getter
-  @Setter
   private List<String> codeListVersion;
 
   @Override

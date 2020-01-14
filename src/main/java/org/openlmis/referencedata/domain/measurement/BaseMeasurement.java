@@ -21,9 +21,11 @@ import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -31,6 +33,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Embeddable
 @MappedSuperclass
+@EqualsAndHashCode
+@ToString
 public abstract class BaseMeasurement {
 
   protected abstract List<String> getCodeListVersion();

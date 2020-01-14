@@ -18,5 +18,5 @@ package org.openlmis.referencedata.domain.measurement;
 // This is a temporary class until the transition between units of measurement is implemented.
 // We will support only liters for now.
 public enum VolumeUnitCode {
-    LTR
+    MLT
 }

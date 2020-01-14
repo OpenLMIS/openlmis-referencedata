@@ -17,6 +17,7 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, ORDERABLE);
+  private static final String REQUIRED = "required";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -49,11 +50,17 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED =
           join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "notSupported");
   public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
-          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "required");
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, REQUIRED);
   public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
-          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, "required");
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, REQUIRED);
   public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE =
           join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE, "value");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE, "value");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE, REQUIRED);
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE, REQUIRED);
   public static final String ERROR_IN_BOX_CUBE_DIMENSION =
           join(ERROR, "inBoxCubeDimension");
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE =
@@ -61,7 +68,9 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_NOT_SUPPORTED =
           join(ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE, "notSupported");
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_REQUIRED =
-          join(ERROR_IN_BOX_CUBE_DIMENSION, "required");
+          join(ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE, REQUIRED);
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE =
           join(ERROR_IN_BOX_CUBE_DIMENSION, "value");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE_REQUIRED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION_VALUE, REQUIRED);
 }

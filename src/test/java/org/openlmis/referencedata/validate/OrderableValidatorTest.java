@@ -114,11 +114,32 @@ public class OrderableValidatorTest {
   }
 
   @Test
+  public void shouldRejectIfInBoxCubeDimensionValueIsNotGiven() {
+    orderableDto.setInBoxCubeDimension(new VolumeMeasurementDataBuilder()
+            .withValue(null).build());
+
+    validator.validate(orderableDto, errors);
+    assertThat(errors.hasFieldErrors(IN_BOX_CUBE_DIMENSION)).isTrue();
+  }
+
+  @Test
   public void shouldRejectIfToleranceTemperatureUnitCodeIsNotGiven() {
     orderableDto.setMinimumToleranceTemperature(new TemperatureMeasurementDataBuilder()
             .withTemperatureMeasurementUnitCode(null).build());
     orderableDto.setMaximumToleranceTemperature(new TemperatureMeasurementDataBuilder()
             .withTemperatureMeasurementUnitCode(null).build());
+
+    validator.validate(orderableDto, errors);
+    assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isTrue();
+    assertThat(errors.hasFieldErrors(MAXIMUM_TOLERANCE_TEMPERATURE)).isTrue();
+  }
+
+  @Test
+  public void shouldRejectIfOnlyToleranceTemperatureUnitCodeIsNotGiven() {
+    orderableDto.setMinimumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withValue(null).build());
+    orderableDto.setMaximumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withValue(null).build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isTrue();

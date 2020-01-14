@@ -24,26 +24,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @Embeddable
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class TemperatureMeasurement extends BaseMeasurement {
 
   private String temperatureMeasurementUnitCode;
+
+  public TemperatureMeasurement(Double value, String temperatureMeasurementUnitCode) {
+    super(value);
+    this.temperatureMeasurementUnitCode = temperatureMeasurementUnitCode;
+  }
 
   @Override
   public List<String> getCodeListVersion() {
     return Stream.of(TemperatureUnitCode.values())
             .map(TemperatureUnitCode::name)
             .collect(Collectors.toList());
-  }
-
-  public TemperatureMeasurement(Double value, String temperatureMeasurementUnitCode) {
-    super(value);
-    this.temperatureMeasurementUnitCode = temperatureMeasurementUnitCode;
   }
 
   /**

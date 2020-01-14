@@ -17,7 +17,9 @@ package org.openlmis.referencedata.domain.measurement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.dto.TemperatureMeasurementDto;
 import org.openlmis.referencedata.testbuilder.TemperatureMeasurementDataBuilder;
 
@@ -46,5 +48,18 @@ public class TemperatureMeasurementTest {
             .isEqualTo(instance.getTemperatureMeasurementUnitCode());
     assertThat(exporter.getValue()).isEqualTo(instance.getValue());
 
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(TemperatureMeasurement.class)
+            .withRedefinedSuperclass()
+            .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    TemperatureMeasurement temperatureMeasurement = new TemperatureMeasurement() {};
+    ToStringTestUtils.verify(TemperatureMeasurement.class, temperatureMeasurement);
   }
 }

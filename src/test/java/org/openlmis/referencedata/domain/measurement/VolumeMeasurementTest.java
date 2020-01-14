@@ -17,7 +17,9 @@ package org.openlmis.referencedata.domain.measurement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.dto.VolumeMeasurementDto;
 import org.openlmis.referencedata.testbuilder.VolumeMeasurementDataBuilder;
 
@@ -44,5 +46,18 @@ public class VolumeMeasurementTest {
     assertThat(exporter.getMeasurementUnitCode()).isEqualTo(instance.getMeasurementUnitCode());
     assertThat(exporter.getValue()).isEqualTo(instance.getValue());
 
+  }
+
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(VolumeMeasurement.class)
+            .withRedefinedSuperclass()
+            .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    VolumeMeasurement volumeMeasurement = new VolumeMeasurement() {};
+    ToStringTestUtils.verify(VolumeMeasurement.class, volumeMeasurement);
   }
 }

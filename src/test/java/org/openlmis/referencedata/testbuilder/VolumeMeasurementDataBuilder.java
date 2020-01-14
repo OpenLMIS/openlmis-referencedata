@@ -36,7 +36,7 @@ public class VolumeMeasurementDataBuilder {
    */
   public VolumeMeasurementDataBuilder() {
 
-    measurementUnitCode = "LTR";
+    measurementUnitCode = "MLT";
     value = 1.0;
   }
 

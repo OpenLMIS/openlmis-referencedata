@@ -24,13 +24,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @Embeddable
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class VolumeMeasurement extends Measurement {
+
+  public VolumeMeasurement(Double value, String measurementUnitCode) {
+    super(value, measurementUnitCode);
+  }
 
   @Override
   public List<String> getCodeListVersion() {
@@ -38,10 +44,6 @@ public class VolumeMeasurement extends Measurement {
                           .map(VolumeUnitCode::name)
                           .collect(Collectors.toList());
     return list;
-  }
-
-  public VolumeMeasurement(Double value, String measurementUnitCode) {
-    super(value, measurementUnitCode);
   }
 
   /**

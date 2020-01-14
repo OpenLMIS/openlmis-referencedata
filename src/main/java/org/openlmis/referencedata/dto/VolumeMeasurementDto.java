@@ -32,7 +32,6 @@ public class VolumeMeasurementDto implements VolumeMeasurement.Importer,
   private String measurementUnitCode;
 
   @Getter
-  @Setter
   private List<String> codeListVersion;
 
   @Override

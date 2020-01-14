@@ -18,15 +18,19 @@ package org.openlmis.referencedata.domain.measurement;
 import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @Embeddable
 @MappedSuperclass
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public abstract class Measurement extends BaseMeasurement {
 
   protected String measurementUnitCode;
