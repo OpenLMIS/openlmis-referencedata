@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain.measurement;
 
+// This is a temporary class until transition between units of measurement is implemented.
+// We will support only Celsius degrees for now.
 public enum TemperatureUnitCode {
-    CEL;
+    CEL
 }

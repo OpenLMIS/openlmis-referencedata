@@ -248,22 +248,16 @@ public class Orderable implements Versionable {
     orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionNumber());
     orderable.lastUpdated = ZonedDateTime.now();
     if (importer.getMinimumToleranceTemperature() != null) {
-      orderable.minimumToleranceTemperature = new TemperatureMeasurement(
-              importer.getMinimumToleranceTemperature().getValue(),
-              importer.getMinimumToleranceTemperature().getTemperatureMeasurementUnitCode()
-      );
+      orderable.minimumToleranceTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMinimumToleranceTemperature());
     }
     if (importer.getMaximumToleranceTemperature() != null) {
-      orderable.maximumToleranceTemperature = new TemperatureMeasurement(
-              importer.getMaximumToleranceTemperature().getValue(),
-              importer.getMaximumToleranceTemperature().getTemperatureMeasurementUnitCode()
-      );
+      orderable.maximumToleranceTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMaximumToleranceTemperature());
     }
     if (importer.getInBoxCubeDimension() != null) {
-      orderable.inBoxCubeDimension = new VolumeMeasurement(
-              importer.getInBoxCubeDimension().getValue(),
-              importer.getInBoxCubeDimension().getMeasurementUnitCode()
-      );
+      orderable.inBoxCubeDimension = VolumeMeasurement
+              .newVolumeMeasurement(importer.getInBoxCubeDimension());
     }
 
     return orderable;
@@ -465,10 +459,10 @@ public class Orderable implements Versionable {
 
     Map<String, String> getIdentifiers();
 
-    TemperatureMeasurement getMinimumToleranceTemperature();
+    TemperatureMeasurement.Importer getMinimumToleranceTemperature();
 
-    TemperatureMeasurement getMaximumToleranceTemperature();
+    TemperatureMeasurement.Importer getMaximumToleranceTemperature();
 
-    VolumeMeasurement getInBoxCubeDimension();
+    VolumeMeasurement.Importer getInBoxCubeDimension();
   }
 }

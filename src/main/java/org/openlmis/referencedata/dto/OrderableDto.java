@@ -67,11 +67,11 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private MetadataDto meta = new MetadataDto();
 
-  private TemperatureMeasurement minimumToleranceTemperature = new TemperatureMeasurement();
+  private TemperatureMeasurementDto minimumToleranceTemperature;
 
-  private TemperatureMeasurement maximumToleranceTemperature = new TemperatureMeasurement();
+  private TemperatureMeasurementDto maximumToleranceTemperature;
 
-  private VolumeMeasurement inBoxCubeDimension = new VolumeMeasurement();
+  private VolumeMeasurementDto inBoxCubeDimension;
 
   @JsonIgnore
   private OrderableRepository orderableRepository;
@@ -140,40 +140,20 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
   @Override
   public void setMinimumToleranceTemperature(
           TemperatureMeasurement minimumToleranceTemperature) {
-    this.minimumToleranceTemperature.setTemperatureMeasurementUnitCode(
-            minimumToleranceTemperature.getTemperatureMeasurementUnitCode());
-    this.minimumToleranceTemperature.setValue(minimumToleranceTemperature.getValue());
+    this.minimumToleranceTemperature = new TemperatureMeasurementDto();
+    minimumToleranceTemperature.export(this.minimumToleranceTemperature);
   }
 
   @Override
   public void setMaximumToleranceTemperature(
           TemperatureMeasurement maximumToleranceTemperature) {
-    this.maximumToleranceTemperature
-            .setTemperatureMeasurementUnitCode(maximumToleranceTemperature
-                    .getTemperatureMeasurementUnitCode());
-    this.maximumToleranceTemperature.setValue(maximumToleranceTemperature.getValue());
+    this.maximumToleranceTemperature = new TemperatureMeasurementDto();
+    maximumToleranceTemperature.export(this.maximumToleranceTemperature);
   }
 
   @Override
   public void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension) {
-    this.inBoxCubeDimension.setMeasurementUnitCode(
-            inBoxCubeDimension.getMeasurementUnitCode());
-    this.inBoxCubeDimension.setValue(
-            inBoxCubeDimension.getValue());
-  }
-
-  @Override
-  public TemperatureMeasurement getMinimumToleranceTemperature() {
-    return minimumToleranceTemperature;
-  }
-
-  @Override
-  public TemperatureMeasurement getMaximumToleranceTemperature() {
-    return maximumToleranceTemperature;
-  }
-
-  @Override
-  public VolumeMeasurement getInBoxCubeDimension() {
-    return inBoxCubeDimension;
+    this.inBoxCubeDimension = new VolumeMeasurementDto();
+    inBoxCubeDimension.export(this.inBoxCubeDimension);
   }
 }

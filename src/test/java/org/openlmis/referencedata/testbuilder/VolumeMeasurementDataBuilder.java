@@ -13,39 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.domain.measurement;
+package org.openlmis.referencedata.testbuilder;
 
-import java.util.List;
+import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
+public class VolumeMeasurementDataBuilder {
+  private String measurementUnitCode;
+  private Double value;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Embeddable
-@MappedSuperclass
-public abstract class BaseMeasurement {
-
-  protected abstract List<String> getCodeListVersion();
-
-  protected Double value;
-
-  public interface Exporter {
-
-    void setValue(Double value);
-
+  public VolumeMeasurementDataBuilder withValue(Double value) {
+    this.value = value;
+    return this;
   }
 
-  public interface Importer {
+  public VolumeMeasurementDataBuilder withMeasurementUnitCode(String measurementUnitCode) {
+    this.measurementUnitCode = measurementUnitCode;
+    return this;
+  }
 
-    Double getValue();
+  /**
+   * Builds instance of {@link VolumeMeasurementDataBuilder} with sample data.
+   */
+  public VolumeMeasurementDataBuilder() {
 
+    measurementUnitCode = "LTR";
+    value = 1.0;
+  }
+
+  /**
+   * Builds instance of {@link VolumeMeasurement}.
+   */
+  public VolumeMeasurement build() {
+    return new VolumeMeasurement(value, measurementUnitCode);
   }
 }

@@ -24,10 +24,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
-import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.TemperatureMeasurementDataBuilder;
+import org.openlmis.referencedata.testbuilder.VolumeMeasurementDataBuilder;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -40,7 +40,6 @@ public class OrderableValidatorTest {
   private Orderable orderable;
   private OrderableDto orderableDto;
   private Errors errors;
-  private static final String CEl = "CEL";
 
   @Before
   public void setUp() {
@@ -61,14 +60,6 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldNotRejectIfToleranceTemperatureUnitCodeIsSupported() {
-    TemperatureMeasurement minimumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(2), CEl);
-    orderableDto.setMinimumToleranceTemperature(minimumToleranceTemperature);
-
-    TemperatureMeasurement maximumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(8), CEl);
-    orderableDto.setMaximumToleranceTemperature(maximumToleranceTemperature);
-
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isFalse();
     assertThat(errors.hasFieldErrors(MAXIMUM_TOLERANCE_TEMPERATURE)).isFalse();
@@ -76,13 +67,10 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfToleranceTemperatureUnitCodeIsNotSupported() {
-    TemperatureMeasurement minimumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(2), "F");
-    orderableDto.setMinimumToleranceTemperature(minimumToleranceTemperature);
-
-    TemperatureMeasurement maximumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(8), "F");
-    orderableDto.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    orderableDto.setMinimumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode("F").build());
+    orderableDto.setMaximumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode("F").build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isTrue();
@@ -91,13 +79,8 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfMinTemperatureValueIsGreaterThanMaxTemperatureValue() {
-    TemperatureMeasurement minimumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(12), CEl);
-    orderableDto.setMinimumToleranceTemperature(minimumToleranceTemperature);
-
-    TemperatureMeasurement maximumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(8), CEl);
-    orderableDto.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    orderableDto.setMinimumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withValue(12.0).build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isTrue();
@@ -105,9 +88,8 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfInBoxCubeDimensionCodeIsNotSupported() {
-    VolumeMeasurement volumeMeasurement =
-            new VolumeMeasurement(Double.valueOf(2), "ML");
-    orderableDto.setInBoxCubeDimension(volumeMeasurement);
+    orderableDto.setInBoxCubeDimension(new VolumeMeasurementDataBuilder()
+            .withMeasurementUnitCode("ML").build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(IN_BOX_CUBE_DIMENSION)).isTrue();
@@ -115,9 +97,8 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfInBoxCubeDimensionValueIsNotPositiveNumber() {
-    VolumeMeasurement volumeMeasurement =
-            new VolumeMeasurement(Double.valueOf(-0.2), "LTR");
-    orderableDto.setInBoxCubeDimension(volumeMeasurement);
+    orderableDto.setInBoxCubeDimension(new VolumeMeasurementDataBuilder()
+            .withValue(-0.2).build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(IN_BOX_CUBE_DIMENSION)).isTrue();
@@ -125,9 +106,8 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfInBoxCubeDimensionCodeIsNotGiven() {
-    VolumeMeasurement volumeMeasurement =
-            new VolumeMeasurement(Double.valueOf(2), null);
-    orderableDto.setInBoxCubeDimension(volumeMeasurement);
+    orderableDto.setInBoxCubeDimension(new VolumeMeasurementDataBuilder()
+            .withMeasurementUnitCode(null).build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(IN_BOX_CUBE_DIMENSION)).isTrue();
@@ -135,13 +115,10 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfToleranceTemperatureUnitCodeIsNotGiven() {
-    TemperatureMeasurement minimumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(2), null);
-    orderableDto.setMinimumToleranceTemperature(minimumToleranceTemperature);
-
-    TemperatureMeasurement maximumToleranceTemperature =
-            new TemperatureMeasurement(Double.valueOf(8), null);
-    orderableDto.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    orderableDto.setMinimumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode(null).build());
+    orderableDto.setMaximumToleranceTemperature(new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode(null).build());
 
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TOLERANCE_TEMPERATURE)).isTrue();

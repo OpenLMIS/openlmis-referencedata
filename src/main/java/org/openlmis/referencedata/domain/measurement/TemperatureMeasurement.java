@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.Embeddable;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,21 +29,60 @@ import lombok.Setter;
 @Setter
 @Embeddable
 @NoArgsConstructor
+@EqualsAndHashCode
 public class TemperatureMeasurement extends BaseMeasurement {
 
   private String temperatureMeasurementUnitCode;
 
   @Override
   public List<String> getCodeListVersion() {
-    List<String> list = Stream.of(TemperatureUnitCode.values())
+    return Stream.of(TemperatureUnitCode.values())
             .map(TemperatureUnitCode::name)
             .collect(Collectors.toList());
-    return list;
   }
 
   public TemperatureMeasurement(Double value, String temperatureMeasurementUnitCode) {
     super(value);
     this.temperatureMeasurementUnitCode = temperatureMeasurementUnitCode;
+  }
+
+  /**
+   * Static factory method for constructing a new Temperature Measurement using an importer (DTO).
+   *
+   * @param importer the TemperatureMeasurement importer (DTO)
+   */
+  public static TemperatureMeasurement newTemperatureMeasurement(
+          TemperatureMeasurement.Importer importer) {
+    TemperatureMeasurement newTemperatureMeasurement = new TemperatureMeasurement();
+    newTemperatureMeasurement.temperatureMeasurementUnitCode =
+            importer.getTemperatureMeasurementUnitCode();
+    newTemperatureMeasurement.value = importer.getValue();
+    return newTemperatureMeasurement;
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(TemperatureMeasurement.Exporter exporter) {
+    exporter.setTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode);
+    exporter.setValue(value);
+    exporter.setCodeListVersion(getCodeListVersion());
+  }
+
+  public interface Exporter extends BaseMeasurement.Exporter {
+
+    void setTemperatureMeasurementUnitCode(String temperatureMeasurementUnitCode);
+
+    void setCodeListVersion(List<String> codeListVersion);
+
+  }
+
+  public interface Importer extends BaseMeasurement.Importer {
+
+    String getTemperatureMeasurementUnitCode();
+
   }
 
 }

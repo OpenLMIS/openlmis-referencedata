@@ -13,39 +13,30 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.domain.measurement;
+package org.openlmis.referencedata.dto;
 
 import java.util.List;
-
-import javax.persistence.Embeddable;
-import javax.persistence.MappedSuperclass;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Embeddable
-@MappedSuperclass
-public abstract class BaseMeasurement {
+public class TemperatureMeasurementDto implements TemperatureMeasurement.Importer,
+        TemperatureMeasurement.Exporter {
 
-  protected abstract List<String> getCodeListVersion();
+  @Getter
+  @Setter
+  private Double value;
 
-  protected Double value;
+  @Getter
+  @Setter
+  private String temperatureMeasurementUnitCode;
 
-  public interface Exporter {
+  @Getter
+  @Setter
+  private List<String> codeListVersion;
 
-    void setValue(Double value);
-
-  }
-
-  public interface Importer {
-
-    Double getValue();
-
+  @Override
+  public void setCodeListVersion(List<String> codeListVersion) {
+    this.codeListVersion = codeListVersion;
   }
 }

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.Embeddable;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +29,7 @@ import lombok.Setter;
 @Setter
 @Embeddable
 @NoArgsConstructor
+@EqualsAndHashCode
 public class VolumeMeasurement extends Measurement {
 
   @Override
@@ -42,4 +44,34 @@ public class VolumeMeasurement extends Measurement {
     super(value, measurementUnitCode);
   }
 
+  /**
+   * Static factory method for constructing a new Volume Measurement using an importer (DTO).
+   *
+   * @param importer the Volume Measurement importer (DTO)
+   */
+  public static VolumeMeasurement newVolumeMeasurement(
+          VolumeMeasurement.Importer importer) {
+    VolumeMeasurement newVolumeMeasurement = new VolumeMeasurement();
+    newVolumeMeasurement.measurementUnitCode =
+            importer.getMeasurementUnitCode();
+    newVolumeMeasurement.value = importer.getValue();
+    return newVolumeMeasurement;
+  }
+
+  /**
+   * Export this object to the specified exporter (DTO).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(VolumeMeasurement.Exporter exporter) {
+    exporter.setMeasurementUnitCode(measurementUnitCode);
+    exporter.setValue(value);
+    exporter.setCodeListVersion(getCodeListVersion());
+  }
+
+  public interface Exporter extends Measurement.Exporter {
+
+    void setCodeListVersion(List<String> codeListVersion);
+
+  }
 }

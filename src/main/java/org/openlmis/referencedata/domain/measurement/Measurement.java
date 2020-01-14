@@ -35,4 +35,16 @@ public abstract class Measurement extends BaseMeasurement {
     super(value);
     this.measurementUnitCode = measurementUnitCode;
   }
+
+  public interface Exporter extends BaseMeasurement.Exporter {
+
+    void setMeasurementUnitCode(String measurementUnitCode);
+
+  }
+
+  public interface Importer extends BaseMeasurement.Importer {
+
+    String getMeasurementUnitCode();
+
+  }
 }

@@ -21,9 +21,9 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
-import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
-import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.TemperatureMeasurementDto;
+import org.openlmis.referencedata.dto.VolumeMeasurementDto;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -104,8 +104,7 @@ public class OrderableValidator implements BaseValidator {
   }
 
   private void validateVolumeMeasurement(OrderableDto dto, Errors errors) {
-    if (dto.getInBoxCubeDimension().getMeasurementUnitCode() != null
-            && dto.getInBoxCubeDimension().getValue() != null) {
+    if (isGivenInBoxCubeDimension(dto.getInBoxCubeDimension())) {
       if (isNotMeasurementUnitCodeSupported(dto.getInBoxCubeDimension())) {
         rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
                 .ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_NOT_SUPPORTED);
@@ -115,7 +114,8 @@ public class OrderableValidator implements BaseValidator {
                 .ERROR_IN_BOX_CUBE_DIMENSION_VALUE);
       }
     }
-    if (dto.getInBoxCubeDimension().getMeasurementUnitCode() == null
+    if (dto.getInBoxCubeDimension() != null
+            && dto.getInBoxCubeDimension().getMeasurementUnitCode() == null
             && dto.getInBoxCubeDimension().getValue() != null) {
       rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
               .ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_REQUIRED);
@@ -123,20 +123,21 @@ public class OrderableValidator implements BaseValidator {
   }
 
   private boolean isNotToleranceTemperatureCodeSupported(
-          TemperatureMeasurement temperatureMeasurement) {
+          TemperatureMeasurementDto temperatureMeasurement) {
     return isGivenToleranceTemperature(temperatureMeasurement)
             && !temperatureMeasurement.getCodeListVersion()
             .contains(temperatureMeasurement.getTemperatureMeasurementUnitCode());
   }
 
-  private boolean isNotMeasurementUnitCodeSupported(VolumeMeasurement volumeMeasurement) {
+  private boolean isNotMeasurementUnitCodeSupported(VolumeMeasurementDto volumeMeasurement) {
     return !volumeMeasurement.getCodeListVersion()
             .contains(volumeMeasurement.getMeasurementUnitCode());
   }
 
   private boolean isMinTemperatureValueGreaterThanMaxTemperatureValue(
-          TemperatureMeasurement minTemperature, TemperatureMeasurement maxTemperature) {
-    return isGivenToleranceTemperature(minTemperature)
+          TemperatureMeasurementDto minTemperature, TemperatureMeasurementDto maxTemperature) {
+    return minTemperature != null && maxTemperature != null
+            && isGivenToleranceTemperature(minTemperature)
             && isGivenToleranceTemperature(maxTemperature)
             && minTemperature.getValue() > maxTemperature.getValue();
   }
@@ -145,14 +146,22 @@ public class OrderableValidator implements BaseValidator {
     return value >= 0;
   }
 
-  private boolean isGivenToleranceTemperature(TemperatureMeasurement temperatureMeasurement) {
-    return temperatureMeasurement.getTemperatureMeasurementUnitCode() != null
+  private boolean isGivenToleranceTemperature(TemperatureMeasurementDto temperatureMeasurement) {
+    return temperatureMeasurement != null
+            && temperatureMeasurement.getTemperatureMeasurementUnitCode() != null
             && temperatureMeasurement.getValue() != null;
   }
 
   private boolean isNotGivenToleranceTemperatureCode(
-          TemperatureMeasurement temperatureMeasurement) {
-    return temperatureMeasurement.getTemperatureMeasurementUnitCode() == null
+          TemperatureMeasurementDto temperatureMeasurement) {
+    return temperatureMeasurement != null
+            && temperatureMeasurement.getTemperatureMeasurementUnitCode() == null
             && temperatureMeasurement.getValue() != null;
+  }
+
+  private boolean isGivenInBoxCubeDimension(VolumeMeasurementDto volumeMeasurement) {
+    return volumeMeasurement != null
+            && volumeMeasurement.getMeasurementUnitCode() != null
+            && volumeMeasurement.getValue() != null;
   }
 }

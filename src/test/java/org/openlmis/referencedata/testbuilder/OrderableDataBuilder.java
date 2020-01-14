@@ -25,6 +25,8 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
+import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 
 public class OrderableDataBuilder {
 
@@ -43,6 +45,9 @@ public class OrderableDataBuilder {
   private Map<String, Object> extraData;
   private Long versionNumber;
   private ZonedDateTime lastUpdated;
+  private TemperatureMeasurement minimumToleranceTemperature;
+  private TemperatureMeasurement maximumToleranceTemperature;
+  private VolumeMeasurement inBoxCubeDimension;
 
   /**
    * Returns instance of {@link OrderableDataBuilder} with sample data.
@@ -63,6 +68,9 @@ public class OrderableDataBuilder {
     extraData = new HashMap<>();
     versionNumber = 1L;
     lastUpdated = ZonedDateTime.now();
+    minimumToleranceTemperature = new TemperatureMeasurementDataBuilder().build();
+    maximumToleranceTemperature = new TemperatureMeasurementDataBuilder().withValue(8.0).build();
+    inBoxCubeDimension = new VolumeMeasurementDataBuilder().build();
   }
 
   public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
@@ -126,6 +134,9 @@ public class OrderableDataBuilder {
     orderable.setIdentifiers(identifiers);
     orderable.setExtraData(extraData);
     orderable.setLastUpdated(lastUpdated);
+    orderable.setMinimumToleranceTemperature(minimumToleranceTemperature);
+    orderable.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    orderable.setInBoxCubeDimension(inBoxCubeDimension);
     return orderable;
   }
 }

@@ -4,7 +4,7 @@
 Bug fixes:
 * [OLMIS-6676](https://openlmis.atlassian.net/browse/OLMIS-6676): Enabled trade items to share lot codes.
 
-Improvements:
+New functionality added in a backwards-compatible manner:
 * [OLMIS-6726](https://openlmis.atlassian.net/browse/OLMIS-6726): Added volume and temperature info to Orderables.
 
 15.0.0 / 2019-12-19
