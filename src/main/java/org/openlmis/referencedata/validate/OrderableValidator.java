@@ -166,7 +166,7 @@ public class OrderableValidator implements BaseValidator {
   }
 
   private boolean isMeasurementVolumeValuePositive(Double value) {
-    return value >= 0;
+    return value > 0;
   }
 
   private boolean isGivenToleranceTemperature(TemperatureMeasurementDto temperatureMeasurement) {

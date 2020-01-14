@@ -32,7 +32,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class VolumeMeasurement extends Measurement {
+public final class VolumeMeasurement extends Measurement {
 
   public VolumeMeasurement(Double value, String measurementUnitCode) {
     super(value, measurementUnitCode);
@@ -40,10 +40,9 @@ public class VolumeMeasurement extends Measurement {
 
   @Override
   public List<String> getCodeListVersion() {
-    List<String> list = Stream.of(VolumeUnitCode.values())
+    return Stream.of(VolumeUnitCode.values())
                           .map(VolumeUnitCode::name)
                           .collect(Collectors.toList());
-    return list;
   }
 
   /**

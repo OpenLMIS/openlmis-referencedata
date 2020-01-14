@@ -32,7 +32,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class TemperatureMeasurement extends BaseMeasurement {
+public final class TemperatureMeasurement extends BaseMeasurement {
 
   private String temperatureMeasurementUnitCode;
 

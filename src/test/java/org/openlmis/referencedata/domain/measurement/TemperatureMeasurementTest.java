@@ -59,7 +59,7 @@ public class TemperatureMeasurementTest {
 
   @Test
   public void shouldImplementToString() {
-    TemperatureMeasurement temperatureMeasurement = new TemperatureMeasurement() {};
+    TemperatureMeasurement temperatureMeasurement = new TemperatureMeasurement();
     ToStringTestUtils.verify(TemperatureMeasurement.class, temperatureMeasurement);
   }
 }

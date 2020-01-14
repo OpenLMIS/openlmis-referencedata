@@ -57,7 +57,7 @@ public class VolumeMeasurementTest {
 
   @Test
   public void shouldImplementToString() {
-    VolumeMeasurement volumeMeasurement = new VolumeMeasurement() {};
+    VolumeMeasurement volumeMeasurement = new VolumeMeasurement();
     ToStringTestUtils.verify(VolumeMeasurement.class, volumeMeasurement);
   }
 }
