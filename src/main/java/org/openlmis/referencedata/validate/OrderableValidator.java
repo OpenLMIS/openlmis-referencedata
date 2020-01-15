@@ -69,11 +69,9 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "roundToZero", ERROR_ROUND_TO_ZERO_REQUIRED);
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
 
-    if (!errors.hasErrors()) {
-      OrderableDto dto = (OrderableDto) target;
-      validateToleranceTemperature(dto, errors);
-      validateVolumeMeasurement(dto, errors);
-    }
+    OrderableDto dto = (OrderableDto) target;
+    validateToleranceTemperature(dto, errors);
+    validateVolumeMeasurement(dto, errors);
 
   }
 

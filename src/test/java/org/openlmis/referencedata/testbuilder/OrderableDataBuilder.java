@@ -28,6 +28,7 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class OrderableDataBuilder {
 
   private static int instanceNumber = 0;
@@ -68,9 +69,9 @@ public class OrderableDataBuilder {
     extraData = new HashMap<>();
     versionNumber = 1L;
     lastUpdated = ZonedDateTime.now();
-    minimumToleranceTemperature = new TemperatureMeasurementDataBuilder().build();
-    maximumToleranceTemperature = new TemperatureMeasurementDataBuilder().withValue(8.0).build();
-    inBoxCubeDimension = new VolumeMeasurementDataBuilder().build();
+    minimumToleranceTemperature = null;
+    maximumToleranceTemperature = null;
+    inBoxCubeDimension = null;
   }
 
   public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
@@ -95,6 +96,41 @@ public class OrderableDataBuilder {
 
   public OrderableDataBuilder withVersionNumber(Long versionNumber) {
     this.versionNumber = versionNumber;
+    return this;
+  }
+
+  /**
+   * Sets the value of minimumToleranceTemperature for new {@link Orderable}.
+   */
+  public OrderableDataBuilder withMinimumToleranceTemperature(
+          String temperatureMeasurementUnitCode, Double value) {
+    this.minimumToleranceTemperature = new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode)
+            .withValue(value)
+            .build();
+    return this;
+  }
+
+  /**
+   * Sets the value of maximumToleranceTemperature for new {@link Orderable}.
+   */
+  public OrderableDataBuilder withMaximumToleranceTemperature(
+          String temperatureMeasurementUnitCode, Double value) {
+    this.maximumToleranceTemperature = new TemperatureMeasurementDataBuilder()
+            .withTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode)
+            .withValue(value)
+            .build();
+    return this;
+  }
+
+  /**
+   * Sets the value of inBoxCubeDimension for new {@link Orderable}.
+   */
+  public OrderableDataBuilder withInBoxCubeDimension(String measurementUnitCode, Double value) {
+    this.inBoxCubeDimension = new VolumeMeasurementDataBuilder()
+            .withMeasurementUnitCode(measurementUnitCode)
+            .withValue(value)
+            .build();
     return this;
   }
 

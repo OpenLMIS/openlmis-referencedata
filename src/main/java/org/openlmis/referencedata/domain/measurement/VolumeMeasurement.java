@@ -53,9 +53,8 @@ public final class VolumeMeasurement extends Measurement {
   public static VolumeMeasurement newVolumeMeasurement(
           VolumeMeasurement.Importer importer) {
     VolumeMeasurement newVolumeMeasurement = new VolumeMeasurement();
-    newVolumeMeasurement.measurementUnitCode =
-            importer.getMeasurementUnitCode();
-    newVolumeMeasurement.value = importer.getValue();
+    newVolumeMeasurement.setMeasurementUnitCode(importer.getMeasurementUnitCode());
+    newVolumeMeasurement.setValue(importer.getValue());
     return newVolumeMeasurement;
   }
 
@@ -65,14 +64,20 @@ public final class VolumeMeasurement extends Measurement {
    * @param exporter exporter to export to
    */
   public void export(VolumeMeasurement.Exporter exporter) {
-    exporter.setMeasurementUnitCode(measurementUnitCode);
-    exporter.setValue(value);
+    exporter.setMeasurementUnitCode(getMeasurementUnitCode());
+    exporter.setValue(getValue());
     exporter.setCodeListVersion(getCodeListVersion());
   }
 
   public interface Exporter extends Measurement.Exporter {
 
     void setCodeListVersion(List<String> codeListVersion);
+
+  }
+
+  public interface Importer extends Measurement.Importer {
+
+    List<String> getCodeListVersion();
 
   }
 }

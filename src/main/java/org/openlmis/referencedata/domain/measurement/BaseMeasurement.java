@@ -20,6 +20,7 @@ import java.util.List;
 import javax.persistence.Embeddable;
 import javax.persistence.MappedSuperclass;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,8 +28,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Getter
-@Setter
+@Getter(AccessLevel.PROTECTED)
+@Setter(AccessLevel.PROTECTED)
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
@@ -39,7 +40,7 @@ public abstract class BaseMeasurement {
 
   protected abstract List<String> getCodeListVersion();
 
-  protected Double value;
+  private Double value;
 
   public interface Exporter {
 

@@ -31,11 +31,11 @@ public class VolumeMeasurementDto implements VolumeMeasurement.Importer,
   @Setter
   private String measurementUnitCode;
 
-  @Getter
+  @Setter
   private List<String> codeListVersion;
 
   @Override
-  public void setCodeListVersion(List<String> codeListVersion) {
-    this.codeListVersion = codeListVersion;
+  public List<String> getCodeListVersion() {
+    return new VolumeMeasurement().getCodeListVersion();
   }
 }

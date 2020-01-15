@@ -45,7 +45,11 @@ public class OrderableValidatorTest {
   public void setUp() {
     orderableDto = new OrderableDto();
 
-    orderable = new OrderableDataBuilder().build();
+    orderable = new OrderableDataBuilder()
+            .withMinimumToleranceTemperature("CEL", 2.0)
+            .withMaximumToleranceTemperature("CEL", 8.0)
+            .withInBoxCubeDimension("MLT", 200.0)
+            .build();
     orderable.export(orderableDto);
 
     errors = new BeanPropertyBindingResult(orderableDto, "orderableDto");

@@ -31,11 +31,11 @@ public class TemperatureMeasurementDto implements TemperatureMeasurement.Importe
   @Setter
   private String temperatureMeasurementUnitCode;
 
-  @Getter
+  @Setter
   private List<String> codeListVersion;
 
   @Override
-  public void setCodeListVersion(List<String> codeListVersion) {
-    this.codeListVersion = codeListVersion;
+  public List<String> getCodeListVersion() {
+    return new TemperatureMeasurement().getCodeListVersion();
   }
 }

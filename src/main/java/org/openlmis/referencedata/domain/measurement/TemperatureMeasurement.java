@@ -58,7 +58,7 @@ public final class TemperatureMeasurement extends BaseMeasurement {
     TemperatureMeasurement newTemperatureMeasurement = new TemperatureMeasurement();
     newTemperatureMeasurement.temperatureMeasurementUnitCode =
             importer.getTemperatureMeasurementUnitCode();
-    newTemperatureMeasurement.value = importer.getValue();
+    newTemperatureMeasurement.setValue(importer.getValue());
     return newTemperatureMeasurement;
   }
 
@@ -69,7 +69,7 @@ public final class TemperatureMeasurement extends BaseMeasurement {
    */
   public void export(TemperatureMeasurement.Exporter exporter) {
     exporter.setTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode);
-    exporter.setValue(value);
+    exporter.setValue(getValue());
     exporter.setCodeListVersion(getCodeListVersion());
   }
 
@@ -77,13 +77,15 @@ public final class TemperatureMeasurement extends BaseMeasurement {
 
     void setTemperatureMeasurementUnitCode(String temperatureMeasurementUnitCode);
 
-    void setCodeListVersion(List<String> codeListVersion);
+    void setCodeListVersion(List<String> getCodeListVersion);
 
   }
 
   public interface Importer extends BaseMeasurement.Importer {
 
     String getTemperatureMeasurementUnitCode();
+
+    List<String> getCodeListVersion();
 
   }
 

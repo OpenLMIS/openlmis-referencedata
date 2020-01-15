@@ -137,6 +137,12 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
     meta.setLastUpdated(lastUpdated);
   }
 
+  @JsonSetter("minimumToleranceTemperature")
+  public void setMinimumToleranceTemperature(
+          TemperatureMeasurementDto minimumToleranceTemperature) {
+    this.minimumToleranceTemperature = minimumToleranceTemperature;
+  }
+
   @Override
   public void setMinimumToleranceTemperature(
           TemperatureMeasurement minimumToleranceTemperature) {
@@ -144,11 +150,22 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
     minimumToleranceTemperature.export(this.minimumToleranceTemperature);
   }
 
+  @JsonSetter("maximumToleranceTemperature")
+  public void setMaximumToleranceTemperature(
+          TemperatureMeasurementDto maximumToleranceTemperature) {
+    this.maximumToleranceTemperature = maximumToleranceTemperature;
+  }
+
   @Override
   public void setMaximumToleranceTemperature(
           TemperatureMeasurement maximumToleranceTemperature) {
     this.maximumToleranceTemperature = new TemperatureMeasurementDto();
     maximumToleranceTemperature.export(this.maximumToleranceTemperature);
+  }
+
+  @JsonSetter("inBoxCubeDimension")
+  public void setInBoxCubeDimension(VolumeMeasurementDto inBoxCubeDimension) {
+    this.inBoxCubeDimension = inBoxCubeDimension;
   }
 
   @Override
