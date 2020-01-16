@@ -38,9 +38,9 @@ import lombok.ToString;
 @ToString
 public abstract class BaseMeasurement {
 
-  protected abstract List<String> getCodeListVersion();
-
   private Double value;
+
+  protected abstract List<String> getCodeListVersion();
 
   public interface Exporter {
 
