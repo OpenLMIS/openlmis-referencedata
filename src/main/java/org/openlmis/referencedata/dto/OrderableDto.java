@@ -30,6 +30,8 @@ import lombok.Setter;
 import lombok.ToString;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
+import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.repository.OrderableRepository;
 
 @Getter
@@ -64,6 +66,12 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
   private Map<String, Object> extraData;
 
   private MetadataDto meta = new MetadataDto();
+
+  private TemperatureMeasurementDto minimumToleranceTemperature;
+
+  private TemperatureMeasurementDto maximumToleranceTemperature;
+
+  private VolumeMeasurementDto inBoxCubeDimension;
 
   @JsonIgnore
   private OrderableRepository orderableRepository;
@@ -129,4 +137,40 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
     meta.setLastUpdated(lastUpdated);
   }
 
+  @JsonSetter("minimumToleranceTemperature")
+  public void setMinimumToleranceTemperature(
+          TemperatureMeasurementDto minimumToleranceTemperature) {
+    this.minimumToleranceTemperature = minimumToleranceTemperature;
+  }
+
+  @Override
+  public void setMinimumToleranceTemperature(
+          TemperatureMeasurement minimumToleranceTemperature) {
+    this.minimumToleranceTemperature = new TemperatureMeasurementDto();
+    minimumToleranceTemperature.export(this.minimumToleranceTemperature);
+  }
+
+  @JsonSetter("maximumToleranceTemperature")
+  public void setMaximumToleranceTemperature(
+          TemperatureMeasurementDto maximumToleranceTemperature) {
+    this.maximumToleranceTemperature = maximumToleranceTemperature;
+  }
+
+  @Override
+  public void setMaximumToleranceTemperature(
+          TemperatureMeasurement maximumToleranceTemperature) {
+    this.maximumToleranceTemperature = new TemperatureMeasurementDto();
+    maximumToleranceTemperature.export(this.maximumToleranceTemperature);
+  }
+
+  @JsonSetter("inBoxCubeDimension")
+  public void setInBoxCubeDimension(VolumeMeasurementDto inBoxCubeDimension) {
+    this.inBoxCubeDimension = inBoxCubeDimension;
+  }
+
+  @Override
+  public void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension) {
+    this.inBoxCubeDimension = new VolumeMeasurementDto();
+    inBoxCubeDimension.export(this.inBoxCubeDimension);
+  }
 }

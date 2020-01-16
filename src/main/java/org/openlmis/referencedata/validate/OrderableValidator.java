@@ -22,6 +22,9 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.TemperatureMeasurementDto;
+import org.openlmis.referencedata.dto.VolumeMeasurementDto;
+import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -32,6 +35,10 @@ import org.springframework.validation.Validator;
  */
 @Component
 public class OrderableValidator implements BaseValidator {
+
+  static final String MINIMUM_TOLERANCE_TEMPERATURE = "minimumToleranceTemperature";
+  static final String MAXIMUM_TOLERANCE_TEMPERATURE = "maximumToleranceTemperature";
+  static final String IN_BOX_CUBE_DIMENSION = "inBoxCubeDimension";
 
   /**
    * Checks if the given class definition is supported.
@@ -61,5 +68,140 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "packRoundingThreshold", ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED);
     rejectIfNull(errors, "roundToZero", ERROR_ROUND_TO_ZERO_REQUIRED);
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
+
+    OrderableDto dto = (OrderableDto) target;
+    validateToleranceTemperature(dto, errors);
+    validateVolumeMeasurement(dto, errors);
+
+  }
+
+  private void validateToleranceTemperature(OrderableDto dto, Errors errors) {
+    validateMinimumToleranceTemperature(dto.getMinimumToleranceTemperature(), errors);
+    validateMaximumToleranceTemperature(dto.getMaximumToleranceTemperature(), errors);
+
+    if (isMinTemperatureValueGreaterThanMaxTemperatureValue(
+            dto.getMinimumToleranceTemperature(),
+            dto.getMaximumToleranceTemperature())) {
+      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE);
+    }
+  }
+
+  private void validateMinimumToleranceTemperature(
+          TemperatureMeasurementDto minimumToleranceTemperature, Errors errors) {
+    if (isNotToleranceTemperatureCodeSupported(minimumToleranceTemperature)) {
+      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
+    }
+
+    if (isNotGivenToleranceTemperatureCode(minimumToleranceTemperature)) {
+      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED);
+    }
+
+    if (isNotGivenToleranceTemperatureValue(minimumToleranceTemperature)) {
+      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED);
+    }
+  }
+
+  private void validateMaximumToleranceTemperature(
+          TemperatureMeasurementDto maximumToleranceTemperature, Errors errors) {
+    if (isNotToleranceTemperatureCodeSupported(maximumToleranceTemperature)) {
+      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
+    }
+
+    if (isNotGivenToleranceTemperatureCode(maximumToleranceTemperature)) {
+      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED);
+    }
+
+    if (isNotGivenToleranceTemperatureValue(maximumToleranceTemperature)) {
+      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED);
+    }
+  }
+
+  private void validateVolumeMeasurement(OrderableDto dto, Errors errors) {
+    if (isGivenInBoxCubeDimension(dto.getInBoxCubeDimension())) {
+      if (isNotMeasurementUnitCodeSupported(dto.getInBoxCubeDimension())) {
+        rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
+                .ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_NOT_SUPPORTED);
+      }
+      if (!isMeasurementVolumeValuePositive(dto.getInBoxCubeDimension().getValue())) {
+        rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
+                .ERROR_IN_BOX_CUBE_DIMENSION_VALUE);
+      }
+    }
+    if (isNotGivenInBoxCubeDimensionCode(dto.getInBoxCubeDimension())) {
+      rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
+              .ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_REQUIRED);
+    }
+    if (isNotGivenInBoxCubeDimensionValue(dto.getInBoxCubeDimension())) {
+      rejectValue(errors, IN_BOX_CUBE_DIMENSION, OrderableMessageKeys
+              .ERROR_IN_BOX_CUBE_DIMENSION_VALUE_REQUIRED);
+    }
+  }
+
+  private boolean isNotToleranceTemperatureCodeSupported(
+          TemperatureMeasurementDto temperatureMeasurement) {
+    return isGivenToleranceTemperature(temperatureMeasurement)
+            && !temperatureMeasurement.getCodeListVersion()
+            .contains(temperatureMeasurement.getTemperatureMeasurementUnitCode());
+  }
+
+  private boolean isNotMeasurementUnitCodeSupported(VolumeMeasurementDto volumeMeasurement) {
+    return !volumeMeasurement.getCodeListVersion()
+            .contains(volumeMeasurement.getMeasurementUnitCode());
+  }
+
+  private boolean isMinTemperatureValueGreaterThanMaxTemperatureValue(
+          TemperatureMeasurementDto minTemperature, TemperatureMeasurementDto maxTemperature) {
+    return isGivenToleranceTemperature(minTemperature)
+            && isGivenToleranceTemperature(maxTemperature)
+            && minTemperature.getValue() > maxTemperature.getValue();
+  }
+
+  private boolean isMeasurementVolumeValuePositive(Double value) {
+    return value > 0;
+  }
+
+  private boolean isGivenToleranceTemperature(TemperatureMeasurementDto temperatureMeasurement) {
+    return temperatureMeasurement != null
+            && temperatureMeasurement.getTemperatureMeasurementUnitCode() != null
+            && temperatureMeasurement.getValue() != null;
+  }
+
+  private boolean isNotGivenToleranceTemperatureCode(
+          TemperatureMeasurementDto temperatureMeasurement) {
+    return temperatureMeasurement != null
+            && temperatureMeasurement.getTemperatureMeasurementUnitCode() == null
+            && temperatureMeasurement.getValue() != null;
+  }
+
+  private boolean isNotGivenToleranceTemperatureValue(
+          TemperatureMeasurementDto temperatureMeasurement) {
+    return temperatureMeasurement != null
+            && temperatureMeasurement.getTemperatureMeasurementUnitCode() != null
+            && temperatureMeasurement.getValue() == null;
+  }
+
+  private boolean isGivenInBoxCubeDimension(VolumeMeasurementDto volumeMeasurement) {
+    return volumeMeasurement != null
+            && volumeMeasurement.getMeasurementUnitCode() != null
+            && volumeMeasurement.getValue() != null;
+  }
+
+  private boolean isNotGivenInBoxCubeDimensionCode(VolumeMeasurementDto volumeMeasurement) {
+    return volumeMeasurement != null
+            && volumeMeasurement.getMeasurementUnitCode() == null
+            && volumeMeasurement.getValue() != null;
+  }
+
+  private boolean isNotGivenInBoxCubeDimensionValue(VolumeMeasurementDto volumeMeasurement) {
+    return volumeMeasurement != null
+            && volumeMeasurement.getMeasurementUnitCode() != null
+            && volumeMeasurement.getValue() == null;
   }
 }
