@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -56,6 +58,8 @@ import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataExporter;
 import org.openlmis.referencedata.domain.ExtraDataEntity.ExtraDataImporter;
 import org.openlmis.referencedata.domain.VersionIdentity.VersionExporter;
 import org.openlmis.referencedata.domain.VersionIdentity.VersionImporter;
+import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
+import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 
@@ -82,6 +86,7 @@ public class Orderable implements Versionable {
 
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
+  public static final String VALUE = "value";
 
   @Embedded
   @Getter
@@ -129,7 +134,7 @@ public class Orderable implements Versionable {
   @ElementCollection
   @MapKeyColumn(name = "key")
   @BatchSize(size = FETCH_SIZE)
-  @Column(name = "value")
+  @Column(name = VALUE)
   @CollectionTable(
       name = "orderable_identifiers",
       joinColumns = {
@@ -147,6 +152,39 @@ public class Orderable implements Versionable {
   @Getter
   @Setter
   private ZonedDateTime lastUpdated;
+
+  @Getter
+  @Setter
+  @Embedded
+  @AttributeOverrides({
+          @AttributeOverride(name = VALUE, column = @Column(
+                  name = "minimumToleranceTemperatureValue")),
+          @AttributeOverride(name = "temperatureMeasurementUnitCode", column = @Column(
+                  name = "minimumToleranceTemperatureCode"))
+  })
+  private TemperatureMeasurement minimumToleranceTemperature;
+
+  @Getter
+  @Setter
+  @Embedded
+  @AttributeOverrides({
+          @AttributeOverride(name = VALUE, column = @Column(
+                  name = "maximumToleranceTemperatureValue")),
+          @AttributeOverride(name = "temperatureMeasurementUnitCode", column = @Column(
+                  name = "maximumToleranceTemperatureCode"))
+  })
+  private TemperatureMeasurement maximumToleranceTemperature;
+
+  @Getter
+  @Setter
+  @Embedded
+  @AttributeOverrides({
+          @AttributeOverride(name = VALUE, column = @Column(
+                  name = "inBoxCubeDimensionValue")),
+          @AttributeOverride(name = "measurementUnitCode", column = @Column(
+                  name = "inBoxCubeDimensionCode"))
+  })
+  private VolumeMeasurement inBoxCubeDimension;
 
   /**
    * Default constructor.
@@ -209,6 +247,19 @@ public class Orderable implements Versionable {
 
     orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionNumber());
     orderable.lastUpdated = ZonedDateTime.now();
+    if (importer.getMinimumToleranceTemperature() != null) {
+      orderable.minimumToleranceTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMinimumToleranceTemperature());
+    }
+    if (importer.getMaximumToleranceTemperature() != null) {
+      orderable.maximumToleranceTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMaximumToleranceTemperature());
+    }
+    if (importer.getInBoxCubeDimension() != null) {
+      orderable.inBoxCubeDimension = VolumeMeasurement
+              .newVolumeMeasurement(importer.getInBoxCubeDimension());
+    }
+
     return orderable;
   }
 
@@ -339,6 +390,15 @@ public class Orderable implements Versionable {
 
     exporter.setVersionNumber(identity.getVersionNumber());
     exporter.setLastUpdated(lastUpdated);
+    if (minimumToleranceTemperature != null) {
+      exporter.setMinimumToleranceTemperature(minimumToleranceTemperature);
+    }
+    if (maximumToleranceTemperature != null) {
+      exporter.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    }
+    if (inBoxCubeDimension != null) {
+      exporter.setInBoxCubeDimension(inBoxCubeDimension);
+    }
   }
 
   public void setExtraData(Map<String, Object> extraData) {
@@ -369,6 +429,12 @@ public class Orderable implements Versionable {
     void setIdentifiers(Map<String, String> identifiers);
 
     void setLastUpdated(ZonedDateTime lastUpdated);
+
+    void setMinimumToleranceTemperature(TemperatureMeasurement minimumToleranceTemperature);
+
+    void setMaximumToleranceTemperature(TemperatureMeasurement maximumToleranceTemperature);
+
+    void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
   }
 
   public interface Importer extends BaseImporter, ExtraDataImporter, VersionImporter {
@@ -393,5 +459,10 @@ public class Orderable implements Versionable {
 
     Map<String, String> getIdentifiers();
 
+    TemperatureMeasurement.Importer getMinimumToleranceTemperature();
+
+    TemperatureMeasurement.Importer getMaximumToleranceTemperature();
+
+    VolumeMeasurement.Importer getInBoxCubeDimension();
   }
 }

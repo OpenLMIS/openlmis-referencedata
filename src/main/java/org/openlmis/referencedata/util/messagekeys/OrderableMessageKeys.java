@@ -17,6 +17,9 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, ORDERABLE);
+  private static final String REQUIRED = "required";
+  private static final String VALUE = "value";
+  private static final String NOT_SUPPORTED = "notSupported";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -36,4 +39,40 @@ public abstract class OrderableMessageKeys extends MessageKeys {
 
   public static final String ERROR_INVALID_VERSION_IDENTITY =
       join(ERROR, SEARCH, "invalidVersionIdentity");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE =
+          join(ERROR, "minimumToleranceTemperature");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE =
+          join(ERROR, "maximumToleranceTemperature");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE, "temperatureMeasurementUnitCode");
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE, "temperatureMeasurementUnitCode");
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, NOT_SUPPORTED);
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, NOT_SUPPORTED);
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, REQUIRED);
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE, REQUIRED);
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE, VALUE);
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE, VALUE);
+  public static final String ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED =
+          join(ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE, REQUIRED);
+  public static final String ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED =
+          join(ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE, REQUIRED);
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION =
+          join(ERROR, "inBoxCubeDimension");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE =
+          join(ERROR_IN_BOX_CUBE_DIMENSION, "measurementUnitCode");
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_NOT_SUPPORTED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE, NOT_SUPPORTED);
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE_REQUIRED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION_UNIT_CODE, REQUIRED);
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE =
+          join(ERROR_IN_BOX_CUBE_DIMENSION, VALUE);
+  public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE_REQUIRED =
+          join(ERROR_IN_BOX_CUBE_DIMENSION_VALUE, REQUIRED);
 }
