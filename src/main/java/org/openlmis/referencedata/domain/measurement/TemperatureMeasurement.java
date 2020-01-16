@@ -77,7 +77,7 @@ public final class TemperatureMeasurement extends BaseMeasurement {
 
     void setTemperatureMeasurementUnitCode(String temperatureMeasurementUnitCode);
 
-    void setCodeListVersion(List<String> getCodeListVersion);
+    void setCodeListVersion(List<String> codeListVersion);
 
   }
 
