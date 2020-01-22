@@ -12,7 +12,7 @@ execution:
     hold-for: ${__P(scenario-duration,60)}
     scenario: orderables-get-10000-by-program
   - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(long-scenario-duration,60)}
+    hold-for: ${__P(scenario-duration,60)}
     scenario: orderables-search-10000-by-version-identities
 
 scenarios:
