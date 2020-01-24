@@ -46,8 +46,8 @@ public class OrderableDataBuilder {
   private Map<String, Object> extraData;
   private Long versionNumber;
   private ZonedDateTime lastUpdated;
-  private TemperatureMeasurement minimumToleranceTemperature;
-  private TemperatureMeasurement maximumToleranceTemperature;
+  private TemperatureMeasurement minimumTemperature;
+  private TemperatureMeasurement maximumTemperature;
   private VolumeMeasurement inBoxCubeDimension;
 
   /**
@@ -69,8 +69,8 @@ public class OrderableDataBuilder {
     extraData = new HashMap<>();
     versionNumber = 1L;
     lastUpdated = ZonedDateTime.now();
-    minimumToleranceTemperature = null;
-    maximumToleranceTemperature = null;
+    minimumTemperature = null;
+    maximumTemperature = null;
     inBoxCubeDimension = null;
   }
 
@@ -100,11 +100,11 @@ public class OrderableDataBuilder {
   }
 
   /**
-   * Sets the value of minimumToleranceTemperature for new {@link Orderable}.
+   * Sets the value of minimumTemperature for new {@link Orderable}.
    */
-  public OrderableDataBuilder withMinimumToleranceTemperature(
+  public OrderableDataBuilder withMinimumTemperature(
           String temperatureMeasurementUnitCode, Double value) {
-    this.minimumToleranceTemperature = new TemperatureMeasurementDataBuilder()
+    this.minimumTemperature = new TemperatureMeasurementDataBuilder()
             .withTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode)
             .withValue(value)
             .build();
@@ -112,11 +112,11 @@ public class OrderableDataBuilder {
   }
 
   /**
-   * Sets the value of maximumToleranceTemperature for new {@link Orderable}.
+   * Sets the value of maximumTemperature for new {@link Orderable}.
    */
-  public OrderableDataBuilder withMaximumToleranceTemperature(
+  public OrderableDataBuilder withMaximumTemperature(
           String temperatureMeasurementUnitCode, Double value) {
-    this.maximumToleranceTemperature = new TemperatureMeasurementDataBuilder()
+    this.maximumTemperature = new TemperatureMeasurementDataBuilder()
             .withTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode)
             .withValue(value)
             .build();
@@ -170,8 +170,8 @@ public class OrderableDataBuilder {
     orderable.setIdentifiers(identifiers);
     orderable.setExtraData(extraData);
     orderable.setLastUpdated(lastUpdated);
-    orderable.setMinimumToleranceTemperature(minimumToleranceTemperature);
-    orderable.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    orderable.setMinimumTemperature(minimumTemperature);
+    orderable.setMaximumTemperature(maximumTemperature);
     orderable.setInBoxCubeDimension(inBoxCubeDimension);
     return orderable;
   }

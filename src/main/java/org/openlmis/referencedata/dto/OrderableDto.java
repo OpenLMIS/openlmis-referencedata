@@ -67,9 +67,9 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private MetadataDto meta = new MetadataDto();
 
-  private TemperatureMeasurementDto minimumToleranceTemperature;
+  private TemperatureMeasurementDto minimumTemperature;
 
-  private TemperatureMeasurementDto maximumToleranceTemperature;
+  private TemperatureMeasurementDto maximumTemperature;
 
   private VolumeMeasurementDto inBoxCubeDimension;
 
@@ -137,30 +137,28 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
     meta.setLastUpdated(lastUpdated);
   }
 
-  @JsonSetter("minimumToleranceTemperature")
-  public void setMinimumToleranceTemperature(
-          TemperatureMeasurementDto minimumToleranceTemperature) {
-    this.minimumToleranceTemperature = minimumToleranceTemperature;
+  @JsonSetter("minimumTemperature")
+  public void setMinimumTemperature(
+          TemperatureMeasurementDto minimumTemperature) {
+    this.minimumTemperature = minimumTemperature;
   }
 
-  @Override
-  public void setMinimumToleranceTemperature(
-          TemperatureMeasurement minimumToleranceTemperature) {
-    this.minimumToleranceTemperature = new TemperatureMeasurementDto();
-    minimumToleranceTemperature.export(this.minimumToleranceTemperature);
+  public void setMinimumTemperature(
+          TemperatureMeasurement minimumTemperature) {
+    this.minimumTemperature = new TemperatureMeasurementDto();
+    minimumTemperature.export(this.minimumTemperature);
   }
 
-  @JsonSetter("maximumToleranceTemperature")
-  public void setMaximumToleranceTemperature(
-          TemperatureMeasurementDto maximumToleranceTemperature) {
-    this.maximumToleranceTemperature = maximumToleranceTemperature;
+  @JsonSetter("maximumTemperature")
+  public void setMaximumTemperature(
+          TemperatureMeasurementDto maximumTemperature) {
+    this.maximumTemperature = maximumTemperature;
   }
 
-  @Override
-  public void setMaximumToleranceTemperature(
-          TemperatureMeasurement maximumToleranceTemperature) {
-    this.maximumToleranceTemperature = new TemperatureMeasurementDto();
-    maximumToleranceTemperature.export(this.maximumToleranceTemperature);
+  public void setMaximumTemperature(
+          TemperatureMeasurement maximumTemperature) {
+    this.maximumTemperature = new TemperatureMeasurementDto();
+    maximumTemperature.export(this.maximumTemperature);
   }
 
   @JsonSetter("inBoxCubeDimension")
