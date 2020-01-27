@@ -36,8 +36,8 @@ import org.springframework.validation.Validator;
 @Component
 public class OrderableValidator implements BaseValidator {
 
-  static final String MINIMUM_TOLERANCE_TEMPERATURE = "minimumToleranceTemperature";
-  static final String MAXIMUM_TOLERANCE_TEMPERATURE = "maximumToleranceTemperature";
+  static final String MINIMUM_TEMPERATURE = "minimumTemperature";
+  static final String MAXIMUM_TEMPERATURE = "maximumTemperature";
   static final String IN_BOX_CUBE_DIMENSION = "inBoxCubeDimension";
 
   /**
@@ -70,56 +70,56 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
 
     OrderableDto dto = (OrderableDto) target;
-    validateToleranceTemperature(dto, errors);
+    validateTemperature(dto, errors);
     validateVolumeMeasurement(dto, errors);
 
   }
 
-  private void validateToleranceTemperature(OrderableDto dto, Errors errors) {
-    validateMinimumToleranceTemperature(dto.getMinimumToleranceTemperature(), errors);
-    validateMaximumToleranceTemperature(dto.getMaximumToleranceTemperature(), errors);
+  private void validateTemperature(OrderableDto dto, Errors errors) {
+    validateMinimumTemperature(dto.getMinimumTemperature(), errors);
+    validateMaximumTemperature(dto.getMaximumTemperature(), errors);
 
     if (isMinTemperatureValueGreaterThanMaxTemperatureValue(
-            dto.getMinimumToleranceTemperature(),
-            dto.getMaximumToleranceTemperature())) {
-      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE);
+            dto.getMinimumTemperature(),
+            dto.getMaximumTemperature())) {
+      rejectValue(errors, MINIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TEMPERATURE_VALUE);
     }
   }
 
-  private void validateMinimumToleranceTemperature(
-          TemperatureMeasurementDto minimumToleranceTemperature, Errors errors) {
-    if (isNotToleranceTemperatureCodeSupported(minimumToleranceTemperature)) {
-      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
+  private void validateMinimumTemperature(
+          TemperatureMeasurementDto minimumTemperature, Errors errors) {
+    if (isNotTemperatureCodeSupported(minimumTemperature)) {
+      rejectValue(errors, MINIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
     }
 
-    if (isNotGivenToleranceTemperatureCode(minimumToleranceTemperature)) {
-      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED);
+    if (isNotGivenTemperatureCode(minimumTemperature)) {
+      rejectValue(errors, MINIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TEMPERATURE_UNIT_CODE_REQUIRED);
     }
 
-    if (isNotGivenToleranceTemperatureValue(minimumToleranceTemperature)) {
-      rejectValue(errors, MINIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MINIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED);
+    if (isNotGivenTemperatureValue(minimumTemperature)) {
+      rejectValue(errors, MINIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MINIMUM_TEMPERATURE_VALUE_REQUIRED);
     }
   }
 
-  private void validateMaximumToleranceTemperature(
-          TemperatureMeasurementDto maximumToleranceTemperature, Errors errors) {
-    if (isNotToleranceTemperatureCodeSupported(maximumToleranceTemperature)) {
-      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
+  private void validateMaximumTemperature(
+          TemperatureMeasurementDto maximumTemperature, Errors errors) {
+    if (isNotTemperatureCodeSupported(maximumTemperature)) {
+      rejectValue(errors, MAXIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TEMPERATURE_UNIT_CODE_NOT_SUPPORTED);
     }
 
-    if (isNotGivenToleranceTemperatureCode(maximumToleranceTemperature)) {
-      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_UNIT_CODE_REQUIRED);
+    if (isNotGivenTemperatureCode(maximumTemperature)) {
+      rejectValue(errors, MAXIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TEMPERATURE_UNIT_CODE_REQUIRED);
     }
 
-    if (isNotGivenToleranceTemperatureValue(maximumToleranceTemperature)) {
-      rejectValue(errors, MAXIMUM_TOLERANCE_TEMPERATURE, OrderableMessageKeys
-              .ERROR_MAXIMUM_TOLERANCE_TEMPERATURE_VALUE_REQUIRED);
+    if (isNotGivenTemperatureValue(maximumTemperature)) {
+      rejectValue(errors, MAXIMUM_TEMPERATURE, OrderableMessageKeys
+              .ERROR_MAXIMUM_TEMPERATURE_VALUE_REQUIRED);
     }
   }
 
@@ -144,9 +144,9 @@ public class OrderableValidator implements BaseValidator {
     }
   }
 
-  private boolean isNotToleranceTemperatureCodeSupported(
+  private boolean isNotTemperatureCodeSupported(
           TemperatureMeasurementDto temperatureMeasurement) {
-    return isGivenToleranceTemperature(temperatureMeasurement)
+    return isGivenTemperature(temperatureMeasurement)
             && !temperatureMeasurement.getCodeListVersion()
             .contains(temperatureMeasurement.getTemperatureMeasurementUnitCode());
   }
@@ -158,8 +158,8 @@ public class OrderableValidator implements BaseValidator {
 
   private boolean isMinTemperatureValueGreaterThanMaxTemperatureValue(
           TemperatureMeasurementDto minTemperature, TemperatureMeasurementDto maxTemperature) {
-    return isGivenToleranceTemperature(minTemperature)
-            && isGivenToleranceTemperature(maxTemperature)
+    return isGivenTemperature(minTemperature)
+            && isGivenTemperature(maxTemperature)
             && minTemperature.getValue() > maxTemperature.getValue();
   }
 
@@ -167,20 +167,20 @@ public class OrderableValidator implements BaseValidator {
     return value > 0;
   }
 
-  private boolean isGivenToleranceTemperature(TemperatureMeasurementDto temperatureMeasurement) {
+  private boolean isGivenTemperature(TemperatureMeasurementDto temperatureMeasurement) {
     return temperatureMeasurement != null
             && temperatureMeasurement.getTemperatureMeasurementUnitCode() != null
             && temperatureMeasurement.getValue() != null;
   }
 
-  private boolean isNotGivenToleranceTemperatureCode(
+  private boolean isNotGivenTemperatureCode(
           TemperatureMeasurementDto temperatureMeasurement) {
     return temperatureMeasurement != null
             && temperatureMeasurement.getTemperatureMeasurementUnitCode() == null
             && temperatureMeasurement.getValue() != null;
   }
 
-  private boolean isNotGivenToleranceTemperatureValue(
+  private boolean isNotGivenTemperatureValue(
           TemperatureMeasurementDto temperatureMeasurement) {
     return temperatureMeasurement != null
             && temperatureMeasurement.getTemperatureMeasurementUnitCode() != null

@@ -158,22 +158,22 @@ public class Orderable implements Versionable {
   @Embedded
   @AttributeOverrides({
           @AttributeOverride(name = VALUE, column = @Column(
-                  name = "minimumToleranceTemperatureValue")),
+                  name = "minimumTemperatureValue")),
           @AttributeOverride(name = "temperatureMeasurementUnitCode", column = @Column(
-                  name = "minimumToleranceTemperatureCode"))
+                  name = "minimumTemperatureCode"))
   })
-  private TemperatureMeasurement minimumToleranceTemperature;
+  private TemperatureMeasurement minimumTemperature;
 
   @Getter
   @Setter
   @Embedded
   @AttributeOverrides({
           @AttributeOverride(name = VALUE, column = @Column(
-                  name = "maximumToleranceTemperatureValue")),
+                  name = "maximumTemperatureValue")),
           @AttributeOverride(name = "temperatureMeasurementUnitCode", column = @Column(
-                  name = "maximumToleranceTemperatureCode"))
+                  name = "maximumTemperatureCode"))
   })
-  private TemperatureMeasurement maximumToleranceTemperature;
+  private TemperatureMeasurement maximumTemperature;
 
   @Getter
   @Setter
@@ -247,13 +247,13 @@ public class Orderable implements Versionable {
 
     orderable.identity = new VersionIdentity(importer.getId(), importer.getVersionNumber());
     orderable.lastUpdated = ZonedDateTime.now();
-    if (importer.getMinimumToleranceTemperature() != null) {
-      orderable.minimumToleranceTemperature = TemperatureMeasurement
-              .newTemperatureMeasurement(importer.getMinimumToleranceTemperature());
+    if (importer.getMinimumTemperature() != null) {
+      orderable.minimumTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMinimumTemperature());
     }
-    if (importer.getMaximumToleranceTemperature() != null) {
-      orderable.maximumToleranceTemperature = TemperatureMeasurement
-              .newTemperatureMeasurement(importer.getMaximumToleranceTemperature());
+    if (importer.getMaximumTemperature() != null) {
+      orderable.maximumTemperature = TemperatureMeasurement
+              .newTemperatureMeasurement(importer.getMaximumTemperature());
     }
     if (importer.getInBoxCubeDimension() != null) {
       orderable.inBoxCubeDimension = VolumeMeasurement
@@ -390,11 +390,11 @@ public class Orderable implements Versionable {
 
     exporter.setVersionNumber(identity.getVersionNumber());
     exporter.setLastUpdated(lastUpdated);
-    if (minimumToleranceTemperature != null) {
-      exporter.setMinimumToleranceTemperature(minimumToleranceTemperature);
+    if (minimumTemperature != null) {
+      exporter.setMinimumTemperature(minimumTemperature);
     }
-    if (maximumToleranceTemperature != null) {
-      exporter.setMaximumToleranceTemperature(maximumToleranceTemperature);
+    if (maximumTemperature != null) {
+      exporter.setMaximumTemperature(maximumTemperature);
     }
     if (inBoxCubeDimension != null) {
       exporter.setInBoxCubeDimension(inBoxCubeDimension);
@@ -430,9 +430,9 @@ public class Orderable implements Versionable {
 
     void setLastUpdated(ZonedDateTime lastUpdated);
 
-    void setMinimumToleranceTemperature(TemperatureMeasurement minimumToleranceTemperature);
+    void setMinimumTemperature(TemperatureMeasurement minimumTemperature);
 
-    void setMaximumToleranceTemperature(TemperatureMeasurement maximumToleranceTemperature);
+    void setMaximumTemperature(TemperatureMeasurement maximumTemperature);
 
     void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
   }
@@ -459,9 +459,9 @@ public class Orderable implements Versionable {
 
     Map<String, String> getIdentifiers();
 
-    TemperatureMeasurement.Importer getMinimumToleranceTemperature();
+    TemperatureMeasurement.Importer getMinimumTemperature();
 
-    TemperatureMeasurement.Importer getMaximumToleranceTemperature();
+    TemperatureMeasurement.Importer getMaximumTemperature();
 
     VolumeMeasurement.Importer getInBoxCubeDimension();
   }
