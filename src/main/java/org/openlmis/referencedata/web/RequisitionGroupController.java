@@ -204,8 +204,8 @@ public class RequisitionGroupController extends BaseController {
               RequisitionGroup.newRequisitionGroup(requisitionGroupDto));
 
       profiler.start("UPDATE_SUPERVISORY_NODE_FROM_REQUISITION_GROUP_DTO");
-      SupervisoryNode updated = getUpdatedSupervisoryNode(requisitionGroupDto);
-      requisitionGroupToUpdate.setSupervisoryNode(updated);
+      SupervisoryNode newNode = getUpdatedSupervisoryNode(requisitionGroupDto);
+      requisitionGroupToUpdate.setSupervisoryNode(newNode);
 
       profiler.start("SAVE_REQUISITION_GROUP");
       requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
@@ -326,15 +326,6 @@ public class RequisitionGroupController extends BaseController {
   }
 
   private SupervisoryNode getUpdatedSupervisoryNode(RequisitionGroupDto dto) {
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository
-            .findOne(dto.getSupervisoryNode().getId());
-    if (null != supervisoryNode) {
-      supervisoryNode = SupervisoryNode.newSupervisoryNode(dto.getSupervisoryNode());
-      supervisoryNodeRepository.saveAndFlush(supervisoryNode);
-    } else {
-      LOGGER.info("RequisitionGroup update with id: {} did not contain a SupervisoryNode"
-          + "already present in a database", dto.getId());
-    }
-    return supervisoryNode;
+    return supervisoryNodeRepository.findOne(dto.getSupervisoryNode().getId());
   }
 }

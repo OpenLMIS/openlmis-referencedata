@@ -26,6 +26,8 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.openlmis.referencedata.domain.RightName.REQUISITION_GROUPS_MANAGE;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -372,6 +374,10 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
             .then()
             .statusCode(200)
             .extract().as(RequisitionGroupDto.class);
+
+    // No supervisory node should ever be changed in the process
+    verify(supervisoryNodeRepository, never()).saveAndFlush(any());
+    verify(supervisoryNodeRepository, never()).save(any(SupervisoryNode.class));
 
     assertEquals(requisitionGroupDto, response);
     assertEquals(requisitionGroup.getId(), requisitionGroupDto.getId());
