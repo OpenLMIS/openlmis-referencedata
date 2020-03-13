@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDate;
@@ -216,12 +217,12 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldReturnTrueIfLotWithGivenCodeAndTradeItemIdExists() {
-    Lot expected = lotRepository.save(generateInstance());
+    Lot existing = lotRepository.save(generateInstance());
 
-    boolean exists = lotRepository.existsByLotCodeAndTradeItemId(expected.getLotCode(),
-        expected.getTradeItem().getId());
+    boolean exists = lotRepository.existsByLotCodeAndTradeItemId(existing.getLotCode(),
+        existing.getTradeItem().getId());
 
-    assertEquals(true, exists);
+    assertTrue(exists);
   }
 
   @Test
