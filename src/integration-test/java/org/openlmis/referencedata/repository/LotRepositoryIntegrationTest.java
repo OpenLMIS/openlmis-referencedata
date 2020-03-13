@@ -215,6 +215,16 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   }
 
   @Test
+  public void shouldReturnTrueIfLotWithGivenCodeAndTradeItemIdExists() {
+    Lot expected = lotRepository.save(generateInstance());
+
+    boolean exists = lotRepository.existsByLotCodeAndTradeItem_Id(expected.getLotCode(),
+        expected.getTradeItem().getId());
+
+    assertEquals(true, exists);
+  }
+
+  @Test
   public void shouldReturnCorrectDate() {
     LocalDate date = LocalDate.now();
 

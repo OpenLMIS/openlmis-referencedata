@@ -4,6 +4,7 @@
 Bug fixes:
 * [OLMIS-6676](https://openlmis.atlassian.net/browse/OLMIS-6676): Enabled trade items to share lot codes.
 * [OLMIS-6749](https://openlmis.atlassian.net/browse/OLMIS-6749): Requisition group updates can no longer modify supervisory nodes.
+* [OLMIS-6790](https://openlmis.atlassian.net/browse/OLMIS-6790): Enabled creating lots with lot code that is partly included in any existing lot code.
 
 15.1.0 / 2019-01-16
 ===================

@@ -15,9 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
@@ -78,12 +76,9 @@ public class LotValidator implements BaseValidator {
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
-    List<Lot> lots = lotRepository.search(null, null, lot.getLotCode(), null, null).getContent()
-        .stream()
-        .filter(l -> !l.getId().equals(lot.getId())
-            && l.getTradeItem().getId().equals(lot.getTradeItemId()))
-        .collect(Collectors.toList());
-    if (!lots.isEmpty()) {
+    boolean existsByCodeAndTradeItem = lotRepository.existsByLotCodeAndTradeItem_Id(
+        lot.getLotCode(), lot.getTradeItemId());
+    if (existsByCodeAndTradeItem) {
       rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE, lot.getLotCode(),
           String.valueOf(lot.getTradeItemId()));
     }

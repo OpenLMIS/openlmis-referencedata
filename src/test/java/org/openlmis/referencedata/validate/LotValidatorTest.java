@@ -23,7 +23,6 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.Before;
@@ -39,7 +38,6 @@ import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -86,8 +84,8 @@ public class LotValidatorTest {
 
   @Test
   public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(Collections.emptyList()));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+        lotDto.getTradeItemId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
 
@@ -130,8 +128,8 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(lots));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lot.getLotCode(),
+        lot.getTradeItem().getId())).thenReturn(true);
 
     validator.validate(lotDto, errors);
 
@@ -146,8 +144,8 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(lots));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+        lotDto.getTradeItemId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
 
@@ -163,8 +161,8 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(lots));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lot.getLotCode(),
+        lot.getTradeItem().getId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
 
@@ -173,8 +171,8 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemIsNull() {
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(Collections.emptyList()));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+        lotDto.getTradeItemId())).thenReturn(false);
 
     lotDto.setTradeItemId(null);
 
@@ -185,8 +183,8 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemDoesNotExist() {
-    when(lotRepository.search(null, null, lotDto.getLotCode(), null, null))
-        .thenReturn(Pagination.getPage(Collections.emptyList()));
+    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+        lotDto.getTradeItemId())).thenReturn(false);
 
     when(tradeItemRepository.findOne(lotDto.getTradeItemId())).thenReturn(null);
 

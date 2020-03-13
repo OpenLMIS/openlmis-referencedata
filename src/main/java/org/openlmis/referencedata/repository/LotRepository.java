@@ -27,6 +27,8 @@ public interface LotRepository
     extends PagingAndSortingRepository<Lot, UUID>, LotRepositoryCustom,
     BaseAuditableRepository<Lot, UUID> {
 
+  boolean existsByLotCodeAndTradeItem_Id(String code, UUID tradeItemId);
+
   @Query(value = "SELECT\n"
       + "    l.*\n"
       + "FROM\n"
