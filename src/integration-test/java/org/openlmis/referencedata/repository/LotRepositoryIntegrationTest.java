@@ -218,7 +218,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldReturnTrueIfLotWithGivenCodeAndTradeItemIdExists() {
     Lot expected = lotRepository.save(generateInstance());
 
-    boolean exists = lotRepository.existsByLotCodeAndTradeItem_Id(expected.getLotCode(),
+    boolean exists = lotRepository.existsByLotCodeAndTradeItemId(expected.getLotCode(),
         expected.getTradeItem().getId());
 
     assertEquals(true, exists);

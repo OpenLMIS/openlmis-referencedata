@@ -76,7 +76,7 @@ public class LotValidator implements BaseValidator {
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
-    boolean existsByCodeAndTradeItem = lotRepository.existsByLotCodeAndTradeItem_Id(
+    boolean existsByCodeAndTradeItem = lotRepository.existsByLotCodeAndTradeItemId(
         lot.getLotCode(), lot.getTradeItemId());
     if (existsByCodeAndTradeItem) {
       rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE, lot.getLotCode(),

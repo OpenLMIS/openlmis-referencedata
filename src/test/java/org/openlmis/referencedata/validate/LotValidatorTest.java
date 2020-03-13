@@ -84,7 +84,7 @@ public class LotValidatorTest {
 
   @Test
   public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
@@ -128,7 +128,7 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lot.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lot.getLotCode(),
         lot.getTradeItem().getId())).thenReturn(true);
 
     validator.validate(lotDto, errors);
@@ -144,7 +144,7 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
@@ -161,7 +161,7 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lot.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lot.getLotCode(),
         lot.getTradeItem().getId())).thenReturn(false);
 
     validator.validate(lotDto, errors);
@@ -171,7 +171,7 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemIsNull() {
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
     lotDto.setTradeItemId(null);
@@ -183,7 +183,7 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemDoesNotExist() {
-    when(lotRepository.existsByLotCodeAndTradeItem_Id(lotDto.getLotCode(),
+    when(lotRepository.existsByLotCodeAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
     when(tradeItemRepository.findOne(lotDto.getTradeItemId())).thenReturn(null);
