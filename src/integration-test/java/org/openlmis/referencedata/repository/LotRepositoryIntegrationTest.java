@@ -219,7 +219,24 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldReturnTrueIfLotWithGivenCodeAndTradeItemIdExists() {
     Lot existing = lotRepository.save(generateInstance());
 
-    boolean exists = lotRepository.existsByLotCodeAndTradeItemId(existing.getLotCode(),
+    boolean exists = lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(existing.getLotCode(),
+        existing.getTradeItem().getId());
+
+    assertTrue(exists);
+  }
+
+  @Test
+  public void shouldIgnoreCaseWhenCheckingIfLotExistsByLotCodeAndTradeItemId() {
+    Lot existing = generateInstance();
+    existing.setLotCode(existing.getLotCode().toLowerCase());
+    lotRepository.save(existing);
+
+    Lot newLot = generateInstance();
+    newLot.setLotCode(existing.getLotCode().toUpperCase());
+    newLot.setTradeItem(existing.getTradeItem());
+    lotRepository.save(newLot);
+
+    boolean exists = lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(newLot.getLotCode(),
         existing.getTradeItem().getId());
 
     assertTrue(exists);
