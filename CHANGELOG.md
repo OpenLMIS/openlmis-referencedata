@@ -5,6 +5,8 @@ Bug fixes:
 * [OLMIS-6676](https://openlmis.atlassian.net/browse/OLMIS-6676): Enabled trade items to share lot codes.
 * [OLMIS-6749](https://openlmis.atlassian.net/browse/OLMIS-6749): Requisition group updates can no longer modify supervisory nodes.
 * [OLMIS-6790](https://openlmis.atlassian.net/browse/OLMIS-6790): Enabled creating lots with lot code that is partly included in any existing lot code.
+* [OLMIS-6776](https://openlmis.atlassian.net/browse/OLMIS-6776): Fixed the issue with invalid token error:
+  * A mechanism to retry authentication load after encountering the error was introduced.
 
 15.1.0 / 2019-01-16
 ===================
