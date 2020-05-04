@@ -95,7 +95,7 @@ public class RightController extends BaseController {
     
     rightService.checkRootAccess();
 
-    Right right = rightRepository.findOne(rightId);
+    Right right = rightRepository.findById(rightId).orElse(null);
 
     if (right == null) {
       throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
@@ -128,7 +128,7 @@ public class RightController extends BaseController {
     rightService.checkRootAccess();
 
     //Return a 404 if the specified instance can't be found
-    Right instance = rightRepository.findOne(id);
+    Right instance = rightRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     }
@@ -190,13 +190,13 @@ public class RightController extends BaseController {
 
     rightService.checkRootAccess();
 
-    Right storedRight = rightRepository.findOne(rightId);
+    Right storedRight = rightRepository.findById(rightId).orElse(null);
     if (storedRight == null) {
       throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
     }
 
     LOGGER.debug("Deleting right");
-    rightRepository.delete(rightId);
+    rightRepository.deleteById(rightId);
   }
 
   /**

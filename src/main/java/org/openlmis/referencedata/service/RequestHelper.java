@@ -19,7 +19,6 @@ import static java.lang.String.valueOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.util.UriUtils.encodeQueryParam;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -46,12 +45,7 @@ public final class RequestHelper {
 
     if (parameters != null) {
       parameters.forEach(e -> {
-        try {
-          builder.queryParam(e.getKey(), encodeQueryParam(valueOf(e.getValue()), UTF_8.name()));
-        } catch (UnsupportedEncodingException ex) {
-          // a very small chance for this exception.
-          throw new IllegalStateException(ex);
-        }
+        builder.queryParam(e.getKey(), encodeQueryParam(valueOf(e.getValue()), UTF_8.name()));
       });
     }
 

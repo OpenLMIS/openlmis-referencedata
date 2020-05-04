@@ -71,7 +71,7 @@ public class SupervisoryNodeValidator implements BaseValidator {
     UUID nodeId = getId(node.getId());
     verifyCode(node, nodeId, errors);
     verifyName(node, nodeId, errors);
-    SupervisoryNode existingNode = repository.findOne(nodeId);
+    SupervisoryNode existingNode = repository.findById(nodeId).orElse(null);
     if (isRequisitionGroupChanged(existingNode, node)) {
       rejectValue(errors, REQUISITION_GROUP,
           SupervisoryNodeMessageKeys.ERROR_UPDATING_REQUISITION_GROUP_SAVE_FAILED);

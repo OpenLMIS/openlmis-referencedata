@@ -25,6 +25,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.assertj.core.util.Lists;
@@ -64,6 +65,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.BindingResult;
 
@@ -188,8 +190,8 @@ public class UserControllerTest {
   }
 
   private void preparePostOrPut() {
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(facilityRepository.findOne(homeFacilityId)).thenReturn(homeFacility);
+    when(repository.findById(userId)).thenReturn(Optional.of(user1));
+    when(facilityRepository.findById(homeFacilityId)).thenReturn(Optional.of(homeFacility));
     when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArguments()[0]);
     when(repository.saveAndFlush(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -202,7 +204,7 @@ public class UserControllerTest {
     List<User> foundUsers = Lists.newArrayList(user1, user2);
     UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
     when(userService.searchUsersById(searchParams, pageable))
-        .thenReturn(Pagination.getPage(foundUsers));
+        .thenReturn(Pagination.getPage(foundUsers, PageRequest.of(0, foundUsers.size())));
 
     //when
     Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
@@ -214,7 +216,7 @@ public class UserControllerTest {
   @Test
   public void shouldGetUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(user1);
+    when(repository.findById(userId)).thenReturn(Optional.of(user1));
     when(roleAssignmentRepository.findByUser(userId)).thenReturn(Collections.emptySet());
 
     //when
@@ -231,7 +233,7 @@ public class UserControllerTest {
     SupervisionRoleAssignment roleAssignment2 = new SupervisionRoleAssignment(supervisionRole1,
         user1, program1);
     user1.assignRoles(roleAssignment1, roleAssignment2);
-    when(repository.findOne(userId)).thenReturn(user1);
+    when(repository.findById(userId)).thenReturn(Optional.of(user1));
     when(roleAssignmentRepository.findByUser(userId)).thenReturn(Sets.newHashSet(
         new RoleAssignmentDto(roleId, null, null, null),
         new RoleAssignmentDto(roleId, programId, null, null)));
@@ -249,7 +251,7 @@ public class UserControllerTest {
   @Test(expected = NotFoundException.class)
   public void shouldNotGetNonExistingUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(null);
+    when(repository.findById(userId)).thenReturn(Optional.empty());
 
     //when
     controller.getUser(userId);
@@ -261,7 +263,7 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    when(repository.findOne(userId)).thenReturn(null);
+    when(repository.findById(userId)).thenReturn(Optional.empty());
     BindingResult result = mock(BindingResult.class);
     when(result.hasErrors()).thenReturn(false);
 
@@ -306,7 +308,7 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
+    when(roleRepository.findById(roleId)).thenReturn(Optional.of(adminRole1));
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(adminRole1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
@@ -327,8 +329,8 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findOne(programId)).thenReturn(program1);
+    when(roleRepository.findById(roleId)).thenReturn(Optional.of(supervisionRole1));
+    when(programRepository.findById(programId)).thenReturn(Optional.of(program1));
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(supervisionRole1);
     roleAssignmentDto.setProgram(program1);
@@ -351,9 +353,10 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    when(roleRepository.findOne(roleId)).thenReturn(supervisionRole1);
-    when(programRepository.findOne(programId)).thenReturn(program1);
-    when(supervisoryNodeRepository.findOne(supervisoryNodeId)).thenReturn(supervisoryNode1);
+    when(roleRepository.findById(roleId)).thenReturn(Optional.of(supervisionRole1));
+    when(programRepository.findById(programId)).thenReturn(Optional.of(program1));
+    when(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .thenReturn(Optional.of(supervisoryNode1));
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(supervisionRole1);
     roleAssignmentDto.setProgram(program1);
@@ -376,8 +379,8 @@ public class UserControllerTest {
     preparePostOrPut();
 
 
-    when(roleRepository.findOne(roleId)).thenReturn(fulfillmentRole1);
-    when(facilityRepository.findOne(warehouseId)).thenReturn(warehouse1);
+    when(roleRepository.findById(roleId)).thenReturn(Optional.of(fulfillmentRole1));
+    when(facilityRepository.findById(warehouseId)).thenReturn(Optional.of(warehouse1));
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(fulfillmentRole1);
     roleAssignmentDto.setWarehouse(warehouse1);
@@ -401,7 +404,7 @@ public class UserControllerTest {
     user1.assignRoles(new SupervisionRoleAssignment(supervisionRole1, user1, program1));
 
 
-    when(roleRepository.findOne(roleId)).thenReturn(adminRole1);
+    when(roleRepository.findById(roleId)).thenReturn(Optional.of(adminRole1));
     RoleAssignmentDto roleAssignmentDto = new RoleAssignmentDto();
     roleAssignmentDto.setRole(adminRole1);
     user1Dto.setRoleAssignments(Sets.newHashSet(roleAssignmentDto));
@@ -437,19 +440,19 @@ public class UserControllerTest {
   @Test
   public void shouldDeleteExistingUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(user1);
+    when(repository.findById(userId)).thenReturn(Optional.of(user1));
 
     //when
     controller.deleteUser(userId);
 
     //then
-    verify(repository).delete(userId);
+    verify(repository).deleteById(userId);
   }
 
   @Test(expected = NotFoundException.class)
   public void shouldNotDeleteNonExistingUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(null);
+    when(repository.findById(userId)).thenReturn(Optional.empty());
 
     //when
     controller.deleteUser(userId);
@@ -458,7 +461,7 @@ public class UserControllerTest {
   @Test(expected = NotFoundException.class)
   public void shouldNotCheckIfUserHasRightForNonExistingUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(null);
+    when(repository.findById(userId)).thenReturn(Optional.empty());
 
     //when
     controller.checkIfUserHasRight(userId,
@@ -471,7 +474,7 @@ public class UserControllerTest {
   @Test(expected = NotFoundException.class)
   public void shouldNotGetUserProgramsForNonExistingUser() {
     //given
-    when(repository.findOne(userId)).thenReturn(null);
+    when(repository.findById(userId)).thenReturn(Optional.empty());
 
     //when
     controller.getUserPrograms(userId);
@@ -488,8 +491,8 @@ public class UserControllerTest {
 
     user1.assignRoles(assignment1);
     user1.assignRoles(assignment2);
-    when(repository.findOne(userId)).thenReturn(user1);
-    when(rightRepository.findOne(rightId)).thenReturn(fulfillmentRight1);
+    when(repository.findById(userId)).thenReturn(Optional.of(user1));
+    when(rightRepository.findById(rightId)).thenReturn(Optional.of(fulfillmentRight1));
 
     //when
     Set<FacilityDto> facilities = controller.getUserFulfillmentFacilities(userId, rightId);

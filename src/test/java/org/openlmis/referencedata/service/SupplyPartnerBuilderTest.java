@@ -25,6 +25,7 @@ import static org.openlmis.referencedata.util.Pagination.NO_PAGINATION;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -138,14 +139,14 @@ public class SupplyPartnerBuilderTest {
     supplyPartner.export(importer);
     importer.setId(null);
 
-    when(programRepository.findOne(program.getId())).thenReturn(program);
-    when(supervisoryNodeRepository.findOne(partnerNode.getId())).thenReturn(partnerNode);
-    when(supervisoryNodeRepository.findOne(supervisoryNode.getId())).thenReturn(supervisoryNode);
-    when(facilityRepository.findAll(Sets.newHashSet(facility.getId())))
+    when(programRepository.findById(program.getId())).thenReturn(Optional.of(program));
+    when(supervisoryNodeRepository.findById(partnerNode.getId()))
+        .thenReturn(Optional.of(partnerNode));
+    when(facilityRepository.findAllById(Sets.newHashSet(facility.getId())))
         .thenReturn(Lists.newArrayList(facility));
     when(orderableRepository.findAllLatestByIds(
-        Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
-        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable)));
+        Sets.newHashSet(orderable.getId()), PageRequest.of(0, 1)))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 1)));
 
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(
@@ -169,7 +170,7 @@ public class SupplyPartnerBuilderTest {
     SupplyPartner existing = new SupplyPartner();
     existing.setId(supplyPartner.getId());
 
-    when(supplyPartnerRepository.findOne(supplyPartner.getId())).thenReturn(existing);
+    when(supplyPartnerRepository.findById(supplyPartner.getId())).thenReturn(Optional.of(existing));
 
     importer.setId(supplyPartner.getId());
 
@@ -181,7 +182,7 @@ public class SupplyPartnerBuilderTest {
   @Test
   public void shouldBuildDomainObjectWithGivenIdBasedOnDataFromImporter() {
     importer.setId(supplyPartner.getId());
-    when(supplyPartnerRepository.findOne(supplyPartner.getId())).thenReturn(null);
+    when(supplyPartnerRepository.findById(supplyPartner.getId())).thenReturn(Optional.empty());
 
     SupplyPartner built = builder.build(importer);
 
@@ -202,7 +203,7 @@ public class SupplyPartnerBuilderTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(ProgramMessageKeys.ERROR_NOT_FOUND);
 
-    when(programRepository.findOne(program.getId())).thenReturn(null);
+    when(programRepository.findById(program.getId())).thenReturn(Optional.empty());
 
     builder.build(importer);
   }
@@ -232,7 +233,7 @@ public class SupplyPartnerBuilderTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
 
-    when(supervisoryNodeRepository.findOne(partnerNode.getId())).thenReturn(null);
+    when(supervisoryNodeRepository.findById(partnerNode.getId())).thenReturn(Optional.empty());
 
     builder.build(importer);
   }
@@ -262,7 +263,7 @@ public class SupplyPartnerBuilderTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
 
-    when(facilityRepository.findAll(Sets.newHashSet(facility.getId())))
+    when(facilityRepository.findAllById(Sets.newHashSet(facility.getId())))
         .thenReturn(Collections.emptyList());
 
     builder.build(importer);
@@ -274,8 +275,8 @@ public class SupplyPartnerBuilderTest {
     exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);
 
     when(orderableRepository.findAllLatestByIds(
-        Sets.newHashSet(orderable.getId()), new PageRequest(0, 1)))
-        .thenReturn(Pagination.getPage(Collections.emptyList()));
+        Sets.newHashSet(orderable.getId()), PageRequest.of(0, 1)))
+        .thenReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 1)));
 
     builder.build(importer);
   }
@@ -307,8 +308,8 @@ public class SupplyPartnerBuilderTest {
     SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
     association.setSupervisoryNode(newSupervisoryNode);
 
-    when(supervisoryNodeRepository.findOne(association.getSupervisoryNodeId()))
-        .thenReturn(newSupervisoryNode);
+    when(supervisoryNodeRepository.findById(association.getSupervisoryNodeId()))
+        .thenReturn(Optional.of(newSupervisoryNode));
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_SUPERVISORY_NODE);
@@ -324,7 +325,7 @@ public class SupplyPartnerBuilderTest {
     SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
     association.addFacility(newFacility);
 
-    when(facilityRepository.findAll(association.getFacilityIds()))
+    when(facilityRepository.findAllById(association.getFacilityIds()))
         .thenReturn(Lists.newArrayList(facility, newFacility));
 
     exception.expect(ValidationMessageException.class);
@@ -342,8 +343,9 @@ public class SupplyPartnerBuilderTest {
     association.addOrderable(newOrderable);
 
     when(orderableRepository.findAllLatestByIds(
-        association.getOrderableIds(), new PageRequest(0, 2)))
-        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable, newOrderable)));
+        association.getOrderableIds(), PageRequest.of(0, 2)))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable, newOrderable),
+            PageRequest.of(0, 2)));
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE);

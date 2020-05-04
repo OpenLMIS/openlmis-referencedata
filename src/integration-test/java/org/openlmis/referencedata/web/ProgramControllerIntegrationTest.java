@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
@@ -75,7 +76,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldDeleteProgram() {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
 
     restAssured
         .given()
@@ -95,7 +96,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
     given(programRedisRepository.exists(programId)).willReturn(true);
     given(programRedisRepository.findById(programId)).willReturn(program);
 
@@ -195,7 +196,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     programDto.setDescription(DESCRIPTION);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
 
     Program response = restAssured
         .given()
@@ -220,7 +221,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(RightName.PROGRAMS_MANAGE);
 
     programDto.setDescription(DESCRIPTION);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
     given(programRedisRepository.findById(programId)).willReturn(program);
     given(programRedisRepository.exists(programId)).willReturn(true);
 
@@ -337,7 +338,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
     UUID id2 = UUID.randomUUID();
 
     List<Program> storedPrograms = asList(program, new Program("P2"));
-    given(programRepository.findAll(asSet(id1, id2))).willReturn(storedPrograms);
+    given(programRepository.findAllById(asSet(id1, id2))).willReturn(storedPrograms);
 
     Program[] response = restAssured
         .given()
@@ -382,9 +383,9 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetProgramFromDatabaseWhenNotInCache() {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(true);
     given(programRedisRepository.exists(programId)).willReturn(false);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
 
     Program response = restAssured
         .given()
@@ -404,8 +405,8 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetProgram() {
-    given(programRepository.exists(programId)).willReturn(true);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(programRepository.existsById(programId)).willReturn(true);
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
 
     Program response = restAssured
         .given()
@@ -427,7 +428,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetProgramFromCache() {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(true);
     given(programRedisRepository.exists(programId)).willReturn(true);
     given(programRedisRepository.findById(programId)).willReturn(program);
 
@@ -450,7 +451,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(supervisoryNodeRepository.exists(programId)).willReturn(false);
+    given(supervisoryNodeRepository.existsById(programId)).willReturn(false);
     given(supervisoryNodeDtoRedisRepository.exists(programId)).willReturn(false);
 
     restAssured
@@ -468,7 +469,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldThrowErrorNotFoundWhenNotInDatabase() {
-    given(supervisoryNodeRepository.exists(programId)).willReturn(false);
+    given(supervisoryNodeRepository.existsById(programId)).willReturn(false);
 
     restAssured
         .given()
@@ -529,7 +530,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    given(programRepository.findOne(any(UUID.class))).willReturn(null);
+    given(programRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -538,7 +539,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetAuditLog() {
-    given(programRepository.findOne(any(UUID.class))).willReturn(program);
+    given(programRepository.findById(any(UUID.class))).willReturn(Optional.of(program));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

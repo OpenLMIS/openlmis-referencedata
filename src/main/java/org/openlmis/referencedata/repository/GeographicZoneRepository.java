@@ -32,12 +32,6 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
                                                   GeographicZoneRepositoryCustom,
                                                   BaseAuditableRepository<GeographicZone, UUID> {
 
-  @Override
-  <S extends GeographicZone> S save(S entity);
-
-  @Override
-  <S extends GeographicZone> Iterable<S> save(Iterable<S> entities);
-
   List<GeographicZone> findByParentAndLevel(GeographicZone parent, GeographicLevel level);
 
   @Query(name = "GeographicZone.findIdsByParent")
@@ -68,7 +62,7 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
       + "ON CAST(gz.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
       + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
       + "    )\n"
-      + " ORDER BY ?#{#pageable}",
+      + " ",
       nativeQuery = true)
   Page<GeographicZone> findAllWithoutSnapshots(Pageable pageable);
 }

@@ -421,7 +421,7 @@ public class FacilityController extends BaseController {
 
   private Facility findFacility(UUID id, Profiler profiler) {
     profiler.start("FIND_FACILITY");
-    Facility facility = facilityRepository.findOne(id);
+    Facility facility = facilityRepository.findById(id).orElse(null);
 
     if (facility == null) {
       profiler.stop().log();
@@ -456,7 +456,7 @@ public class FacilityController extends BaseController {
         .collect(Collectors.toSet());
 
     Map<UUID, Orderable> orderables = orderableRepository
-        .findAllLatestByIds(orderableId, new PageRequest(0, orderableId.size()))
+        .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
         .getContent()
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));

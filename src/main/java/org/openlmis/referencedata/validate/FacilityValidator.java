@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -64,7 +64,7 @@ public class FacilityValidator extends FhirLocationValidator<FacilityDto, Facili
 
   @Override
   Facility getExistingResource(FacilityDto target) {
-    return facilityRepository.findOne(target.getId());
+    return facilityRepository.findById(target.getId()).orElse(null);
   }
 
   @Override

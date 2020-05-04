@@ -16,14 +16,14 @@
 package org.openlmis.referencedata.util;
 
 import java.io.Serializable;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.UUIDGenerator;
 import org.openlmis.referencedata.domain.BaseEntity;
 
 public class ConditionalUuidGenerator extends UUIDGenerator {
 
   @Override
-  public Serializable generate(SessionImplementor session, Object object) {
+  public Serializable generate(SharedSessionContractImplementor session, Object object) {
     if ((((BaseEntity) object).getId()) == null) {
       return super.generate(session, object);
     } else {

@@ -21,7 +21,8 @@ import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Locale;
 import javax.annotation.PostConstruct;
-import org.flywaydb.core.api.callback.FlywayCallback;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.callback.Callback;
 import org.javers.core.Javers;
 import org.javers.core.MappingStyle;
 import org.javers.core.diff.ListCompareAlgorithm;
@@ -47,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.cache.annotation.EnableCaching;
@@ -54,6 +56,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -83,15 +88,6 @@ public class Application {
 
   @Value("${time.zoneId}")
   private String timeZoneId;
-
-  @Value("${redis.url}")
-  private String redisUrl;
-
-  @Value("${redis.port}")
-  private int redisPort;
-
-  @Value("${redis.password}")
-  private String redisPassword;
 
   @Autowired
   DialectName dialectName;
@@ -183,14 +179,14 @@ public class Application {
   public FlywayMigrationStrategy cleanMigrationStrategy() {
     return flyway -> {
       logger.info("Using clean-migrate flyway strategy -- production profile not active");
-      flyway.setCallbacks(flywayCallback());
+      Flyway.configure().callbacks(flywayCallback());
       flyway.clean();
       flyway.migrate();
     };
   }
 
   @Bean
-  public FlywayCallback flywayCallback() {
+  public Callback flywayCallback() {
     return new ExportSchemaFlywayCallback();
   }
 
@@ -229,13 +225,12 @@ public class Application {
   }
 
   @Bean
-  JedisConnectionFactory connectionFactory() {
-    JedisConnectionFactory factory = new JedisConnectionFactory();
-    factory.setHostName(redisUrl);
-    factory.setPort(redisPort);
-    factory.setPassword(redisPassword);
-    factory.setUsePool(true);
-    return factory;
+  RedisConnectionFactory connectionFactory(RedisProperties properties) {
+    RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(
+        properties.getHost(), properties.getPort());
+    config.setPassword(properties.getPassword());
+    JedisClientConfiguration clientConfig = JedisClientConfiguration.builder().usePooling().build();
+    return new JedisConnectionFactory(config, clientConfig);
   }
 
   @Bean
@@ -247,12 +242,13 @@ public class Application {
    * Creates RedisTemplate instance.
    */
   @Bean
-  public RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory factory,
+  public RedisTemplate<String, Object> redisTemplate(RedisProperties properties,
       ObjectMapper objectMapper) {
     RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    
     Jackson2JsonRedisSerializer jackson2JsonRedisSerializer =
         new Jackson2JsonRedisSerializer<>(Object.class);
-    redisTemplate.setConnectionFactory(factory);
+    redisTemplate.setConnectionFactory(connectionFactory(properties));
     redisTemplate.setKeySerializer(stringRedisSerializer());
     redisTemplate.setDefaultSerializer(jackson2JsonRedisSerializer);
     redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
@@ -266,13 +262,10 @@ public class Application {
    * Creates RedisCacheManager instance.
    */
   @Bean
-  public RedisCacheManager cacheManager(ObjectMapper objectMapper) {
-    RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplate(connectionFactory(),
-        objectMapper));
-    redisCacheManager.setTransactionAware(true);
-    redisCacheManager.setLoadRemoteCachesOnStartup(true);
-    redisCacheManager.setUsePrefix(true);
-    return redisCacheManager;
+  public RedisCacheManager cacheManager(RedisProperties properties) {
+    return RedisCacheManager.builder(connectionFactory(properties))
+        .transactionAware()
+        .build();
   }
 
   @Bean
@@ -281,10 +274,10 @@ public class Application {
   }
 
   @Bean
-  StateRepository getStateRepository() {
+  StateRepository getStateRepository(RedisProperties properties) {
     return new RedisStateRepository.Builder()
         .keyPrefix("togglz:")
-        .jedisPool(new JedisPool(redisUrl, redisPort))
+        .jedisPool(new JedisPool(properties.getHost(), properties.getPort()))
         .build();
   }
 

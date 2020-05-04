@@ -116,7 +116,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
         .createQuery(hqlWithSort, Facility.class)
         .setParameter("ids", ids)
         .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setFirstResult(Math.toIntExact(pageable.getOffset()))
         .getResultList();
 
     return Pagination.getPage(facilities, pageable, ids.size());
@@ -144,7 +144,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     params.forEach(searchQuery::setParameter);
     List<Facility> facilities =  searchQuery
         .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setFirstResult(Math.toIntExact(pageable.getOffset()))
         .getResultList();
 
     return Pagination.getPage(facilities, pageable, count);

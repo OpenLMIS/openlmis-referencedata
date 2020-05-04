@@ -7,7 +7,7 @@ services:
     depends_on: [db, log, redis]
 
   db:
-    image: openlmis/postgres:9.6-postgis
+    image: openlmis/postgres:9.6-debezium
     ports:
       - "5432"
     env_file: .env

@@ -206,7 +206,7 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
 
   @Test
   public void testSearchSortByUsername() {
-    Sort sort = new Sort(new Sort.Order(Sort.Direction.ASC, "username"));
+    Sort sort = Sort.by(new Sort.Order(Sort.Direction.ASC, "username"));
     when(pageable.getSort()).thenReturn(sort);
 
     Page<User> receivedUsers = repository

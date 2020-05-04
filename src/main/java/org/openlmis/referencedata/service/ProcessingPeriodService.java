@@ -89,7 +89,7 @@ public class ProcessingPeriodService {
   }
 
   private <T> void existsById(CrudRepository<T, UUID> repository, UUID id, String errorKey) {
-    boolean exists = id != null && repository.exists(id);
+    boolean exists = id != null && repository.existsById(id);
     if (null != id && !exists) {
       throw new NotFoundException(new Message(errorKey, id));
     }

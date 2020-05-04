@@ -56,7 +56,7 @@ public interface FacilityTypeApprovedProductRepository extends
       + "         AND (CAST(ftap.versionNumber AS varchar) ="
       + "           CAST(CAST(g.local_id AS json)->'versionNumber' AS varchar))"
       + "       INNER JOIN referencedata.jv_snapshot s ON g.global_id_pk = s.global_id_fk)"
-      + " ORDER BY ?#{#pageable}",
+      + " ",
       nativeQuery = true)
   Page<FacilityTypeApprovedProduct> findAllWithoutSnapshots(Pageable pageable);
 }

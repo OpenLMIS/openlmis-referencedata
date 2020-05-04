@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -81,8 +82,8 @@ public class SystemNotificationValidatorTest {
 
   @Test
   public void shouldRejectSystemNotificationWithEmptyCreatedDate() {
-    when(systemNotificationRepository.findOne(systemNotification.getId()))
-        .thenReturn(systemNotification);
+    when(systemNotificationRepository.findById(systemNotification.getId()))
+        .thenReturn(Optional.of(systemNotification));
 
     systemNotificationDto.setCreatedDate(null);
 
@@ -125,8 +126,8 @@ public class SystemNotificationValidatorTest {
     systemNotification.setStartDate(ZonedDateTime.now().minusYears(10));
     systemNotification.setExpiryDate(ZonedDateTime.now().plusYears(10));
 
-    when(systemNotificationRepository.findOne(systemNotification.getId()))
-        .thenReturn(systemNotification);
+    when(systemNotificationRepository.findById(systemNotification.getId()))
+        .thenReturn(Optional.of(systemNotification));
 
     systemNotification.export(systemNotificationDto);
     validator.validate(systemNotificationDto, errors);
@@ -140,8 +141,8 @@ public class SystemNotificationValidatorTest {
         .withAuthor(author)
         .build();
 
-    when(systemNotificationRepository.findOne(systemNotification.getId()))
-        .thenReturn(savedNotification);
+    when(systemNotificationRepository.findById(systemNotification.getId()))
+        .thenReturn(Optional.of(savedNotification));
 
     systemNotification.setCreatedDate(ZonedDateTime.now().plusDays(10));
     systemNotification.setAuthor(new UserDataBuilder().build());

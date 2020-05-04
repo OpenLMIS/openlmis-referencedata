@@ -23,6 +23,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -109,10 +110,10 @@ import org.openlmis.referencedata.validate.ProcessingPeriodValidator;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -178,7 +179,7 @@ public abstract class BaseWebIntegrationTest {
   static final String CONTENT = "content";
   static final String CONTENT_ID = CONTENT + "." + ID;
 
-  protected Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
+  protected Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 2000);
 
   @Value("${service.url}")
   protected String baseUri;
@@ -376,7 +377,7 @@ public abstract class BaseWebIntegrationTest {
   @Before
   public void setUp() {
     // by default user has no access to resources
-    given(userRepository.exists(ADMIN_ID)).willReturn(true);
+    given(userRepository.existsById(ADMIN_ID)).willReturn(true);
     given(rightAssignmentRepository.existsByUserIdAndRightName(eq(ADMIN_ID), anyString()))
         .willReturn(false);
 
@@ -411,7 +412,8 @@ public abstract class BaseWebIntegrationTest {
   }
 
   protected void mockUserHasRight(String rightName) {
-    doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(), any(UUID.class));
+    doNothing().when(rightService).checkAdminRight(eq(rightName), anyBoolean(),
+        nullable(UUID.class));
     doNothing().when(rightService).checkAdminRight(rightName);
 
     doReturn(true).when(rightService).hasRight(rightName);

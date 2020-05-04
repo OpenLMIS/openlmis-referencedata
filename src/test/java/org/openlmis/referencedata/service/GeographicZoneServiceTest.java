@@ -33,6 +33,7 @@ import com.google.common.collect.Sets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -49,6 +50,7 @@ import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -88,12 +90,7 @@ public class GeographicZoneServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 
-    when(child.getName()).thenReturn("zone-1");
-    when(secondChild.getName()).thenReturn("zone-2");
     geographicZones = Lists.newArrayList(child, secondChild);
-
-    when(pageable.getPageSize()).thenReturn(10);
-    when(pageable.getPageNumber()).thenReturn(0);
   }
 
   @Test
@@ -131,8 +128,6 @@ public class GeographicZoneServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
-    when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
-
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(PARENT, "zone-code");
     geographicZoneService.search(searchParams, pageable);
@@ -150,7 +145,8 @@ public class GeographicZoneServiceTest {
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
     when(geographicZoneRepository.findAll(eq(pageable)))
-        .thenReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
+        .thenReturn(Pagination.getPage(geographicZones, PageRequest.of(0, geographicZones.size()),
+            geographicZones.size()));
 
     Page<GeographicZone> actual = geographicZoneService.search(new HashMap<>(), pageable);
     verify(geographicZoneRepository).findAll(eq(pageable));
@@ -159,11 +155,11 @@ public class GeographicZoneServiceTest {
 
   @Test
   public void shouldSearchForRequisitionGroupsWithAllParametersProvided() {
-    when(geographicZoneRepository.findOne(parentId)).thenReturn(parent);
+    when(geographicZoneRepository.findById(parentId)).thenReturn(Optional.of(parent));
     when(geographicLevelRepository.findByLevelNumber(1)).thenReturn(level);
     when(geographicZoneRepository.search(eq("name"), eq("code"),
         eq(parent), eq(level), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(geographicZones, null, 2));
+        .thenReturn(Pagination.getPage(geographicZones, PageRequest.of(0, 2), 2));
 
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(NAME, "name");

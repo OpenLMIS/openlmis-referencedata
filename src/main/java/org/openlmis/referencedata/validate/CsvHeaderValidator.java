@@ -22,7 +22,7 @@ import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.E
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.web.csv.model.ModelClass;

@@ -64,12 +64,12 @@ public class CommodityTypeRepositoryIntegrationTest extends
     grandChild1.assignParent(child);
     grandChild2.assignParent(child);
 
-    repository.save(asList(commodityType, child, grandChild1, grandChild2));
+    repository.saveAll(asList(commodityType, child, grandChild1, grandChild2));
 
-    commodityType = repository.findOne(commodityType.getId());
-    child = repository.findOne(child.getId());
-    grandChild1 = repository.findOne(grandChild1.getId());
-    grandChild2 = repository.findOne(grandChild2.getId());
+    commodityType = repository.findById(commodityType.getId()).orElse(null);
+    child = repository.findById(child.getId()).orElse(null);
+    grandChild1 = repository.findById(grandChild1.getId()).orElse(null);
+    grandChild2 = repository.findById(grandChild2.getId()).orElse(null);
 
     assertNull(commodityType.getParent());
     assertEquals(singletonList(child), commodityType.getChildren());

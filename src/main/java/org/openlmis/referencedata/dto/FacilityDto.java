@@ -17,6 +17,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
@@ -49,8 +50,8 @@ public final class FacilityDto extends BasicFacilityDto {
   private Point location;
   private Map<String, Object> extraData;
 
-  @Getter
-  private Set<SupportedProgramDto> supportedPrograms;
+  @JsonProperty("supportedPrograms")
+  private Set<SupportedProgramDto> supportedProgramsRef;
 
   public FacilityDto(UUID id) {
     setId(id);
@@ -77,13 +78,19 @@ public final class FacilityDto extends BasicFacilityDto {
     this.operator = new FacilityOperatorDto();
     operator.export(this.operator);
   }
-
+  
+  @JsonIgnore
+  public Set<SupportedProgramDto> getSupportedPrograms() {
+    return supportedProgramsRef;
+  }
+  
   @Override
+  @JsonIgnore
   public void setSupportedPrograms(Set<SupportedProgram> supportedPrograms) {
     if (supportedPrograms == null) {
-      this.supportedPrograms = null;
+      this.supportedProgramsRef = null;
     } else {
-      this.supportedPrograms = supportedPrograms
+      this.supportedProgramsRef = supportedPrograms
           .stream()
           .map(supportedProgram -> {
             SupportedProgramDto supportedProgramDto = new SupportedProgramDto();

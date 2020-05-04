@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -148,7 +147,7 @@ public class Resource2Db {
   void updateDbFromSqlStrings(final List<String> sqlLines) {
     XLOGGER.entry();
 
-    if (CollectionUtils.isEmpty(sqlLines)) {
+    if (sqlLines.isEmpty()) {
       return;
     }
 

@@ -146,7 +146,7 @@ public class RightService {
 
     if (null != expectedUserId
         && userId.equals(expectedUserId)
-        && userRepository.exists(userId)) {
+        && userRepository.existsById(userId)) {
       XLOGGER.exit("user id allowed to bypass right check");
       return true;
     }

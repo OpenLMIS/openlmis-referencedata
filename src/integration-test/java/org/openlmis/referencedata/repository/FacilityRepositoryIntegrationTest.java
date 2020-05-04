@@ -118,8 +118,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
     repository.save(facility1);
 
-    pageable = new PageRequest(0, Integer.MAX_VALUE, Sort.Direction.ASC, "name");
-    pageableWithNullSort = new PageRequest(0, Integer.MAX_VALUE);
+    pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.ASC, "name");
+    pageableWithNullSort = PageRequest.of(0, Integer.MAX_VALUE);
   }
 
   @Override
@@ -420,7 +420,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
 
     // when
     Set<UUID> ids = Sets.newHashSet(facility.getId(), facility1.getId());
-    List<Facility> found = repository.findAll(ids);
+    List<Facility> found = repository.findAllById(ids);
 
     // then
     assertEquals(2, found.size());
@@ -486,7 +486,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     Pageable pageable = mock(Pageable.class);
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);
-    given(pageable.getSort()).willReturn(null);
+    given(pageable.getSort()).willReturn(Sort.unsorted());
     return pageable;
   }
 

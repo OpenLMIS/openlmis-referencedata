@@ -89,7 +89,7 @@ public class LotValidator implements BaseValidator {
     if (tradeItemId == null) {
       rejectValue(errors, TRADE_ITEM_ID, LotMessageKeys.ERROR_TRADE_ITEM_REQUIRED);
     } else {
-      TradeItem tradeItem = tradeItemRepository.findOne(tradeItemId);
+      TradeItem tradeItem = tradeItemRepository.findById(tradeItemId).orElse(null);
       if (tradeItem == null) {
         rejectValue(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID,
             String.valueOf(tradeItemId));

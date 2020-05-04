@@ -239,7 +239,7 @@ public class GeographicZoneRepositoryIntegrationTest
 
   @Test
   public void shouldReturnGeographicZonesWithFullCount() {
-    Pageable pageable = mockPageable(1, 0);
+    Pageable pageable = mockPageable(0, 1);
 
     Page<GeographicZone> result = repository.search(
         null, districtZone.getCode(), null, null, pageable
@@ -287,7 +287,7 @@ public class GeographicZoneRepositoryIntegrationTest
   @Test
   public void shouldReturnEmptyListIfSearchParametersAreNotProvided() {
     Pageable pageable = mockPageable(0, 10);
-    given(pageable.getSort()).willReturn(new Sort(new Sort.Order(Sort.Direction.ASC, "name")));
+    given(pageable.getSort()).willReturn(Sort.by(new Sort.Order(Sort.Direction.ASC, "name")));
 
     Page<GeographicZone> foundPage = repository.search(null, null, null,
         null, pageable);
@@ -309,7 +309,7 @@ public class GeographicZoneRepositoryIntegrationTest
     assertThat(foundPage.getContent(), hasItem(hasProperty("name", equalTo(zone.getName()))));
   }
 
-  private Pageable mockPageable(int pageSize, int pageNumber) {
+  private Pageable mockPageable(int pageNumber, int pageSize) {
     Pageable pageable = mock(Pageable.class);
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);

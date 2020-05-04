@@ -148,7 +148,7 @@ public class UserService {
   public Set<User> rightSearch(UUID rightId, UUID programId, UUID supervisoryNodeId,
                                UUID warehouseId) {
 
-    Right right = rightRepository.findOne(rightId);
+    Right right = rightRepository.findById(rightId).orElse(null);
 
     if (right == null) {
       throw new ValidationMessageException(RightMessageKeys.ERROR_NOT_FOUND);
@@ -168,7 +168,7 @@ public class UserService {
       throw new ValidationMessageException(UserMessageKeys.WAREHOUSE_ID_REQUIRED);
     }
 
-    Facility warehouse = facilityRepository.findOne(warehouseId);
+    Facility warehouse = facilityRepository.findById(warehouseId).orElse(null);
 
     if (warehouse == null) {
       throw new ValidationMessageException(new Message(
@@ -184,7 +184,7 @@ public class UserService {
       throw new ValidationMessageException(UserMessageKeys.PROGRAM_ID_REQUIRED);
     }
 
-    if (!programRepository.exists(programId)) {
+    if (!programRepository.existsById(programId)) {
       throw new ValidationMessageException(new Message(
           ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
@@ -193,7 +193,7 @@ public class UserService {
       return userRepository.findUsersBySupervisionRight(rightId, programId);
     }
 
-    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+    if (!supervisoryNodeRepository.existsById(supervisoryNodeId)) {
       throw new ValidationMessageException(new Message(
           SupervisoryNodeMessageKeys.ERROR_NOT_FOUND, supervisoryNodeId));
     }

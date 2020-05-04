@@ -21,6 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -110,8 +111,7 @@ public class SupervisoryNodeValidatorTest {
             .withCode(DC1);
     SupervisoryNode existing = builder.build();
 
-    when(repository.findOne(existing.getId())).thenReturn(existing);
-    when(repository.findByCode(DC1)).thenReturn(existing);
+    when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
     builder
             .withCode("Updated Code")
@@ -134,8 +134,7 @@ public class SupervisoryNodeValidatorTest {
             .withCode(DC1);
     SupervisoryNode existing = builder.build();
 
-    when(repository.findOne(existing.getId())).thenReturn(existing);
-    when(repository.findByCode(DC1)).thenReturn(existing);
+    when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
     builder
             .withCode("Updated Code")
@@ -172,8 +171,7 @@ public class SupervisoryNodeValidatorTest {
         .withCode(DC1);
     SupervisoryNode existing = builder.build();
 
-    when(repository.findOne(existing.getId())).thenReturn(existing);
-    when(repository.findByCode(DC1)).thenReturn(existing);
+    when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
     builder
         .withCode("Updated Code")
@@ -191,7 +189,7 @@ public class SupervisoryNodeValidatorTest {
         .withRequisitionGroup(requisitionGroup);
     SupervisoryNode existing = builder.build();
 
-    when(repository.findOne(existing.getId())).thenReturn(existing);
+    when(repository.findById(existing.getId())).thenReturn(Optional.of(existing));
 
     builder
         .withRequisitionGroup(new RequisitionGroupDataBuilder().build())

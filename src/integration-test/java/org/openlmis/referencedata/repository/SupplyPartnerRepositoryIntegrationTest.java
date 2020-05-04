@@ -80,7 +80,7 @@ public class SupplyPartnerRepositoryIntegrationTest
   private GeographicZoneRepository geographicZoneRepository;
 
   private SupplyPartner[] supplyPartners;
-  private Pageable pageable = new PageRequest(0, 10);
+  private Pageable pageable = PageRequest.of(0, 10);
 
   @Override
   CrudRepository<SupplyPartner, UUID> getRepository() {

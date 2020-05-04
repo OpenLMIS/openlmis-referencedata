@@ -174,7 +174,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     requisitionGroup.setSupervisoryNode(supervisoryNode);
     repository.save(requisitionGroup);
 
-    assertEquals(repository.findOne(requisitionGroup.getId()).getSupervisoryNode(),
+    assertEquals(repository.findById(requisitionGroup.getId()).get().getSupervisoryNode(),
             supervisoryNode);
 
     SupervisoryNode supervisoryNode1 = new SupervisoryNodeDataBuilder()
@@ -188,9 +188,9 @@ public class RequisitionGroupRepositoryIntegrationTest
     repository.save(requisitionGroup);
 
     assertNotEquals(supervisoryNode1, supervisoryNode);
-    assertEquals(repository.findOne(requisitionGroup.getId()).getSupervisoryNode(),
+    assertEquals(repository.findById(requisitionGroup.getId()).get().getSupervisoryNode(),
           supervisoryNode1);
-    assertEquals(repository.findOne(requisitionGroup.getId()).getSupervisoryNode()
+    assertEquals(repository.findById(requisitionGroup.getId()).get().getSupervisoryNode()
           .getName(), "Updated SN Name");
     assertNull(supervisoryNode.getRequisitionGroup());
   }
@@ -326,7 +326,7 @@ public class RequisitionGroupRepositoryIntegrationTest
 
     assertEquals(11, repository.count());
 
-    Pageable pageable = mockPageable(3, 0);
+    Pageable pageable = mockPageable(0, 3);
 
     Page<RequisitionGroup> result = repository.search("XXX", null, null, null, pageable);
 
@@ -353,7 +353,7 @@ public class RequisitionGroupRepositoryIntegrationTest
 
     assertEquals(9, repository.count());
 
-    Pageable pageable = mockPageable(2, 0);
+    Pageable pageable = mockPageable(0, 2);
     Program programOne = programRepository.findByCode(Code.code("PRO1"));
     Program programTwo = programRepository.findByCode(Code.code("PRO2"));
 
@@ -471,7 +471,7 @@ public class RequisitionGroupRepositoryIntegrationTest
     assertEquals(requisitionGroup.getName(), foundPage.getContent().get(0).getName());
   }
 
-  private Pageable mockPageable(int pageSize, int pageNumber) {
+  private Pageable mockPageable(int pageNumber, int pageSize) {
     Pageable pageable = mock(Pageable.class);
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);

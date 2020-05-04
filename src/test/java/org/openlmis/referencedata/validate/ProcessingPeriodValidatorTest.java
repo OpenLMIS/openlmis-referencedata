@@ -23,6 +23,7 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,8 +134,8 @@ public class ProcessingPeriodValidatorTest {
     savedProcessingPeriod.setName("name");
     savedProcessingPeriod.setDescription("desc");
 
-    when(processingPeriodRepository.findOne(processingPeriod.getId()))
-        .thenReturn(savedProcessingPeriod);
+    when(processingPeriodRepository.findById(processingPeriod.getId()))
+        .thenReturn(Optional.of(savedProcessingPeriod));
 
     validator.validate(processingPeriod, errors);
 
@@ -149,8 +150,8 @@ public class ProcessingPeriodValidatorTest {
     processingPeriod.setProcessingSchedule(new ProcessingSchedule());
 
     ProcessingPeriod savedProcessingPeriod = initiateProcessingPeriod();
-    when(processingPeriodRepository.findOne(processingPeriod.getId()))
-        .thenReturn(savedProcessingPeriod);
+    when(processingPeriodRepository.findById(processingPeriod.getId()))
+        .thenReturn(Optional.of(savedProcessingPeriod));
     processingPeriod.setProcessingSchedule(processingSchedule);
     validator.validate(processingPeriod, errors);
 

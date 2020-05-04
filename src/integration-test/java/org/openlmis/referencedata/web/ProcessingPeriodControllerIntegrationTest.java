@@ -35,6 +35,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -166,7 +167,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldReturnBadRequestIfThereAreValidationErrorsWhenPuttingPeriod() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(periodRepository.findOne(secondPeriod.getId())).willReturn(secondPeriod);
+    given(periodRepository.findById(secondPeriod.getId())).willReturn(Optional.of(secondPeriod));
 
     doAnswer(invocation -> {
       Object[] args = invocation.getArguments();
@@ -191,7 +192,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldDisplayTotalDifference() {
 
-    given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
+    given(periodRepository.findById(firstPeriodId)).willReturn(Optional.of(firstPeriod));
 
     ResultDto<Integer> response = new ResultDto<>();
     response = restAssured.given()
@@ -211,11 +212,11 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     final UUID id1 = UUID.randomUUID();
     final UUID id2 = UUID.randomUUID();
 
-    given(programRepository.exists(programId))
+    given(programRepository.existsById(programId))
         .willReturn(true);
-    given(facilityRepository.exists(facilityId))
+    given(facilityRepository.existsById(facilityId))
         .willReturn(true);
-    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(START_DATE));
     given(periodRepository
         .search(null, programId, facilityId, firstPeriod.getStartDate(),
             firstPeriod.getEndDate(), asSet(id1, id2), pageable))
@@ -265,7 +266,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
 
-    given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
+    given(periodRepository.findById(firstPeriodId)).willReturn(Optional.of(firstPeriod));
 
     ProcessingPeriodDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -287,7 +288,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    PageRequest pageable = new PageRequest(0, 10, new Sort(END_DATE));
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(END_DATE));
     given(periodRepository.search(null,null, null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
@@ -314,7 +315,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     List<ProcessingPeriod> storedPeriods = Lists.newArrayList(
         firstPeriod, secondPeriod, thirdPeriod
     );
-    PageRequest pageable = new PageRequest(0, 10, new Sort(START_DATE));
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by(START_DATE));
     given(periodRepository.search(null,null, null, null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(storedPeriods, pageable, 3));
 
@@ -340,7 +341,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
 
     ProcessingPeriodDto dto = new ProcessingPeriodDto();
     firstPeriod.export(dto);
-    given(periodRepository.findOne(firstPeriodId)).willReturn(firstPeriod);
+    given(periodRepository.findById(firstPeriodId)).willReturn(Optional.of(firstPeriod));
 
     ProcessingPeriodDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -418,7 +419,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(periodRepository.findOne(any(UUID.class))).willReturn(null);
+    given(periodRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -430,7 +431,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(periodRepository.findOne(any(UUID.class))).willReturn(null);
+    given(periodRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -442,7 +443,7 @@ public class ProcessingPeriodControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(periodRepository.findOne(any(UUID.class))).willReturn(firstPeriod);
+    given(periodRepository.findById(any(UUID.class))).willReturn(Optional.of(firstPeriod));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -31,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -53,6 +55,7 @@ import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 
@@ -119,7 +122,7 @@ public class UserServiceTest {
   public void searchUsersShouldUseExtraDataString() {
     when(userRepository
         .searchUsers(any(UserSearchParams.class), any(List.class), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), PageRequest.of(0, 2), 2));
 
     userSearch.setExtraData(extraData);
     when(userRepository.findByExtraData(any(String.class))).thenReturn(Arrays.asList(user, user2));
@@ -135,7 +138,7 @@ public class UserServiceTest {
   public void searchUsersShouldReturnEmptyPageIfExtraDataSearchReturnedNoResults() {
     when(userRepository
         .searchUsers(any(UserSearchParams.class), any(List.class), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), PageRequest.of(0, 2), 2));
 
     userSearch.setExtraData(extraData);
 
@@ -152,8 +155,8 @@ public class UserServiceTest {
   @Test
   public void searchUsersShouldNotSearchExtraDataIfParameterIsNullOrEmpty() {
     when(userRepository
-        .searchUsers(any(UserSearchParams.class), any(List.class), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+        .searchUsers(any(UserSearchParams.class), nullable(List.class), any(Pageable.class)))
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), PageRequest.of(0, 2), 2));
 
     Page<User> receivedUsers = userService.searchUsers(userSearch, pageable);
 
@@ -168,7 +171,7 @@ public class UserServiceTest {
   public void searchUsersShouldSearchByAllParameters() {
     when(userRepository
         .searchUsers(any(UserSearchParams.class), any(List.class), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), null, 2));
+        .thenReturn(Pagination.getPage(Arrays.asList(user, user2), PageRequest.of(0, 2), 2));
 
     UserSearchParams searchParams = new UserSearchParamsDataBuilder()
         .withFirstName(FIRST_NAME_SEARCH)
@@ -176,8 +179,8 @@ public class UserServiceTest {
         .build();
 
     Facility homeFacility = new Facility("some-code");
-    when(facilityRepository.findOne(searchParams.getHomeFacilityUuid()))
-        .thenReturn(homeFacility);
+    when(facilityRepository.findById(searchParams.getHomeFacilityUuid()))
+        .thenReturn(Optional.of(homeFacility));
 
     List<User> foundUsers = Arrays.asList(user, user2);
     when(userRepository.findByExtraData(any(String.class))).thenReturn(foundUsers);
@@ -193,7 +196,7 @@ public class UserServiceTest {
   @Test
   public void rightSearchShouldFindByDirectRightAssignments() {
     Set<User> expected = newHashSet(user, user2);
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.GENERAL_ADMIN);
     when(userRepository.findUsersByDirectRight(right))
         .thenReturn(expected);
@@ -207,9 +210,9 @@ public class UserServiceTest {
   @Test
   public void rightSearchShouldFindByFulfillmentAssignment() {
     Set<User> expected = newHashSet(user, user2);
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
-    when(facilityRepository.findOne(WAREHOUSE_ID)).thenReturn(warehouse);
+    when(facilityRepository.findById(WAREHOUSE_ID)).thenReturn(Optional.of(warehouse));
     when(warehouse.isWarehouse()).thenReturn(true);
     when(userRepository.findUsersByFulfillmentRight(right, warehouse))
         .thenReturn(expected);
@@ -223,10 +226,10 @@ public class UserServiceTest {
   @Test
   public void rightSearchShouldFindBySupervisionAssignment() {
     Set<User> expected = newHashSet(user, user2);
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(true);
-    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
+    when(supervisoryNodeRepository.existsById(SUPERVISORY_NODE_ID)).thenReturn(true);
+    when(programRepository.existsById(PROGRAM_ID)).thenReturn(true);
     when(userRepository.findUsersBySupervisionRight(RIGHT_ID, SUPERVISORY_NODE_ID, PROGRAM_ID))
         .thenReturn(expected);
 
@@ -240,9 +243,9 @@ public class UserServiceTest {
   @Test
   public void rightSearchShouldFindBySupervisionAssignmentWithoutSupervisoryNode() {
     Set<User> expected = newHashSet(user, user2);
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
+    when(programRepository.existsById(PROGRAM_ID)).thenReturn(true);
     when(userRepository.findUsersBySupervisionRight(RIGHT_ID, PROGRAM_ID))
         .thenReturn(expected);
 
@@ -254,7 +257,7 @@ public class UserServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldRequireExistingRight() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(null);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.empty());
 
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
@@ -266,7 +269,7 @@ public class UserServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldRequireWarehouseIdForFulfillmentRights() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
 
     try {
@@ -279,14 +282,14 @@ public class UserServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldThrowExceptionForNonExistentFacility() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
-    when(facilityRepository.findOne(WAREHOUSE_ID)).thenReturn(null);
+    when(facilityRepository.findById(WAREHOUSE_ID)).thenReturn(Optional.empty());
 
     try {
       userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
     } finally {
-      verify(facilityRepository).findOne(WAREHOUSE_ID);
+      verify(facilityRepository).findById(WAREHOUSE_ID);
       verifyZeroInteractions(supervisoryNodeRepository, programRepository,
           userRepository);
     }
@@ -294,9 +297,9 @@ public class UserServiceTest {
 
   @Test
   public void rightSearchShouldNotThrowExceptionForNonWarehouseFacility() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.ORDER_FULFILLMENT);
-    when(facilityRepository.findOne(WAREHOUSE_ID)).thenReturn(warehouse);
+    when(facilityRepository.findById(WAREHOUSE_ID)).thenReturn(Optional.of(warehouse));
     when(warehouse.isWarehouse()).thenReturn(false);
 
     userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
@@ -306,7 +309,7 @@ public class UserServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldRequireProgramIdForSupervisoryRights() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.SUPERVISION);
 
     try {
@@ -319,30 +322,30 @@ public class UserServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldThrowExceptionForNonExistentProgram() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(true);
-    when(programRepository.exists(PROGRAM_ID)).thenReturn(false);
+    when(supervisoryNodeRepository.existsById(SUPERVISORY_NODE_ID)).thenReturn(true);
+    when(programRepository.existsById(PROGRAM_ID)).thenReturn(false);
 
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
-      verify(programRepository).exists(PROGRAM_ID);
+      verify(programRepository).existsById(PROGRAM_ID);
       verifyZeroInteractions(facilityRepository, userRepository);
     }
   }
 
   @Test(expected = ValidationMessageException.class)
   public void rightSearchShouldThrowExceptionForNonExistentSupervisoryNode() {
-    when(rightRepository.findOne(RIGHT_ID)).thenReturn(right);
+    when(rightRepository.findById(RIGHT_ID)).thenReturn(Optional.of(right));
     when(right.getType()).thenReturn(RightType.SUPERVISION);
-    when(supervisoryNodeRepository.exists(SUPERVISORY_NODE_ID)).thenReturn(false);
-    when(programRepository.exists(PROGRAM_ID)).thenReturn(true);
+    when(supervisoryNodeRepository.existsById(SUPERVISORY_NODE_ID)).thenReturn(false);
+    when(programRepository.existsById(PROGRAM_ID)).thenReturn(true);
 
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
-      verify(supervisoryNodeRepository).exists(SUPERVISORY_NODE_ID);
+      verify(supervisoryNodeRepository).existsById(SUPERVISORY_NODE_ID);
       verifyZeroInteractions(facilityRepository, userRepository);
     }
   }

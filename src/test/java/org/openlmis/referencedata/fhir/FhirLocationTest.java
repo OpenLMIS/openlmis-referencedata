@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import java.util.Optional;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
 import org.openlmis.referencedata.domain.Facility;

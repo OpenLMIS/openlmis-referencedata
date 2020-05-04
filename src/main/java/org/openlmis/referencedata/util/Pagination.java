@@ -131,7 +131,7 @@ public class Pagination {
    */
   public static <T> void handlePage(Function<Pageable, Page<T>> data,
                                     Consumer<? super T> pageAction) {
-    Pageable pageable = new PageRequest(DEFAULT_PAGE_NUMBER, 2000);
+    Pageable pageable = PageRequest.of(DEFAULT_PAGE_NUMBER, 2000);
 
     while (true) {
       Page<T> page = data.apply(pageable);

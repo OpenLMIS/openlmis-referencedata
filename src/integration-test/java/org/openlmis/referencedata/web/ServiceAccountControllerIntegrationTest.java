@@ -27,6 +27,7 @@ import static org.openlmis.referencedata.util.messagekeys.SystemMessageKeys.ERRO
 
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
@@ -61,8 +62,8 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
     given(serviceAccountRepository.save(any(ServiceAccount.class)))
         .willAnswer(invocation -> invocation.getArguments()[0]);
-    given(serviceAccountRepository.findOne(account.getToken()))
-        .willReturn(account);
+    given(serviceAccountRepository.findById(account.getToken()))
+        .willReturn(Optional.of(account));
 
     given(authenticationHelper.getCurrentUser()).willReturn(user);
 
@@ -143,8 +144,8 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForGetServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getToken()))
-        .willReturn(null);
+    given(serviceAccountRepository.findById(account.getToken()))
+        .willReturn(Optional.empty());
 
     String response = get()
         .statusCode(HttpStatus.NOT_FOUND.value())
@@ -196,8 +197,8 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForPutServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getToken()))
-        .willReturn(null);
+    given(serviceAccountRepository.findById(account.getToken()))
+        .willReturn(Optional.empty());
 
     String response = put(accountDto)
         .statusCode(HttpStatus.NOT_FOUND.value())
@@ -238,8 +239,8 @@ public class ServiceAccountControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldReturnNotFoundIfAccountNotExistForDeleteServiceAccountEndpoint() {
-    given(serviceAccountRepository.findOne(account.getToken()))
-        .willReturn(null);
+    given(serviceAccountRepository.findById(account.getToken()))
+        .willReturn(Optional.empty());
 
     String response = delete()
         .statusCode(HttpStatus.NOT_FOUND.value())

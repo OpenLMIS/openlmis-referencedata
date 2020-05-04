@@ -241,7 +241,7 @@ public class SystemNotificationController extends BaseController {
 
   private SystemNotification findSystemNotification(UUID id, Profiler profiler) {
     profiler.start("FIND_SYSTEM_NOTIFICATION");
-    SystemNotification systemNotification = systemNotificationRepository.findOne(id);
+    SystemNotification systemNotification = systemNotificationRepository.findById(id).orElse(null);
 
     if (systemNotification == null) {
       profiler.stop().log();
@@ -268,7 +268,7 @@ public class SystemNotificationController extends BaseController {
     throwValidationMessageExceptionIfErrors(bindingResult);
 
     profiler.start("BUILD_SYSTEM_NOTIFICATION");
-    User author = userRepository.findOne(systemNotificationDto.getAuthorId());
+    User author = userRepository.findById(systemNotificationDto.getAuthorId()).orElse(null);
     SystemNotification systemNotification =
         SystemNotification.newInstance(systemNotificationDto, author);
 

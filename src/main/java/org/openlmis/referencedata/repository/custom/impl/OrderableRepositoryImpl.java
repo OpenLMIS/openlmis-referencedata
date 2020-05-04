@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Lists;
@@ -236,7 +236,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
       return entityManager.createQuery(query)
           .setMaxResults(pageable.getPageSize())
-          .setFirstResult(pageable.getOffset());
+          .setFirstResult(Math.toIntExact(pageable.getOffset()));
     }
 
     return entityManager.createQuery(newQuery);

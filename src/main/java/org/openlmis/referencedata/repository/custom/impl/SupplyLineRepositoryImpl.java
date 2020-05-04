@@ -131,7 +131,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
 
     List<SupplyLine> result = searchQuery
         .setMaxResults(pageable != null ? pageable.getPageSize() : Integer.MAX_VALUE)
-        .setFirstResult(pageable != null ? pageable.getOffset() : 0)
+        .setFirstResult(pageable != null ? Math.toIntExact(pageable.getOffset()) : 0)
         .getResultList();
 
     return Pagination.getPage(result, pageable, count);
@@ -165,7 +165,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   }
 
   private String getOrderPredicate(Pageable pageable) {
-    if (null != pageable && null != pageable.getSort()) {
+    if (null != pageable && pageable.getSort().isSorted()) {
 
       List<String> orderPredicate = StreamSupport.stream(
           Spliterators.spliteratorUnknownSize(pageable.getSort().iterator(), Spliterator.ORDERED),

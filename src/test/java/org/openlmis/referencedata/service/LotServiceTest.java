@@ -68,7 +68,7 @@ public class LotServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    pageable = new PageRequest(0, 2);
+    pageable = PageRequest.of(0, 2);
     tradeItem = new TradeItemDataBuilder().build();
     lot = new LotDataBuilder()
         .withTradeItem(tradeItem)
@@ -88,7 +88,7 @@ public class LotServiceTest {
     );
 
     List<TradeItem> tradeItems = singletonList(tradeItem);
-    when(tradeItemRepository.findAll(tradeItemIds))
+    when(tradeItemRepository.findAllById(tradeItemIds))
         .thenReturn(tradeItems);
 
     when(lotRepository.search(
@@ -128,7 +128,7 @@ public class LotServiceTest {
 
   @Test
   public void searchShouldReturnEmptyListIfTradeItemDoesNotExist() {
-    when(tradeItemRepository.findAll(singletonList(tradeItem.getId()))).thenReturn(emptyList());
+    when(tradeItemRepository.findAllById(singletonList(tradeItem.getId()))).thenReturn(emptyList());
 
     LotSearchParams lotSearchParams = new LotSearchParams(
         LocalDate.now(),

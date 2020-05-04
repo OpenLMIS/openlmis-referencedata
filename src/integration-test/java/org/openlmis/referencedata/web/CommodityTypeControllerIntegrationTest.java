@@ -41,19 +41,20 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.CommodityType;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
@@ -173,8 +174,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     mockUserHasRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
 
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     CommodityTypeDto response = restAssured
         .given()
@@ -220,7 +221,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     when(commodityTypeRepository.findAll()).thenReturn(commodityTypes);
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -228,7 +229,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     List<CommodityTypeDto> expected = CommodityTypeDto.newInstance(commodityTypes);
 
@@ -240,8 +241,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldUpdateTradeItemAssociations() {
     mockUserHasRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -259,7 +260,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
         .statusCode(200);
 
     ArgumentCaptor<Set> captor = ArgumentCaptor.forClass(Set.class);
-    verify(tradeItemRepository).save(captor.capture());
+    verify(tradeItemRepository).saveAll(captor.capture());
 
     Set<TradeItem> itemsToUpdate = captor.getValue();
     assertThat(itemsToUpdate, hasSize(2));
@@ -270,8 +271,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldRejectUpdateTradeItemAssociationsIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
     commodityType.setId(commodityTypeId);
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -295,8 +296,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldGetTradeItemAssociations() {
 
     commodityType.setId(commodityTypeId);
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     TradeItem tradeItem = mockTradeItem();
     TradeItem anotherTradeItem = mockTradeItem();
@@ -346,10 +347,9 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     commodityType = new CommodityTypeDto(NAME, CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
 
     commodityType.setId(commodityTypeId);
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
-    given(commodityTypeRepository.findOne(parentId))
-        .willReturn(newInstance(parent));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
+    given(commodityTypeRepository.findById(parentId)).willReturn(Optional.of(newInstance(parent)));
 
     CommodityTypeDto response = restAssured
         .given()
@@ -376,8 +376,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
 
     commodityType = new CommodityTypeDto(NAME,  CLASSIFICATION_SYS, CLASSIFICATION_SYS_ID, parent);
     commodityType.setId(commodityTypeId);
-    given(commodityTypeRepository.findOne(commodityTypeId))
-        .willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(commodityTypeId))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     restAssured
         .given()
@@ -397,7 +397,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(commodityTypeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -409,7 +409,7 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(commodityTypeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -421,7 +421,8 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(commodityTypeRepository.findOne(any(UUID.class))).willReturn(newInstance(commodityType));
+    given(commodityTypeRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(newInstance(commodityType)));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -439,11 +440,11 @@ public class CommodityTypeControllerIntegrationTest extends BaseWebIntegrationTe
     UUID id = UUID.randomUUID();
     TradeItem tradeItem = new TradeItem("manufacturer", new ArrayList<>());
     tradeItem.setId(id);
-    when(tradeItemRepository.findOne(id)).thenReturn(tradeItem);
+    when(tradeItemRepository.findById(id)).thenReturn(Optional.of(tradeItem));
     return tradeItem;
   }
 
-  private void checkIfEquals(PageImplRepresentation response, List<CommodityTypeDto> expected) {
+  private void checkIfEquals(PageDto response, List<CommodityTypeDto> expected) {
     List pageContent = response.getContent();
     assertEquals(expected.size(), pageContent.size());
     for (int i = 0; i < pageContent.size(); i++) {

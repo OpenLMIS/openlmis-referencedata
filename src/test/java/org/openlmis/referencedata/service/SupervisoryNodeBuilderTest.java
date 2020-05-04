@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -87,17 +88,17 @@ public class SupervisoryNodeBuilderTest {
     supervisoryNode.export(importer);
     importer.setId(null);
 
-    when(facilityRepository.findOne(facility.getId()))
-        .thenReturn(facility);
-    when(requisitionGroupRepository.findOne(requisitionGroup.getId()))
-        .thenReturn(requisitionGroup);
-    when(supervisoryNodeRepository.findOne(parent.getId()))
-        .thenReturn(parent);
-    when(supervisoryNodeRepository.findOne(partnerOf.getId()))
-        .thenReturn(partnerOf);
-    when(supervisoryNodeRepository.findAll(Sets.newHashSet(child.getId())))
+    when(facilityRepository.findById(facility.getId()))
+        .thenReturn(Optional.of(facility));
+    when(requisitionGroupRepository.findById(requisitionGroup.getId()))
+        .thenReturn(Optional.of(requisitionGroup));
+    when(supervisoryNodeRepository.findById(parent.getId()))
+        .thenReturn(Optional.of(parent));
+    when(supervisoryNodeRepository.findById(partnerOf.getId()))
+        .thenReturn(Optional.of(partnerOf));
+    when(supervisoryNodeRepository.findAllById(Sets.newHashSet(child.getId())))
         .thenReturn(Lists.newArrayList(child));
-    when(supervisoryNodeRepository.findAll(Sets.newHashSet(partner.getId())))
+    when(supervisoryNodeRepository.findAllById(Sets.newHashSet(partner.getId())))
         .thenReturn(Lists.newArrayList(partner));
   }
 
@@ -113,7 +114,8 @@ public class SupervisoryNodeBuilderTest {
     SupervisoryNode existing = new SupervisoryNode();
     existing.setId(supervisoryNode.getId());
 
-    when(supervisoryNodeRepository.findOne(supervisoryNode.getId())).thenReturn(existing);
+    when(supervisoryNodeRepository.findById(supervisoryNode.getId()))
+        .thenReturn(Optional.of(existing));
 
     importer.setId(supervisoryNode.getId());
 
@@ -125,7 +127,7 @@ public class SupervisoryNodeBuilderTest {
   @Test
   public void shouldBuildDomainObjectWithGivenIdBasedOnDataFromImporter() {
     importer.setId(supervisoryNode.getId());
-    when(supervisoryNodeRepository.findOne(supervisoryNode.getId())).thenReturn(null);
+    when(supervisoryNodeRepository.findById(supervisoryNode.getId())).thenReturn(Optional.empty());
 
     SupervisoryNode built = builder.build(importer);
 
@@ -134,8 +136,8 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfFacilityCouldNotBeFound() {
-    when(facilityRepository.findOne(facility.getId()))
-        .thenReturn(null);
+    when(facilityRepository.findById(facility.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
@@ -145,8 +147,8 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfRequisitionGroupCouldNotBeFound() {
-    when(requisitionGroupRepository.findOne(requisitionGroup.getId()))
-        .thenReturn(null);
+    when(requisitionGroupRepository.findById(requisitionGroup.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
@@ -156,8 +158,8 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfParentNodeCouldNotBeFound() {
-    when(supervisoryNodeRepository.findOne(parent.getId()))
-        .thenReturn(null);
+    when(supervisoryNodeRepository.findById(parent.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -167,8 +169,8 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfPartnerNodeOfCouldNotBeFound() {
-    when(supervisoryNodeRepository.findOne(partnerOf.getId()))
-        .thenReturn(null);
+    when(supervisoryNodeRepository.findById(partnerOf.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
@@ -178,7 +180,7 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfChildNodeCouldNotBeFound() {
-    when(supervisoryNodeRepository.findAll(Sets.newHashSet(child.getId())))
+    when(supervisoryNodeRepository.findAllById(Sets.newHashSet(child.getId())))
         .thenReturn(Lists.newArrayList());
 
     exception.expect(ValidationMessageException.class);
@@ -189,7 +191,7 @@ public class SupervisoryNodeBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfPartnerNodeCouldNotBeFound() {
-    when(supervisoryNodeRepository.findAll(Sets.newHashSet(partner.getId())))
+    when(supervisoryNodeRepository.findAllById(Sets.newHashSet(partner.getId())))
         .thenReturn(Lists.newArrayList());
 
     exception.expect(ValidationMessageException.class);

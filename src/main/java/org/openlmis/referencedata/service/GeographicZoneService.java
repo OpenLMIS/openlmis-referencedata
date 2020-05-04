@@ -105,7 +105,7 @@ public class GeographicZoneService {
   private GeographicZone findGeographicZone(Optional<UUID> parentId) {
     GeographicZone parent = null;
     if (parentId.isPresent()) {
-      parent = geographicZoneRepository.findOne(parentId.get());
+      parent = geographicZoneRepository.findById(parentId.get()).orElse(null);
       if (parent == null) {
         throw new ValidationMessageException(
             new Message(GeographicZoneMessageKeys.ERROR_NOT_FOUND_WITH_ID, parentId));

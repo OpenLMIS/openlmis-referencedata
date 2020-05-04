@@ -49,30 +49,29 @@ public class IdealStockAmountServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    when(isa.getId()).thenReturn(isaId);
   }
 
   @Test
   public void shouldCallRepositorySearch() {
     when(repository.search(null))
         .thenReturn(Collections.singletonList(isaId));
-    when(repository.findAll(any(Iterable.class)))
+    when(repository.findAllById(any(Iterable.class)))
         .thenReturn(Collections.singletonList(isa));
 
     assertEquals(Collections.singletonList(isa), service.search());
     verify(repository).search(null);
-    verify(repository).findAll(any(Iterable.class));
+    verify(repository).findAllById(any(Iterable.class));
   }
 
   @Test
   public void shouldCallRepositorySearchWithListParameter() {
     when(repository.search(Collections.singletonList(isa)))
         .thenReturn(Collections.singletonList(isaId));
-    when(repository.findAll(any(Iterable.class)))
+    when(repository.findAllById(any(Iterable.class)))
         .thenReturn(Collections.singletonList(isa));
 
     assertEquals(Collections.singletonList(isa), service.search(Collections.singletonList(isa)));
     verify(repository).search(Collections.singletonList(isa));
-    verify(repository).findAll(any(Iterable.class));
+    verify(repository).findAllById(any(Iterable.class));
   }
 }

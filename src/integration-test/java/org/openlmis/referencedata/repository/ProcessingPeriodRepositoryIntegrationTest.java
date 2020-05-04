@@ -91,7 +91,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
   private ProcessingSchedule schedule;
   private Facility facility;
 
-  private PageRequest pageable = new PageRequest(0, 10);
+  private PageRequest pageable = PageRequest.of(0, 10);
 
   private ProcessingPeriod period1;
   private ProcessingPeriod period2;
@@ -194,7 +194,7 @@ public class ProcessingPeriodRepositoryIntegrationTest
 
   @Test
   public void shouldSortByStartDateDesc() {
-    pageable = new PageRequest(0, 10, Direction.DESC, "startDate");
+    pageable = PageRequest.of(0, 10, Direction.DESC, "startDate");
 
     Page<ProcessingPeriod> page = periodRepository.search(schedule.getId(), null, null, null,
         null, null, pageable);

@@ -28,6 +28,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -122,8 +123,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   public void shouldDeleteOrderableDisplayCategory() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    given(orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     restAssured
         .given()
@@ -142,8 +143,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   public void shouldRejectDeleteOrderableDisplayCategoryIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
 
-    given(orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     String messageKey = restAssured
         .given()
@@ -204,8 +205,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   public void shouldPutWithIdOrderableDisplayCategory() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    given(orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     OrderableDisplayCategoryDto response = restAssured
         .given()
@@ -227,8 +228,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   public void shouldRejectPutOrderableDisplayCategoryIfUserHasNoRight() {
     mockUserHasNoRight(ORDERABLES_MANAGE);
 
-    given(orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId)).willReturn(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     String messageKey = restAssured
         .given()
@@ -286,8 +287,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
   @Test
   public void shouldGetOrderableDisplayCategory() {
 
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId)).willReturn(
-        orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId)).willReturn(
+        Optional.of(orderableDisplayCategory));
 
     OrderableDisplayCategoryDto response = restAssured
         .given()
@@ -324,7 +325,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableDisplayCategoryRepository.findOne(any(UUID.class))).willReturn(null);
+    given(orderableDisplayCategoryRepository.findById(any(UUID.class)))
+        .willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -336,7 +338,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableDisplayCategoryRepository.findOne(any(UUID.class))).willReturn(null);
+    given(orderableDisplayCategoryRepository.findById(any(UUID.class)))
+        .willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -348,8 +351,8 @@ public class OrderableDisplayCategoryControllerIntegrationTest extends BaseWebIn
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(orderableDisplayCategoryRepository.findOne(any(UUID.class)))
-        .willReturn(orderableDisplayCategory);
+    given(orderableDisplayCategoryRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

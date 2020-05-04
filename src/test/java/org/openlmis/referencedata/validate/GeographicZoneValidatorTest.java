@@ -25,6 +25,7 @@ import static org.openlmis.referencedata.validate.GeographicZoneValidator.NAME;
 import static org.openlmis.referencedata.validate.GeographicZoneValidator.PARENT;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -80,7 +81,8 @@ public class GeographicZoneValidatorTest
 
     geographicZone.export(geographicZoneDto);
 
-    when(geographicZoneRepository.findOne(geographicZone.getId())).thenReturn(geographicZone);
+    when(geographicZoneRepository.findById(geographicZone.getId()))
+        .thenReturn(Optional.of(geographicZone));
   }
 
   @Test

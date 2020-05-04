@@ -28,13 +28,14 @@ import static org.mockito.Mockito.doThrow;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
@@ -61,7 +62,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
 
   private FacilityType facilityType;
   private UUID facilityTypeId;
-  private Pageable pageable = new PageRequest(0, 10);
+  private Pageable pageable = PageRequest.of(0, 10);
 
   public FacilityTypeControllerIntegrationTest() {
     facilityType = new FacilityType("code");
@@ -71,7 +72,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   @Test
   public void shouldDeleteFacilityType() {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(facilityType);
+    given(facilityTypeRepository.findById(facilityTypeId)).willReturn(Optional.of(facilityType));
 
     restAssured
         .given()
@@ -230,7 +231,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .search(eq(params), eq(pageable)))
         .willReturn(new PageImpl<>(storedFacilityTypes, pageable, 2));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -243,7 +244,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(storedFacilityTypes.size(), response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -266,7 +267,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   @Test
   public void shouldGetFacilityType() {
     
-    given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(facilityType);
+    given(facilityTypeRepository.findById(facilityTypeId)).willReturn(Optional.of(facilityType));
 
     FacilityType response = restAssured
         .given()
@@ -286,7 +287,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   @Test
   public void shouldReturn() {
 
-    given(facilityTypeRepository.findOne(facilityTypeId)).willReturn(null);
+    given(facilityTypeRepository.findById(facilityTypeId)).willReturn(Optional.empty());
 
     String response = restAssured
         .given()
@@ -323,7 +324,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityTypeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -335,7 +336,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityTypeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -347,7 +348,7 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityTypeRepository.findOne(any(UUID.class))).willReturn(facilityType);
+    given(facilityTypeRepository.findById(any(UUID.class))).willReturn(Optional.of(facilityType));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

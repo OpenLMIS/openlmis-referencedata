@@ -52,6 +52,7 @@ public class OrderableDtoTest {
         .thenReturn(orderable);
     when(orderable.getVersionNumber()).thenReturn(2L);
     orderableDto.setOrderableRepository(orderableRepository);
+    orderableDto.setId(UUID.randomUUID());
 
     //then
     assertEquals(2L, orderableDto.getVersionNumber().longValue());

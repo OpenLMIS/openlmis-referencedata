@@ -37,10 +37,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -57,11 +57,13 @@ import org.openlmis.referencedata.dto.RequisitionGroupBaseDto;
 import org.openlmis.referencedata.dto.RequisitionGroupDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -129,7 +131,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   public void shouldDeleteRequisitionGroup() {
     mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
 
     restAssured
         .given()
@@ -148,7 +151,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   public void shouldRejectDeleteRequisitionGroupIfUserHasNoRight() {
     mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
 
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
 
     String messageKey = restAssured
         .given()
@@ -170,7 +174,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   public void shouldNotDeleteNonexistentRequisitionGroup() {
     mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
+    given(requisitionGroupRepository.findById(requisitionGroupId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -262,7 +266,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldGetRequisitionGroup() {
 
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
 
     RequisitionGroupDto response = restAssured
         .given()
@@ -297,7 +302,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldNotGetNonexistentRequisitionGroup() {
 
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
+    given(requisitionGroupRepository.findById(requisitionGroupId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -317,7 +322,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     requisitionGroup.setDescription(DESCRIPTION);
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
@@ -356,7 +362,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     assertNotNull(supervisoryNode1);
 
     requisitionGroup.setSupervisoryNode(supervisoryNode1);
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
             .willReturn(requisitionGroup);
 
@@ -392,7 +399,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasNoRight(REQUISITION_GROUPS_MANAGE);
 
     requisitionGroup.setDescription(DESCRIPTION);
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(requisitionGroupId))
+        .willReturn(Optional.of(requisitionGroup));
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
@@ -421,7 +429,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     mockUserHasRight(REQUISITION_GROUPS_MANAGE);
 
     requisitionGroup.setDescription(DESCRIPTION);
-    given(requisitionGroupRepository.findOne(requisitionGroupId)).willReturn(null);
+    given(requisitionGroupRepository.findById(requisitionGroupId)).willReturn(Optional.empty());
     given(requisitionGroupRepository.saveAndFlush(any(RequisitionGroup.class)))
         .willReturn(requisitionGroup);
 
@@ -458,9 +466,9 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     given(pageable.getPageSize()).willReturn(1);
     listToReturn.add(requisitionGroup);
     given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, null, 1));
+        .willReturn(Pagination.getPage(listToReturn, PageRequest.of(0, 10), 1));
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -468,7 +476,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     Map<String, String> foundRequisitionGroup = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
@@ -520,9 +528,9 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     Map<String, Object> requestBody = new HashMap<>();
 
     given(requisitionGroupService.searchRequisitionGroups(eq(requestBody), any(Pageable.class)))
-        .willReturn(Pagination.getPage(listToReturn, null, 1));
+        .willReturn(Pagination.getPage(listToReturn, PageRequest.of(0, 10), 1));
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .queryParam("page", 0)
         .queryParam("size", 1)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -532,7 +540,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(1, response.getTotalElements());
@@ -547,7 +555,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
-    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(null);
+    given(requisitionGroupRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -559,7 +567,7 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
-    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(null);
+    given(requisitionGroupRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -571,7 +579,8 @@ public class RequisitionGroupControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.REQUISITION_GROUPS_MANAGE);
-    given(requisitionGroupRepository.findOne(any(UUID.class))).willReturn(requisitionGroup);
+    given(requisitionGroupRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(requisitionGroup));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

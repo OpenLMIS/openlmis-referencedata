@@ -160,7 +160,7 @@ public class ServiceAccountController extends BaseController {
 
   private ServiceAccount findAccount(UUID token, Profiler profiler) {
     profiler.start("FIND_SERVICE_ACCOUNT");
-    ServiceAccount account = serviceAccountRepository.findOne(token);
+    ServiceAccount account = serviceAccountRepository.findById(token).orElse(null);
 
     if (null == account) {
       profiler.stop().log();

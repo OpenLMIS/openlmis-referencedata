@@ -189,7 +189,8 @@ public class GeographicZoneController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     profiler.start("FIND_ONE_BY_ID");
-    GeographicZone geographicZone = geographicZoneRepository.findOne(geographicZoneId);
+    GeographicZone geographicZone = geographicZoneRepository.findById(geographicZoneId)
+        .orElse(null);
 
     if (geographicZone == null) {
       profiler.stop().log();
@@ -217,7 +218,7 @@ public class GeographicZoneController extends BaseController {
     checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
     profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
-    boolean exists = geographicZoneRepository.exists(geographicZoneId);
+    boolean exists = geographicZoneRepository.existsById(geographicZoneId);
 
     if (!exists) {
       profiler.stop().log();
@@ -225,7 +226,7 @@ public class GeographicZoneController extends BaseController {
     }
 
     profiler.start("DELETE_INSTANCE");
-    geographicZoneRepository.delete(geographicZoneId);
+    geographicZoneRepository.deleteById(geographicZoneId);
 
     profiler.stop().log();
   }
@@ -307,7 +308,7 @@ public class GeographicZoneController extends BaseController {
     checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT, profiler);
 
     profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
-    boolean exists = geographicZoneRepository.exists(id);
+    boolean exists = geographicZoneRepository.existsById(id);
 
     if (!exists) {
       profiler.stop().log();

@@ -52,7 +52,7 @@ public class GeographicZoneValidator
 
   @Override
   GeographicZone getExistingResource(GeographicZoneDto target) {
-    return geographicZoneRepository.findOne(target.getId());
+    return geographicZoneRepository.findById(target.getId()).orElse(null);
   }
 
   @Override

@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
 import com.google.common.base.Joiner;
@@ -110,7 +110,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
         .createQuery(hqlWithSort, ProcessingPeriod.class)
         .setParameter("ids", periodIds)
         .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setFirstResult(Math.toIntExact(pageable.getOffset()))
         .getResultList();
 
     return Pagination.getPage(periods, pageable, periodIds.size());

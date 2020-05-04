@@ -84,7 +84,7 @@ public class LotController extends BaseController {
 
     validator.validate(lotDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
-    TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
+    TradeItem tradeItem = tradeItemRepository.findById(lotDto.getTradeItemId()).orElse(null);
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(null);
 
@@ -107,13 +107,13 @@ public class LotController extends BaseController {
                        BindingResult bindingResult) {
     rightService.checkAdminRight(LOTS_MANAGE);
 
-    Lot existingLot = lotRepository.findOne(lotId);
+    Lot existingLot = lotRepository.findById(lotId).orElse(null);
     if (existingLot == null) {
       throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
     }
     validator.validate(lotDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
-    TradeItem tradeItem = tradeItemRepository.findOne(lotDto.getTradeItemId());
+    TradeItem tradeItem = tradeItemRepository.findById(lotDto.getTradeItemId()).orElse(null);
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(lotId);
 
@@ -133,7 +133,7 @@ public class LotController extends BaseController {
   @ResponseBody
   public LotDto getLot(@PathVariable("id") UUID lotId) {
 
-    Lot lot = lotRepository.findOne(lotId);
+    Lot lot = lotRepository.findById(lotId).orElse(null);
     if (lot == null) {
       throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
     }
@@ -198,7 +198,7 @@ public class LotController extends BaseController {
     rightService.checkAdminRight(LOTS_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    Lot instance = lotRepository.findOne(id);
+    Lot instance = lotRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
     }

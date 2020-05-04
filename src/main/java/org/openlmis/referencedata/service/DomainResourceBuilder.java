@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -33,18 +34,14 @@ interface DomainResourceBuilder<I, O> {
 
   O build(I input);
 
-  default <R> R findResource(Function<UUID, R> finder, BaseImporter importer, String errorMessage) {
+  default <R> R findResource(Function<UUID, Optional<R>> finder, BaseImporter importer,
+      String errorMessage) {
     if (null == importer || null == importer.getId()) {
       throw new ValidationMessageException(errorMessage);
     }
 
-    R resource = finder.apply(importer.getId());
-
-    if (null == resource) {
-      throw new ValidationMessageException(errorMessage);
-    }
-
-    return resource;
+    return finder.apply(importer.getId())
+        .orElseThrow(() -> new ValidationMessageException(errorMessage));
   }
 
   default <R extends Identifiable> List<R> findResources(Function<Set<UUID>, Iterable<R>> finder,

@@ -33,15 +33,16 @@ import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.dto.SupplyLineDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -75,7 +76,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     supplyLineDto = new SupplyLineDto();
     supplyLine.export(supplyLineDto);
     supplyLineId = supplyLine.getId();
-    pageable = new PageRequest(0, 10);
+    pageable = PageRequest.of(0, 10);
 
     given(supplyLineRepository.save(any(SupplyLine.class))).willAnswer(new SaveAnswer<>());
   }
@@ -100,12 +101,12 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
   @Test
   public void shouldFindSupplyLinesWithoutParameters() {
-    Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+    Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
     given(supplyLineRepository.search(null, null, emptySet(), pageable))
         .willReturn(Pagination.getPage(singletonList(supplyLine), pageable, 1));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -113,7 +114,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.getContent().size());
@@ -130,7 +131,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
 
     Map<String, Object> requestBody = getSearchParameters();
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .params(requestBody)
@@ -139,7 +140,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.getContent().size());
@@ -157,7 +158,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     Map<String, Object> requestBody = getSearchParameters();
     requestBody.put("expand", "supervisoryNode");
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .params(requestBody)
@@ -166,7 +167,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertEquals(1, response.getContent().size());
@@ -176,7 +177,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldDeleteSupplyLine() {
     mockUserHasRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.of(supplyLine));
 
     restAssured
         .given()
@@ -195,7 +196,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldRejectDeleteSupplyLineIfUserHasNoRight() {
     mockUserHasNoRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.of(supplyLine));
 
     String messageKey = restAssured
         .given()
@@ -217,7 +218,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldNotDeleteNonexistentSupplyLine() {
     mockUserHasRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -276,7 +277,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldPutSupplyLine() {
     mockUserHasRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.of(supplyLine));
 
     ValidatableResponse response = restAssured
         .given()
@@ -299,7 +300,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldRejectPutSupplyLineIfUserHasNoRight() {
     mockUserHasNoRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.of(supplyLine));
 
     supplyLine.export(supplyLineDto);
 
@@ -324,7 +325,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldCreateNewSupplyLineIfDoesNotExist() {
     mockUserHasRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.empty());
 
     ValidatableResponse response = restAssured
         .given()
@@ -346,7 +347,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   @Test
   public void shouldGetSupplyLine() {
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(supplyLine);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.of(supplyLine));
 
     ValidatableResponse response = restAssured
         .given()
@@ -383,7 +384,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
   public void shouldNotGetNonexistentSupplyLine() {
     mockUserHasRight(SUPPLY_LINES_MANAGE);
 
-    given(supplyLineRepository.findOne(supplyLineId)).willReturn(null);
+    given(supplyLineRepository.findById(supplyLineId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -403,7 +404,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supplyLineRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -415,7 +416,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supplyLineRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -427,7 +428,7 @@ public class SupplyLineControllerIntegrationTest extends BaseWebIntegrationTest 
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.SUPPLY_LINES_MANAGE);
-    given(supplyLineRepository.findOne(any(UUID.class))).willReturn(supplyLine);
+    given(supplyLineRepository.findById(any(UUID.class))).willReturn(Optional.of(supplyLine));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

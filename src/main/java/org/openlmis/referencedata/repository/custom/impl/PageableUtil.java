@@ -45,7 +45,7 @@ class PageableUtil {
   }
 
   static String getOrderPredicate(Pageable pageable, String alias, String defaultSort) {
-    if (pageable.getSort() != null) {
+    if (pageable.getSort().isSorted()) {
       List<String> orderPredicate = new ArrayList<>();
       List<String> sql = new ArrayList<>();
       Iterator<Sort.Order> iterator = pageable.getSort().iterator();

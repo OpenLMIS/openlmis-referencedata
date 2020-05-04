@@ -39,7 +39,7 @@ public class FacilityTypeRepositoryIntegrationTest
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
 
-  Pageable pageable = new PageRequest(0, 10);
+  Pageable pageable = PageRequest.of(0, 10);
 
   @Override
   FacilityTypeRepository getRepository() {
@@ -70,7 +70,7 @@ public class FacilityTypeRepositoryIntegrationTest
 
   @Test
   public void shouldPaginateResultWhileSearchingByIds() {
-    pageable = new PageRequest(1, 1);
+    pageable = PageRequest.of(1, 1);
 
     FacilityType type1 = facilityTypeRepository.save(generateInstance());
     FacilityType type2 = facilityTypeRepository.save(generateInstance());

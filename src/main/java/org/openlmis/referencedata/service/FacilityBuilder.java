@@ -63,14 +63,14 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
    */
   public Facility build(FacilityDto importer) {
     final GeographicZone geographicZone = findResource(
-        geographicZoneRepository::findOne, importer.getGeographicZone(),
+        geographicZoneRepository::findById, importer.getGeographicZone(),
         GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     final FacilityType facilityType = findResource(
-        facilityTypeRepository::findOne, importer.getType(),
+        facilityTypeRepository::findById, importer.getType(),
         FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     final FacilityOperator facilityOperator = null == importer.getOperator()
         ? null
-        : findResource(facilityOperatorRepository::findOne, importer.getOperator(),
+        : findResource(facilityOperatorRepository::findById, importer.getOperator(),
             FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
 
     Facility facility;
@@ -78,7 +78,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     if (null == importer.getId()) {
       facility = new Facility();
     } else {
-      facility = facilityRepository.findOne(importer.getId());
+      facility = facilityRepository.findById(importer.getId()).orElse(null);
 
       if (null == facility) {
         facility = new Facility();
@@ -127,7 +127,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     if (null != supportedProgram.getCode()) {
       program = programRepository.findByCode(Code.code(supportedProgram.getCode()));
     } else if (null != supportedProgram.getId()) {
-      program = programRepository.findOne(supportedProgram.getId());
+      program = programRepository.findById(supportedProgram.getId()).orElse(null);
     } else {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_CODE_OR_ID_REQUIRED);
     }

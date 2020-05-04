@@ -39,13 +39,11 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProcessingPeriodRepository;
 import org.openlmis.referencedata.repository.ProcessingScheduleRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
-import org.openlmis.referencedata.repository.RequisitionGroupProgramScheduleRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingPeriodDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProcessingScheduleDataBuilder;
@@ -73,9 +71,6 @@ public class ProcessingPeriodServiceTest {
   private ProcessingPeriodRepository periodRepository;
 
   @Mock
-  private RequisitionGroupProgramScheduleRepository repository;
-
-  @Mock
   private ProgramRepository programRepository;
 
   @Mock
@@ -84,9 +79,6 @@ public class ProcessingPeriodServiceTest {
   @Mock
   private ProcessingScheduleRepository processingScheduleRepository;
 
-  @Mock
-  private RequisitionGroupProgramSchedule requisitionGroupProgramSchedule;
-
   private LinkedMultiValueMap<String, Object> queryMap;
 
   private ProcessingPeriod period = new ProcessingPeriodDataBuilder().build();
@@ -94,19 +86,15 @@ public class ProcessingPeriodServiceTest {
   private Program program = new ProgramDataBuilder().build();
   private Facility facility = new FacilityDataBuilder().build();
   private List<ProcessingPeriod> periods = generateInstances();
-  private PageRequest pageable = new PageRequest(0, 10);
+  private PageRequest pageable = PageRequest.of(0, 10);
 
   @Before
   public void setUp() {
     queryMap = new LinkedMultiValueMap<>();
 
-    when(requisitionGroupProgramSchedule.getProcessingSchedule()).thenReturn(schedule);
-    when(facilityRepository.findOne(facility.getId())).thenReturn(facility);
-    when(programRepository.findOne(program.getId())).thenReturn(program);
-    when(processingScheduleRepository.findOne(schedule.getId())).thenReturn(schedule);
-    when(facilityRepository.exists(facility.getId())).thenReturn(true);
-    when(programRepository.exists(program.getId())).thenReturn(true);
-    when(processingScheduleRepository.exists(schedule.getId())).thenReturn(true);
+    when(facilityRepository.existsById(facility.getId())).thenReturn(true);
+    when(programRepository.existsById(program.getId())).thenReturn(true);
+    when(processingScheduleRepository.existsById(schedule.getId())).thenReturn(true);
   }
 
   @Test(expected = NotFoundException.class)
@@ -114,7 +102,7 @@ public class ProcessingPeriodServiceTest {
     queryMap.add(PROGRAM_ID, program.getId().toString());
     queryMap.add(FACILITY_ID, facility.getId().toString());
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
-    when(programRepository.exists(program.getId())).thenReturn(false);
+    when(programRepository.existsById(program.getId())).thenReturn(false);
     periodService.searchPeriods(params, pageable);
   }
 
@@ -123,7 +111,7 @@ public class ProcessingPeriodServiceTest {
     queryMap.add(PROGRAM_ID, program.getId().toString());
     queryMap.add(FACILITY_ID, facility.getId().toString());
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
-    when(facilityRepository.exists(facility.getId())).thenReturn(false);
+    when(facilityRepository.existsById(facility.getId())).thenReturn(false);
     periodService.searchPeriods(params, pageable);
   }
 
@@ -150,8 +138,6 @@ public class ProcessingPeriodServiceTest {
 
   @Test
   public void shouldFindPeriodsByProgramAndFacility() {
-    doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
-          .searchRequisitionGroupProgramSchedules(program.getId(), facility.getId());
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
         .when(periodRepository).search(null, program.getId(), facility.getId(), null, null,
         emptySet(), pageable);
@@ -168,8 +154,6 @@ public class ProcessingPeriodServiceTest {
 
   @Test
   public void shouldFindPeriodsByProgram() {
-    doReturn(Collections.singletonList(requisitionGroupProgramSchedule)).when(repository)
-            .searchRequisitionGroupProgramSchedules(program.getId(), null);
     doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
         .when(periodRepository).search(null, program.getId(), null, null, null, emptySet(),
         pageable);
@@ -184,7 +168,7 @@ public class ProcessingPeriodServiceTest {
 
   @Test(expected = NotFoundException.class)
   public void shouldThrowExceptionWhenScheduleWasNotFoundById() {
-    doReturn(false).when(processingScheduleRepository).exists(schedule.getId());
+    doReturn(false).when(processingScheduleRepository).existsById(schedule.getId());
 
     queryMap.add(PROCESSING_SCHEDULE_ID, schedule.getId().toString());
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
@@ -194,10 +178,6 @@ public class ProcessingPeriodServiceTest {
 
   @Test
   public void shouldFindPeriodsBySchedule() {
-    doReturn(Pagination.getPage(Collections.singletonList(period), pageable, 1))
-        .when(periodRepository).search(schedule.getId(), program.getId(), facility.getId(), null,
-        null, emptySet(), pageable);
-
     queryMap.add(PROCESSING_SCHEDULE_ID, schedule.getId().toString());
     ProcessingPeriodSearchParams params = new ProcessingPeriodSearchParams(queryMap);
 

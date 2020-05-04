@@ -32,6 +32,7 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -256,7 +257,7 @@ public class UserValidatorTest {
 
   private void prepareForValidateInvariants() {
     when(rightService.hasRight(RightName.USERS_MANAGE_RIGHT)).thenReturn(false);
-    when(userRepository.findOne(userDto.getId())).thenReturn(user);
+    when(userRepository.findById(userDto.getId())).thenReturn(Optional.of(user));
     when(roleAssignmentRepository.findByUser(userDto.getId()))
         .thenReturn(userDto.getRoleAssignments());
   }

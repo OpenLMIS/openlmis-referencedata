@@ -23,10 +23,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -42,16 +42,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -95,7 +96,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(LOTS_MANAGE);
 
     given(lotRepository.search(null, null, lot.getLotCode(), null, null))
-        .willReturn(Pagination.getPage(Collections.emptyList()));
+        .willReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
         .given()
@@ -158,10 +159,10 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldUpdateLot() {
     mockUserHasRight(LOTS_MANAGE);
-    when(lotRepository.findOne(lotId)).thenReturn(lot);
+    when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
     given(lotRepository.search(null, null, lot.getLotCode(), null, null))
-        .willReturn(Pagination.getPage(Collections.singletonList(lot)));
+        .willReturn(Pagination.getPage(Collections.singletonList(lot), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
         .given()
@@ -187,7 +188,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnNotFoundIfUpdatedLotDoesNotExist() {
     mockUserHasRight(LOTS_MANAGE);
-    when(lotRepository.findOne(lotId)).thenReturn(null);
+    when(lotRepository.findById(lotId)).thenReturn(Optional.empty());
 
     restAssured
             .given()
@@ -206,7 +207,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRejectUpdateLotIfUserHasNoRight() {
     mockUserHasNoRight(LOTS_MANAGE);
-    when(lotRepository.findOne(lotId)).thenReturn(lot);
+    when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
     restAssured
             .given()
@@ -224,13 +225,13 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindLots() {
-    given(lotRepository.search(anyListOf(TradeItem.class), any(LocalDate.class), anyString(),
-        anyList(), any(Pageable.class)))
+    given(lotRepository.search(anyList(), any(LocalDate.class), anyString(),
+        nullable(List.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(lot), pageable));
-    when(tradeItemRepository.findAll(anyListOf(UUID.class)))
+    when(tradeItemRepository.findAllById(anyList()))
         .thenReturn(Collections.singletonList(new TradeItem()));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeItemId", lot.getTradeItem().getId())
@@ -241,7 +242,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -249,7 +250,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnEmptyListWhenTradeItemNotFound() {
-    when(tradeItemRepository.findAll(anyListOf(UUID.class))).thenReturn(emptyList());
+    when(tradeItemRepository.findAllById(anyList())).thenReturn(emptyList());
 
     restAssured
         .given()
@@ -280,7 +281,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetLot() {
 
-    when(lotRepository.findOne(lotId)).thenReturn(lot);
+    when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
     LotDto response = restAssured
         .given()
@@ -319,7 +320,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnNotFoundIfLotNotExist() {
 
-    when(lotRepository.findOne(lotId)).thenReturn(null);
+    when(lotRepository.findById(lotId)).thenReturn(Optional.empty());
 
     restAssured
         .given()
@@ -339,7 +340,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.LOTS_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(null);
+    given(lotRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -351,7 +352,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.LOTS_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(null);
+    given(lotRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -363,7 +364,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.LOTS_MANAGE);
-    given(lotRepository.findOne(any(UUID.class))).willReturn(lot);
+    given(lotRepository.findById(any(UUID.class))).willReturn(Optional.of(lot));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -383,9 +384,9 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(null),
         eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
         any(Pageable.class)
-    )).willReturn(Pagination.getPage(lots));
+    )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(ID, lots.get(0).getId())
@@ -394,7 +395,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(2, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -412,10 +413,10 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(null),
         eq(null),
         eq(null),
-        eq(new PageRequest(0, 2))
-    )).willReturn(Pagination.getPage(lots));
+        eq(PageRequest.of(0, 2))
+    )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 2)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(PAGE, 0)
@@ -424,7 +425,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(2, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -435,7 +436,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     TradeItem tradeItem = new TradeItem("name", new ArrayList<>());
     tradeItem.setId(id);
-    when(tradeItemRepository.findOne(id)).thenReturn(tradeItem);
+    when(tradeItemRepository.findById(id)).thenReturn(Optional.of(tradeItem));
     return tradeItem;
   }
 

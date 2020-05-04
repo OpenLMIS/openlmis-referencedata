@@ -53,16 +53,16 @@ public class RequisitionGroupValidator implements BaseValidator {
   static final String REQUISITION_GROUP_PROGRAM_SCHEDULES = "requisitionGroupProgramSchedules";
 
   @Autowired
-  private SupervisoryNodeRepository supervisoryNodes;
+  private SupervisoryNodeRepository supervisoryNodeRepository;
 
   @Autowired
-  private RequisitionGroupRepository requisitionGroups;
+  private RequisitionGroupRepository requisitionGroupRepository;
 
   @Autowired
-  private FacilityRepository facilities;
+  private FacilityRepository facilityRepository;
 
   @Autowired
-  private ProgramRepository programs;
+  private ProgramRepository programRepository;
 
   /**
    * Checks if the given class definition is supported.
@@ -143,7 +143,7 @@ public class RequisitionGroupValidator implements BaseValidator {
 
   private void verifyCode(UUID id, String code, Errors errors) {
     // requisition group code cannot be duplicated
-    RequisitionGroup db = requisitionGroups.findByCode(code);
+    RequisitionGroup db = requisitionGroupRepository.findByCode(code);
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, CODE, RequisitionGroupMessageKeys.ERROR_CODE_DUPLICATED);
@@ -153,7 +153,8 @@ public class RequisitionGroupValidator implements BaseValidator {
   private void verifySupervisoryNode(RequisitionGroupBaseDto group, Errors errors) {
     // supervisory node matches a defined supervisory node
     SupervisoryNodeBaseDto supervisoryNode = group.getSupervisoryNode();
-    SupervisoryNode existing = supervisoryNodes.findOne(supervisoryNode.getId());
+    SupervisoryNode existing = supervisoryNodeRepository.findById(supervisoryNode.getId())
+        .orElse(null);
     if (null == supervisoryNode.getId()) {
       rejectValue(errors, SUPERVISORY_NODE,
           RequisitionGroupMessageKeys.ERROR_SUPERVISORY_NODE_ID_REQUIRED);
@@ -180,7 +181,7 @@ public class RequisitionGroupValidator implements BaseValidator {
       } else if (null == facility.getId()) {
         rejectValue(errors, MEMBER_FACILITIES,
             RequisitionGroupMessageKeys.ERROR_FACILITY_ID_REQUIRED);
-      } else if (null == this.facilities.findOne(facility.getId())) {
+      } else if (null == this.facilityRepository.findById(facility.getId()).orElse(null)) {
         rejectValue(errors, MEMBER_FACILITIES,
             RequisitionGroupMessageKeys.ERROR_FACILITY_NON_EXISTENT);
       }
@@ -200,7 +201,7 @@ public class RequisitionGroupValidator implements BaseValidator {
       } else if (null == schedule.getProgram().getId()) {
         rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
             RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_ID_REQUIRED);
-      } else if (null == programs.findOne(schedule.getProgram().getId())) {
+      } else if (null == programRepository.findById(schedule.getProgram().getId()).orElse(null)) {
         rejectValue(errors, REQUISITION_GROUP_PROGRAM_SCHEDULES,
             RequisitionGroupMessageKeys.ERROR_PROGRAM_SCHEDULE_PROGRAM_NON_EXISTENT);
       }

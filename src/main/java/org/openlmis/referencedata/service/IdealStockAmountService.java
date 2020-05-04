@@ -37,7 +37,7 @@ public class IdealStockAmountService {
 
   public List<IdealStockAmount> search(List<IdealStockAmount> idealStockAmounts) {
     List<UUID> uuids = repository.search(idealStockAmounts);
-    return Lists.newArrayList(repository.findAll(uuids));
+    return Lists.newArrayList(repository.findAllById(uuids));
   }
 
   public Page<IdealStockAmount> search(IdealStockAmountSearchParams requestParams,

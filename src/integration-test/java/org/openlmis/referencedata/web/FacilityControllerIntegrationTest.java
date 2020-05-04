@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -40,13 +41,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.assertj.core.util.Lists;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -60,6 +61,7 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -111,7 +113,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
       new Coordinate(0, 2),
       new Coordinate(0, 0)
   };
-  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
+  private PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
   @Before
   @Override
@@ -138,10 +140,12 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
     mockUserHasRight(FACILITIES_MANAGE_RIGHT);
 
-    given(geographicZoneRepository.findOne(geographicZone.getId())).willReturn(geographicZone);
-    given(facilityTypeRepository.findOne(facilityType.getId())).willReturn(facilityType);
-    given(facilityRepository.findOne(facility.getId())).willReturn(facility);
-    given(facilityRepository.findOne(facility1.getId())).willReturn(facility1);
+    given(geographicZoneRepository.findById(geographicZone.getId()))
+        .willReturn(Optional.of(geographicZone));
+    given(facilityTypeRepository.findById(facilityType.getId()))
+        .willReturn(Optional.of(facilityType));
+    given(facilityRepository.findById(facility.getId())).willReturn(Optional.of(facility));
+    given(facilityRepository.findById(facility1.getId())).willReturn(Optional.of(facility1));
   }
 
   @Test
@@ -160,7 +164,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         new FacilitySearchParams(map), pageable))
         .willReturn(page);
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -168,7 +172,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
@@ -205,7 +209,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityService.searchFacilities(new FacilitySearchParams(map), pageable))
         .willReturn(page);
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(requestBody)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -213,7 +217,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     Map<String, String> foundFacility = (LinkedHashMap) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
@@ -257,7 +261,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
             new FacilitySearchParams(transformedRequestBody), pageable))
               .willReturn(page);
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam(PAGE, pageable.getPageNumber())
         .queryParam(SIZE, pageable.getPageSize())
@@ -267,7 +271,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(0, response.getContent().size());
   }
@@ -283,7 +287,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityService.searchFacilities(new FacilitySearchParams(requestBody), pageable))
         .willReturn(page);
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .queryParam(PAGE, pageable.getPageNumber())
         .queryParam(SIZE, pageable.getPageSize())
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -293,7 +297,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_FACILITIES)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(1, response.getTotalElements());
@@ -305,7 +309,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacility() {
-    pageable = new PageRequest(0, Integer.MAX_VALUE);
+    pageable = PageRequest.of(0, Integer.MAX_VALUE);
     Orderable orderable = new OrderableDataBuilder().build();
     FacilityTypeApprovedProduct approvedProduct = new FacilityTypeApprovedProductsDataBuilder()
         .withOrderableId(orderable.getId())
@@ -318,7 +322,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(program.getId()), eq(false), eq(null), eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
-    PageImplRepresentation productDtos = restAssured.given()
+    PageDto productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, program.getId())
         .queryParam(FULL_SUPPLY, false)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -326,7 +330,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL + "/" + facility.getId() + APPROVED_PRODUCTS)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, productDtos.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -334,7 +338,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindApprovedProductsForFacilityAndOrderableIds() {
-    pageable = new PageRequest(0, Integer.MAX_VALUE);
+    pageable = PageRequest.of(0, Integer.MAX_VALUE);
     Orderable orderable = new OrderableDataBuilder().build();
     List<UUID> orderableIds = Arrays.asList(orderable.getId(), orderableId);
     FacilityTypeApprovedProduct approvedProduct = new FacilityTypeApprovedProductsDataBuilder()
@@ -348,7 +352,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(program.getId()), eq(false), eq(orderableIds), eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
-    PageImplRepresentation productDtos = restAssured.given()
+    PageDto productDtos = restAssured.given()
         .queryParam(PROGRAM_ID, program.getId())
         .queryParam(FULL_SUPPLY, false)
         .queryParam("orderableId", orderable.getId())
@@ -358,7 +362,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL + "/" + facility.getId() + APPROVED_PRODUCTS)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, productDtos.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -381,8 +385,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
     when(facilityTypeApprovedProductRepository
-        .searchProducts(any(UUID.class), any(UUID.class), any(Boolean.class), any(List.class),
-            any(Boolean.class), any(Pageable.class)))
+        .searchProducts(any(UUID.class), nullable(UUID.class), nullable(Boolean.class),
+            nullable(List.class), nullable(Boolean.class), any(Pageable.class)))
         .thenThrow(new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND));
 
     restAssured.given()
@@ -402,16 +406,16 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
     given(facilityService.searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()),
-        pageable)).willReturn(Pagination.getPage(storedFacilities));
+        pageable)).willReturn(Pagination.getPage(storedFacilities, PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(storedFacilities.size(), response.getContent().size());
     assertEquals(storedFacilities.size(), response.getNumberOfElements());
@@ -430,9 +434,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     queryMap.add("id", facilityIdTwo.toString());
 
     given(facilityService.searchFacilities(new FacilitySearchParams(queryMap), pageable))
-        .willReturn(Pagination.getPage(storedFacilities));
+        .willReturn(Pagination.getPage(storedFacilities, PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("id", facilityIdOne)
@@ -441,7 +445,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(storedFacilities.size(), response.getContent().size());
     assertEquals(storedFacilities.size(), response.getNumberOfElements());
@@ -454,9 +458,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility = new FacilityDataBuilder()
         .withSupportedProgram(program).nonActive().build();
     given(facilityRepository.findByActive(eq(false), any(Pageable.class))).willReturn(
-        Pagination.getPage(Lists.newArrayList(facility)));
+        Pagination.getPage(Lists.newArrayList(facility), PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .queryParam("active", false)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -464,7 +468,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(MINIMAL_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(response.getContent().size(), 1);
     assertEquals(response.getNumberOfElements(), 1);
@@ -475,9 +479,9 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnActiveFacilitiesWithMinimalRepresentation() {
     given(facilityRepository.findByActive(eq(true), any(Pageable.class))).willReturn(
-        Pagination.getPage(Lists.newArrayList(facility)));
+        Pagination.getPage(Lists.newArrayList(facility), PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .queryParam("active", true)
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -485,7 +489,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(MINIMAL_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(response.getContent().size(), 1);
     assertEquals(response.getNumberOfElements(), 1);
@@ -498,7 +502,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
         .withSupportedProgram(program).build());
     given(facilityRepository.findAll(any(Pageable.class))).willReturn(
-        Pagination.getPage(storedFacilities));
+        Pagination.getPage(storedFacilities, PageRequest.of(0, 10)));
 
     Page<MinimalFacilityDto> response = restAssured
         .given()
@@ -507,7 +511,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(MINIMAL_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(storedFacilities.size(), response.getContent().size());
     assertEquals(storedFacilities.size(), response.getNumberOfElements());
@@ -517,7 +521,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getShouldGetFacility() {
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.of(facility));
 
     FacilityDto response = restAssured
         .given()
@@ -540,7 +544,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -560,7 +564,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.of(facility));
 
     restAssured
         .given()
@@ -593,7 +597,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void getFacilityAuditLogShouldReturnNotFoundIfFacilityDoesNotExist() {
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -607,7 +611,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -843,7 +847,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     given(facilityRepository.findByBoundary(boundary))
         .willReturn(Collections.singletonList(facility));
 
-    PageImplRepresentation response = restAssured.given()
+    PageDto response = restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .body(boundary)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -851,7 +855,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(BYBOUNDARY_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     Map<String, String> foundFacility = (Map) response.getContent().get(0);
     assertEquals(1, response.getContent().size());
@@ -886,7 +890,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -896,7 +900,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
     mockUserHasNoRight(FACILITIES_MANAGE_RIGHT);
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -905,7 +909,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldGetAuditLog() {
-    given(facilityRepository.findOne(any(UUID.class))).willReturn(facility);
+    given(facilityRepository.findById(any(UUID.class))).willReturn(Optional.of(facility));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

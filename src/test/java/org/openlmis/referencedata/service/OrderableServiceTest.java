@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anySetOf;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
-
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -49,6 +49,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.profiler.Profiler;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -91,8 +92,6 @@ public class OrderableServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     orderableList = Lists.newArrayList(orderable1, orderable2);
-    when(orderable2.getId()).thenReturn(orderableId);
-    when(orderable1.getLastUpdated()).thenReturn(modifiedDate.minusHours(1));
     when(orderable2.getLastUpdated()).thenReturn(modifiedDate);
   }
 
@@ -125,9 +124,6 @@ public class OrderableServiceTest {
 
   @Test
   public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
-    Page<Orderable> thePage = Pagination.getPage(orderableList, null);
-    when(orderableRepository.findAllLatest(null)).thenReturn(thePage);
-
     searchParams.add(CODE, "-1");
     searchParams.add(NAME, "-1");
     searchParams.add(PROGRAM_CODE, "program-code");
@@ -152,8 +148,9 @@ public class OrderableServiceTest {
   @Test
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
     // given
-    Page<Orderable> thePage = Pagination.getPage(orderableList, null);
-    when(orderableRepository.findAllLatest(any(Pageable.class)))
+    Page<Orderable> thePage = Pagination.getPage(orderableList,
+        PageRequest.of(0, orderableList.size()));
+    when(orderableRepository.findAllLatest(nullable(Pageable.class)))
         .thenReturn(thePage);
 
     // when
@@ -161,15 +158,16 @@ public class OrderableServiceTest {
         searchParams), null);
 
     // then
-    verify(orderableRepository).findAllLatest(isNull(Pageable.class));
+    verify(orderableRepository).findAllLatest(isNull());
     assertEquals(thePage, actual);
   }
 
   @Test
   public void shouldReturnAllElementsIfQueryMapIsNull() {
     // given
-    Page<Orderable> thePage = Pagination.getPage(orderableList, null);
-    when(orderableRepository.findAllLatest(any(Pageable.class)))
+    Page<Orderable> thePage = Pagination.getPage(orderableList,
+        PageRequest.of(0, orderableList.size()));
+    when(orderableRepository.findAllLatest(nullable(Pageable.class)))
         .thenReturn(thePage);
 
     // when
@@ -177,7 +175,7 @@ public class OrderableServiceTest {
         orderableService.searchOrderables(new QueryOrderableSearchParams(null), null);
 
     // then
-    verify(orderableRepository).findAllLatest(isNull(Pageable.class));
+    verify(orderableRepository).findAllLatest(isNull());
     assertEquals(thePage, actual);
   }
 
@@ -190,7 +188,8 @@ public class OrderableServiceTest {
     given(orderableRepository.search(
         any(SearchParams.class),
         any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2)));
+        .willReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2),
+            PageRequest.of(0, 2)));
 
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
@@ -214,7 +213,7 @@ public class OrderableServiceTest {
   public void shouldFindOrderablesByIds() {
     // given
     given(orderableRepository.findAllLatestByIds(anySetOf(UUID.class), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable2)));
+        .willReturn(Pagination.getPage(Lists.newArrayList(orderable2), PageRequest.of(0, 1)));
 
     searchParams.add(ID, orderableId.toString());
     UUID orderableId2 = UUID.randomUUID();

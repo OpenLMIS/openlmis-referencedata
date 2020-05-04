@@ -36,7 +36,7 @@ services:
     image: openlmis/referencedata
 
   db:
-    image: openlmis/postgres:9.6-postgis
+    image: openlmis/postgres:9.6-debezium
     env_file: .env
 
   redis:

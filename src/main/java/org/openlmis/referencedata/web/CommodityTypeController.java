@@ -81,14 +81,14 @@ public class CommodityTypeController extends BaseController {
 
     if (null != commodityType.getId()) {
       UUID productId = commodityType.getId();
-      CommodityType storedCommodityType = repository.findOne(productId);
+      CommodityType storedCommodityType = repository.findById(productId).orElse(null);
       if (null != storedCommodityType) {
         commodityType.setChildren(storedCommodityType.getChildren());
       }
     }
 
     if (commodityType.getParent() != null) {
-      CommodityType parent = repository.findOne(commodityType.getParent().getId());
+      CommodityType parent = repository.findById(commodityType.getParent().getId()).orElse(null);
       if (parent == null) {
         throw new ValidationMessageException(new Message(
             CommodityTypeMessageKeys.ERROR_PARENT_NOT_FOUND, commodityType.getParent()));
@@ -120,7 +120,7 @@ public class CommodityTypeController extends BaseController {
     }
 
     // ensure commodity type exists
-    CommodityType commodityType = repository.findOne(commodityTypeId);
+    CommodityType commodityType = repository.findById(commodityTypeId).orElse(null);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -128,7 +128,7 @@ public class CommodityTypeController extends BaseController {
     // create set of trade items from their ids, stop if any one is not found
     Set<TradeItem> tradeItems = new HashSet<>(tradeItemIds.size());
     for (UUID id : tradeItemIds) {
-      TradeItem item = tradeItemRepository.findOne(id);
+      TradeItem item = tradeItemRepository.findById(id).orElse(null);
       if (null == item) {
         throw new NotFoundException(new Message(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID, id));
       }
@@ -139,7 +139,7 @@ public class CommodityTypeController extends BaseController {
     }
 
     // update the trade items with new classifications
-    tradeItemRepository.save(tradeItems);
+    tradeItemRepository.saveAll(tradeItems);
   }
 
   /**
@@ -154,7 +154,7 @@ public class CommodityTypeController extends BaseController {
   public Set<UUID> getTradeItems(@PathVariable("id") UUID commodityTypeId) {
 
     // ensure commodity type exists
-    CommodityType commodityType = repository.findOne(commodityTypeId);
+    CommodityType commodityType = repository.findById(commodityTypeId).orElse(null);
     if (null == commodityType) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -207,7 +207,7 @@ public class CommodityTypeController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    CommodityType instance = repository.findOne(id);
+    CommodityType instance = repository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(CommodityTypeMessageKeys.ERROR_NOT_FOUND);
     }

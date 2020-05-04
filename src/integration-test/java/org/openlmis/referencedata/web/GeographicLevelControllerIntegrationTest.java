@@ -27,6 +27,7 @@ import static org.openlmis.referencedata.domain.RightName.GEOGRAPHIC_ZONES_MANAG
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -56,7 +57,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   public void shouldDeleteGeographicLevel() {
     mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(geographicLevelId))
+        .willReturn(Optional.of(geographicLevel));
 
     restAssured
         .given()
@@ -75,7 +77,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   public void shouldRejectDeleteGeographicLevelIfUserHasNoRight() {
     mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(geographicLevelId))
+        .willReturn(Optional.of(geographicLevel));
 
     String messageKey = restAssured
         .given()
@@ -137,7 +140,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
     mockUserHasRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     geographicLevel.setName("OpenLMIS");
-    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(geographicLevelId))
+        .willReturn(Optional.of(geographicLevel));
 
     GeographicLevel response = restAssured
         .given()
@@ -161,7 +165,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
     mockUserHasNoRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     geographicLevel.setName("OpenLMIS");
-    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(geographicLevelId))
+        .willReturn(Optional.of(geographicLevel));
 
     String messageKey = restAssured
         .given()
@@ -218,7 +223,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldGetGeographicLevel() {
 
-    given(geographicLevelRepository.findOne(geographicLevelId)).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(geographicLevelId))
+        .willReturn(Optional.of(geographicLevel));
 
     GeographicLevel response = restAssured
         .given()
@@ -255,7 +261,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+    given(geographicLevelRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -267,7 +273,7 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(null);
+    given(geographicLevelRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -279,7 +285,8 @@ public class GeographicLevelControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
-    given(geographicLevelRepository.findOne(any(UUID.class))).willReturn(geographicLevel);
+    given(geographicLevelRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(geographicLevel));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

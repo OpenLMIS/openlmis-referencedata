@@ -40,12 +40,12 @@ public class GeographicZoneBuilder
    */
   public GeographicZone build(GeographicZoneDto importer) {
     final GeographicLevel level = findResource(
-        geographicLevelRepository::findOne, importer.getLevel(),
+        geographicLevelRepository::findById, importer.getLevel(),
         GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     final GeographicZone parent = null == importer.getParent()
         ? null
         : findResource(
-            geographicZoneRepository::findOne, importer.getParent(),
+            geographicZoneRepository::findById, importer.getParent(),
             GeographicZoneMessageKeys.ERROR_NOT_FOUND);
 
     GeographicZone zone;
@@ -53,7 +53,7 @@ public class GeographicZoneBuilder
     if (null == importer.getId()) {
       zone = new GeographicZone();
     } else {
-      zone = geographicZoneRepository.findOne(importer.getId());
+      zone = geographicZoneRepository.findById(importer.getId()).orElse(null);
 
       if (null == zone) {
         zone = new GeographicZone();

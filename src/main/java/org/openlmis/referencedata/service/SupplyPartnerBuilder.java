@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -87,7 +87,7 @@ public class SupplyPartnerBuilder
     if (null == importer.getId()) {
       supplyPartner = new SupplyPartner();
     } else {
-      supplyPartner = supplyPartnerRepository.findOne(importer.getId());
+      supplyPartner = supplyPartnerRepository.findById(importer.getId()).orElse(null);
 
       if (null == supplyPartner) {
         supplyPartner = new SupplyPartner();
@@ -124,17 +124,17 @@ public class SupplyPartnerBuilder
       throw new ValidationMessageException(SupplyPartnerMessageKeys.ERROR_MISSING_ORDERABLES);
     }
 
-    Program program = findResource(programRepository::findOne,
+    Program program = findResource(programRepository::findById,
         dto.getProgram(), ProgramMessageKeys.ERROR_NOT_FOUND);
 
-    SupervisoryNode supervisoryNode = findResource(supervisoryNodeRepository::findOne,
+    SupervisoryNode supervisoryNode = findResource(supervisoryNodeRepository::findById,
         dto.getSupervisoryNode(), SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
 
-    Set<Facility> facilities = new HashSet<>(findResources(facilityRepository::findAll,
+    Set<Facility> facilities = new HashSet<>(findResources(facilityRepository::findAllById,
         dto.getFacilityIds(), FacilityMessageKeys.ERROR_NOT_FOUND));
 
     Set<Orderable> orderables = new HashSet<>(findResources(
-        ids -> orderableRepository.findAllLatestByIds(ids, new PageRequest(0, ids.size())),
+        ids -> orderableRepository.findAllLatestByIds(ids, PageRequest.of(0, ids.size())),
         dto.getOrderableIds(), OrderableMessageKeys.ERROR_NOT_FOUND));
 
     validateFacilities(program, supervisoryNode, facilities);

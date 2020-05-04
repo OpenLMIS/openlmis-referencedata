@@ -29,6 +29,7 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Before;
@@ -88,7 +89,7 @@ public class FacilityValidatorTest extends FhirLocationValidatorTest<FacilityDto
 
     facility.export(facilityDto);
 
-    when(facilityRepository.findOne(facility.getId())).thenReturn(facility);
+    when(facilityRepository.findById(facility.getId())).thenReturn(Optional.of(facility));
   }
 
   @Test

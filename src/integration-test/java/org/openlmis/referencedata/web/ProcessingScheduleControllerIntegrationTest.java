@@ -26,9 +26,9 @@ import static org.mockito.Mockito.doThrow;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.ProcessingSchedule;
@@ -37,6 +37,7 @@ import org.openlmis.referencedata.domain.RequisitionGroupProgramSchedule;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
@@ -77,7 +78,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldDeleteSchedule() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
+    given(scheduleRepository.findById(processingScheduleId)).willReturn(Optional.of(schedule));
 
     restAssured
         .given()
@@ -114,7 +115,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   public void shouldPutProcessingSchedule() {
     mockUserHasRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
     schedule.setDescription("OpenLMIS");
-    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
+    given(scheduleRepository.findById(processingScheduleId)).willReturn(Optional.of(schedule));
 
     ProcessingSchedule response = restAssured
         .given()
@@ -137,11 +138,11 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   public void shouldGetAllProcessingSchedules() {
     ProcessingScheduleDto dto = new ProcessingScheduleDto();
     schedule.export(dto);
-    PageRequest pageRequest = new PageRequest(1, 10);
+    PageRequest pageRequest = PageRequest.of(1, 10);
     given(scheduleRepository.findAll(pageRequest))
         .willReturn(Pagination.getPage(Collections.singletonList(schedule), pageRequest, 11));
 
-    PageImplRepresentation<LinkedHashMap> response = restAssured
+    PageDto<LinkedHashMap> response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -151,7 +152,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(dto.getId().toString(), response.getContent().get(0).get("id").toString());
@@ -161,7 +162,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldGetProcessingSchedule() {
 
-    given(scheduleRepository.findOne(processingScheduleId)).willReturn(schedule);
+    given(scheduleRepository.findById(processingScheduleId)).willReturn(Optional.of(schedule));
 
     ProcessingSchedule response = restAssured
         .given()
@@ -181,8 +182,8 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldGetProcessingScheduleByFacilityAndProgram() {
 
-    given(facilityRepository.exists(facilityId)).willReturn(true);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(facilityRepository.existsById(facilityId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(true);
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         programId, facilityId)).willReturn(
             singletonList(requisitionGroupProgramSchedule));
@@ -206,8 +207,8 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldBadRequestSearchWhenProgramDoesNotExist() {
 
-    given(facilityRepository.findOne(facilityId)).willReturn(facility);
-    given(programRepository.findOne(programId)).willReturn(null);
+    given(facilityRepository.findById(facilityId)).willReturn(Optional.of(facility));
+    given(programRepository.findById(programId)).willReturn(Optional.empty());
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         programId, facilityId)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
@@ -228,8 +229,8 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
   @Test
   public void shouldBadRequestSearchWhenFacilityDoesNotExist() {
 
-    given(facilityRepository.findOne(facilityId)).willReturn(null);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(facilityRepository.findById(facilityId)).willReturn(Optional.empty());
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
     given(requisitionGroupProgramScheduleService.searchRequisitionGroupProgramSchedules(
         programId, facilityId)).willReturn(singletonList(requisitionGroupProgramSchedule));
 
@@ -333,7 +334,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(null);
+    given(scheduleRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -345,7 +346,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(null);
+    given(scheduleRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -357,7 +358,7 @@ public class ProcessingScheduleControllerIntegrationTest extends BaseWebIntegrat
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    given(scheduleRepository.findOne(any(UUID.class))).willReturn(schedule);
+    given(scheduleRepository.findById(any(UUID.class))).willReturn(Optional.of(schedule));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

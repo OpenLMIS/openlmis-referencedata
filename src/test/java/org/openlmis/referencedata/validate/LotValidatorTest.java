@@ -24,6 +24,7 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +78,7 @@ public class LotValidatorTest {
     tradeItem.setId(UUID.randomUUID());
     lotDto.setTradeItemId(tradeItem.getId());
 
-    when(tradeItemRepository.findOne(tradeItem.getId())).thenReturn(tradeItem);
+    when(tradeItemRepository.findById(tradeItem.getId())).thenReturn(Optional.of(tradeItem));
 
     errors = new BeanPropertyBindingResult(lotDto, "lotDto");
   }
@@ -161,9 +162,6 @@ public class LotValidatorTest {
     List<Lot> lots = new ArrayList<>();
     lots.add(lot);
 
-    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lot.getLotCode(),
-        lot.getTradeItem().getId())).thenReturn(false);
-
     validator.validate(lotDto, errors);
 
     assertEquals(0, errors.getErrorCount());
@@ -171,9 +169,6 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemIsNull() {
-    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lotDto.getLotCode(),
-        lotDto.getTradeItemId())).thenReturn(false);
-
     lotDto.setTradeItemId(null);
 
     validator.validate(lotDto, errors);
@@ -183,10 +178,7 @@ public class LotValidatorTest {
 
   @Test
   public void shouldRejectWhenTradeItemDoesNotExist() {
-    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lotDto.getLotCode(),
-        lotDto.getTradeItemId())).thenReturn(false);
-
-    when(tradeItemRepository.findOne(lotDto.getTradeItemId())).thenReturn(null);
+    when(tradeItemRepository.findById(lotDto.getTradeItemId())).thenReturn(Optional.empty());
 
     validator.validate(lotDto, errors);
 

@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
@@ -95,7 +96,7 @@ public class OrderableBuilderTest {
 
     Orderable child = createOrderable();
 
-    Page<Orderable> orderablePage = new PageImpl<>(asList(child), new PageRequest(1, 100), 1);
+    Page<Orderable> orderablePage = new PageImpl<>(asList(child), PageRequest.of(1, 100), 1);
 
     when(orderableRepository
         .findAllLatestByIds(any(), any()))
@@ -126,7 +127,7 @@ public class OrderableBuilderTest {
     Program program = new Program(UUID.randomUUID());
     program.setCode(Code.code(code));
 
-    when(programRepository.findOne(program.getId())).thenReturn(program);
+    when(programRepository.findById(program.getId())).thenReturn(Optional.of(program));
 
     return program;
   }

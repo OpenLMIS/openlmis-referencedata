@@ -126,7 +126,7 @@ public class SupplyLineController extends BaseController {
       @PathVariable UUID id) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
-    SupplyLine supplyLineToUpdate = supplyLineRepository.findOne(id);
+    SupplyLine supplyLineToUpdate = supplyLineRepository.findById(id).orElse(null);
     if (supplyLineToUpdate == null) {
       supplyLineToUpdate = new SupplyLine();
       LOGGER.debug("Creating new supplyLine");
@@ -164,7 +164,7 @@ public class SupplyLineController extends BaseController {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    SupplyLine instance = supplyLineRepository.findOne(id);
+    SupplyLine instance = supplyLineRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     }
@@ -182,7 +182,7 @@ public class SupplyLineController extends BaseController {
   @GetMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
   public SupplyLineDto getSupplyLine(@PathVariable UUID id) {
-    SupplyLine supplyLine = supplyLineRepository.findOne(id);
+    SupplyLine supplyLine = supplyLineRepository.findById(id).orElse(null);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -200,7 +200,7 @@ public class SupplyLineController extends BaseController {
   public void deleteSupplyLine(@PathVariable UUID id) {
     rightService.checkAdminRight(SUPPLY_LINES_MANAGE);
 
-    SupplyLine supplyLine = supplyLineRepository.findOne(id);
+    SupplyLine supplyLine = supplyLineRepository.findById(id).orElse(null);
     if (supplyLine == null) {
       throw new NotFoundException(SupplyLineMessageKeys.ERROR_NOT_FOUND);
     } else {

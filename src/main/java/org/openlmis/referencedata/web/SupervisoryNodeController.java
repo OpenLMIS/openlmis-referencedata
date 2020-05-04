@@ -164,13 +164,14 @@ public class SupervisoryNodeController extends BaseController {
       return supervisoryNodeDto;
     }
 
-    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+    if (!supervisoryNodeRepository.existsById(supervisoryNodeId)) {
       profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     }
 
     profiler.start("GET_SUPERVISORY_NODE_FROM_DATABASE");
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findById(supervisoryNodeId)
+        .orElse(null);
     profiler.start("EXPORT_TO_DTO");
     supervisoryNodeDto = exportToDto(supervisoryNode);
 
@@ -247,13 +248,10 @@ public class SupervisoryNodeController extends BaseController {
       deleteSupervisoryNodeDtoFromCache(supervisoryNodeId);
     }
 
-    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
-    if (supervisoryNode == null) {
-      throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      supervisoryNodeRepository.delete(supervisoryNode);
-      return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findById(supervisoryNodeId)
+        .orElseThrow(() -> new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND));
+    supervisoryNodeRepository.delete(supervisoryNode);
+    return new ResponseEntity(HttpStatus.NO_CONTENT);
   }
 
   /**
@@ -278,19 +276,19 @@ public class SupervisoryNodeController extends BaseController {
     rightService.checkAdminRight(RightName.USERS_MANAGE_RIGHT);
 
     profiler.start("CHECK_IF_SUPERVISORY_NODE_EXISTS");
-    if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+    if (!supervisoryNodeRepository.existsById(supervisoryNodeId)) {
       profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     }
 
     profiler.start("CHECK_IF_RIGHT_EXISTS");
-    if (!rightRepository.exists(rightId)) {
+    if (!rightRepository.existsById(rightId)) {
       profiler.stop().log();
       throw new ValidationMessageException(RightMessageKeys.ERROR_NOT_FOUND);
     }
 
     profiler.start("CHECK_IF_PROGRAM_EXISTS");
-    if (!programRepository.exists(programId)) {
+    if (!programRepository.existsById(programId)) {
       profiler.stop().log();
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
@@ -316,7 +314,7 @@ public class SupervisoryNodeController extends BaseController {
     rightService.checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     SupervisoryNode supervisoryNode = Optional
-        .ofNullable(supervisoryNodeRepository.findOne(supervisoryNodeId))
+        .ofNullable(supervisoryNodeRepository.findById(supervisoryNodeId)).orElse(null)
         .orElseThrow(() -> new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND));
 
     Program program;
@@ -325,7 +323,7 @@ public class SupervisoryNodeController extends BaseController {
       program = null;
     } else {
       program = Optional
-          .ofNullable(programRepository.findOne(programId))
+          .ofNullable(programRepository.findById(programId)).orElse(null)
           .orElseThrow(() -> new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND));
     }
 
@@ -393,7 +391,7 @@ public class SupervisoryNodeController extends BaseController {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    SupervisoryNode instance = supervisoryNodeRepository.findOne(id);
+    SupervisoryNode instance = supervisoryNodeRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     }
@@ -417,12 +415,12 @@ public class SupervisoryNodeController extends BaseController {
     if (supervisoryNodeIsInCache) {
       profiler.start("GET_SUPERVISORY_NODE_FROM_CACHE");
       supervisoryNodeDto = supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId);
-    } else if (!supervisoryNodeRepository.exists(supervisoryNodeId)) {
+    } else if (!supervisoryNodeRepository.existsById(supervisoryNodeId)) {
       profiler.stop().log();
       throw new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND);
     } else {
       profiler.start("GET_SUPERVISORY_NODE_FROM_DATABASE");
-      supervisoryNode = supervisoryNodeRepository.findOne(supervisoryNodeId);
+      supervisoryNode = supervisoryNodeRepository.findById(supervisoryNodeId).orElse(null);
       profiler.start("EXPORT_TO_DTO");
       supervisoryNodeDto = exportToDto(supervisoryNode);
       profiler.start("SAVE_SUPERVISORY_NODE_IN_CACHE");
@@ -480,10 +478,11 @@ public class SupervisoryNodeController extends BaseController {
 
   private RequisitionGroup updateRequisitionGroup(SupervisoryNode existing,
       SupervisoryNodeDto supervisoryNodeDto) {
-    RequisitionGroup requisitionGroup =
-            requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId());
+    RequisitionGroup requisitionGroup = requisitionGroupRepository
+        .findById(supervisoryNodeDto.getRequisitionGroupId())
+        .orElse(null);
     requisitionGroup.setSupervisoryNode(supervisoryNodeRepository
-            .findOne(existing.getId()));
+            .findById(existing.getId()).orElse(null));
     requisitionGroupRepository.saveAndFlush(requisitionGroup);
     return requisitionGroup;
   }

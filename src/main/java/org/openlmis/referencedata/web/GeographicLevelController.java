@@ -122,12 +122,8 @@ public class GeographicLevelController extends BaseController {
   public GeographicLevel getGeographicLevel(
       @PathVariable("id") UUID geographicLevelId) {
 
-    GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
-    if (geographicLevel == null) {
-      throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return geographicLevel;
-    }
+    return geographicLevelRepository.findById(geographicLevelId)
+        .orElseThrow(() -> new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND));
   }
 
   /**
@@ -141,12 +137,9 @@ public class GeographicLevelController extends BaseController {
       @PathVariable("id") UUID geographicLevelId) {
     rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
-    GeographicLevel geographicLevel = geographicLevelRepository.findOne(geographicLevelId);
-    if (geographicLevel == null) {
-      throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      geographicLevelRepository.delete(geographicLevel);
-    }
+    GeographicLevel geographicLevel = geographicLevelRepository.findById(geographicLevelId)
+        .orElseThrow(() -> new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND));
+    geographicLevelRepository.delete(geographicLevel);
   }
 
   /**
@@ -174,7 +167,7 @@ public class GeographicLevelController extends BaseController {
     rightService.checkAdminRight(GEOGRAPHIC_ZONES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    GeographicLevel instance = geographicLevelRepository.findOne(id);
+    GeographicLevel instance = geographicLevelRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
     }

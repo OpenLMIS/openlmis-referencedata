@@ -77,7 +77,7 @@ public class SystemNotificationValidator implements BaseValidator {
       verifyAuthor(err, notification);
       UUID notificationId = notification.getId();
       SystemNotification existingNotification = (notificationId != null)
-          ? repository.findOne(notificationId) : null;
+          ? repository.findById(notificationId).orElse(null) : null;
       if (existingNotification != null) {
         rejectIfEmpty(err, CREATED_DATE, SystemNotificationMessageKeys.ERROR_CREATED_DATE_REQUIRED);
         rejectIfValueChanged(err, notification.getAuthor().getId(),

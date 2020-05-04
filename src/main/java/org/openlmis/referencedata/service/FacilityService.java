@@ -71,7 +71,7 @@ public class FacilityService {
     profiler.setLogger(LOGGER);
 
     profiler.start("CHECK_IF_GEO_ZONE_EXISTS");
-    if (null != params.getZoneId() && !geographicZoneRepository.exists(params.getZoneId())) {
+    if (null != params.getZoneId() && !geographicZoneRepository.existsById(params.getZoneId())) {
       throw new ValidationMessageException(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     }
 

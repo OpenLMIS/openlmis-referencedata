@@ -105,7 +105,7 @@ public class OrderableRepositoryIntegrationTest {
 
   private AtomicInteger instanceNumber = new AtomicInteger(0);
 
-  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE, Sort.Direction.ASC,
+  private PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.ASC,
       "fullProductName");
 
   private int getNextInstanceNumber() {
@@ -200,7 +200,7 @@ public class OrderableRepositoryIntegrationTest {
     // when
     Set<UUID> ids = newHashSet(orderable.getId());
     Page<Orderable> found = repository.findAllLatestByIds(ids,
-        new PageRequest(0, 5));
+        PageRequest.of(0, 5));
 
     // then
     assertEquals(1, found.getTotalElements());
@@ -326,7 +326,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams("something", "something", null, null), null);
+        .search(new TestSearchParams("something", "something", null, null), pageable);
 
     // then
     assertEquals(0, foundOrderables.getTotalElements());
@@ -489,7 +489,7 @@ public class OrderableRepositoryIntegrationTest {
     }
 
     // when
-    Pageable pageable = new PageRequest(1, 2);
+    Pageable pageable = PageRequest.of(1, 2);
     Page<Orderable> actual = repository.search(new TestSearchParams(), pageable);
 
     // then

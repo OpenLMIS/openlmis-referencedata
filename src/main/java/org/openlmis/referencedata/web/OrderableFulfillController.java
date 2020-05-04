@@ -106,7 +106,7 @@ public class OrderableFulfillController extends BaseController {
   }
 
   private List<Orderable> getOrderables(Set<UUID> ids) {
-    PageRequest noPaginationRequest = new PageRequest(Pagination.DEFAULT_PAGE_NUMBER,
+    PageRequest noPaginationRequest = PageRequest.of(Pagination.DEFAULT_PAGE_NUMBER,
         Pagination.NO_PAGINATION);
     Page<Orderable> pageWithAllOrderables = ids.isEmpty()
         ? orderableRepository.findAllLatest(noPaginationRequest)

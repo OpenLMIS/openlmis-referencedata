@@ -129,6 +129,6 @@ public class TradeItemRepositoryIntegrationTest extends
     tradeItem2.assignCommodityType("cSysThree", "ID_3");
     tradeItem3.assignCommodityType("cSysOne", "CID1");
 
-    repository.save(asList(tradeItem1, tradeItem2, tradeItem3));
+    repository.saveAll(asList(tradeItem1, tradeItem2, tradeItem3));
   }
 }

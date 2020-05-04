@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +50,7 @@ public class LotService {
     List<TradeItem> tradeItems = Collections.emptyList();
 
     if (!isEmpty(requestParams.getTradeItemId())) {
-      tradeItems = tradeItemRepository.findAll(requestParams.getTradeItemId());
+      tradeItems = tradeItemRepository.findAllById(requestParams.getTradeItemId());
 
       if (tradeItems.isEmpty()) {
         return Pagination.getPage(Collections.emptyList(), pageable, 0);

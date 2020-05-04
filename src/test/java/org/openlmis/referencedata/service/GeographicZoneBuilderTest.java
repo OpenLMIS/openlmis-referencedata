@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,8 +70,8 @@ public class GeographicZoneBuilderTest {
     geographicZone.export(importer);
     importer.setId(null);
 
-    when(geographicLevelRepository.findOne(level.getId())).thenReturn(level);
-    when(geographicZoneRepository.findOne(parent.getId())).thenReturn(parent);
+    when(geographicLevelRepository.findById(level.getId())).thenReturn(Optional.of(level));
+    when(geographicZoneRepository.findById(parent.getId())).thenReturn(Optional.of(parent));
   }
 
   @Test
@@ -85,8 +86,8 @@ public class GeographicZoneBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfGeographicLevelCouldNotBeFound() {
-    when(geographicLevelRepository.findOne(level.getId()))
-        .thenReturn(null);
+    when(geographicLevelRepository.findById(level.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(GeographicLevelMessageKeys.ERROR_NOT_FOUND);
@@ -96,7 +97,7 @@ public class GeographicZoneBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfParentCouldNotBeFound() {
-    when(geographicZoneRepository.findOne(parent.getId())).thenReturn(null);
+    when(geographicZoneRepository.findById(parent.getId())).thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
@@ -143,8 +144,8 @@ public class GeographicZoneBuilderTest {
   @Test
   public void shouldUseInstanceFromDatabaseIfImporterHasIdSet() {
     importer.setId(UUID.randomUUID());
-    when(geographicZoneRepository.findOne(importer.getId()))
-        .thenReturn(geographicZone);
+    when(geographicZoneRepository.findById(importer.getId()))
+        .thenReturn(Optional.of(geographicZone));
 
     GeographicZone built = builder.build(importer);
     assertThat(built.getId()).isEqualTo(geographicZone.getId());

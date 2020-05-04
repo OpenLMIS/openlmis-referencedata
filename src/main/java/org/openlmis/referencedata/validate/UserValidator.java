@@ -113,7 +113,7 @@ public class UserValidator implements BaseValidator {
   }
 
   private void validateInvariants(UserDto dto, Errors errors) {
-    User db = userRepository.findOne(dto.getId());
+    User db = userRepository.findById(dto.getId()).orElse(null);
 
     rejectIfInvariantWasChanged(errors, USERNAME, db.getUsername(), dto.getUsername());
     rejectIfInvariantWasChanged(errors, JOB_TITLE, db.getJobTitle(), dto.getJobTitle());

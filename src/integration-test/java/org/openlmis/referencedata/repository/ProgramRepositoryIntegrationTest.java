@@ -99,12 +99,12 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
   public void testSkippableEdit() {
     Program testProgram = this.generateInstance();
     testProgram = repository.save(testProgram);
-    testProgram = repository.findOne(testProgram.getId());
+    testProgram = repository.findById(testProgram.getId()).orElse(null);
     assertTrue(testProgram.getPeriodsSkippable());
 
     testProgram.setPeriodsSkippable(false);
     testProgram = repository.save(testProgram);
-    testProgram = repository.findOne(testProgram.getId());
+    testProgram = repository.findById(testProgram.getId()).orElse(null);
     assertFalse(testProgram.getPeriodsSkippable());
   }
 

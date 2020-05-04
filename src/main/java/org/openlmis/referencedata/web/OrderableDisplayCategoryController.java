@@ -114,7 +114,7 @@ public class OrderableDisplayCategoryController extends BaseController {
     LOGGER.debug("Updating orderableDisplayCategory with id: %s", orderableDisplayCategoryId);
 
     OrderableDisplayCategory orderableDisplayCategoryToUpdate =
-        orderableDisplayCategoryRepository.findOne(orderableDisplayCategoryId);
+        orderableDisplayCategoryRepository.findById(orderableDisplayCategoryId).orElse(null);
 
     if (null == orderableDisplayCategoryToUpdate) {
       throw new ValidationMessageException(new Message(
@@ -141,8 +141,8 @@ public class OrderableDisplayCategoryController extends BaseController {
   public OrderableDisplayCategoryDto getOrderableDisplayCategory(
       @PathVariable("id") UUID orderableDisplayCategoryId) {
 
-    OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId);
+    OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
+        .findById(orderableDisplayCategoryId).orElse(null);
     if (orderableDisplayCategory == null) {
       throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -161,8 +161,8 @@ public class OrderableDisplayCategoryController extends BaseController {
       @PathVariable("id") UUID orderableDisplayCategoryId) {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
-    OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository.findOne(
-        orderableDisplayCategoryId);
+    OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
+        .findById(orderableDisplayCategoryId).orElse(null);
     if (orderableDisplayCategory == null) {
       throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -201,7 +201,8 @@ public class OrderableDisplayCategoryController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    OrderableDisplayCategory instance = orderableDisplayCategoryRepository.findOne(id);
+    OrderableDisplayCategory instance = orderableDisplayCategoryRepository.findById(id)
+        .orElse(null);
     if (instance == null) {
       throw new NotFoundException(OrderableDisplayCategoryMessageKeys.ERROR_NOT_FOUND);
     }

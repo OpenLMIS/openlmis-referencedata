@@ -15,61 +15,40 @@
 
 package org.openlmis.referencedata.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.io.IOException;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.junit.Test;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
-public class CustomSortDeserializerTest {
+public class CustomSortSerializerTest {
 
   private ObjectMapper mapper = new ObjectMapper();
 
   @Test
-  public void shouldDeserializeArraySort() throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+  public void serializeShouldSerializeSort() throws JsonProcessingException {
+    TestObject testObject = new TestObject(Sort.by(Direction.DESC, "startDate"));
+    String json = mapper.writeValueAsString(testObject);
 
-    ObjectNode order = mapper.createObjectNode();
-    order.put("direction", "DESC");
-    order.put("property", "startDate");
-    order.put("ignoreCase", false);
-    order.put("nullHandling", "NATIVE");
-    order.put("ascending", false);
-    order.put("descending", true);
-
-    ArrayNode arrayNode = mapper.createArrayNode();
-    arrayNode.add(order);
-
-    ObjectNode testObject = mapper.createObjectNode();
-    testObject.set("sort", arrayNode);
-
-    Sort sort = deserialize(testObject.toString());
-
-    assertEquals(Sort.Direction.DESC, sort.getOrderFor("startDate").getDirection());
-  }
-
-  private Sort deserialize(String json) throws IOException {
-    TestObject testObject = mapper.readValue(json, TestObject.class);
-    return testObject.getSort();
+    assertThat(json, containsString("\"direction\":\"DESC\""));
+    assertThat(json, containsString("\"property\":\"startDate\""));
   }
 
   @AllArgsConstructor
-  @NoArgsConstructor
   private static class TestObject {
 
     private Sort sort;
 
+    @JsonSerialize(using =  CustomSortSerializer.class)
     public Sort getSort() {
       return sort;
     }
 
-    @JsonDeserialize(using = CustomSortDeserializer.class)
     public void setSort(Sort sort) {
       this.sort = sort;
     }

@@ -51,35 +51,37 @@ public class SupervisoryNodeBuilder
     final Facility facility = Optional
         .ofNullable(importer.getFacility())
         .map(obj -> findResource(
-            facilityRepository::findOne, obj, FacilityMessageKeys.ERROR_NOT_FOUND))
+            facilityRepository::findById, obj, FacilityMessageKeys.ERROR_NOT_FOUND))
         .orElse(null);
     final SupervisoryNode parent = Optional
         .ofNullable(importer.getParentNode())
         .map(obj -> findResource(
-            supervisoryNodeRepository::findOne, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+            supervisoryNodeRepository::findById, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
         .orElse(null);
     final SupervisoryNode partnerNodeOf = Optional
         .ofNullable(importer.getPartnerNodeOf())
         .map(obj -> findResource(
-            supervisoryNodeRepository::findOne, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+            supervisoryNodeRepository::findById, obj, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
         .orElse(null);
     final RequisitionGroup requisitionGroup = Optional
         .ofNullable(importer.getRequisitionGroup())
         .map(obj -> findResource(
-            requisitionGroupRepository::findOne, obj, RequisitionGroupMessageKeys.ERROR_NOT_FOUND))
+            requisitionGroupRepository::findById, obj, RequisitionGroupMessageKeys.ERROR_NOT_FOUND))
         .orElse(null);
     final Set<SupervisoryNode> childNodes = Optional
         .ofNullable(importer.getChildNodes())
         .map(nodes -> nodes.stream().map(BaseDto::getId).collect(Collectors.toSet()))
         .map(ids -> findResources(
-            supervisoryNodeRepository::findAll, ids, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+            supervisoryNodeRepository::findAllById, ids,
+            SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
         .map(HashSet::new)
         .orElse(new HashSet<>());
     final Set<SupervisoryNode> partnerNodes = Optional
         .ofNullable(importer.getPartnerNodes())
         .map(nodes -> nodes.stream().map(BaseDto::getId).collect(Collectors.toSet()))
         .map(ids -> findResources(
-            supervisoryNodeRepository::findAll, ids, SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
+            supervisoryNodeRepository::findAllById, ids,
+            SupervisoryNodeMessageKeys.ERROR_NOT_FOUND))
         .map(HashSet::new)
         .orElse(new HashSet<>());
 
@@ -88,7 +90,7 @@ public class SupervisoryNodeBuilder
     if (null == importer.getId()) {
       supervisoryNode = new SupervisoryNode();
     } else {
-      supervisoryNode = supervisoryNodeRepository.findOne(importer.getId());
+      supervisoryNode = supervisoryNodeRepository.findById(importer.getId()).orElse(null);
 
       if (null == supervisoryNode) {
         supervisoryNode = new SupervisoryNode();

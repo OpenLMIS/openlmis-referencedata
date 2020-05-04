@@ -156,12 +156,9 @@ public class RequisitionGroupController extends BaseController {
   public RequisitionGroupDto getRequisitionGroup(
       @PathVariable("id") UUID requisitionGroupId) {
 
-    RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
-    if (requisitionGroup == null) {
-      throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return exportToDto(requisitionGroup);
-    }
+    RequisitionGroup requisitionGroup = requisitionGroupRepository.findById(requisitionGroupId)
+        .orElseThrow(() -> new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND));
+    return exportToDto(requisitionGroup);
   }
 
   /**
@@ -190,7 +187,7 @@ public class RequisitionGroupController extends BaseController {
     if (bindingResult.getErrorCount() == 0) {
       profiler.start("FIND_REQUISITION_GROUP");
       RequisitionGroup requisitionGroupToUpdate =
-          requisitionGroupRepository.findOne(requisitionGroupId);
+          requisitionGroupRepository.findById(requisitionGroupId).orElse(null);
 
       if (null == requisitionGroupToUpdate) {
         profiler.start("CREATE_REQUISITION_GROUP");
@@ -240,7 +237,8 @@ public class RequisitionGroupController extends BaseController {
     checkAdminRight(REQUISITION_GROUPS_MANAGE, profiler);
 
     profiler.start("FIND_REQUISITION_GROUP");
-    RequisitionGroup requisitionGroup = requisitionGroupRepository.findOne(requisitionGroupId);
+    RequisitionGroup requisitionGroup = requisitionGroupRepository.findById(requisitionGroupId)
+        .orElse(null);
     if (requisitionGroup == null) {
       profiler.stop().log();
       throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
@@ -280,7 +278,7 @@ public class RequisitionGroupController extends BaseController {
     rightService.checkAdminRight(REQUISITION_GROUPS_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    RequisitionGroup instance = requisitionGroupRepository.findOne(id);
+    RequisitionGroup instance = requisitionGroupRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND);
     }
@@ -326,6 +324,6 @@ public class RequisitionGroupController extends BaseController {
   }
 
   private SupervisoryNode getUpdatedSupervisoryNode(RequisitionGroupDto dto) {
-    return supervisoryNodeRepository.findOne(dto.getSupervisoryNode().getId());
+    return supervisoryNodeRepository.findById(dto.getSupervisoryNode().getId()).orElse(null);
   }
 }

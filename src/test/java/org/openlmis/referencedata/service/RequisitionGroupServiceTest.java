@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,7 @@ import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 public class RequisitionGroupServiceTest {
@@ -110,7 +112,7 @@ public class RequisitionGroupServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
-    when(geographicZoneRepository.findOne(any(UUID.class))).thenReturn(null);
+    when(geographicZoneRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(ZONE, "zone-code");
@@ -145,7 +147,7 @@ public class RequisitionGroupServiceTest {
         .when(supervisoryNodeRepository).search(any(), any());
     when(requisitionGroupRepository.search(any(String.class), any(String.class),
         any(Program.class), any(List.class), any(Pageable.class)))
-        .thenReturn(Pagination.getPage(requisitionGroups, null, 2));
+        .thenReturn(Pagination.getPage(requisitionGroups, PageRequest.of(0, 2), 2));
 
     Map<String, Object> searchParams = new HashMap<>();
     searchParams.put(NAME, "name");

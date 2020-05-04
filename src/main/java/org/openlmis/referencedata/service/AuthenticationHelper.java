@@ -38,7 +38,7 @@ public class AuthenticationHelper {
    */
   public User getCurrentUser() {
     UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    User user = userRepository.findOne(userId);
+    User user = userRepository.findById(userId).orElse(null);
 
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);

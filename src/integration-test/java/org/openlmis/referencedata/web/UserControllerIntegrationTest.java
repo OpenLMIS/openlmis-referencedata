@@ -53,12 +53,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -83,6 +83,7 @@ import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.UserSearchParams;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
@@ -93,6 +94,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UserSearchParamsDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -184,16 +186,17 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserSearchParams queryMap = new UserSearchParams();
     given(userService.searchUsersById(eq(queryMap), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser())));
+        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()),
+            PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .when()
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertThat(response.getContent().size(), is(2));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -211,9 +214,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
 
     UserSearchParams userSearchParams = new UserSearchParams(ids);
     given(userService.searchUsersById(eq(userSearchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()), null, 4));
+        .willReturn(Pagination.getPage(Lists.newArrayList(user1, generateUser()),
+            PageRequest.of(0, 2), 4));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .queryParam(PAGE, 0)
         .queryParam(SIZE, 2)
@@ -224,7 +228,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(2, response.getContent().size());
     assertEquals(4, response.getTotalElements());
@@ -346,7 +350,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldReturnNotFoundWhenGettingFullRoleAssignmentsForNotExistingUser() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.findOne(userId)).willReturn(null);
+    given(userRepository.findById(userId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -511,7 +515,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserHasRight() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(facilityRepository.exists(homeFacilityId)).willReturn(true);
+    given(facilityRepository.existsById(homeFacilityId)).willReturn(true);
 
     ResultDto<Boolean> response = new ResultDto<>();
     response = getUserHasRight()
@@ -527,7 +531,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldGetUserHasRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(facilityRepository.exists(homeFacilityId)).willReturn(true);
+    given(facilityRepository.existsById(homeFacilityId)).willReturn(true);
 
     getUserHasRight()
         .then()
@@ -554,9 +558,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldBadRequestGetUserHasRightWithMissingFacility() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.exists(userId)).willReturn(true);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.exists(program2Id)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
+    given(rightRepository.findById(supervisionRightId)).willReturn(Optional.of(supervisionRight));
+    given(programRepository.existsById(program2Id)).willReturn(true);
 
     restAssured
         .given()
@@ -614,7 +618,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUserSupportedPrograms() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
 
     Program[] response = getUserSupportedPrograms()
         .then()
@@ -643,7 +647,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetUserSupportedProgramsWithNoRightIfUserRequestsTheirOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
-    given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
 
     getUserSupportedPrograms()
         .then()
@@ -655,7 +659,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnNotFoundIfNoUserExistWhenGetSupportedPrograms() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
-    given(userRepository.exists(userId)).willReturn(false);
+    given(userRepository.existsById(userId)).willReturn(false);
 
     getUserSupportedPrograms()
         .then()
@@ -705,8 +709,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldReturnBadRequestWhenGettingFulfillmentFacilitiesWithIncorrectRight() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(fulfillmentRightId)).willReturn(null);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
+    given(rightRepository.findById(fulfillmentRightId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -731,9 +735,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .build();
 
     given(userService.searchUsers(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(singletonList(user1)));
+        .willReturn(Pagination.getPage(singletonList(user1), PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -742,7 +746,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -759,9 +763,9 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     UserSearchParams searchParams = new UserSearchParamsDataBuilder().build();
 
     given(userService.searchUsers(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(asList(user1), null, 2));
+        .willReturn(Pagination.getPage(asList(user1), PageRequest.of(0, 1), 2));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .queryParam(PAGE, 0)
         .queryParam(SIZE, 1)
@@ -772,7 +776,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(SEARCH_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(2, response.getTotalElements());
@@ -961,7 +965,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, null);
-    given(userRepository.findOne(any(UUID.class))).willReturn(null);
+    given(userRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -973,7 +977,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(userRepository.findOne(any(UUID.class))).willReturn(null);
+    given(userRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -985,7 +989,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, null);
-    given(userRepository.exists(any(UUID.class))).willReturn(true);
+    given(userRepository.existsById(any(UUID.class))).willReturn(true);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -996,8 +1000,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getPermissionStringsShouldReturnOkIfServiceToken() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.exists(userId)).willReturn(true);
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.existsById(userId)).willReturn(true);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
     given(rightAssignmentRepository.findByUser(userId))
         .willReturn(Sets.newHashSet(ADMIN_RIGHT_NAME));
 
@@ -1017,8 +1021,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getPermissionStringsShouldReturnOkIfUserTokenAndUserRequestsOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(userRepository.exists(userId)).willReturn(true);
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.existsById(userId)).willReturn(true);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
     given(rightAssignmentRepository.findByUser(userId))
         .willReturn(Sets.newHashSet(ADMIN_RIGHT_NAME));
 
@@ -1052,7 +1056,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getPermissionStringsShouldReturnNotFoundIfUserDoesNotExist() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.exists(userId)).willReturn(false);
+    given(userRepository.existsById(userId)).willReturn(false);
 
     getUsersPermissionStrings()
         .then()
@@ -1065,7 +1069,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getFacilitiesShouldReturnOkIfServiceToken() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
     given(facilityRepository.findSupervisionFacilitiesByUser(userId))
         .willReturn(Sets.newHashSet(new NamedResource(homeFacilityId, homeFacility.getName())));
 
@@ -1087,7 +1091,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getFacilitiesShouldReturnOkIfUserTokenAndUserRequestsOwnRecord() {
     mockUserHasNoRight(RightName.USERS_MANAGE_RIGHT, userId);
 
-    given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
     given(facilityRepository.findSupervisionFacilitiesByUser(userId))
         .willReturn(Sets.newHashSet(new NamedResource(homeFacilityId, homeFacility.getName())));
 
@@ -1123,7 +1127,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getFacilitiesShouldReturnNotFoundIfUserDoesNotExist() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(userRepository.exists(userId)).willReturn(false);
+    given(userRepository.existsById(userId)).willReturn(false);
 
     getUserFacilities()
         .then()
@@ -1153,7 +1157,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUser() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
 
     return restAssured
         .given()
@@ -1164,7 +1168,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUsersFullRoleAssignments() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
 
     return restAssured
         .given()
@@ -1179,12 +1183,12 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
       userDto = new UserDto();
     }
     user1.export(userDto);
-    given(roleRepository.findOne(adminRoleId)).willReturn(adminRole);
-    given(roleRepository.findOne(supervisionRoleId)).willReturn(supervisionRole);
+    given(roleRepository.findById(adminRoleId)).willReturn(Optional.of(adminRole));
+    given(roleRepository.findById(supervisionRoleId)).willReturn(Optional.of(supervisionRole));
     given(programRepository.findByCode(Code.code(PROGRAM1_CODE))).willReturn(program1);
     given(programRepository.findByCode(Code.code(PROGRAM2_CODE))).willReturn(program2);
     given(supervisoryNodeRepository.findByCode(SUPERVISORY_NODE_CODE)).willReturn(supervisoryNode);
-    given(roleRepository.findOne(fulfillmentRoleId)).willReturn(fulfillmentRole);
+    given(roleRepository.findById(fulfillmentRoleId)).willReturn(Optional.of(fulfillmentRole));
     given(facilityRepository.findFirstByCode(WAREHOUSE_CODE)).willReturn(warehouse);
 
     return restAssured
@@ -1197,7 +1201,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response deleteUser() {
-    given(userRepository.findOne(userId)).willReturn(user1);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
 
     return restAssured
         .given()
@@ -1209,10 +1213,10 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUserHasRight() {
-    given(userRepository.exists(userId)).willReturn(true);
-    given(rightRepository.findOne(supervisionRightId)).willReturn(supervisionRight);
-    given(programRepository.exists(program1Id)).willReturn(true);
-    given(programRepository.exists(program2Id)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
+    given(rightRepository.findById(supervisionRightId)).willReturn(Optional.of(supervisionRight));
+    given(programRepository.existsById(program1Id)).willReturn(true);
+    given(programRepository.existsById(program2Id)).willReturn(true);
     given(rightAssignmentRepository.existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(
         userId, supervisionRight.getName(), homeFacilityId, program1Id)).willReturn(true);
 
@@ -1228,7 +1232,7 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUserPrograms() {
-    given(userRepository.exists(userId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(true);
     given(programRepository.findSupervisionProgramsByUser(userId)).willReturn(
         Sets.newHashSet(program1));
 
@@ -1253,8 +1257,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   private Response getUserFulfillmentFacilities() {
-    given(userRepository.findOne(userId)).willReturn(user1);
-    given(rightRepository.findOne(fulfillmentRightId)).willReturn(fulfillmentRight);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user1));
+    given(rightRepository.findById(fulfillmentRightId)).willReturn(Optional.of(fulfillmentRight));
 
     return restAssured
         .given()

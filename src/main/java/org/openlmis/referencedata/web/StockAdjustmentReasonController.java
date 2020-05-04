@@ -101,7 +101,7 @@ public class StockAdjustmentReasonController extends BaseController {
   public StockAdjustmentReason getChosenStockAdjustmentReason(
           @PathVariable("id") UUID stockAdjustmentReasonId) {
     StockAdjustmentReason stockAdjustmentReason =
-            stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
+            stockAdjustmentReasonRepository.findById(stockAdjustmentReasonId).orElse(null);
     if (stockAdjustmentReason == null) {
       throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -133,7 +133,7 @@ public class StockAdjustmentReasonController extends BaseController {
     rightService.checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    StockAdjustmentReason instance = stockAdjustmentReasonRepository.findOne(id);
+    StockAdjustmentReason instance = stockAdjustmentReasonRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     }
@@ -156,7 +156,7 @@ public class StockAdjustmentReasonController extends BaseController {
     rightService.checkAdminRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
     StockAdjustmentReason stockAdjustmentReason =
-            stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
+            stockAdjustmentReasonRepository.findById(stockAdjustmentReasonId).orElse(null);
     if (stockAdjustmentReason == null) {
       throw new NotFoundException(StockAdjustmentReasonMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -183,7 +183,7 @@ public class StockAdjustmentReasonController extends BaseController {
     }
 
     StockAdjustmentReason storedStockAdjustmentReason =
-            stockAdjustmentReasonRepository.findOne(stockAdjustmentReasonId);
+            stockAdjustmentReasonRepository.findById(stockAdjustmentReasonId).orElse(null);
     if (storedStockAdjustmentReason == null) {
       LOGGER.warn("Update failed - stockAdjustmentReason with id: {} not found",
               stockAdjustmentReasonId);

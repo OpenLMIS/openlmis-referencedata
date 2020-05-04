@@ -30,6 +30,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -74,7 +75,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldDeleteStockAdjustmentReason() {
     mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(reasonId)).willReturn(Optional.of(reason));
 
     restAssured
         .given()
@@ -93,7 +94,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldRejectDeleteStockAdjustmentReasonIfUserHasNoRight() {
     mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(reasonId)).willReturn(Optional.of(reason));
 
     String messageKey = restAssured
         .given()
@@ -161,7 +162,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldPutStockAdjustmentReason() {
     mockUserHasRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(reasonId)).willReturn(Optional.of(reason));
 
     StockAdjustmentReason response = restAssured
         .given()
@@ -183,7 +184,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldRejectPutStockAdjustmentReasonIfUserHasNoRight() {
     mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(reasonId)).willReturn(Optional.of(reason));
 
     String messageKey = restAssured
         .given()
@@ -232,7 +233,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
   public void shouldGetStockAdjustmentReason() {
     mockUserHasNoRight(STOCK_ADJUSTMENT_REASONS_MANAGE);
 
-    given(stockAdjustmentReasonRepository.findOne(reasonId)).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(reasonId)).willReturn(Optional.of(reason));
 
     StockAdjustmentReason response = restAssured
         .given()
@@ -280,7 +281,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
+    given(stockAdjustmentReasonRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -292,7 +293,7 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(null);
+    given(stockAdjustmentReasonRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -304,7 +305,8 @@ public class StockAdjustmentReasonControllerIntegrationTest extends BaseWebInteg
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.STOCK_ADJUSTMENT_REASONS_MANAGE);
-    given(stockAdjustmentReasonRepository.findOne(any(UUID.class))).willReturn(reason);
+    given(stockAdjustmentReasonRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(reason));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

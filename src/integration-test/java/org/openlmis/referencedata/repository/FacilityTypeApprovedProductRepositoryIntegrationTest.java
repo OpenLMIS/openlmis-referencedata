@@ -233,7 +233,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         .buildAsNew();
     facilityRepository.save(facility);
 
-    pageable = new PageRequest(0, 10);
+    pageable = PageRequest.of(0, 10);
   }
 
   @Test
@@ -288,7 +288,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     saveAndGetProduct(facilityType2, true);
     saveAndGetProduct(facilityType2, false);
 
-    pageable = new PageRequest(0, 1);
+    pageable = PageRequest.of(0, 1);
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
@@ -454,7 +454,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         .build();
     ftapRepository.save(ftap);
 
-    Pageable pageRequest = new PageRequest(0, 10);
+    Pageable pageRequest = PageRequest.of(0, 10);
 
     Page<FacilityTypeApprovedProduct> result = ftapRepository.searchProducts(
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
@@ -531,7 +531,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
             .withFacilityTypeCode("abc")
             .build(),
-        null);
+        pageable);
 
     // then
     assertNotNull(actual);
@@ -547,7 +547,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     saveAndGetProduct(facilityType1, program2, orderable2);
 
     // when
-    Pageable pageRequest = new PageRequest(1, 2);
+    Pageable pageRequest = PageRequest.of(1, 2);
     Page<FacilityTypeApprovedProduct> actual = ftapRepository.searchProducts(
         new FacilityTypeApprovedProductSearchParamsDataBuilder()
             .withFacilityTypeCode(FACILITY_TYPE_CODE)
@@ -583,7 +583,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
             .withFacilityTypeCode(FACILITY_TYPE_CODE)
             .withFacilityTypeCode(FACILITY_TYPE2_CODE)
             .build(),
-        new PageRequest(0, 10));
+        PageRequest.of(0, 10));
 
     // then
     assertThat(actual, is(notNullValue()));
@@ -652,7 +652,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     FacilityTypeApprovedProduct anotherFtap = saveAndGetProduct(facilityType2, true);
     anotherFtap.setActive(true);
 
-    ftapRepository.save(Arrays.asList(ftapWithTwoVersions, anotherFtap));
+    ftapRepository.saveAll(Arrays.asList(ftapWithTwoVersions, anotherFtap));
 
     // when
     ftapRepository.deactivatePreviousVersions(ftapWithTwoVersions.getId());

@@ -120,12 +120,8 @@ public class FacilityOperatorController extends BaseController {
   public FacilityOperator getFacilityOperators(
       @PathVariable("id") UUID facilityOperatorId) {
 
-    FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
-    if (facilityOperator == null) {
-      throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      return facilityOperator;
-    }
+    return facilityOperatorRepository.findById(facilityOperatorId)
+        .orElseThrow(() -> new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND));
   }
 
   /**
@@ -137,12 +133,9 @@ public class FacilityOperatorController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityOperators(@PathVariable("id") UUID facilityOperatorId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    FacilityOperator facilityOperator = facilityOperatorRepository.findOne(facilityOperatorId);
-    if (facilityOperator == null) {
-      throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
-    } else {
-      facilityOperatorRepository.delete(facilityOperator);
-    }
+    FacilityOperator facilityOperator = facilityOperatorRepository.findById(facilityOperatorId)
+        .orElseThrow(() -> new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND));
+    facilityOperatorRepository.delete(facilityOperator);
   }
 
 
@@ -171,7 +164,7 @@ public class FacilityOperatorController extends BaseController {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    FacilityOperator instance = facilityOperatorRepository.findOne(id);
+    FacilityOperator instance = facilityOperatorRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
     }

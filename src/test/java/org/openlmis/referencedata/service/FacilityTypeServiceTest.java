@@ -58,7 +58,7 @@ public class FacilityTypeServiceTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
 
-    pageable = new PageRequest(0, 10);
+    pageable = PageRequest.of(0, 10);
 
     facilityType1 = new FacilityTypeDataBuilder().build();
     facilityType2 = new FacilityTypeDataBuilder().build();

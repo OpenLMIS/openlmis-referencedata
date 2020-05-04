@@ -43,7 +43,7 @@ public class SystemNotificationRepositoryIntegrationTest extends BaseCrudReposit
   private UserRepository userRepository;
 
   private User user;
-  private Pageable pageable = new PageRequest(0, 10);
+  private Pageable pageable = PageRequest.of(0, 10);
 
   SystemNotificationRepository getRepository() {
     return this.repository;

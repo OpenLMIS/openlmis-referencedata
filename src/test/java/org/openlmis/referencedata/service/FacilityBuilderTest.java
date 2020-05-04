@@ -20,6 +20,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
@@ -100,16 +101,16 @@ public class FacilityBuilderTest {
     facility.export(importer);
     importer.setId(null);
 
-    when(geographicZoneRepository.findOne(geographicZone.getId()))
-        .thenReturn(geographicZone);
-    when(facilityOperatorRepository.findOne(facilityOperator.getId()))
-        .thenReturn(facilityOperator);
-    when(facilityTypeRepository.findOne(facilityType.getId()))
-        .thenReturn(facilityType);
+    when(geographicZoneRepository.findById(geographicZone.getId()))
+        .thenReturn(Optional.of(geographicZone));
+    when(facilityOperatorRepository.findById(facilityOperator.getId()))
+        .thenReturn(Optional.of(facilityOperator));
+    when(facilityTypeRepository.findById(facilityType.getId()))
+        .thenReturn(Optional.of(facilityType));
     when(programRepository.findByCode(any(Code.class)))
         .thenReturn(program);
-    when(programRepository.findOne(program.getId()))
-        .thenReturn(program);
+    when(programRepository.findById(program.getId()))
+        .thenReturn(Optional.of(program));
   }
 
   @Test
@@ -135,8 +136,8 @@ public class FacilityBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfGeographicZoneCouldNotBeFound() {
-    when(geographicZoneRepository.findOne(geographicZone.getId()))
-        .thenReturn(null);
+    when(geographicZoneRepository.findById(geographicZone.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(GeographicZoneMessageKeys.ERROR_NOT_FOUND);
@@ -146,8 +147,8 @@ public class FacilityBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfFacilityTypeCouldNotBeFound() {
-    when(facilityTypeRepository.findOne(facilityType.getId()))
-        .thenReturn(null);
+    when(facilityTypeRepository.findById(facilityType.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
@@ -157,7 +158,8 @@ public class FacilityBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfFacilityOperatorCouldNotBeFound() {
-    when(facilityOperatorRepository.findOne(facilityOperator.getId())).thenReturn(null);
+    when(facilityOperatorRepository.findById(facilityOperator.getId()))
+        .thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(FacilityOperatorMessageKeys.ERROR_NOT_FOUND);
@@ -255,7 +257,7 @@ public class FacilityBuilderTest {
 
   @Test
   public void shouldHandleEmptySupportedProgramSet() {
-    ReflectionTestUtils.setField(importer, "supportedPrograms", null);
+    ReflectionTestUtils.setField(importer, "supportedProgramsRef", null);
     Facility built = builder.build(importer);
 
     assertThat(built.getSupportedPrograms()).hasSize(0);
@@ -263,7 +265,7 @@ public class FacilityBuilderTest {
 
   @Test
   public void shouldHandleNullValueAsSupportedProgramSet() {
-    ReflectionTestUtils.setField(importer, "supportedPrograms", Sets.newHashSet());
+    ReflectionTestUtils.setField(importer, "supportedProgramsRef", Sets.newHashSet());
     Facility built = builder.build(importer);
 
     assertThat(built.getSupportedPrograms()).hasSize(0);
@@ -272,8 +274,8 @@ public class FacilityBuilderTest {
   @Test
   public void shouldUseInstanceFromDatabaseIfImporterHasIdSet() {
     importer.setId(UUID.randomUUID());
-    when(facilityRepository.findOne(importer.getId()))
-        .thenReturn(facility);
+    when(facilityRepository.findById(importer.getId()))
+        .thenReturn(Optional.of(facility));
 
     Facility built = builder.build(importer);
     assertThat(built.getId()).isEqualTo(facility.getId());

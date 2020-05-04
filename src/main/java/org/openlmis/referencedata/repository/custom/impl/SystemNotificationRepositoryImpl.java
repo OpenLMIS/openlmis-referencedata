@@ -93,7 +93,7 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
     params.forEach(searchQuery::setParameter);
     List<SystemNotification> resultList =  searchQuery
         .setMaxResults(pageable.getPageSize())
-        .setFirstResult(pageable.getOffset())
+        .setFirstResult(Math.toIntExact(pageable.getOffset()))
         .getResultList();
 
     return Pagination.getPage(resultList, pageable, count);

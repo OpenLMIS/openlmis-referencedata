@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
 
@@ -122,7 +122,7 @@ public class ProgramController extends BaseController {
     if (!isEmpty(ids) && null != name) {
       programs = programRepository.findByIdInAndNameIgnoreCaseContaining(ids, name);
     } else if (!isEmpty(ids)) {
-      programs = programRepository.findAll(ids);
+      programs = programRepository.findAllById(ids);
     } else if (null != name) {
       programs = programRepository.findByNameIgnoreCaseContaining(name);
     } else {
@@ -154,13 +154,13 @@ public class ProgramController extends BaseController {
       return program;
     }
 
-    if (!programRepository.exists(programId)) {
+    if (!programRepository.existsById(programId)) {
       profiler.stop().log();
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
 
     profiler.start("GET_PROGRAM_FROM_DATABASE");
-    program = programRepository.findOne(programId);
+    program = programRepository.findById(programId).orElse(null);
 
     profiler.stop().log();
     return program;
@@ -176,7 +176,7 @@ public class ProgramController extends BaseController {
   public void deleteProgram(@PathVariable("id") UUID programId) {
     rightService.checkAdminRight(RightName.PROGRAMS_MANAGE);
 
-    Program program = programRepository.findOne(programId);
+    Program program = programRepository.findById(programId).orElse(null);
 
     if (AvailableFeatures.REDIS_CACHING.isActive()) {
       deleteProgramFromCache(programId);
@@ -207,7 +207,7 @@ public class ProgramController extends BaseController {
       throw new ValidationMessageException(ProgramMessageKeys.ERROR_ID_NULL);
     }
 
-    Program storedProgram = programRepository.findOne(id);
+    Program storedProgram = programRepository.findById(id).orElse(null);
     if (storedProgram == null) {
       XLOGGER.warn("Update failed - program with id: {} not found", id);
       throw new ValidationMessageException(
@@ -282,7 +282,7 @@ public class ProgramController extends BaseController {
           boolean returnJson,
       Pageable page) {
     //Return a 404 if the specified instance can't be found
-    Program instance = programRepository.findOne(id);
+    Program instance = programRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     }
@@ -304,12 +304,12 @@ public class ProgramController extends BaseController {
     if (programInCache) {
       profiler.start("GET_PROGRAM_FROM_CACHE");
       program = programRedisRepository.findById(programId);
-    } else if (!programRepository.exists(programId)) {
+    } else if (!programRepository.existsById(programId)) {
       profiler.stop().log();
       throw new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND);
     } else {
       profiler.start("GET_PROGRAM_FROM_DATABASE");
-      program = programRepository.findOne(programId);
+      program = programRepository.findById(programId).orElse(null);
       profiler.start("SAVE_PROGRAM_IN_CACHE");
       programRedisRepository.save(program);
     }

@@ -20,8 +20,8 @@ import static org.apache.commons.lang3.StringUtils.joinWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -194,7 +194,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .statusCode(200)
         .extract().as(UploadResultDto.class);
 
-    verify(idealStockAmountRepository).save(anyListOf(IdealStockAmount.class));
+    verify(idealStockAmountRepository).saveAll(anyList());
     assertEquals(1, result.getAmount().intValue());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }

@@ -42,7 +42,7 @@ public abstract class PageableSearchParams {
    */
   @JsonIgnore
   public Pageable getPageable() {
-    return new PageRequest(
+    return PageRequest.of(
         Optional.ofNullable(page).orElse(Pagination.DEFAULT_PAGE_NUMBER),
         Optional.ofNullable(size).orElse(Pagination.NO_PAGINATION)
     );

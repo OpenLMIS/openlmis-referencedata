@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
@@ -282,7 +282,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
       }
 
       profiler.start("DELETE_ALL_VERSIONS");
-      repository.delete(facilityTypeApprovedProducts);
+      repository.deleteAll(facilityTypeApprovedProducts);
     } else {
       profiler.start("FIND_FTAP_BY_ID_AND_VERSION_NAME");
       FacilityTypeApprovedProduct facilityTypeApprovedProduct = repository
@@ -362,7 +362,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
         .collect(Collectors.toSet());
 
     Map<UUID, Orderable> orderables = orderableRepository
-        .findAllLatestByIds(orderableId, new PageRequest(0, orderableId.size()))
+        .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
         .getContent()
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));

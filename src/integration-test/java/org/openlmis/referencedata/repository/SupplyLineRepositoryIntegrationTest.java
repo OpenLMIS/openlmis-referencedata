@@ -78,7 +78,7 @@ public class SupplyLineRepositoryIntegrationTest
   private ProgramRepository programRepository;
 
   private List<SupplyLine> supplyLines;
-  private Pageable pageable = new PageRequest(0, 10);
+  private Pageable pageable = PageRequest.of(0, 10);
 
   CrudRepository<SupplyLine, UUID> getRepository() {
     return repository;
@@ -123,7 +123,7 @@ public class SupplyLineRepositoryIntegrationTest
 
   @Test
   public void shouldSearchSupplyLinesWithSorting() {
-    Pageable pageable = new PageRequest(0, 10, new Sort(DESC, "supplyingFacility.name"));
+    Pageable pageable = PageRequest.of(0, 10, Sort.by(DESC, "supplyingFacility.name"));
     Page<SupplyLine> result = repository.search(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));

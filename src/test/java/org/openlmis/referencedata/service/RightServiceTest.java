@@ -29,7 +29,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.RightQuery;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
@@ -117,9 +116,7 @@ public class RightServiceTest {
   @Test
   public void checkAdminRightShouldAllowRequesterWithSpecifiedUserId() {
     when(securityContext.getAuthentication()).thenReturn(userClient);
-    when(userRepository.exists(any(UUID.class))).thenReturn(true);
-    when(userRepository.findOne(any(UUID.class))).thenReturn(user);
-    when(user.hasRight(any(RightQuery.class))).thenReturn(false);
+    when(userRepository.existsById(any(UUID.class))).thenReturn(true);
 
     rightService.checkAdminRight(RIGHT_NAME, true, user.getId());
   }

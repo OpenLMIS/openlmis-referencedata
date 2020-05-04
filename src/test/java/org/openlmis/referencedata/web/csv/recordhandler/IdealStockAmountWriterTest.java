@@ -61,6 +61,6 @@ public class IdealStockAmountWriterTest {
 
     idealStockAmountWriter.write(Arrays.asList(idealStockAmount));
 
-    verify(idealStockAmountRepository).save(Arrays.asList(idealStockAmount));
+    verify(idealStockAmountRepository).saveAll(Arrays.asList(idealStockAmount));
   }
 }

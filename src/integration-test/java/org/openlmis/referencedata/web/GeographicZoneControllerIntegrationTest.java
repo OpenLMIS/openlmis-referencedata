@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -46,6 +47,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -115,23 +117,26 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     districtZone.export(districtZoneDto);
 
     given(geographicZoneRepository.save(any(GeographicZone.class))).willAnswer(new SaveAnswer<>());
-    given(geographicZoneRepository.findOne(countryZoneDto.getId())).willReturn(countryZone);
-    given(geographicZoneRepository.findOne(regionZoneDto.getId())).willReturn(regionZone);
-    given(geographicZoneRepository.findOne(districtZoneDto.getId())).willReturn(districtZone);
+    given(geographicZoneRepository.findById(countryZoneDto.getId()))
+        .willReturn(Optional.of(countryZone));
+    given(geographicZoneRepository.findById(regionZoneDto.getId()))
+        .willReturn(Optional.of(regionZone));
+    given(geographicZoneRepository.findById(districtZoneDto.getId()))
+        .willReturn(Optional.of(districtZone));
 
-    given(geographicLevelRepository.findOne(countryZoneDto.getLevel().getId()))
-        .willReturn(countryZone.getLevel());
-    given(geographicLevelRepository.findOne(regionZoneDto.getLevel().getId()))
-        .willReturn(regionZone.getLevel());
-    given(geographicLevelRepository.findOne(districtZoneDto.getLevel().getId()))
-        .willReturn(districtZone.getLevel());
+    given(geographicLevelRepository.findById(countryZoneDto.getLevel().getId()))
+        .willReturn(Optional.of(countryZone.getLevel()));
+    given(geographicLevelRepository.findById(regionZoneDto.getLevel().getId()))
+        .willReturn(Optional.of(regionZone.getLevel()));
+    given(geographicLevelRepository.findById(districtZoneDto.getLevel().getId()))
+        .willReturn(Optional.of(districtZone.getLevel()));
 
     mockUserHasRight(RightName.GEOGRAPHIC_ZONES_MANAGE_RIGHT);
   }
 
   @Test
   public void shouldDeleteGeographicZone() {
-    given(geographicZoneRepository.exists(countryZoneDto.getId())).willReturn(true);
+    given(geographicZoneRepository.existsById(countryZoneDto.getId())).willReturn(true);
 
     restAssured
         .given()
@@ -183,7 +188,8 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void shouldGetAllGeographicZones() {
     List<GeographicZone> geographicZones = Lists
         .newArrayList(countryZone, regionZone, districtZone);
-    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, null);
+    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones,
+        PageRequest.of(0, 10));
 
     given(geographicZoneRepository.findAll(pageable)).willReturn(geographicZonesPage);
 
@@ -211,7 +217,8 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
 
     given(geographicZoneService.search(anyMapOf(String.class, Object.class), any(Pageable.class)))
-        .willReturn(Pagination.getPage(geographicZones, null, geographicZones.size()));
+        .willReturn(Pagination.getPage(geographicZones, PageRequest.of(0, 10),
+            geographicZones.size()));
 
     Map<String, Object> requestBody = getSearchBody();
 
@@ -413,7 +420,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
-    given(geographicZoneRepository.exists(any(UUID.class))).willReturn(false);
+    given(geographicZoneRepository.existsById(any(UUID.class))).willReturn(false);
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -431,7 +438,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
 
   @Test
   public void shouldGetAuditLog() {
-    given(geographicZoneRepository.exists(any(UUID.class))).willReturn(true);
+    given(geographicZoneRepository.existsById(any(UUID.class))).willReturn(true);
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

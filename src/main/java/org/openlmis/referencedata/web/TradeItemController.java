@@ -93,7 +93,7 @@ public class TradeItemController extends BaseController {
     rightService.checkAdminRight(ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
-    TradeItem instance = repository.findOne(id);
+    TradeItem instance = repository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID);
     }

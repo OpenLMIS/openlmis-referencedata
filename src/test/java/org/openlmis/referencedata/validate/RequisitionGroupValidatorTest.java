@@ -33,6 +33,7 @@ import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErro
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -102,13 +103,13 @@ public class RequisitionGroupValidatorTest {
 
     errors = new BeanPropertyBindingResult(requisitionGroupDto, "requisitionGroup");
 
-    doReturn(mock(SupervisoryNode.class))
+    doReturn(Optional.of(mock(SupervisoryNode.class)))
         .when(supervisoryNodes)
-        .findOne(supervisoryNode.getId());
+        .findById(supervisoryNode.getId());
 
-    doReturn(mock(Facility.class))
+    doReturn(Optional.of(mock(Facility.class)))
         .when(facilities)
-        .findOne(facility.getId());
+        .findById(facility.getId());
   }
 
   @Test
@@ -158,7 +159,7 @@ public class RequisitionGroupValidatorTest {
     oldGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
     oldGroup.setSupervisoryNode(supervisoryNode);
 
-    when(supervisoryNodes.findOne(supervisoryNode.getId()).getRequisitionGroup())
+    when(supervisoryNodes.findById(supervisoryNode.getId()).get().getRequisitionGroup())
             .thenReturn(oldGroup);
 
     requisitionGroupDto.setId(null);
@@ -178,7 +179,7 @@ public class RequisitionGroupValidatorTest {
     oldGroup.setDescription(RandomStringUtils.randomAlphanumeric(250));
     oldGroup.setSupervisoryNode(supervisoryNode);
 
-    when(supervisoryNodes.findOne(supervisoryNode.getId()).getRequisitionGroup())
+    when(supervisoryNodes.findById(supervisoryNode.getId()).get().getRequisitionGroup())
             .thenReturn(oldGroup);
 
     validator.validate(requisitionGroupDto, errors);
@@ -188,9 +189,9 @@ public class RequisitionGroupValidatorTest {
 
   @Test
   public void shouldRejectIfSupervisoryNodeCanNotBeFound() throws Exception {
-    doReturn(null)
+    doReturn(Optional.empty())
         .when(supervisoryNodes)
-        .findOne(any(UUID.class));
+        .findById(any(UUID.class));
 
     validator.validate(requisitionGroupDto, errors);
 
@@ -296,9 +297,9 @@ public class RequisitionGroupValidatorTest {
     RequisitionGroupProgramScheduleDto schedule2 = new RequisitionGroupProgramScheduleDto();
     schedule2.setProgram(new ProgramDto(programId));
 
-    doReturn(schedule1.getProgram())
+    doReturn(Optional.of(schedule1.getProgram()))
         .when(programs)
-        .findOne(programId);
+        .findById(programId);
 
 
     requisitionGroupDto.setRequisitionGroupProgramScheduleDtos(

@@ -26,6 +26,7 @@ import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Test;
@@ -105,7 +106,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getShouldGetRight() {
     mockClientHasRootAccess();
 
-    given(rightRepository.findOne(rightId)).willReturn(right);
+    given(rightRepository.findById(rightId)).willReturn(Optional.of(right));
 
     RightDto response = restAssured
         .given()
@@ -142,7 +143,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   public void getShouldReturnNotFoundForNonExistingRight() {
     mockClientHasRootAccess();
 
-    given(rightRepository.findOne(rightId)).willReturn(null);
+    given(rightRepository.findById(rightId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -244,7 +245,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   public void deleteShouldDeleteRight() {
     mockClientHasRootAccess();
 
-    given(rightRepository.findOne(rightId)).willReturn(right);
+    given(rightRepository.findById(rightId)).willReturn(Optional.of(right));
 
     restAssured
         .given()
@@ -278,7 +279,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   public void deleteShouldReturnNotFoundForNonExistingRight() {
     mockClientHasRootAccess();
 
-    given(rightRepository.findOne(rightId)).willReturn(null);
+    given(rightRepository.findById(rightId)).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -351,7 +352,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void getAuditLogShouldReturnNotFoundIfEntityDoesNotExist() {
     mockClientHasRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(null);
+    given(rightRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -361,7 +362,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void getAuditLogShouldReturnUnauthorizedIfUserDoesNotHaveRight() {
     mockClientHasNoRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(null);
+    given(rightRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -371,7 +372,7 @@ public class RightControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetAuditLog() {
     mockClientHasRootAccess();
-    given(rightRepository.findOne(any(UUID.class))).willReturn(right);
+    given(rightRepository.findById(any(UUID.class))).willReturn(Optional.of(right));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

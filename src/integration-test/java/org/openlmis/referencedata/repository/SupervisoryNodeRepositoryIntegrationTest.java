@@ -23,7 +23,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.javers.common.collections.Sets.asSet;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
 import java.util.UUID;
@@ -88,6 +88,8 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
   private FacilityType facilityType;
   private GeographicLevel geographicLevel;
   private GeographicZone geographicZone;
+  
+  private PageRequest pageRequest = PageRequest.of(0, 10);
 
   @Override
   CrudRepository<SupervisoryNode, UUID> getRepository() {
@@ -192,30 +194,30 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(
         "name", "code", null, null, null, null);
     assertEquals(3, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     params.setCode("CODE");
     params.setName("NAME");
     assertEquals(3, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     params.setCode("CoDe");
     params.setName("nAMe");
     assertEquals(3, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
 
     params.setName("some-name");
     params.setCode(null);
     assertEquals(1, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     params.setCode("random-string");
     assertEquals(0, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     params.setCode("some-code");
     params.setName(null);
     assertEquals(1, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     params.setName("random-string");
     assertEquals(0, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
   }
 
   @Test
@@ -293,7 +295,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null, null, null, null,
         geographicZone.getId(), null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(node, result.getContent().get(0));
@@ -310,7 +312,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null, null, null, null,
         null, asSet(node1.getId(), node2.getId()));
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
 
     assertEquals(2, result.getTotalElements());
     assertThat(result.getContent(), hasItems(node1, node2));
@@ -326,16 +328,16 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams();
     assertEquals(2, supervisoryNodeRepository
-        .search(params, new PageRequest(0, 2)).getContent().size());
+        .search(params, PageRequest.of(0, 2)).getContent().size());
     assertEquals(2, supervisoryNodeRepository
-        .search(params, new PageRequest(1, 2)).getContent().size());
+        .search(params, PageRequest.of(1, 2)).getContent().size());
     assertEquals(1, supervisoryNodeRepository
-        .search(params, new PageRequest(2, 2)).getContent().size());
+        .search(params, PageRequest.of(2, 2)).getContent().size());
 
     assertEquals(4, supervisoryNodeRepository
-        .search(params, new PageRequest(0, 4)).getContent().size());
+        .search(params, PageRequest.of(0, 4)).getContent().size());
     assertEquals(1, supervisoryNodeRepository
-        .search(params, new PageRequest(1, 4)).getContent().size());
+        .search(params, PageRequest.of(1, 4)).getContent().size());
   }
 
   @Test
@@ -348,17 +350,17 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
 
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams();
     assertEquals(5, supervisoryNodeRepository
-        .search(params, null).getTotalElements());
+        .search(params, pageRequest).getTotalElements());
     assertEquals(5, supervisoryNodeRepository
-        .search(params, null).getContent().size());
+        .search(params, pageRequest).getContent().size());
     assertEquals(5, supervisoryNodeRepository
-        .search(params, null).getNumberOfElements());
+        .search(params, pageRequest).getNumberOfElements());
     assertEquals(0, supervisoryNodeRepository
-        .search(params, null).getNumber());
-    assertEquals(0, supervisoryNodeRepository
-        .search(params, null).getSize());
-    assertNull(supervisoryNodeRepository
-        .search(params, null).getSort());
+        .search(params, pageRequest).getNumber());
+    assertEquals(10, supervisoryNodeRepository
+        .search(params, pageRequest).getSize());
+    assertTrue(supervisoryNodeRepository
+        .search(params, pageRequest).getSort().isUnsorted());
   }
 
   @Test
@@ -373,7 +375,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null,
         null, null, program.getId(), null, null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
 
     assertEquals(0, result.getTotalElements());
 
@@ -394,7 +396,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
         .buildAsNew());
 
     result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(supervisoryNode, result.getContent().get(0));
@@ -416,7 +418,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
     SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(null,
         null, newFacility.getId(), null, null, null);
     Page<SupervisoryNode> result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
     assertEquals(0, result.getTotalElements());
 
     SupervisoryNode supervisoryNode = supervisoryNodeRepository.save(generateInstance());
@@ -427,7 +429,7 @@ public class SupervisoryNodeRepositoryIntegrationTest extends
         .buildAsNew());
 
     result = supervisoryNodeRepository
-        .search(params, null);
+        .search(params, pageRequest);
 
     assertEquals(1, result.getTotalElements());
     assertEquals(supervisoryNode, result.getContent().get(0));

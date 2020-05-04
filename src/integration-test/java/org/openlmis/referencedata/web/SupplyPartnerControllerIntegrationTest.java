@@ -27,6 +27,7 @@ import static org.mockito.Matchers.eq;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matcher;
@@ -49,6 +50,7 @@ import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -96,7 +98,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
   public void shouldGetSupplyPartners() {
     given(supplyPartnerRepository.search(
         any(SupplyPartnerRepositoryCustom.SearchParams.class), eq(pageable)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(supplyPartner)));
+        .willReturn(Pagination.getPage(Lists.newArrayList(supplyPartner), PageRequest.of(0, 10)));
 
     ValidatableResponse response = restAssured
         .given()
@@ -219,7 +221,8 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldGetSupplyPartner() {
-    given(supplyPartnerRepository.findOne(supplyPartner.getId())).willReturn(supplyPartner);
+    given(supplyPartnerRepository.findById(supplyPartner.getId()))
+        .willReturn(Optional.of(supplyPartner));
 
     ValidatableResponse response = restAssured
         .given()
@@ -267,7 +270,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnNotFoundIfSupplyPartnerDoesNotExistInGetSupplyPartner() {
-    given(supplyPartnerRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supplyPartnerRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -354,7 +357,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnAuditLog() {
-    given(supplyPartnerRepository.findOne(any(UUID.class))).willReturn(supplyPartner);
+    given(supplyPartnerRepository.findById(any(UUID.class))).willReturn(Optional.of(supplyPartner));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_PATH);
 
@@ -372,7 +375,7 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
   @Test
   public void shouldReturnNotFoundIfSupplyPartnerDoesNotExistInGetAuditLog() {
-    given(supplyPartnerRepository.findOne(supplyPartner.getId())).willReturn(null);
+    given(supplyPartnerRepository.findById(supplyPartner.getId())).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_PATH);
 

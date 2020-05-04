@@ -26,6 +26,7 @@ import static org.mockito.Mockito.doThrow;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Right;
@@ -110,7 +111,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldGetRole() {
 
-    given(roleRepository.findOne(roleId)).willReturn(role);
+    given(roleRepository.findById(roleId)).willReturn(Optional.of(role));
 
     RoleDto response = restAssured
         .given()
@@ -191,7 +192,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    given(roleRepository.findOne(roleId)).willReturn(role);
+    given(roleRepository.findById(roleId)).willReturn(Optional.of(role));
     given(rightRepository.findFirstByName(RIGHT1_NAME)).willReturn(right1);
     given(rightRepository.findFirstByName(RIGHT2_NAME)).willReturn(right2);
 
@@ -238,7 +239,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    given(roleRepository.findOne(roleId)).willReturn(role);
+    given(roleRepository.findById(roleId)).willReturn(Optional.of(role));
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -276,7 +277,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
+    given(roleRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -288,7 +289,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(null);
+    given(roleRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -300,7 +301,7 @@ public class RoleControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
-    given(roleRepository.findOne(any(UUID.class))).willReturn(role);
+    given(roleRepository.findById(any(UUID.class))).willReturn(Optional.of(role));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

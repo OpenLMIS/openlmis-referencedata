@@ -114,7 +114,7 @@ public class RoleController extends BaseController {
   public RoleDto getRole(@PathVariable("roleId") UUID roleId) {
 
     LOGGER.debug("Getting role");
-    Role role = roleRepository.findOne(roleId);
+    Role role = roleRepository.findById(roleId).orElse(null);
     if (role == null) {
       throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
@@ -146,7 +146,7 @@ public class RoleController extends BaseController {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    Role instance = roleRepository.findOne(id);
+    Role instance = roleRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
@@ -229,13 +229,13 @@ public class RoleController extends BaseController {
   public void deleteRole(@PathVariable("roleId") UUID roleId) {
     rightService.checkAdminRight(RightName.USER_ROLES_MANAGE_RIGHT, false);
 
-    Role storedRole = roleRepository.findOne(roleId);
+    Role storedRole = roleRepository.findById(roleId).orElse(null);
     if (storedRole == null) {
       throw new NotFoundException(RoleMessageKeys.ERROR_NOT_FOUND);
     }
 
     LOGGER.debug("Deleting role");
-    roleRepository.delete(roleId);
+    roleRepository.deleteById(roleId);
   }
 
   private RoleDto exportToDto(Role role) {

@@ -180,9 +180,9 @@ public class UserController extends BaseController {
 
     User user;
     profiler.start("USER_EXISTS_IN_DB_CHECK");
-    if (userId != null && userRepository.exists(userId)) {
+    if (userId != null && userRepository.existsById(userId)) {
       profiler.start("GET_USER_FROM_DB");
-      user = userRepository.findOne(userId);
+      user = userRepository.findById(userId).orElse(null);
       profiler.start("UPDATE_USER_FROM_DTO");
       user.updateFrom(userDto);
     } else {
@@ -281,7 +281,7 @@ public class UserController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER");
-    User user = userRepository.findOne(userId);
+    User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
       LOGGER.error("User to get does not exist");
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
@@ -314,7 +314,7 @@ public class UserController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER_ROLE_ASSIGNMENTS");
-    User user = userRepository.findOne(userId);
+    User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
@@ -345,12 +345,12 @@ public class UserController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
     profiler.start("FIND_USER");
-    User user = userRepository.findOne(userId);
+    User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     } else {
       profiler.start("DELETE_USER_FROM_DB");
-      userRepository.delete(userId);
+      userRepository.deleteById(userId);
     }
     profiler.stop().log();
   }
@@ -422,18 +422,18 @@ public class UserController extends BaseController {
     boolean hasRight;
 
     profiler.start("GET_RIGHT");
-    Right right = rightRepository.findOne(rightId);
+    Right right = rightRepository.findById(rightId).orElse(null);
 
     if (programId != null) {
       profiler.start("CHECK_PROGRAM_EXISTS");
-      if (!programRepository.exists(programId)) {
+      if (!programRepository.existsById(programId)) {
         throw new ValidationMessageException(new Message(
             ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
       }
 
       if (facilityId != null) {
         profiler.start("CHECK_FACILITY_EXISTS");
-        if (!facilityRepository.exists(facilityId)) {
+        if (!facilityRepository.existsById(facilityId)) {
           throw new ValidationMessageException(new Message(
               FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
         }
@@ -449,7 +449,7 @@ public class UserController extends BaseController {
     } else if (warehouseId != null) {
 
       profiler.start("CHECK_WAREHOUSE_EXISTS");
-      if (!facilityRepository.exists(warehouseId)) {
+      if (!facilityRepository.existsById(warehouseId)) {
         throw new ValidationMessageException(new Message(
             FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, warehouseId));
       }
@@ -679,7 +679,7 @@ public class UserController extends BaseController {
 
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, userId, profiler);
 
-    if (!userRepository.exists(userId)) {
+    if (!userRepository.existsById(userId)) {
       throw new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND);
     }
 
@@ -696,7 +696,7 @@ public class UserController extends BaseController {
   }
 
   private User validateUser(UUID userId) {
-    User user = userRepository.findOne(userId);
+    User user = userRepository.findById(userId).orElse(null);
     if (user == null) {
       throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
     }
@@ -709,7 +709,7 @@ public class UserController extends BaseController {
       UUID id,
       CrudRepository<? extends Identifiable, UUID> repository) {
 
-    Identifiable identifiable = repository.findOne(id);
+    Identifiable identifiable = repository.findById(id).orElse(null);
     return (null != identifiable) ? Optional.of(identifiable) : Optional.empty();
   }
 
@@ -718,7 +718,7 @@ public class UserController extends BaseController {
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
 
-      Role role = roleRepository.findOne(roleAssignmentDto.getRoleId());
+      Role role = roleRepository.findById(roleAssignmentDto.getRoleId()).orElse(null);
 
       if (role.getRights().isEmpty()) {
         throw new ValidationMessageException(new Message(
@@ -729,12 +729,12 @@ public class UserController extends BaseController {
       UUID warehouseId = roleAssignmentDto.getWarehouseId();
       if (programId != null) {
 
-        Program program = programRepository.findOne(programId);
+        Program program = programRepository.findById(programId).orElse(null);
         UUID supervisoryNodeId = roleAssignmentDto.getSupervisoryNodeId();
         if (supervisoryNodeId != null) {
 
-          SupervisoryNode supervisoryNode = supervisoryNodeRepository.findOne(
-              supervisoryNodeId);
+          SupervisoryNode supervisoryNode = supervisoryNodeRepository.findById(
+              supervisoryNodeId).orElse(null);
           roleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
 
         } else {
@@ -743,7 +743,7 @@ public class UserController extends BaseController {
 
       } else if (warehouseId != null) {
 
-        Facility warehouse = facilityRepository.findOne(warehouseId);
+        Facility warehouse = facilityRepository.findById(warehouseId).orElse(null);
         roleAssignment = new FulfillmentRoleAssignment(role, user, warehouse);
 
       } else {
@@ -835,7 +835,7 @@ public class UserController extends BaseController {
 
   private void checkUserExists(UUID userId, Profiler profiler) {
     profiler.start("CHECK_USER_EXISTS");
-    if (!userRepository.exists(userId)) {
+    if (!userRepository.existsById(userId)) {
       throw new NotFoundException(new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, userId));
     }
   }

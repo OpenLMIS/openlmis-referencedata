@@ -90,7 +90,7 @@ public class FacilityServiceTest {
   @InjectMocks
   private FacilityService facilityService = new FacilityService();
 
-  private PageRequest pageable = new PageRequest(0, Integer.MAX_VALUE);
+  private PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
   @Before
   public void setUp() {
@@ -100,7 +100,7 @@ public class FacilityServiceTest {
     when(facility2.getId()).thenReturn(facility2Id);
 
     when(facilityTypeRepository.existsByCode(FACILITY_TYPE)).thenReturn(true);
-    when(geographicZoneRepository.exists(parentId)).thenReturn(true);
+    when(geographicZoneRepository.existsById(parentId)).thenReturn(true);
   }
 
   @Test
@@ -137,7 +137,7 @@ public class FacilityServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfGeographicZoneDoesNotExist() {
-    when(geographicZoneRepository.exists(parentId)).thenReturn(false);
+    when(geographicZoneRepository.existsById(parentId)).thenReturn(false);
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(ZONE_ID, UUID.randomUUID().toString());
@@ -147,7 +147,7 @@ public class FacilityServiceTest {
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionIfFacilityTypeDoesNotExist() {
     when(facilityTypeRepository.existsByCode(any(String.class))).thenReturn(false);
-    PageRequest pageable = new PageRequest(0, 10, new Sort("name"));
+    PageRequest pageable = PageRequest.of(0, 10, Sort.by("name"));
 
     MultiValueMap<String, Object> params = new LinkedMultiValueMap<>();
     params.add(ZONE_ID, UUID.randomUUID().toString());

@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.google.common.collect.Maps;
@@ -137,7 +137,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     if (total <= 0) {
       profiler.stop().log();
-      return Pagination.getPage(Collections.emptyList());
+      return Pagination.getPage(Collections.emptyList(), pageable);
     }
 
     profiler.start("GET_VERSION_IDENTITY");
@@ -264,7 +264,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     if (!count) {
       return entityManager.createQuery(query)
           .setMaxResults(pageable.getPageSize())
-          .setFirstResult(pageable.getOffset());
+          .setFirstResult(Math.toIntExact(pageable.getOffset()));
     }
 
     return entityManager.createQuery(newQuery);

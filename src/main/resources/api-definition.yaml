@@ -344,6 +344,8 @@ resourceTypes:
                   repeat: false
           responses:
               200:
+                headers:
+                  Keep-Alive:
                 body:
                   application/json:
                     schema: auditLogEntryArray
@@ -367,11 +369,15 @@ resourceTypes:
                         }
                       ]
               403:
+                headers:
+                  Keep-Alive:
                 body:
                   application/json:
                     schema: localizedErrorResponse
               404:
                 description: The specified <<resourcePathName|!singularize>> does not exist.
+                headers:
+                  Keep-Alive:
                 body:
                   application/json:
                     schema: localizedErrorResponse
@@ -473,6 +479,8 @@ resourceTypes:
                       repeat: true
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: processingPeriodPage
@@ -481,6 +489,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -490,6 +500,8 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
@@ -512,10 +524,14 @@ resourceTypes:
               description: Get chosen processingPeriod.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: processingPeriod
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
@@ -529,6 +545,8 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: processingPeriod
@@ -537,6 +555,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -552,6 +572,8 @@ resourceTypes:
               description: Display total months of processingPeriod.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: integerResult
@@ -559,6 +581,8 @@ resourceTypes:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
       /{id}/auditLog:
@@ -574,6 +598,8 @@ resourceTypes:
                     schema: orderableDisplayCategory
             responses:
                 "201":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                             schema: orderableDisplayCategory
@@ -581,6 +607,8 @@ resourceTypes:
                     body:
                         application/json:
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -589,10 +617,14 @@ resourceTypes:
             description: Get all orderableDisplayCategories.
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                             schema: orderableDisplayCategoryArray
                 401:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
       /{id}:
@@ -609,6 +641,8 @@ resourceTypes:
                     application/json:
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: orderableDisplayCategory
@@ -617,6 +651,8 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -625,10 +661,14 @@ resourceTypes:
                 description: Get chosen orderableDisplayCategory.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: orderableDisplayCategory
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                     "404":
@@ -639,6 +679,8 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes display category. This action is not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "404":
                         body:
                           application/json:
@@ -647,6 +689,8 @@ resourceTypes:
                         body:
                             application/json:
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -665,10 +709,14 @@ resourceTypes:
                       repeat: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: orderableDisplayCategoryArray
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
 
@@ -682,6 +730,8 @@ resourceTypes:
               schema: orderable
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                         schema: orderable
@@ -690,6 +740,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -721,11 +773,15 @@ resourceTypes:
                   repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                         schema: orderablePage
               "304":
                 description: Returned with no response body if no resource was modified since date provided in the If-Modified-Since request header.
+                headers:
+                  Keep-Alive:
               "400":
                   body:
                     application/json:
@@ -749,11 +805,15 @@ resourceTypes:
                       required: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: orderable
                   "304":
                       description: Returned with no response body if resource was not modified since date provided in the If-Modified-Since request header.
+                      headers:
+                        Keep-Alive:
                   "401":
                       body:
                         application/json:
@@ -786,6 +846,8 @@ resourceTypes:
                   application/json:
                     schema: localizedErrorResponse
               "404":
+                headers:
+                  Keep-Alive:
                 body:
                   application/json:
                     schema: localizedErrorResponse
@@ -803,13 +865,19 @@ resourceTypes:
               responses:
                 200:
                     description: The request is valid and a page of orderables will be returned.
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                             schema: orderablePage
                 "304":
                   description: Returned with no response body if no resource was modified since date provided in the If-Modified-Since request header.
+                  headers:
+                    Keep-Alive:
                 401:
                     description: The request does not contain a token or the token might be invalid.
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
 
@@ -823,6 +891,8 @@ resourceTypes:
               schema: tradeItem
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                         schema: tradeItem
@@ -850,10 +920,14 @@ resourceTypes:
                       repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: tradeItemPage
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       /{id}/auditLog:
@@ -869,6 +943,8 @@ resourceTypes:
                 schema: commodityType
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                         schema: commodityType
@@ -877,6 +953,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -885,6 +963,8 @@ resourceTypes:
           description: Retrieve commodity types.
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: commodityTypePage
@@ -901,10 +981,14 @@ resourceTypes:
               description: Get a list of Trade Item UUIDs that may fulfill for the given Commodity Type.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: uuidArray
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
@@ -925,6 +1009,8 @@ resourceTypes:
                           schema: localizedErrorResponse
                   "404":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -938,9 +1024,13 @@ resourceTypes:
           description: Get all schedules.
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -950,12 +1040,16 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
                   body:
                     application/json:
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -977,6 +1071,8 @@ resourceTypes:
                           repeat: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: processingScheduleArray
@@ -997,7 +1093,11 @@ resourceTypes:
               description: "[AVOID USING] Completely removes processing schedule. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1011,12 +1111,18 @@ resourceTypes:
               description: Get chosen processingSchedule.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1027,9 +1133,13 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1069,6 +1179,8 @@ resourceTypes:
                   repeat: true
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: supplyLinePage
@@ -1088,12 +1200,16 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
                   body:
                     application/json:
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1109,12 +1225,18 @@ resourceTypes:
               description: "[AVOID USING] Completely removes supply line. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
                   "409":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1123,12 +1245,18 @@ resourceTypes:
               description: Get chosen supplyLine.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1139,6 +1267,8 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "400":
@@ -1147,6 +1277,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1216,10 +1348,14 @@ resourceTypes:
                 repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: userPage
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1231,6 +1367,8 @@ resourceTypes:
                 schema: user
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: user
@@ -1239,6 +1377,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1254,6 +1394,8 @@ resourceTypes:
               description: "[AVOID USING] Completely removes user. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "400":
                       body:
                         application/json:
@@ -1262,6 +1404,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1270,6 +1414,8 @@ resourceTypes:
               description: Get a chosen user by providing his ID.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: user
@@ -1278,6 +1424,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1287,14 +1435,20 @@ resourceTypes:
                   description: Return full information about user's roles and rights.
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: detailedRoleAssignmentDtoArray
                       "404":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1329,6 +1483,8 @@ resourceTypes:
                           repeat: false
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: booleanResult
@@ -1338,6 +1494,8 @@ resourceTypes:
                               schema: errorResponse
                       "404":
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1349,6 +1507,8 @@ resourceTypes:
                   description: Get all programs the associated user supervises.
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: programArray
@@ -1357,6 +1517,8 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1369,14 +1531,20 @@ resourceTypes:
                       facility.
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: programArray
                       "404":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1395,6 +1563,8 @@ resourceTypes:
                           repeat: false
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: facilityArray
@@ -1404,6 +1574,8 @@ resourceTypes:
                               schema: localizedErrorResponse
                       "404":
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1428,14 +1600,20 @@ resourceTypes:
                       granting Role Assignments to Users in the User resource.
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: stringArray
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
                       "404":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1447,14 +1625,20 @@ resourceTypes:
                   description: Gets all supervision facilities associated with a user. To determine which facilities work with which right and program, please use /permissionStrings for mappings.
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: namedResourceArray
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
                       "404":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1476,10 +1660,14 @@ resourceTypes:
                     schema: userQueryDto
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: userPage
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1519,6 +1707,8 @@ resourceTypes:
                           repeat: false
                   responses:
                       "200":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                                 schema: userArray
@@ -1527,6 +1717,8 @@ resourceTypes:
                             application/json:
                               schema: localizedErrorResponse
                       "403":
+                          headers:
+                            Keep-Alive:
                           body:
                             application/json:
                               schema: localizedErrorResponse
@@ -1569,6 +1761,8 @@ resourceTypes:
                   repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: basicFacilityPage
@@ -1580,6 +1774,8 @@ resourceTypes:
                 schema: facility
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: facility
@@ -1588,6 +1784,8 @@ resourceTypes:
                     application/json:
                       schema: errorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1603,11 +1801,17 @@ resourceTypes:
               description: "[AVOID USING] Completely removes facility. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1616,10 +1820,14 @@ resourceTypes:
               description: Get chosen facility.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: facility
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1631,6 +1839,8 @@ resourceTypes:
                     schema: facility
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: facility
@@ -1639,6 +1849,8 @@ resourceTypes:
                         application/json:
                           schema: errorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1673,6 +1885,8 @@ resourceTypes:
                       repeat: true
               responses:
                 200:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: approvedProductDtoPage
@@ -1681,6 +1895,8 @@ resourceTypes:
                       application/json:
                         schema: errorResponse
                 401:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
       /search:
@@ -1700,6 +1916,8 @@ resourceTypes:
                       application/json:
                         schema: localizedErrorResponse
                 401:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
       /minimal:
@@ -1714,6 +1932,8 @@ resourceTypes:
                     repeat: false
               responses:
                   200:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: minimalFacilityDtoPage
@@ -1726,6 +1946,8 @@ resourceTypes:
                   schema: geoJsonPolygon
               responses:
                 200:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                           schema: facilityPage
@@ -1734,6 +1956,8 @@ resourceTypes:
                       application/json:
                         schema: localizedErrorResponse
                 403:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -1756,10 +1980,14 @@ resourceTypes:
                   repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: facilityTypePage
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
       post:
@@ -1769,12 +1997,16 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
                   body:
                     application/json:
               403:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1790,12 +2022,16 @@ resourceTypes:
               description: "[AVOID USING] Completely removes facility type. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "404":
                       body:
                         application/json:
                           schema: localizedErrorResponse
                   "409":
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1804,12 +2040,18 @@ resourceTypes:
               description: Get chosen facilityType.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1820,10 +2062,14 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "400":
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1850,6 +2096,8 @@ resourceTypes:
                   repeat: true
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -1859,9 +2107,13 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1881,7 +2133,11 @@ resourceTypes:
               description: "[AVOID USING] Completely removes program. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1895,9 +2151,13 @@ resourceTypes:
               description: Get chosen program.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1908,9 +2168,13 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1930,6 +2194,8 @@ resourceTypes:
                       repeat: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
       /{id}/auditLog:
@@ -1942,6 +2208,8 @@ resourceTypes:
           description: WARNING! deprecated; please use /stockCardLineItemReasons (for all reasons) or /validReasons (for reasons by program and facility type) to get a list of reasons. Get all stockAdjustmentReasons.
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: stockAdjustmentReasonArray
@@ -1958,6 +2226,8 @@ resourceTypes:
                   schema: stockAdjustmentReason
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: stockAdjustmentReason
@@ -1965,6 +2235,8 @@ resourceTypes:
                   body:
                     application/json:
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -1980,12 +2252,16 @@ resourceTypes:
               description: "WARNING! deprecated. [AVOID USING] Completely removes stock adjustment reason. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "404":
                       body:
                         application/json:
                           schema: localizedErrorResponse
                   "409":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -1994,6 +2270,8 @@ resourceTypes:
               description: WARNING! deprecated; please use /stockCardLineItemReasons (for all reasons) or /validReasons (for reasons by program and facility type) to get a list of reasons. Get chosen Stock Adjustment Reason.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: stockAdjustmentReason
@@ -2013,11 +2291,15 @@ resourceTypes:
                       schema: stockAdjustmentReason
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: stockAdjustmentReason
                   "400":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2033,6 +2315,8 @@ resourceTypes:
                       repeat: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: stockAdjustmentReasonArray
@@ -2053,9 +2337,13 @@ resourceTypes:
                 application/json:
             responses:
                 "201":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                 403:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2067,9 +2355,13 @@ resourceTypes:
             description: Returns all Facility Operators.
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                 401:
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
       /{id}:
@@ -2086,6 +2378,8 @@ resourceTypes:
                     application/json:
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     "404":
@@ -2093,6 +2387,8 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     403:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2101,9 +2397,13 @@ resourceTypes:
                 description: Get Facility Operator with given id.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                     "404":
@@ -2115,6 +2415,8 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes facility operator. This action is  not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "404":
                         body:
                           application/json:
@@ -2123,6 +2425,8 @@ resourceTypes:
                         body:
                             application/json:
                     403:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2136,10 +2440,14 @@ resourceTypes:
           description: Get all geographicZones.
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: geographicZonePage
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -2150,10 +2458,14 @@ resourceTypes:
                 schema: geographicZone
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: geographicZone
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -2169,7 +2481,11 @@ resourceTypes:
               description: "[AVOID USING] Completely removes geographic zone. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2182,10 +2498,14 @@ resourceTypes:
               description: Get chosen geographicZone.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: geographicZone
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
@@ -2200,10 +2520,14 @@ resourceTypes:
                     schema: geographicZone
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: geographicZone
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2218,6 +2542,8 @@ resourceTypes:
                   schema: geographicZoneQuery
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: geographicZonePage
@@ -2225,6 +2551,8 @@ resourceTypes:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
       /byLocation:
@@ -2236,6 +2564,8 @@ resourceTypes:
                   schema: geoJsonPoint
               responses:
                 200:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                           schema: geographicZoneArray
@@ -2244,6 +2574,8 @@ resourceTypes:
                       application/json:
                         schema: localizedErrorResponse
                 403:
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2255,9 +2587,13 @@ resourceTypes:
           description: Get all geographicLevels.
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -2267,12 +2603,16 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
                   body:
                     application/json:
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -2288,12 +2628,16 @@ resourceTypes:
               description: "[AVOID USING] Completely removes geographic level. This action is not recoverable."
               responses:
                   "204":
+                    headers:
+                      Keep-Alive:
                   "404":
                       body:
                         application/json:
                           schema: localizedErrorResponse
                   "409":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2302,9 +2646,13 @@ resourceTypes:
               description: Get chosen geographicLevel.
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "404":
@@ -2318,10 +2666,14 @@ resourceTypes:
                   application/json:
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   "400":
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2339,6 +2691,8 @@ resourceTypes:
             responses:
                 201:
                     description: The request is valid and the given facility type approved product has been created.
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: approvedProductDto
@@ -2349,10 +2703,14 @@ resourceTypes:
                         schema: localizedErrorResponse
                 401:
                     description: The request does not contain a token or the token might be invalid.
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                 403:
                     description: The server understood the request but refuses to authorize it.
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2409,6 +2767,8 @@ resourceTypes:
                         schema: localizedErrorResponse
             401:
                 description: The request does not contain a token or the token might be invalid.
+                headers:
+                  Keep-Alive:
                 body:
                     application/json:
       /search:
@@ -2431,6 +2791,8 @@ resourceTypes:
                                 schema: approvedProductDtoPage
                     401:
                         description: The request does not contain a token or the token might be invalid.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
       /{id}:
@@ -2449,6 +2811,8 @@ resourceTypes:
                 responses:
                     200:
                         description: The request is valid and the given facility type approved product has been updated or created with the given ID.
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: approvedProductDto
@@ -2459,10 +2823,14 @@ resourceTypes:
                             schema: localizedErrorResponse
                     401:
                         description: The request does not contain a token or the token might be invalid.
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                     403:
                         description: The server understood the request but refuses to authorize it.
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2482,15 +2850,21 @@ resourceTypes:
                 responses:
                     200:
                         description: The request is valid and the given facility type approved product will be returned.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: approvedProductDto
                     401:
                         description: The request does not contain a token or the token might be invalid.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     404:
                         description: The server could not find a facility type approved product with the given id and version.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: localizedErrorResponse
@@ -2512,17 +2886,25 @@ resourceTypes:
                 responses:
                     204:
                         description: The request is valid and the given facility type approved product has been removed.
+                        headers:
+                          Keep-Alive:
                     401:
                         description: The request does not contain a token or the token might be invalid.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     403:
                         description: The server understood the request but refuses to authorize it.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: localizedErrorResponse
                     404:
                         description: The server could not find a facility type approved product with the given id and version.
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: localizedErrorResponse
@@ -2538,6 +2920,8 @@ resourceTypes:
               application/json:
           responses:
               "201":
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
               "400":
@@ -2545,6 +2929,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -2584,9 +2970,13 @@ resourceTypes:
                   repeat: true
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
 
@@ -2604,6 +2994,8 @@ resourceTypes:
                     application/json:
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     "400":
@@ -2615,6 +3007,8 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2623,12 +3017,18 @@ resourceTypes:
                 description: Get chosen supervisoryNode.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2637,6 +3037,8 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes supervisory node. This action is not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "404":
                         body:
                           application/json:
@@ -2645,6 +3047,8 @@ resourceTypes:
                         body:
                             application/json:
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2665,6 +3069,8 @@ resourceTypes:
                                   repeat: false
                       responses:
                           "200":
+                              headers:
+                                Keep-Alive:
                               body:
                                 application/json:
                                     schema: userArray
@@ -2673,10 +3079,14 @@ resourceTypes:
                                 application/json:
                                   schema: localizedErrorResponse
                           "403":
+                              headers:
+                                Keep-Alive:
                               body:
                                 application/json:
                                   schema: localizedErrorResponse
                           "404":
+                              headers:
+                                Keep-Alive:
                               body:
                                 application/json:
                                   schema: localizedErrorResponse
@@ -2725,6 +3135,8 @@ resourceTypes:
                   schema: role
             responses:
                 "201":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                           schema: role
@@ -2732,6 +3144,8 @@ resourceTypes:
                     body:
                         application/json:
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2758,11 +3172,15 @@ resourceTypes:
             responses:
                 "200":
                     description: The request is valid and a list of roles has been returned.
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                           schema: roleArray
                 401:
                     description: The request does not contain a token or the token might be invalid.
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
       /{roleId}:
@@ -2780,6 +3198,8 @@ resourceTypes:
                       schema: role
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                               schema: role
@@ -2787,6 +3207,8 @@ resourceTypes:
                         body:
                             application/json:
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                               schema: localizedErrorResponse
@@ -2795,10 +3217,14 @@ resourceTypes:
                 description: Get chosen role.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                               schema: role
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                     "404":
@@ -2810,10 +3236,14 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes role. This action is not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "400":
                         body:
                             application/json:
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                               schema: localizedErrorResponse
@@ -2834,6 +3264,8 @@ resourceTypes:
                     schema: right
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                             schema: right
@@ -2841,6 +3273,8 @@ resourceTypes:
                     body:
                         application/json:
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2849,10 +3283,14 @@ resourceTypes:
             description: Get all rights.
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                             schema: rightArray
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2868,14 +3306,20 @@ resourceTypes:
                 description: Get chosen right.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                                 schema: right
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2884,11 +3328,17 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes right. This action is not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2911,6 +3361,8 @@ resourceTypes:
                       repeat: false
               responses:
                   "200":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: rightArray
@@ -2919,6 +3371,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   "403":
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                           schema: localizedErrorResponse
@@ -2936,9 +3390,13 @@ resourceTypes:
                 application/json:
             responses:
                 "201":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -2947,9 +3405,13 @@ resourceTypes:
             description: Get all requisitionGroups.
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                 401:
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
       /{id}:
@@ -2966,6 +3428,8 @@ resourceTypes:
                     application/json:
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     "404":
@@ -2973,6 +3437,8 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2981,12 +3447,18 @@ resourceTypes:
                 description: Get chosen requisitionGroup.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                             application/json:
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -2995,12 +3467,18 @@ resourceTypes:
                 description: "[AVOID USING] Completely removes requisition group. This action is not recoverable."
                 responses:
                     "204":
+                      headers:
+                        Keep-Alive:
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
                     "409":
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -3023,6 +3501,8 @@ resourceTypes:
                         application/json:
                           schema: localizedErrorResponse
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
 
@@ -3033,6 +3513,8 @@ resourceTypes:
             description: Get all currency settings.
             responses:
                 "200":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                           schema: currencySettingsDto
@@ -3070,6 +3552,8 @@ resourceTypes:
 
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               "400":
@@ -3077,6 +3561,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -3087,6 +3573,8 @@ resourceTypes:
                   schema: lotDto
             responses:
                 "201":
+                    headers:
+                      Keep-Alive:
                     body:
                         application/json:
                           schema: lotDto
@@ -3095,6 +3583,8 @@ resourceTypes:
                       application/json:
                         schema: localizedErrorResponse
                 "403":
+                    headers:
+                      Keep-Alive:
                     body:
                       application/json:
                         schema: localizedErrorResponse
@@ -3113,6 +3603,8 @@ resourceTypes:
                       schema: lotDto
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: lotDto
@@ -3121,10 +3613,14 @@ resourceTypes:
                           application/json:
                             schema: localizedErrorResponse
                     "403":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -3133,13 +3629,19 @@ resourceTypes:
                 description: Get chosen lot. This endpoint is experimental.
                 responses:
                     "200":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: lotDto
                     401:
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                     "404":
+                        headers:
+                          Keep-Alive:
                         body:
                           application/json:
                             schema: localizedErrorResponse
@@ -3177,6 +3679,8 @@ resourceTypes:
                   repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: idealStockAmountPage
@@ -3186,6 +3690,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
       post:
@@ -3207,6 +3713,8 @@ resourceTypes:
                          repeat: false
           responses:
               "200":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: uploadResult
@@ -3215,6 +3723,8 @@ resourceTypes:
                     application/json:
                       schema: localizedErrorResponse
               "403":
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: localizedErrorResponse
@@ -3234,13 +3744,19 @@ resourceTypes:
                 schema: serviceAccountCreationBody
           responses:
               201:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
                       schema: serviceAccount
               401:
+                  headers:
+                    Keep-Alive:
                   body:
                     application/json:
               403:
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: localizedErrorResponse
@@ -3260,17 +3776,25 @@ resourceTypes:
               description: "Get Service Account."
               responses:
                   200:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: serviceAccount
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3282,10 +3806,14 @@ resourceTypes:
                       schema: serviceAccount
               responses:
                   200:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                             schema: serviceAccount
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   400:
@@ -3293,10 +3821,14 @@ resourceTypes:
                           application/json:
                               schema: localizedErrorResponse
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3305,14 +3837,22 @@ resourceTypes:
               description: "Completely removes Service Account. This action is not recoverable."
               responses:
                   204:
+                    headers:
+                      Keep-Alive:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                         application/json:
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3378,6 +3918,8 @@ resourceTypes:
           description: "Get local resources (like geographic zones, facilities) as FHIR Location instances."
           responses:
               200:
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: Location
@@ -3409,15 +3951,21 @@ resourceTypes:
           responses:
               200:
                   description: The request is valid and a page of supply partners has been returned.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: supplyPartnerPage
               401:
                   description: The request does not contain a token or the token might be invalid.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
               403:
                   description: The server understood the request but refuses to authorize it.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: localizedErrorResponse
@@ -3430,6 +3978,8 @@ resourceTypes:
           responses:
               201:
                   description: The request is valid and the given supply partner has been created.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: supplyPartner
@@ -3440,10 +3990,14 @@ resourceTypes:
                           schema: localizedErrorResponse
               401:
                   description: The request does not contain a token or the token might be invalid.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
               403:
                   description: The server understood the request but refuses to authorize it.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: localizedErrorResponse
@@ -3460,20 +4014,28 @@ resourceTypes:
               responses:
                   200:
                       description: The request is valid and the given supply partner has been returned.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: supplyPartner
                   401:
                       description: The request does not contain a token or the token might be invalid.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   403:
                       description: The server understood the request but refuses to authorize it.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
                       description: The server could not find a supply partner with the given id.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3489,6 +4051,8 @@ resourceTypes:
                         The request is valid and if there is a supply partner with the given id
                         in the system, the supply partner has been updated. Otherwise a new supply
                         partner has been created with the given id value.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: supplyPartner
@@ -3499,10 +4063,14 @@ resourceTypes:
                               schema: localizedErrorResponse
                   401:
                       description: The request does not contain a token or the token might be invalid.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   403:
                       description: The server understood the request but refuses to authorize it.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3539,6 +4107,8 @@ resourceTypes:
           responses:
               200:
                   description: The request is valid and a page of system notifications has been returned.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: systemNotificationDtoPage
@@ -3564,6 +4134,8 @@ resourceTypes:
           responses:
               201:
                   description: The request is valid and the given system notification has been created.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: systemNotificationDto
@@ -3574,10 +4146,14 @@ resourceTypes:
                           schema: localizedErrorResponse
               401:
                   description: The request does not contain a token or the token might be invalid.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
               403:
                   description: The server understood the request but refuses to authorize it.
+                  headers:
+                    Keep-Alive:
                   body:
                       application/json:
                           schema: localizedErrorResponse
@@ -3594,20 +4170,28 @@ resourceTypes:
               responses:
                   200:
                       description: The request is valid and the given system notification has been returned.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: systemNotificationDto
                   401:
                       description: The request does not contain a token or the token might be invalid.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   403:
                       description: The server understood the request but refuses to authorize it.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
                       description: The server could not find a system notification with the given id.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3623,6 +4207,8 @@ resourceTypes:
                           The request is valid and if there is a system notification with the given id
                           in the system and it has been updated. Otherwise a new system notification
                           has been created with the given id value.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: systemNotificationDto
@@ -3633,10 +4219,14 @@ resourceTypes:
                               schema: localizedErrorResponse
                   401:
                       description: The request does not contain a token or the token might be invalid.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   403:
                       description: The server understood the request but refuses to authorize it.
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3645,14 +4235,22 @@ resourceTypes:
               description: Completely removes a system notification. This action is not recoverable.
               responses:
                   204:
+                    headers:
+                      Keep-Alive:
                   401:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                   403:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
                   404:
+                      headers:
+                        Keep-Alive:
                       body:
                           application/json:
                               schema: localizedErrorResponse
@@ -3665,6 +4263,8 @@ resourceTypes:
     description: Get locale settings.
     responses:
       "200":
+        headers:
+          Keep-Alive:
         body:
           application/json:
             schema: localeDto

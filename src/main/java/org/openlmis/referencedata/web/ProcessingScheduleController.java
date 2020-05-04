@@ -146,14 +146,14 @@ public class ProcessingScheduleController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("FIND_PROGRAM_IN_DB");
-    if (!programRepository.exists(programId)) {
+    if (!programRepository.existsById(programId)) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(ProgramMessageKeys.ERROR_NOT_FOUND_WITH_ID, programId));
     }
 
     profiler.start("FIND_FACILITY_IN_DB");
-    if (!facilityRepository.exists(facilityId)) {
+    if (!facilityRepository.existsById(facilityId)) {
       profiler.stop().log();
       throw new ValidationMessageException(
           new Message(FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, facilityId));
@@ -188,7 +188,7 @@ public class ProcessingScheduleController extends BaseController {
   public ProcessingSchedule getProcessingSchedule(
       @PathVariable("id") UUID scheduleId) {
 
-    ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
+    ProcessingSchedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
     if (schedule == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -206,7 +206,7 @@ public class ProcessingScheduleController extends BaseController {
   public void deleteProcessingSchedule(
       @PathVariable("id") UUID scheduleId) {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
-    ProcessingSchedule schedule = scheduleRepository.findOne(scheduleId);
+    ProcessingSchedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
     if (schedule == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -239,7 +239,7 @@ public class ProcessingScheduleController extends BaseController {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    ProcessingSchedule instance = scheduleRepository.findOne(id);
+    ProcessingSchedule instance = scheduleRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(ProcessingScheduleMessageKeys.ERROR_NOT_FOUND);
     }

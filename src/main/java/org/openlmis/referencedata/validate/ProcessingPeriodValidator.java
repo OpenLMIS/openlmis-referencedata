@@ -49,7 +49,7 @@ public class ProcessingPeriodValidator implements BaseValidator {
       ProcessingPeriod period = (ProcessingPeriod) obj;
       UUID periodId = period.getId();
       ProcessingPeriod existingPeriod = (periodId != null)
-          ? processingPeriodRepository.findOne(periodId) : null;
+          ? processingPeriodRepository.findById(periodId).orElse(null) : null;
       if (existingPeriod != null) {
         rejectIfValueChanged(err, period.getProcessingSchedule(),
             existingPeriod.getProcessingSchedule(), PROCESSING_SCHEDULE);

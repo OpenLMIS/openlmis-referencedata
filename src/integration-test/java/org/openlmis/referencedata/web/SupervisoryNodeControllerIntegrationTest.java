@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.hamcrest.Matcher;
@@ -58,7 +59,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.openlmis.referencedata.AvailableFeatures;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
@@ -72,6 +72,7 @@ import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.SupervisoryNodeDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
@@ -142,13 +143,13 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     rightId = UUID.randomUUID();
     zoneId = UUID.randomUUID();
 
-    when(facilityRepository.findOne(supervisoryNodeDto.getFacilityId()))
-        .thenReturn(facility);
-    when(requisitionGroupRepository.findOne(supervisoryNodeDto.getRequisitionGroupId()))
-        .thenReturn(supervisoryNode.getRequisitionGroup());
-    when(supervisoryNodeRepository.findOne(supervisoryNodeDto.getParentNodeId()))
-        .thenReturn(supervisoryNode.getParentNode());
-    when(supervisoryNodeRepository.findAll(supervisoryNodeDto.getChildNodeIds()))
+    when(facilityRepository.findById(supervisoryNodeDto.getFacilityId()))
+        .thenReturn(Optional.of(facility));
+    when(requisitionGroupRepository.findById(supervisoryNodeDto.getRequisitionGroupId()))
+        .thenReturn(Optional.of(supervisoryNode.getRequisitionGroup()));
+    when(supervisoryNodeRepository.findById(supervisoryNodeDto.getParentNodeId()))
+        .thenReturn(Optional.of(supervisoryNode.getParentNode()));
+    when(supervisoryNodeRepository.findAllById(supervisoryNodeDto.getChildNodeIds()))
         .thenReturn(Lists.newArrayList(supervisoryNode.getChildNodes()));
 
     when(supervisoryNodeRepository.save(any(SupervisoryNode.class)))
@@ -158,7 +159,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldDeleteSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     restAssured
         .given()
@@ -177,7 +179,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldDeleteSupervisoryNodeFromCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
         .willReturn(supervisoryNodeDto);
@@ -200,7 +203,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectDeleteSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     String messageKey = restAssured
         .given()
@@ -315,7 +319,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     SupervisoryNode existing = builder.build();
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId)).willReturn(Optional.of(existing));
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
@@ -338,13 +342,15 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     assertEquals(supervisoryNodeDto.getRequisitionGroupId(), response.getRequisitionGroupId());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertNotNull(supervisoryNodeRepository.findOne(supervisoryNodeId).getRequisitionGroup());
+    assertNotNull(
+        supervisoryNodeRepository.findById(supervisoryNodeId).get().getRequisitionGroup());
   }
 
   @Test
   public void shouldRejectPostSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     String messageKey = restAssured
         .given()
@@ -448,7 +454,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     supervisoryNodeDto.setDescription(DESCRIPTION);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     ValidatableResponse response = restAssured
             .given()
@@ -471,7 +478,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     supervisoryNodeDto.setDescription(DESCRIPTION);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
         .willReturn(supervisoryNodeDto);
@@ -504,7 +512,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId)).willReturn(Optional.of(existing));
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
@@ -542,7 +550,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId)).willReturn(Optional.of(existing));
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
@@ -605,7 +613,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(existing);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId)).willReturn(Optional.of(existing));
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
@@ -631,7 +639,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldRejectPutSupervisoryNodeIfUserHasNoRight() {
     mockUserHasNoRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     String messageKey = restAssured
         .given()
@@ -711,9 +720,10 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldGetSupervisoryNodeFromDatabaseWhenNotInCache() {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     ValidatableResponse response = restAssured
         .given()
@@ -733,9 +743,10 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldSaveSupervisoryNodeInCacheAfterGettingOneFromDatabase() {
 
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     ValidatableResponse response = restAssured
         .given()
@@ -755,7 +766,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldGetSupervisoryNodeFromCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(true);
     given(supervisoryNodeDtoRedisRepository.findById(supervisoryNodeId))
         .willReturn(supervisoryNodeDto);
@@ -779,7 +790,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldThrowErrorNotFoundWhenNeitherInDatabaseNorInCache() {
     togglzRule.enable(AvailableFeatures.REDIS_CACHING);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(false);
     given(supervisoryNodeDtoRedisRepository.exists(supervisoryNodeId)).willReturn(false);
 
     restAssured
@@ -797,8 +808,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldGetSupervisoryNodeFromDatabase() {
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     ValidatableResponse response = restAssured
         .given()
@@ -817,8 +829,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldNotSaveSupervisoryNodeInCacheWhenFeatureFlagDisabled() {
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
 
     ValidatableResponse response = restAssured
         .given()
@@ -837,7 +850,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldThrowErrorNotFoundWhenInDatabase() {
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(false);
 
     restAssured
         .given()
@@ -880,9 +893,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
     Set<User> supervisingUsers = asSet(supervisingUser);
 
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(rightRepository.exists(rightId)).willReturn(true);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.existsById(rightId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(true);
     given(userRepository.findUsersBySupervisionRight(rightId, supervisoryNodeId, programId))
         .willReturn(supervisingUsers);
 
@@ -908,9 +921,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void findSupervisingUsersShouldReturnBadRequestIfRightNotFound() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
 
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(rightRepository.exists(rightId)).willReturn(false);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.existsById(rightId)).willReturn(false);
+    given(programRepository.existsById(programId)).willReturn(true);
 
     restAssured
         .given()
@@ -932,9 +945,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(true);
-    given(rightRepository.exists(rightId)).willReturn(true);
-    given(programRepository.exists(programId)).willReturn(false);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(true);
+    given(rightRepository.existsById(rightId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(false);
 
     restAssured
         .given()
@@ -980,9 +993,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.USERS_MANAGE_RIGHT);
-    given(supervisoryNodeRepository.exists(supervisoryNodeId)).willReturn(false);
-    given(rightRepository.exists(rightId)).willReturn(true);
-    given(programRepository.exists(programId)).willReturn(true);
+    given(supervisoryNodeRepository.existsById(supervisoryNodeId)).willReturn(false);
+    given(rightRepository.existsById(rightId)).willReturn(true);
+    given(programRepository.existsById(programId)).willReturn(true);
 
     restAssured
         .given()
@@ -1003,7 +1016,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   public void shouldSearchSupervisoryNodes() {
     final UUID id = UUID.randomUUID();
 
-    final Pageable pageable = new PageRequest(0, 10);
+    final Pageable pageable = PageRequest.of(0, 10);
 
     HashMap<String, Object> queryParams = new HashMap<>();
 
@@ -1021,8 +1034,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.search(params, pageable))
         .willReturn(new PageImpl(Collections.singletonList(supervisoryNode), pageable, 1));
 
-    PageImplRepresentation response = searchForSupervisoryNode(queryParams, 200)
-        .extract().as(PageImplRepresentation.class);
+    PageDto response = searchForSupervisoryNode(queryParams, 200)
+        .extract().as(PageDto.class);
     Map<String, String> foundSupervisoryNode = (LinkedHashMap) response.getContent().get(0);
 
     assertEquals(supervisoryNode.getCode(), foundSupervisoryNode.get("code"));
@@ -1051,7 +1064,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supervisoryNodeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -1063,7 +1076,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supervisoryNodeRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -1075,7 +1088,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
-    given(supervisoryNodeRepository.findOne(any(UUID.class))).willReturn(supervisoryNode);
+    given(supervisoryNodeRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(supervisoryNode));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -1087,8 +1101,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     SupervisoryNode spy = spy(supervisoryNode);
     given(spy.getAllSupervisedFacilities(program)).willReturn(Sets.newHashSet(facility));
 
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(spy);
-    given(programRepository.findOne(programId)).willReturn(program);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(spy));
+    given(programRepository.findById(programId)).willReturn(Optional.of(program));
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     restAssured
@@ -1135,7 +1150,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldThrowNotFoundErrorIfSupervisoryNodeDoesNotExistForGetSupervisingFacilities() {
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(null);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId)).willReturn(Optional.empty());
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     restAssured
@@ -1152,8 +1167,9 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldThrowNotFoundErrorIfProgramDoesNotExistForGetSupervisingFacilities() {
-    given(supervisoryNodeRepository.findOne(supervisoryNodeId)).willReturn(supervisoryNode);
-    given(programRepository.findOne(any(UUID.class))).willReturn(null);
+    given(supervisoryNodeRepository.findById(supervisoryNodeId))
+        .willReturn(Optional.of(supervisoryNode));
+    given(programRepository.findById(any(UUID.class))).willReturn(Optional.empty());
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
     restAssured

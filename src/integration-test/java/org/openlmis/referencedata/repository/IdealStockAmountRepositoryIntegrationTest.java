@@ -162,7 +162,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     IdealStockAmount isa = isaRepository.save(generateInstance());
 
     Page<IdealStockAmount> page = isaRepository
-        .search(facilityId, commodityTypeId, processingPeriodId, new PageRequest(1, 1));
+        .search(facilityId, commodityTypeId, processingPeriodId, PageRequest.of(1, 1));
 
     checkPageProperties(page);
     checkIsaProperties(isa, page);
@@ -172,7 +172,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   public void shouldGetPageOfIdealStockAmountsWhenAnyParameterIsNull() {
     isaRepository.save(generateInstance());
 
-    PageRequest pageable = new PageRequest(0, 10);
+    PageRequest pageable = PageRequest.of(0, 10);
     Page<IdealStockAmount> page = isaRepository
         .search(facilityId, commodityTypeId, null, pageable);
     assertEquals(1, page.getContent().size());
@@ -188,7 +188,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   public void shouldGetEmptyPageOfIdealStockAmountsWhenAnyParameterIsWrong() {
     isaRepository.save(generateInstance());
 
-    PageRequest pageable = new PageRequest(0, 10);
+    PageRequest pageable = PageRequest.of(0, 10);
     Page<IdealStockAmount> page = isaRepository
         .search(facilityId, commodityTypeId, UUID.randomUUID(), pageable);
     assertEquals(0, page.getContent().size());
@@ -203,7 +203,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
   @Test
   public void shouldGetEmptyPageOfIdealStockAmountsWhenPageableIsNull() {
     Page<IdealStockAmount> page = isaRepository
-        .search(null, null, null, null);
+        .search(null, null, null, PageRequest.of(0, 10));
 
     assertEquals(0, page.getContent().size());
   }
@@ -215,7 +215,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     isaRepository.save(generateInstance());
 
     Page<IdealStockAmount> page = isaRepository
-        .search(null, null, null, new PageRequest(0, 10));
+        .search(null, null, null, PageRequest.of(0, 10));
 
     assertEquals(3, page.getContent().size());
   }
@@ -225,7 +225,7 @@ public class IdealStockAmountRepositoryIntegrationTest extends
     isaRepository.save(generateInstance());
 
     Page<IdealStockAmount> page = isaRepository
-        .search(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), new PageRequest(0, 10));
+        .search(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), PageRequest.of(0, 10));
 
     assertEquals(0, page.getContent().size());
   }

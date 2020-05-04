@@ -106,7 +106,8 @@ public class FacilityTypeController extends BaseController {
       @RequestBody FacilityType facilityType, @PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
-    FacilityType facilityTypeToUpdate = facilityTypeRepository.findOne(facilityTypeId);
+    FacilityType facilityTypeToUpdate = facilityTypeRepository.findById(facilityTypeId)
+        .orElse(null);
     try {
       if (facilityTypeToUpdate == null) {
         facilityTypeToUpdate = new FacilityType();
@@ -136,7 +137,7 @@ public class FacilityTypeController extends BaseController {
   @ResponseBody
   public FacilityType getFacilityType(@PathVariable("id") UUID facilityTypeId) {
 
-    FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
+    FacilityType facilityType = facilityTypeRepository.findById(facilityTypeId).orElse(null);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -153,7 +154,7 @@ public class FacilityTypeController extends BaseController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteFacilityType(@PathVariable("id") UUID facilityTypeId) {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    FacilityType facilityType = facilityTypeRepository.findOne(facilityTypeId);
+    FacilityType facilityType = facilityTypeRepository.findById(facilityTypeId).orElse(null);
     if (facilityType == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     } else {
@@ -191,7 +192,7 @@ public class FacilityTypeController extends BaseController {
     rightService.checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    FacilityType instance = facilityTypeRepository.findOne(id);
+    FacilityType instance = facilityTypeRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     }

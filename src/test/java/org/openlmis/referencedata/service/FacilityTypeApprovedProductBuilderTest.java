@@ -18,6 +18,7 @@ package org.openlmis.referencedata.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -73,8 +74,9 @@ public class FacilityTypeApprovedProductBuilderTest {
 
     importer.setOrderable(orderable);
 
-    when(programRepository.findOne(program.getId())).thenReturn(program);
-    when(facilityTypeRepository.findOne(facilityType.getId())).thenReturn(facilityType);
+    when(programRepository.findById(program.getId())).thenReturn(Optional.of(program));
+    when(facilityTypeRepository.findById(facilityType.getId()))
+        .thenReturn(Optional.of(facilityType));
   }
 
   @Test
@@ -93,7 +95,7 @@ public class FacilityTypeApprovedProductBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfProgramCouldNotBeFound() {
-    when(programRepository.findOne(program.getId())).thenReturn(null);
+    when(programRepository.findById(program.getId())).thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(ProgramMessageKeys.ERROR_NOT_FOUND);
@@ -103,7 +105,7 @@ public class FacilityTypeApprovedProductBuilderTest {
 
   @Test
   public void shouldThrowExceptionIfFacilityTypeCouldNotBeFound() {
-    when(facilityTypeRepository.findOne(facilityType.getId())).thenReturn(null);
+    when(facilityTypeRepository.findById(facilityType.getId())).thenReturn(Optional.empty());
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(FacilityTypeMessageKeys.ERROR_NOT_FOUND);

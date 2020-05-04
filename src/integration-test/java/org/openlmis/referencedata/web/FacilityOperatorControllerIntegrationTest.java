@@ -27,6 +27,7 @@ import static org.mockito.Mockito.doThrow;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -136,7 +137,8 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
 
     facilityOperator.setName("NewNameUpdate");
 
-    given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
+    given(facilityOperatorRepository.findById(facilityOperatorId))
+        .willReturn(Optional.of(facilityOperator));
 
     FacilityOperator response = restAssured
         .given()
@@ -179,7 +181,8 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldGetFacilityOperator() {
 
-    given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
+    given(facilityOperatorRepository.findById(facilityOperatorId))
+        .willReturn(Optional.of(facilityOperator));
 
     FacilityOperator response = restAssured
         .given()
@@ -215,7 +218,8 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
   public void shouldDeleteFacilityOperator() {
     mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
     
-    given(facilityOperatorRepository.findOne(facilityOperatorId)).willReturn(facilityOperator);
+    given(facilityOperatorRepository.findById(facilityOperatorId))
+        .willReturn(Optional.of(facilityOperator));
 
     restAssured
         .given()
@@ -255,7 +259,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityOperatorRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -267,7 +271,7 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(null);
+    given(facilityOperatorRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -279,7 +283,8 @@ public class FacilityOperatorControllerIntegrationTest extends BaseWebIntegratio
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT);
-    given(facilityOperatorRepository.findOne(any(UUID.class))).willReturn(facilityOperator);
+    given(facilityOperatorRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(facilityOperator));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

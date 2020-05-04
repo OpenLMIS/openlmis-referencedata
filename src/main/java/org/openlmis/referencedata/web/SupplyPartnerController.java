@@ -222,7 +222,7 @@ public class SupplyPartnerController extends BaseController {
 
   private SupplyPartner findSupplyPartner(UUID id, Profiler profiler) {
     profiler.start("FIND_SUPPLY_PARTNER");
-    SupplyPartner supplyPartner = supplyPartnerRepository.findOne(id);
+    SupplyPartner supplyPartner = supplyPartnerRepository.findById(id).orElse(null);
 
     if (supplyPartner == null) {
       profiler.stop().log();

@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
 import org.hamcrest.Matcher;
@@ -65,7 +66,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
   private SystemNotification notification;
   private SystemNotification notification2;
   private SystemNotificationDto notificationDto = new SystemNotificationDto();
-  private Pageable pageable = new PageRequest(0, Integer.MAX_VALUE);
+  private Pageable pageable = PageRequest.of(0, Integer.MAX_VALUE);
 
   @Override
   @Before
@@ -75,7 +76,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
     author = new UserDataBuilder().build();
     notification = new SystemNotificationDataBuilder().withAuthor(author).build();
     notification2 = new SystemNotificationDataBuilder().withAuthor(author).build();
-    pageable = new PageRequest(0, 10);
+    pageable = PageRequest.of(0, 10);
 
     notificationDto.setServiceUrl(baseUri);
     notification.export(notificationDto);
@@ -118,7 +119,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
     given(systemNotificationRepository.search(
         any(SystemNotificationRepositoryCustom.SearchParams.class), eq(pageable)))
-        .willReturn(Pagination.getPage(Arrays.asList(notification, notification2)));
+        .willReturn(Pagination.getPage(Arrays.asList(notification, notification2),
+            PageRequest.of(0, 10)));
 
     ValidatableResponse response = restAssured
         .given()
@@ -143,7 +145,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
     given(systemNotificationRepository.search(
         any(SystemNotificationRepositoryCustom.SearchParams.class), eq(pageable)))
-        .willReturn(Pagination.getPage(Arrays.asList(notification, notification2)));
+        .willReturn(Pagination.getPage(Arrays.asList(notification, notification2),
+            PageRequest.of(0, 10)));
 
     ValidatableResponse response = restAssured
         .given()
@@ -196,7 +199,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldGetSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    given(systemNotificationRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(notification));
 
     ValidatableResponse response = restAssured
         .given()
@@ -244,7 +248,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnNotFoundIfSystemNotificationDoesNotExistInGetSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
+    given(systemNotificationRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -262,7 +266,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldCreateSystemNotification() {
-    given(userRepository.findOne(any(UUID.class))).willReturn(author);
+    given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(author));
     notificationDto.setId(null);
 
     ValidatableResponse response = restAssured
@@ -282,7 +286,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnBadRequestIfRequiredFieldIsMissedInPostSystemNotifications() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
+    given(systemNotificationRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     notificationDto.setId(null);
     notificationDto.setAuthor(new UserObjectReferenceDto());
@@ -353,7 +357,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldUpdateSystemNotification() {
-    given(userRepository.findOne(any(UUID.class))).willReturn(author);
+    given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(author));
     notificationDto.setStartDate(ZonedDateTime.now().plusDays(1));
 
     ValidatableResponse response = restAssured
@@ -374,7 +378,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnBadRequestIfUneditableFieldIsChangedInPutSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    given(systemNotificationRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(notification));
     notificationDto.setCreatedDate(ZonedDateTime.now().plusDays(1));
 
     restAssured
@@ -394,7 +399,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldCreateSystemNotificationInPutIfDoesNotExist() {
-    given(userRepository.findOne(any(UUID.class))).willReturn(author);
+    given(userRepository.findById(any(UUID.class))).willReturn(Optional.of(author));
     UUID newNotificationId = UUID.randomUUID();
     notificationDto.setId(newNotificationId);
 
@@ -467,7 +472,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldDeleteSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    given(systemNotificationRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(notification));
 
     restAssured
         .given()
@@ -514,7 +520,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnNotFoundIfSystemNotificationDoesNotExistInDeleteSystemNotification() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
+    given(systemNotificationRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     restAssured
         .given()
@@ -532,7 +538,8 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnAuditLog() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(notification);
+    given(systemNotificationRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(notification));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_PATH);
 
@@ -550,7 +557,7 @@ public class SystemNotificationControllerIntegrationTest extends BaseWebIntegrat
 
   @Test
   public void shouldReturnNotFoundIfSystemNotificationDoesNotExistInGetAuditLog() {
-    given(systemNotificationRepository.findOne(any(UUID.class))).willReturn(null);
+    given(systemNotificationRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_PATH);
 

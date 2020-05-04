@@ -171,7 +171,7 @@ public class ProcessingPeriodController extends BaseController {
     profiler.setLogger(LOGGER);
 
     profiler.start("FIND_PERIOD_IN_DB");
-    ProcessingPeriod period = periodRepository.findOne(periodId);
+    ProcessingPeriod period = periodRepository.findById(periodId).orElse(null);
     if (period == null) {
       profiler.stop().log();
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
@@ -196,7 +196,7 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseBody
   public ResultDto<Integer> getDuration(@PathVariable("id") UUID periodId) {
 
-    ProcessingPeriod period = periodRepository.findOne(periodId);
+    ProcessingPeriod period = periodRepository.findById(periodId).orElse(null);
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 
@@ -228,7 +228,7 @@ public class ProcessingPeriodController extends BaseController {
     rightService.checkAdminRight(RightName.PROCESSING_SCHEDULES_MANAGE_RIGHT);
 
     //Return a 404 if the specified instance can't be found
-    ProcessingPeriod instance = periodRepository.findOne(id);
+    ProcessingPeriod instance = periodRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND);
     }

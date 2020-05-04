@@ -42,9 +42,9 @@ public class FacilityTypeApprovedProductBuilder
    * Creates new {@link FacilityTypeApprovedProduct} based on data from importer.
    */
   public FacilityTypeApprovedProduct build(Importer importer) {
-    Program program = findResource(programRepository::findOne, importer.getProgram(),
+    Program program = findResource(programRepository::findById, importer.getProgram(),
         ProgramMessageKeys.ERROR_NOT_FOUND);
-    FacilityType facilityType = findResource(facilityTypeRepository::findOne,
+    FacilityType facilityType = findResource(facilityTypeRepository::findById,
         importer.getFacilityType(), FacilityTypeMessageKeys.ERROR_NOT_FOUND);
 
     FacilityTypeApprovedProduct approvedProduct = newFacilityTypeApprovedProduct(importer);

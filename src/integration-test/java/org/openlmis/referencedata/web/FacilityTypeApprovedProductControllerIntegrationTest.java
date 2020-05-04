@@ -28,11 +28,11 @@ import static org.openlmis.referencedata.domain.RightName.FACILITY_APPROVED_ORDE
 import com.google.common.collect.Lists;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -41,6 +41,7 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductSearchParamsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeApprovedProductsDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
@@ -103,7 +104,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(facilityTypeApprovedProductRepository.save(any(FacilityTypeApprovedProduct.class)))
         .willAnswer(invocation -> {
           FacilityTypeApprovedProduct resource = invocation
-              .getArgumentAt(0, FacilityTypeApprovedProduct.class);
+              .getArgument(0, FacilityTypeApprovedProduct.class);
           resource.updateLastUpdatedDate();
 
           return resource;
@@ -113,10 +114,11 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
         orderable.getId())).willReturn(orderable);
     given(orderableRepository
-        .findAllLatestByIds(Collections.singleton(orderable.getId()), new PageRequest(0, 1)))
+        .findAllLatestByIds(Collections.singleton(orderable.getId()), PageRequest.of(0, 1)))
         .willReturn(new PageImpl<>(Collections.singletonList(orderable)));
-    given(programRepository.findOne(program.getId())).willReturn(program);
-    given(facilityTypeRepository.findOne(facilityType1.getId())).willReturn(facilityType1);
+    given(programRepository.findById(program.getId())).willReturn(Optional.of(program));
+    given(facilityTypeRepository.findById(facilityType1.getId()))
+        .willReturn(Optional.of(facilityType1));
 
     mockUserHasRight(FACILITY_APPROVED_ORDERABLES_MANAGE);
   }
@@ -200,9 +202,9 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
   @Test
   public void shouldPostFacilityTypeApprovedProduct() {
-    given(programRepository.findOne(program.getId())).willReturn(program);
-    given(orderableDisplayCategoryRepository.findOne(orderableDisplayCategory.getId()))
-        .willReturn(orderableDisplayCategory);
+    given(programRepository.findById(program.getId())).willReturn(Optional.of(program));
+    given(orderableDisplayCategoryRepository.findById(orderableDisplayCategory.getId()))
+        .willReturn(Optional.of(orderableDisplayCategory));
 
     ftapDto.setId(null);
 
@@ -416,9 +418,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     given(facilityTypeApprovedProductRepository
         .searchProducts(any(QueryFacilityTypeApprovedProductSearchParams.class),
             any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd),
+            PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -430,7 +433,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .then()
         .statusCode(HttpStatus.SC_OK)
         .extract()
-        .as(PageImplRepresentation.class);
+        .as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(ftapDto.getId().toString(),
@@ -462,9 +465,10 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
 
     given(facilityTypeApprovedProductRepository
         .searchProducts(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd)));
+        .willReturn(Pagination.getPage(Lists.newArrayList(facilityTypeAppProd),
+            PageRequest.of(0, 10)));
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -474,7 +478,7 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
         .then()
         .statusCode(HttpStatus.SC_OK)
         .extract()
-        .as(PageImplRepresentation.class);
+        .as(PageDto.class);
 
     assertEquals(1, response.getContent().size());
     assertEquals(ftapDto.getId().toString(),

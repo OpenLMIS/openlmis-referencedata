@@ -33,15 +33,16 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.PageImplRepresentation;
 import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.http.HttpHeaders;
@@ -98,7 +99,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(tradeItemRepository.findAll()).thenReturn(items);
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -106,7 +107,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     List<TradeItemDto> expected = newInstance(items);
     checkIfEquals(response, expected);
@@ -122,7 +123,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(tradeItemRepository.findByClassificationIdLike(CID)).thenReturn(items);
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("classificationId", CID)
@@ -131,7 +132,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     List<TradeItemDto> expected = newInstance(items);
     checkIfEquals(response, expected);
@@ -147,7 +148,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     when(tradeItemRepository.findByClassificationId(CID)).thenReturn(items);
 
-    PageImplRepresentation response = restAssured
+    PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("classificationId", CID)
@@ -156,7 +157,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(RESOURCE_URL)
         .then()
         .statusCode(200)
-        .extract().as(PageImplRepresentation.class);
+        .extract().as(PageDto.class);
 
     List<TradeItemDto> expected = newInstance(items);
     checkIfEquals(response, expected);
@@ -197,7 +198,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+    given(tradeItemRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.notFound(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -209,7 +210,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     doThrow(new UnauthorizedException(new Message("UNAUTHORIZED")))
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(null);
+    given(tradeItemRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
     AuditLogHelper.unauthorized(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -221,8 +222,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.ORDERABLES_MANAGE);
-    given(tradeItemRepository.findOne(any(UUID.class))).willReturn(
-        generateItem("abc", null));
+    given(tradeItemRepository.findById(any(UUID.class))).willReturn(
+        Optional.of(generateItem("abc", null)));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 
@@ -239,7 +240,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     return tradeItem;
   }
 
-  private void checkIfEquals(PageImplRepresentation response, List<TradeItemDto> expected) {
+  private void checkIfEquals(PageDto response, List<TradeItemDto> expected) {
     List pageContent = response.getContent();
     assertEquals(expected.size(), pageContent.size());
     for (int i = 0; i < pageContent.size(); i++) {

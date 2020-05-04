@@ -32,7 +32,7 @@ public interface StockAdjustmentReasonRepository
   <S extends StockAdjustmentReason> S save(S entity);
 
   @Override
-  <S extends StockAdjustmentReason> Iterable<S> save(Iterable<S> entities);
+  <S extends StockAdjustmentReason> Iterable<S> saveAll(Iterable<S> entities);
 
   @Query("SELECT r FROM StockAdjustmentReason r WHERE r.program.id = :programId")
   List<StockAdjustmentReason> findByProgramId(@Param("programId") UUID programId);
@@ -51,7 +51,7 @@ public interface StockAdjustmentReasonRepository
       + "ON CAST(sar.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
       + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
       + "    )\n"
-      + " ORDER BY ?#{#pageable}",
+      + " ",
       nativeQuery = true)
   Page<StockAdjustmentReason> findAllWithoutSnapshots(Pageable pageable);
 }

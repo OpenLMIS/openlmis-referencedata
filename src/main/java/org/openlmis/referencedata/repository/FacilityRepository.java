@@ -66,7 +66,7 @@ public interface FacilityRepository
       + "ON CAST(f.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
       + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
       + "    )\n"
-      + " ORDER BY ?#{#pageable}",
+      + " ",
       nativeQuery = true)
   Page<Facility> findAllWithoutSnapshots(Pageable pageable);
 }

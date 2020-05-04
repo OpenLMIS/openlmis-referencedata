@@ -107,7 +107,7 @@ public class RequisitionGroupService {
       SupervisoryNodeSearchParams params = new SupervisoryNodeSearchParams(
           null, null, null, null, zone.getId(), null);
       supervisoryNodes = supervisoryNodeRepository.search(params,
-          new PageRequest(0, Integer.MAX_VALUE)).getContent();
+          PageRequest.of(0, Integer.MAX_VALUE)).getContent();
     }
     return supervisoryNodes;
   }

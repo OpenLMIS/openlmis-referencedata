@@ -13,24 +13,20 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web.csv.recordhandler;
+package org.openlmis.referencedata.service;
 
-import org.openlmis.referencedata.domain.IdealStockAmount;
-import org.openlmis.referencedata.repository.IdealStockAmountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
 
-/**
- * This class is responsible for saving {@link IdealStockAmount} instances to the database.
- */
-@Component
-public class IdealStockAmountWriter implements RecordWriter<IdealStockAmount> {
+public class PageDtoTest {
 
-  @Autowired
-  private IdealStockAmountRepository repository;
-
-  @Override
-  public void write(Iterable<IdealStockAmount> records) {
-    repository.saveAll(records);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(PageDto.class)
+        .suppress(Warning.NONFINAL_FIELDS) // fields cannot be final
+        .verify();
   }
+
 }

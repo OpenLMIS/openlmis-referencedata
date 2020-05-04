@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Collection;
