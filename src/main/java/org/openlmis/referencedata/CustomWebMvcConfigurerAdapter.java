@@ -27,10 +27,10 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
+public class CustomWebMvcConfigurerAdapter implements WebMvcConfigurer {
 
   @Value("${service.url}")
   private String serviceUrl;
@@ -44,14 +44,12 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
         .setViewName("redirect:" + serviceUrl + "/referencedata/docs/");
     registry.addViewController("/referencedata/docs/")
         .setViewName("forward:/referencedata/docs/index.html");
-    super.addViewControllers(registry);
   }
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     registry.addResourceHandler("/referencedata/webjars/**")
         .addResourceLocations("classpath:/META-INF/resources/webjars/");
-    super.addResourceHandlers(registry);
   }
 
   @Override
@@ -62,7 +60,6 @@ public class CustomWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
             Pagination.DEFAULT_PAGE_NUMBER,
             Pagination.NO_PAGINATION));
     argumentResolvers.add(resolver);
-    super.addArgumentResolvers(argumentResolvers);
   }
 
   @Override

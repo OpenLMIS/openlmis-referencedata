@@ -25,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -61,6 +63,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
+import org.openlmis.referencedata.domain.RequisitionGroup;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.RightType;
@@ -128,6 +131,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
         .withParentNode(new SupervisoryNodeDataBuilder().build())
         .withChildNode(new SupervisoryNodeDataBuilder().build())
         .build();
+    RequisitionGroup requisitionGroup = supervisoryNode.getRequisitionGroup();
+    requisitionGroup.setSupervisoryNode(supervisoryNode);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
     supervisoryNodeDto.setServiceUrl(baseUri);
@@ -225,6 +230,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldPostSupervisoryNode() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findById(not(eq(supervisoryNode.getParentNode().getId()))))
+        .willReturn(Optional.of(supervisoryNode));
 
     assertNotNull(supervisoryNodeDto.getRequisitionGroup());
 
@@ -278,6 +285,8 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
   @Test
   public void shouldPostSupervisoryNodeWithRequisitionGroup() {
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
+    given(supervisoryNodeRepository.findById(any(UUID.class)))
+        .willReturn(Optional.of(supervisoryNode));
 
     SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
             .withoutId()
@@ -537,16 +546,17 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldUpdateSupervisoryNode() {
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+    SupervisoryNodeDataBuilder existingBuilder = new SupervisoryNodeDataBuilder()
+            .withId(supervisoryNodeId)
             .withFacility(supervisoryNode.getFacility())
             .withRequisitionGroup(supervisoryNode.getRequisitionGroup())
             .withParentNode(supervisoryNode.getParentNode());
 
     supervisoryNode
             .getChildNodes()
-            .forEach(builder::withChildNode);
+            .forEach(existingBuilder::withChildNode);
 
-    SupervisoryNode existing = builder.build();
+    SupervisoryNode existing = existingBuilder.build();
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
@@ -554,9 +564,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
-    builder
-            .build()
-            .export(supervisoryNodeDto);
+    existing.export(supervisoryNodeDto);
 
     ValidatableResponse response = restAssured
             .given()
@@ -604,12 +612,13 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldAcceptPutSupervisoryNodeIfRequisitionGroupIsNotOnBothUpdateAndExistingNode() {
-    SupervisoryNodeDataBuilder builder = new SupervisoryNodeDataBuilder()
+    SupervisoryNodeDataBuilder existingBuilder = new SupervisoryNodeDataBuilder()
+            .withId(supervisoryNodeId)
             .withFacility(supervisoryNode.getFacility())
             .withoutRequisitionGroup()
             .withParentNode(supervisoryNode.getParentNode());
 
-    SupervisoryNode existing = builder.build();
+    SupervisoryNode existing = existingBuilder.build();
 
     mockUserHasRight(RightName.SUPERVISORY_NODES_MANAGE);
 
@@ -617,7 +626,7 @@ public class SupervisoryNodeControllerIntegrationTest extends BaseWebIntegration
     given(supervisoryNodeRepository.findByCode(existing.getCode())).willReturn(existing);
 
     supervisoryNodeDto = new SupervisoryNodeDto();
-    builder
+    existingBuilder
             .withoutRequisitionGroup()
             .build()
             .export(supervisoryNodeDto);

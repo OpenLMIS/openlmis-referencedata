@@ -40,7 +40,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.hibernate.type.LongType;
 import org.hibernate.type.PostgresUUIDType;
@@ -190,7 +190,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     String queryString = String.format(NATIVE_SELECT_FACILITY_TYPE_ID, facilityId);
     Query query = entityManager.createNativeQuery(queryString);
 
-    SQLQuery sql = query.unwrap(SQLQuery.class);
+    NativeQuery sql = query.unwrap(NativeQuery.class);
     sql.addScalar("type_id", PostgresUUIDType.INSTANCE);
 
     try {
@@ -331,7 +331,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     params.forEach(nativeQuery::setParameter);
 
     if (!count) {
-      SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
+      NativeQuery sqlQuery = nativeQuery.unwrap(NativeQuery.class);
       sqlQuery.addScalar(ID, PostgresUUIDType.INSTANCE);
       sqlQuery.addScalar(VERSION_NUMBER, LongType.INSTANCE);
     }
@@ -380,7 +380,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     return entityManager
         .createQuery(criteriaQuery)
-        .unwrap(org.hibernate.Query.class)
+        .unwrap(org.hibernate.query.Query.class)
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
   }

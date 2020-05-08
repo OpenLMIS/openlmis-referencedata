@@ -30,7 +30,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.ProcessingPeriod;
 import org.openlmis.referencedata.repository.custom.ProcessingPeriodRepositoryCustom;
@@ -92,7 +92,7 @@ public class ProcessingPeriodRepositoryImpl implements ProcessingPeriodRepositor
         scheduleId, programId, facilityId, startDate, endDate, ids, params));
     params.forEach(nativeQuery::setParameter);
 
-    SQLQuery countQuery = nativeQuery.unwrap(SQLQuery.class);
+    NativeQuery countQuery = nativeQuery.unwrap(NativeQuery.class);
     countQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
 
     // appropriate scalar is added to native query

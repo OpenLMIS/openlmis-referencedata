@@ -196,7 +196,8 @@ public class ProcessingPeriodController extends BaseController {
   @ResponseBody
   public ResultDto<Integer> getDuration(@PathVariable("id") UUID periodId) {
 
-    ProcessingPeriod period = periodRepository.findById(periodId).orElse(null);
+    ProcessingPeriod period = periodRepository.findById(periodId)
+        .orElseThrow(() -> new NotFoundException(ProcessingPeriodMessageKeys.ERROR_NOT_FOUND));
 
     LOGGER.debug("Returning total number of months of processingPeriod");
 

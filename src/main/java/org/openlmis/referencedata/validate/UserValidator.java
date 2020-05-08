@@ -21,9 +21,11 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -113,7 +115,9 @@ public class UserValidator implements BaseValidator {
   }
 
   private void validateInvariants(UserDto dto, Errors errors) {
-    User db = userRepository.findById(dto.getId()).orElse(null);
+    User db = userRepository.findById(dto.getId())
+        .orElseThrow(() -> new NotFoundException(
+            new Message(UserMessageKeys.ERROR_NOT_FOUND_WITH_ID, dto.getId())));
 
     rejectIfInvariantWasChanged(errors, USERNAME, db.getUsername(), dto.getUsername());
     rejectIfInvariantWasChanged(errors, JOB_TITLE, db.getJobTitle(), dto.getJobTitle());

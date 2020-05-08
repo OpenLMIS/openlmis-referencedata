@@ -63,6 +63,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.openlmis.referencedata.validate.UserValidator;
 import org.slf4j.Logger;
@@ -183,6 +184,7 @@ public class UserController extends BaseController {
     if (userId != null && userRepository.existsById(userId)) {
       profiler.start("GET_USER_FROM_DB");
       user = userRepository.findById(userId).orElse(null);
+      assert user != null;
       profiler.start("UPDATE_USER_FROM_DTO");
       user.updateFrom(userDto);
     } else {
@@ -422,7 +424,9 @@ public class UserController extends BaseController {
     boolean hasRight;
 
     profiler.start("GET_RIGHT");
-    Right right = rightRepository.findById(rightId).orElse(null);
+    Right right = rightRepository.findById(rightId)
+        .orElseThrow(() -> new ValidationMessageException(
+            new Message(RightMessageKeys.ERROR_NOT_FOUND_WITH_ID, rightId)));
 
     if (programId != null) {
       profiler.start("CHECK_PROGRAM_EXISTS");
@@ -718,7 +722,8 @@ public class UserController extends BaseController {
     for (RoleAssignmentDto roleAssignmentDto : roleAssignmentDtos) {
       RoleAssignment roleAssignment;
 
-      Role role = roleRepository.findById(roleAssignmentDto.getRoleId()).orElse(null);
+      Role role = roleRepository.findById(roleAssignmentDto.getRoleId())
+          .orElseThrow(() -> new ValidationMessageException(RoleMessageKeys.ERROR_NOT_FOUND));
 
       if (role.getRights().isEmpty()) {
         throw new ValidationMessageException(new Message(

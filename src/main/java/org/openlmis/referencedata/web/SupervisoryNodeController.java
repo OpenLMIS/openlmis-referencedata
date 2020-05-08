@@ -19,7 +19,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.openlmis.referencedata.domain.RightName.SUPERVISORY_NODES_MANAGE;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,8 +42,10 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.service.RightAssignmentService;
 import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
+import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.validate.SupervisoryNodeValidator;
@@ -201,6 +202,8 @@ public class SupervisoryNodeController extends BaseController {
     rightService.checkAdminRight(SUPERVISORY_NODES_MANAGE);
     LOGGER.info("Updating supervisoryNode with id: {}", supervisoryNodeId);
 
+    supervisoryNodeDto.setId(supervisoryNodeId);
+
     profiler.start("VALIDATE_SUPERVISORY_NODE");
     validator.validate(supervisoryNodeDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
@@ -313,8 +316,7 @@ public class SupervisoryNodeController extends BaseController {
       Pageable pageable) {
     rightService.checkAdminRight(RightName.SUPERVISORY_NODES_MANAGE);
 
-    SupervisoryNode supervisoryNode = Optional
-        .ofNullable(supervisoryNodeRepository.findById(supervisoryNodeId)).orElse(null)
+    SupervisoryNode supervisoryNode = supervisoryNodeRepository.findById(supervisoryNodeId)
         .orElseThrow(() -> new NotFoundException(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND));
 
     Program program;
@@ -322,8 +324,7 @@ public class SupervisoryNodeController extends BaseController {
     if (null == programId) {
       program = null;
     } else {
-      program = Optional
-          .ofNullable(programRepository.findById(programId)).orElse(null)
+      program = programRepository.findById(programId)
           .orElseThrow(() -> new NotFoundException(ProgramMessageKeys.ERROR_NOT_FOUND));
     }
 
@@ -480,9 +481,10 @@ public class SupervisoryNodeController extends BaseController {
       SupervisoryNodeDto supervisoryNodeDto) {
     RequisitionGroup requisitionGroup = requisitionGroupRepository
         .findById(supervisoryNodeDto.getRequisitionGroupId())
-        .orElse(null);
-    requisitionGroup.setSupervisoryNode(supervisoryNodeRepository
-            .findById(existing.getId()).orElse(null));
+        .orElseThrow(() -> new NotFoundException(RequisitionGroupMessageKeys.ERROR_NOT_FOUND));
+    requisitionGroup.setSupervisoryNode(supervisoryNodeRepository.findById(existing.getId())
+        .orElseThrow(() -> new NotFoundException(
+            new Message(SupervisoryNodeMessageKeys.ERROR_NOT_FOUND_WITH_ID, existing.getId()))));
     requisitionGroupRepository.saveAndFlush(requisitionGroup);
     return requisitionGroup;
   }

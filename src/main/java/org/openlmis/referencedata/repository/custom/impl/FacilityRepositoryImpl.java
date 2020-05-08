@@ -30,7 +30,7 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import org.hibernate.SQLQuery;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.type.PostgresUUIDType;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
@@ -98,7 +98,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     Query nativeQuery = entityManager.createNativeQuery(query);
     params.forEach(nativeQuery::setParameter);
 
-    SQLQuery sqlQuery = nativeQuery.unwrap(SQLQuery.class);
+    NativeQuery sqlQuery = nativeQuery.unwrap(NativeQuery.class);
     sqlQuery.addScalar("ID", PostgresUUIDType.INSTANCE);
 
     // appropriate scalar is added to native query

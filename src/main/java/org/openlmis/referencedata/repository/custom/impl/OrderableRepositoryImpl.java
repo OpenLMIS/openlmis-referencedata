@@ -307,7 +307,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         .createQuery(criteriaQuery)
         .setHint("javax.persistence.loadgraph",
             entityManager.getEntityGraphs(Orderable.class))
-        .unwrap(org.hibernate.Query.class)
+        .unwrap(org.hibernate.query.Query.class)
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
   }
