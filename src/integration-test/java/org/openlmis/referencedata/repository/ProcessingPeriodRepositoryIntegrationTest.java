@@ -210,15 +210,30 @@ public class ProcessingPeriodRepositoryIntegrationTest
     scheduleRepository.save(schedule2);
     periodRepository.save(generateInstance(schedule2));
 
-    List<ProcessingPeriod> periods = periodRepository.findByProcessingSchedule(schedule);
+    List<ProcessingPeriod> periods = periodRepository
+        .findByProcessingScheduleOrderByEndDate(schedule);
     assertEquals(3, periods.size());
     assertEquals(schedule, periods.get(0).getProcessingSchedule());
     assertEquals(schedule, periods.get(1).getProcessingSchedule());
     assertEquals(schedule, periods.get(2).getProcessingSchedule());
 
-    periods = periodRepository.findByProcessingSchedule(schedule2);
+    periods = periodRepository.findByProcessingScheduleOrderByEndDate(schedule2);
     assertEquals(1, periods.size());
     assertEquals(schedule2, periods.get(0).getProcessingSchedule());
+  }
+
+  @Test
+  public void shouldPeriodsFoundByScheduleListBeOrderedByEndDate() {
+    // Triggering update to change the default order
+    period2.setName("custom name");
+    periodRepository.save(period2);
+
+    List<ProcessingPeriod> periods = periodRepository
+        .findByProcessingScheduleOrderByEndDate(schedule);
+
+    assertEquals(3, periods.size());
+    assertTrue(periods.get(0).getEndDate().isBefore(periods.get(1).getEndDate()));
+    assertTrue(periods.get(1).getEndDate().isBefore(periods.get(2).getEndDate()));
   }
 
   @Test

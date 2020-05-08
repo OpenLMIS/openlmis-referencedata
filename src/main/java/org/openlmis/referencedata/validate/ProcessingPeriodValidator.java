@@ -61,7 +61,7 @@ public class ProcessingPeriodValidator implements BaseValidator {
             existingPeriod.getDurationInMonths(), "durationInMonths");
       }
       List<ProcessingPeriod> periodList = processingPeriodRepository
-          .findByProcessingSchedule(period.getProcessingSchedule());
+          .findByProcessingScheduleOrderByEndDate(period.getProcessingSchedule());
 
       LocalDate startDate = period.getStartDate();
       LocalDate endDate = period.getEndDate();

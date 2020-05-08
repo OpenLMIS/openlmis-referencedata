@@ -164,7 +164,7 @@ public class ProcessingPeriodValidatorTest {
 
   @Test
   public void shouldRejectPeriodIfItWouldIntroduceGapBetweenPeriods() {
-    when(processingPeriodRepository.findByProcessingSchedule(processingSchedule))
+    when(processingPeriodRepository.findByProcessingScheduleOrderByEndDate(processingSchedule))
         .thenReturn(Collections.singletonList(previousPeriod));
     when(previousPeriod.getEndDate()).thenReturn(LocalDate.of(2016, 5, 27));
 

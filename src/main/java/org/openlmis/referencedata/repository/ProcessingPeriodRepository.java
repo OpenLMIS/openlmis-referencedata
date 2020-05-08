@@ -30,7 +30,7 @@ public interface ProcessingPeriodRepository extends JpaRepository<ProcessingPeri
     ProcessingPeriodRepositoryCustom,
     BaseAuditableRepository<ProcessingPeriod, UUID> {
 
-  List<ProcessingPeriod> findByProcessingSchedule(ProcessingSchedule schedule);
+  List<ProcessingPeriod> findByProcessingScheduleOrderByEndDate(ProcessingSchedule schedule);
 
   Optional<ProcessingPeriod> findOneByNameAndProcessingSchedule(String name,
                                                                 ProcessingSchedule schedule);
