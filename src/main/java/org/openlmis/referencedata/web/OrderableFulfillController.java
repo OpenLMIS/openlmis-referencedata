@@ -74,6 +74,9 @@ public class OrderableFulfillController extends BaseController {
   @Autowired
   private FacilityTypeApprovedProductRepository ftapRepository;
 
+  private PageRequest noPaginationRequest = PageRequest.of(Pagination.DEFAULT_PAGE_NUMBER,
+      Pagination.NO_PAGINATION);
+
   /**
    * Gets orderable fulfills.
    */
@@ -106,8 +109,6 @@ public class OrderableFulfillController extends BaseController {
   }
 
   private List<Orderable> getOrderables(Set<UUID> ids) {
-    PageRequest noPaginationRequest = PageRequest.of(Pagination.DEFAULT_PAGE_NUMBER,
-        Pagination.NO_PAGINATION);
     Page<Orderable> pageWithAllOrderables = ids.isEmpty()
         ? orderableRepository.findAllLatest(noPaginationRequest)
         : orderableRepository.findAllLatestByIds(ids, noPaginationRequest);
@@ -126,7 +127,8 @@ public class OrderableFulfillController extends BaseController {
     if (queryMap.isSearchByFacilityIdAndProgramId()) {
       profiler.start("GET_ORDERABLES_IDS_BY_FACILITY_AND_PROGRAM");
       return ftapRepository
-          .searchProducts(queryMap.getFacilityId(), queryMap.getProgramId(), null, null, true, null)
+          .searchProducts(queryMap.getFacilityId(), queryMap.getProgramId(), null, null, true,
+              noPaginationRequest)
           .getContent()
           .stream()
           .map(FacilityTypeApprovedProduct::getOrderableId)
