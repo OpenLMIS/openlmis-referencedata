@@ -5,7 +5,7 @@
     "Tags": ["openlmis-service"],
     "check": {
       "interval": "10s",
-      "http": "http://HOST:PORT/health"
+      "http": "http://HOST:PORT/actuator/health"
     }
   },
   "raml": "src/main/resources/api-definition.yaml",

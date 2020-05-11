@@ -90,7 +90,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/referencedata",
             "/webjars/**",
             "/referencedata/webjars/**",
-            "/health",
+            "/actuator/health",
             "/referencedata/docs/**",
             "/localeSettings",
             "/togglz-console/**",
