@@ -1,3 +1,21 @@
+15.2.0 / WIP
+=================
+New functionality added in a backwards-compatible manner:
+* [OLMIS-6783](https://openlmis.atlassian.net/browse/OLMIS-6784): Update Spring Boot version to 2.x:
+  * Spring Boot version is 2.2.2.
+  * Flyway is at 6.0.8, new mechanism for loading Spring Security for OAuth2 (matching Spring Boot version), new versions for REST Assured, RAML tester, RAML parser, PowerMock, Mockito (so tests will pass) and Java callback mechanism has changed to a general handle() method.
+  * Spring application properties for Flyway have changed.
+  * Re-implement generation of Jasper reports.
+  * Fix repository method signatures (findOne is now findById, etc.); additionally they return Optional.
+  * Fix unit tests.
+  * Fix integration tests. Use TestApplication which sets default redis server in order to get the tests to run.
+  * API definitions require "Keep-Alive" header for web integration tests.
+  * Pagination does not allow a null sort, and by default returns an object, rather than an array, so add CustomSortSerializer to serialize Sort
+  * Hibernate Spatial using 5.3 instead of latest to use old JTS classes (issues with using new classes that are difficult to resolve).
+  * Remove migration integration tests as they are not necessary if migrations do not change.
+  * Fix Jackson issue in supported programs in FacilityDto.
+  * Remove order by pageable SQL (not necessary in Spring Boot 2)
+
 15.1.1 / 2020-04-14
 =====================
 
