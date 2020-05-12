@@ -17,6 +17,6 @@
     "referencedata/webjars/<all>",
     "togglz-console",
     "togglz-console/<all>",
-    "togglz"
+    "actuator/togglz"
   ]
 }

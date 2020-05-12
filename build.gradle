@@ -70,8 +70,8 @@ dependencies {
 
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
-    
-    compile 'org.togglz:togglz-legacy-spring-boot-starter:2.6.1.Final'
+
+    implementation 'org.togglz:togglz-spring-boot-starter:2.6.1.Final'
     compile 'org.togglz:togglz-console:2.6.1.Final'
     compile 'org.togglz:togglz-spring-security:2.6.1.Final'
     compile 'org.togglz:togglz-redis:2.6.1.Final'
