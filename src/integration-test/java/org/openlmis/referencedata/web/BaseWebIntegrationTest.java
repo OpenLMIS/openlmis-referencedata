@@ -83,7 +83,6 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.ServiceAccountRepository;
-import org.openlmis.referencedata.repository.StockAdjustmentReasonRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
@@ -282,9 +281,6 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected RoleRepository roleRepository;
-
-  @MockBean
-  protected StockAdjustmentReasonRepository stockAdjustmentReasonRepository;
 
   @MockBean
   protected UserRepository userRepository;

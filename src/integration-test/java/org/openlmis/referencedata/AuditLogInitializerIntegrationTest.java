@@ -54,7 +54,6 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.ServiceAccount;
-import org.openlmis.referencedata.domain.StockAdjustmentReason;
 import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.domain.SupplyPartner;
@@ -315,16 +314,6 @@ public class AuditLogInitializerIntegrationTest {
     addServiceAccount(serviceAccountId);
 
     executeTest(serviceAccountId, ServiceAccount.class);
-  }
-
-  @Test
-  public void shouldCreateSnapshotsForStockAdjustmentReason() {
-    //given
-    UUID stockAdjustmentReasonId = UUID.randomUUID();
-    Program program = addNewProgram();
-    addStockAdjustmentReason(stockAdjustmentReasonId, program.getId());
-
-    executeTest(stockAdjustmentReasonId, StockAdjustmentReason.class);
   }
 
   @Test
