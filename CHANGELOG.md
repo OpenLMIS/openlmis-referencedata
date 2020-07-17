@@ -15,6 +15,7 @@ New functionality added in a backwards-compatible manner:
   * Remove migration integration tests as they are not necessary if migrations do not change.
   * Fix Jackson issue in supported programs in FacilityDto.
   * Remove order by pageable SQL (not necessary in Spring Boot 2)
+* [OLMIS-3100](https://openlmis.atlassian.net/browse/OLMIS-3100): Removed stock adjustment reasons endpoint
 
 15.1.1 / 2020-04-14
 =====================
