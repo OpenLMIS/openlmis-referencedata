@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.Sets;
 import java.util.Collections;
@@ -161,6 +162,15 @@ public class SupplyPartnerRepositoryIntegrationTest
 
     Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
     assertThat(search.getContent()).contains(supplyPartners);
+  }
+
+  @Test
+  public void shouldReturnNotThrowErrorWhenNoSupplyPartnersConfigured() {
+    supplyPartnerRepository.deleteAll();
+    SupplyPartnerRepositoryCustom.SearchParams searchParams = new TestSearchParams();
+
+    Page<SupplyPartner> search = supplyPartnerRepository.search(searchParams, pageable);
+    assertEquals(0, search.getContent().size());
   }
 
   @Test
