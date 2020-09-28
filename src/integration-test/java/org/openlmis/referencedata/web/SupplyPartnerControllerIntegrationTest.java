@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -27,6 +28,7 @@ import static org.mockito.Matchers.eq;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.ValidatableResponse;
 import guru.nidi.ramltester.junit.RamlMatchers;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
@@ -41,6 +43,7 @@ import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.SupplyPartner;
 import org.openlmis.referencedata.dto.SupplyPartnerDto;
 import org.openlmis.referencedata.repository.custom.SupplyPartnerRepositoryCustom;
+import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
@@ -113,6 +116,27 @@ public class SupplyPartnerControllerIntegrationTest extends BaseWebIntegrationTe
 
     assertResponseBody(response, "content[0]", is(supplyPartner.getId().toString()));
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldNotThrowErrorWhenNoSupplyPartners() {
+    given(supplyPartnerRepository.search(
+        any(SupplyPartnerRepositoryCustom.SearchParams.class), eq(pageable)))
+        .willReturn(Pagination.getPage(Collections.emptyList(), pageable));
+
+    PageDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
+        .when()
+        .get(RESOURCE_PATH)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .extract().as(PageDto.class);
+
+    assertEquals(0, response.getContent().size());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

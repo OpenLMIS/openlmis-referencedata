@@ -16,6 +16,7 @@ New functionality added in a backwards-compatible manner:
   * Fix Jackson issue in supported programs in FacilityDto.
   * Remove order by pageable SQL (not necessary in Spring Boot 2)
 * [OLMIS-3100](https://openlmis.atlassian.net/browse/OLMIS-3100): Removed stock adjustment reasons endpoint
+* [OLMIS-6941](https://openlmis.atlassian.net/browse/OLMIS-6941): Added missing pageable parameter when no supply partners configured.
 
 15.1.1 / 2020-04-14
 =====================

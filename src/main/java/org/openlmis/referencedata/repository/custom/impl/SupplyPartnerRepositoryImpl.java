@@ -61,7 +61,7 @@ public class SupplyPartnerRepositoryImpl implements SupplyPartnerRepositoryCusto
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
     if (count == 0) {
-      return Pagination.getPage(Collections.emptyList());
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
     CriteriaQuery<SupplyPartner> query = builder.createQuery(SupplyPartner.class);
