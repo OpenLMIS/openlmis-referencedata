@@ -174,7 +174,7 @@ public class OrderableController extends BaseController {
     ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(searchParams, profiler);
 
     if (lastUpdated == null) {
-      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
+      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable, 0);
       return ResponseEntity.ok()
               .body(emptyPage);
     }
@@ -227,7 +227,7 @@ public class OrderableController extends BaseController {
             .getLatestLastUpdatedDate(getQueryOrderableSearchParams(body), profiler);
 
     if (lastUpdated == null) {
-      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable);
+      Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable, 0);
       return ResponseEntity.ok()
               .body(emptyPage);
     }

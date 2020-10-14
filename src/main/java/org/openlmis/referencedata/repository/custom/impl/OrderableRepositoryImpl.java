@@ -127,7 +127,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
     if (total < 1) {
       profiler.stop().log();
-      return Pagination.getPage(Collections.emptyList(), pageable);
+      return Pagination.getPage(Collections.emptyList(), pageable,0);
     }
 
     profiler.start("GET_VERSION_IDENTITY");
