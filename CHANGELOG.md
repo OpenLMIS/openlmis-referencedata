@@ -17,6 +17,8 @@ New functionality added in a backwards-compatible manner:
   * Remove order by pageable SQL (not necessary in Spring Boot 2)
 * [OLMIS-3100](https://openlmis.atlassian.net/browse/OLMIS-3100): Removed stock adjustment reasons endpoint
 * [OLMIS-6941](https://openlmis.atlassian.net/browse/OLMIS-6941): Added missing pageable parameter when no supply partners configured.
+Bug fixes:
+* [OLMIS-6943](https://openlmis.atlassian.net/browse/OLMIS-6943): It's impossible to create the kit unpack list.
 
 15.1.1 / 2020-04-14
 =====================
