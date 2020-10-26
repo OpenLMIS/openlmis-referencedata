@@ -17,7 +17,6 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -44,7 +43,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,7 +58,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
-import org.aspectj.weaver.ast.Or;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -74,7 +71,6 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
@@ -232,7 +228,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(orderableDto1.getId(), orderableDto3.getId());
     assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
     assertThat(response3.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-    assertEquals(orderableChild.getId(), getChildFromOrderableDto(orderableDto3).getOrderable().getId());
+    assertEquals(orderableChild.getId(),
+        getChildFromOrderableDto(orderableDto3).getOrderable().getId());
     assertEquals(getChildFromOrderableDto(orderableDto1).getQuantity(),
         getChildFromOrderableDto(orderableDto3).getQuantity());
   }
@@ -939,6 +936,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
       return orderable;
     });
   }
+  
   private OrderableChildDto getChildFromOrderableDto(OrderableDto orderableDto) {
     if (orderableDto.getChildren().size() > 0) {
       return orderableDto.getChildren().iterator().next();
