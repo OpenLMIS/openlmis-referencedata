@@ -35,7 +35,6 @@ import org.openlmis.referencedata.domain.OrderableChild;
 public class OrderableChildDto implements OrderableChild.Exporter, OrderableChild.Importer {
 
   @Getter
-  @JsonProperty("orderable")
   private ObjectReferenceDto orderable;
 
   @Getter
@@ -65,6 +64,7 @@ public class OrderableChildDto implements OrderableChild.Exporter, OrderableChil
 
   @Override
   @JsonIgnore
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   public void setOrderable(Orderable orderable) {
     this.orderable = new ObjectReferenceDto();
     this.orderable.setId(orderable.getId());

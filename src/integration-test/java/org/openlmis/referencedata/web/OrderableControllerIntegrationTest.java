@@ -36,18 +36,22 @@ import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +60,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
+import org.aspectj.weaver.ast.Or;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -69,6 +74,8 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
+import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
@@ -78,6 +85,8 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.slf4j.profiler.Profiler;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -165,24 +174,67 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableDto orderableDto1 = response1.as(OrderableDto.class);
     orderableDto1.setNetContent(11L);
 
+    Orderable orderableChild = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
+        10, 5, false, UUID.randomUUID(), orderableVersionNumber);
+    orderableChild.setProgramOrderables(Collections.emptyList());
+    orderableChild.setLastUpdated(modifiedDate);
+
+    OrderableDto orderableChildDto = OrderableDto.newInstance(orderableChild);
+    orderableChildDto.setNetContent(11L);
+    List<UUID> orderableIdList = new ArrayList<>();
+    orderableIdList.add(orderableChildDto.getId());
+
+    List<Orderable> orderableList = new ArrayList<>();
+    orderableList.add(Orderable.newInstance(orderableChildDto));
+    Page<Orderable> orderableMap = new PageImpl<Orderable>(orderableList);
+
+    when(orderableRepository.findAllLatestByIds(orderableIdList, null)).thenReturn(orderableMap);
+
+
     Response response2 = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableChildDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().response();
+
+
+
+    OrderableDto orderableDto2 = response2.as(OrderableDto.class);
+    orderableDto2.setNetContent(11L);
+
+    OrderableChildDto childDto = new OrderableChildDto();
+    childDto.setOrderable(orderableChild);
+    childDto.setQuantity(1L);
+    Set<OrderableChildDto> childSet = new HashSet<>();
+    childSet.add(childDto);
+
+    orderableDto1.setChildren(childSet);
+
+    Response response3 = restAssured
             .given()
             .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .body(orderableDto1)
             .when()
-            .put(String.join("/", RESOURCE_URL, orderableDto1.getId().toString()))
+            .put(String.join("/", RESOURCE_URL, orderableDto.getId().toString()))
             .then()
             .statusCode(200)
             .extract().response();
 
-    OrderableDto orderableDto2 = response2.as(OrderableDto.class);
+    OrderableDto orderableDto3 = response3.as(OrderableDto.class);
 
-    assertEquals(11L, orderableDto2.getNetContent().longValue());
-    assertEquals(orderableDto1.getId(), orderableDto2.getId());
-    assertNotEquals(orderableDto1, orderableDto2);
+    assertEquals(11L, orderableDto3.getNetContent().longValue());
+    assertEquals(orderableDto1.getId(), orderableDto3.getId());
     assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-    assertThat(response2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertThat(response3.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertEquals(orderableChild.getId(), getChildFromOrderableDto(orderableDto3).getOrderable().getId());
+    assertEquals(getChildFromOrderableDto(orderableDto1).getQuantity(),
+        getChildFromOrderableDto(orderableDto3).getQuantity());
   }
 
   @Test
@@ -886,6 +938,12 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
           - requestCount * Integer.valueOf(orderable.getDescription()));
       return orderable;
     });
+  }
+  private OrderableChildDto getChildFromOrderableDto(OrderableDto orderableDto) {
+    if (orderableDto.getChildren().size() > 0) {
+      return orderableDto.getChildren().iterator().next();
+    }
+    return null;
   }
 
   private void assertOrderablesDtoParams(OrderableDto orderableDto, OrderableDto response) {
