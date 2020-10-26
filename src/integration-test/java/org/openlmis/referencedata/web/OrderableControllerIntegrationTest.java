@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -158,6 +159,45 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void updateShouldUpdateOrderable() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+    when(orderableRepository.save(any(Orderable.class))).thenAnswer(i -> i.getArguments()[0]);
+
+    Response response1 = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableDto)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().response();
+
+    OrderableDto orderableDto1 = response1.as(OrderableDto.class);
+    orderableDto1.setNetContent(11L);
+
+    Response response2 = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(orderableDto1)
+        .when()
+        .put(String.join("/", RESOURCE_URL, orderableDto1.getId().toString()))
+        .then()
+        .statusCode(200)
+        .extract().response();
+
+    OrderableDto orderableDto2 = response2.as(OrderableDto.class);
+
+    assertEquals(11L, orderableDto2.getNetContent().longValue());
+    assertEquals(orderableDto1.getId(), orderableDto2.getId());
+    assertNotEquals(orderableDto1, orderableDto2);
+    assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertThat(response2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+  }
+
+  @Test
+  public void updateShouldUpdateOrderableWithChildOrderable() {
     mockUserHasRight(ORDERABLES_MANAGE);
     when(orderableRepository.save(any(Orderable.class))).thenAnswer(i -> i.getArguments()[0]);
 
