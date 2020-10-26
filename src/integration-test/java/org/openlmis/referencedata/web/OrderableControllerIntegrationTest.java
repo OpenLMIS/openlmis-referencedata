@@ -77,6 +77,7 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.PageDto;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
@@ -169,19 +170,23 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     OrderableDto orderableDto1 = response1.as(OrderableDto.class);
     orderableDto1.setNetContent(11L);
-
-    Orderable orderableChild = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
-        10, 5, false, UUID.randomUUID(), orderableVersionNumber);
-    orderableChild.setProgramOrderables(Collections.emptyList());
+    Orderable orderableChild =
+        new OrderableDataBuilder()
+            .withProductCode(Code.code(CODE))
+            .withDispensable(Dispensable.createNew(UNIT))
+            .withVersionNumber(orderableVersionNumber)
+            .withProgramOrderables(Collections.emptyList())
+            .build();
     orderableChild.setLastUpdated(modifiedDate);
 
-    OrderableDto orderableChildDto = OrderableDto.newInstance(orderableChild);
+    OrderableDto orderableChildDto = new OrderableDto();
+    orderableChild.export(orderableChildDto);
     orderableChildDto.setNetContent(11L);
     List<UUID> orderableIdList = new ArrayList<>();
     orderableIdList.add(orderableChildDto.getId());
 
     List<Orderable> orderableList = new ArrayList<>();
-    orderableList.add(Orderable.newInstance(orderableChildDto));
+    orderableList.add(orderableChild);
     Page<Orderable> orderableMap = new PageImpl<Orderable>(orderableList);
 
     when(orderableRepository.findAllLatestByIds(orderableIdList, null)).thenReturn(orderableMap);
