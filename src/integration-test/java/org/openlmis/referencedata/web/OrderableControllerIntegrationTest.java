@@ -125,6 +125,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .withProgramOrderables(Collections.emptyList())
         .withVersionNumber(orderableVersionNumber)
         .build();
+    orderable.setId(orderableId);
     orderable.setLastUpdated(modifiedDate);
     orderable.export(orderableDto);
 
