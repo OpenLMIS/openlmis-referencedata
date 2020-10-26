@@ -119,9 +119,12 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void setUp() {
     super.setUp();
 
-    orderable = new Orderable(Code.code(CODE), Dispensable.createNew(UNIT),
-        10, 5, false, orderableId, orderableVersionNumber);
-    orderable.setProgramOrderables(Collections.emptyList());
+    orderable = new OrderableDataBuilder()
+        .withProductCode(Code.code(CODE))
+        .withDispensable(Dispensable.createNew(UNIT))
+        .withProgramOrderables(Collections.emptyList())
+        .withVersionNumber(orderableVersionNumber)
+        .build();
     orderable.setLastUpdated(modifiedDate);
     orderable.export(orderableDto);
 
