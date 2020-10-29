@@ -263,6 +263,19 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
+  public void shouldNotThrowErrorWhenNoUsersFound() {
+
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .asEmpty()
+        .withUsername("test")
+        .build();
+    Page<User> found = repository.searchUsers(searchParams,Collections.emptyList(), pageable);
+
+    // then
+    assertEquals(0, found.getContent().size());
+  }
+
+  @Test
   public void findByExtraDataShouldFindDataWhenParametersMatch() throws JsonProcessingException {
     //given
     Map<String, Object> extraData = Collections.singletonMap(EXTRA_DATA_KEY, EXTRA_DATA_VALUE);

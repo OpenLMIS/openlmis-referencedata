@@ -19,6 +19,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-6941](https://openlmis.atlassian.net/browse/OLMIS-6941): Added missing pageable parameter when no supply partners configured.
 Bug fixes:
 * [OLMIS-6943](https://openlmis.atlassian.net/browse/OLMIS-6943): Added missing Json annotation to restore child orderables support
+* [OLMIS-6950](https://openlmis.atlassian.net/browse/OLMIS-6950): Added missing pagable parameter to fix users filter.
 
 15.1.1 / 2020-04-14
 =====================

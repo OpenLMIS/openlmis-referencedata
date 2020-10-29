@@ -74,7 +74,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom {
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
     if (count == 0) {
-      return Pagination.getPage(Collections.emptyList());
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
     CriteriaQuery<User> query = builder.createQuery(User.class);
