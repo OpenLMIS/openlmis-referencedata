@@ -21,9 +21,16 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
+import java.math.BigDecimal;
+import java.util.Iterator;
+import java.util.Set;
+import org.joda.money.Money;
+
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.TemperatureMeasurementDto;
 import org.openlmis.referencedata.dto.VolumeMeasurementDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -70,6 +77,16 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
 
     OrderableDto dto = (OrderableDto) target;
+    Set<ProgramOrderableDto> programs = dto.getPrograms();
+    Iterator iterator = programs.iterator();
+    if (iterator.hasNext()) {
+      ProgramOrderableDto programOrderableDto = (ProgramOrderableDto)iterator.next();
+      Money pricePerPack = programOrderableDto.getPricePerPack();
+      BigDecimal amount = pricePerPack.getAmount();
+      if (amount.compareTo(BigDecimal.ZERO) == -1) {
+        throw new ValidationMessageException(OrderableMessageKeys.ERROR_NEGATIVE_PRICE_PER_PACK);
+      }
+    }
     validateTemperature(dto, errors);
     validateVolumeMeasurement(dto, errors);
 
