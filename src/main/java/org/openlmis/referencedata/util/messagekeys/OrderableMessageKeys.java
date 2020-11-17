@@ -20,6 +20,7 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String REQUIRED = "required";
   private static final String VALUE = "value";
   private static final String NOT_SUPPORTED = "notSupported";
+  private static final String NEGATIVE_PRICE_PER_PACK = "negativePricePerPackNotAllowed";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -75,4 +76,5 @@ public abstract class OrderableMessageKeys extends MessageKeys {
           join(ERROR_IN_BOX_CUBE_DIMENSION, VALUE);
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE_REQUIRED =
           join(ERROR_IN_BOX_CUBE_DIMENSION_VALUE, REQUIRED);
+  public static final String ERROR_NEGATIVE_PRICE_PER_PACK = join(ERROR, NEGATIVE_PRICE_PER_PACK);
 }
