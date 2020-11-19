@@ -20,11 +20,17 @@ import static org.openlmis.referencedata.validate.OrderableValidator.IN_BOX_CUBE
 import static org.openlmis.referencedata.validate.OrderableValidator.MAXIMUM_TEMPERATURE;
 import static org.openlmis.referencedata.validate.OrderableValidator.MINIMUM_TEMPERATURE;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TemperatureMeasurementDataBuilder;
 import org.openlmis.referencedata.testbuilder.VolumeMeasurementDataBuilder;
@@ -32,6 +38,7 @@ import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableValidatorTest {
 
   @InjectMocks
@@ -148,5 +155,16 @@ public class OrderableValidatorTest {
     validator.validate(orderableDto, errors);
     assertThat(errors.hasFieldErrors(MINIMUM_TEMPERATURE)).isTrue();
     assertThat(errors.hasFieldErrors(MAXIMUM_TEMPERATURE)).isTrue();
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfPricePerPackIsNegative() {
+    ProgramOrderableDto programOrderableDto = new ProgramOrderableDto();
+    Money pricePerPack = Money.parse("USD -23.87");
+    programOrderableDto.setPricePerPack(pricePerPack);
+    Set<ProgramOrderableDto> programs = new HashSet<>();
+    programs.add(programOrderableDto);
+    orderableDto.setPrograms(programs);
+    validator.validate(orderableDto,errors);
   }
 }
