@@ -20,7 +20,7 @@ New functionality added in a backwards-compatible manner:
 Bug fixes:
 * [OLMIS-6943](https://openlmis.atlassian.net/browse/OLMIS-6943): Added missing Json annotation to restore child orderables support
 * [OLMIS-6950](https://openlmis.atlassian.net/browse/OLMIS-6950): Added missing pagable parameter to fix users filter.
-
+* [OLMIS-6454](https://openlmis.atlassian.net/browse/OLMIS-6454?filter=20519): added validation for negative priceperpack.
 15.1.1 / 2020-04-14
 =====================
 
