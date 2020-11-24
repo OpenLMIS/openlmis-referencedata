@@ -83,7 +83,7 @@ public class OrderableValidator implements BaseValidator {
       ProgramOrderableDto programOrderableDto = (ProgramOrderableDto)iterator.next();
       Money pricePerPack = programOrderableDto.getPricePerPack();
       BigDecimal amount = pricePerPack.getAmount();
-      if (amount.compareTo(BigDecimal.ZERO) == -1) {
+      if (amount.compareTo(BigDecimal.ZERO) < 0) {
         throw new ValidationMessageException(OrderableMessageKeys.ERROR_NEGATIVE_PRICE_PER_PACK);
       }
     }
