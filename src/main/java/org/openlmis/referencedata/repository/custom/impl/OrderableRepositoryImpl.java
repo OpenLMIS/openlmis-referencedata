@@ -41,6 +41,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
@@ -130,13 +131,20 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       return Pagination.getPage(Collections.emptyList(), pageable,0);
     }
 
-    profiler.start("GET_VERSION_IDENTITY");
-    List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder, pageable);
-
-    profiler.start("RETRIEVE_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
-    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
-      orderables.addAll(retrieveOrderables(partition));
+
+    if (pageable.isPaged() && pageable.getPageSize() < total) {
+      profiler.start("GET_VERSION_IDENTITY");
+      List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder,
+          pageable);
+
+      profiler.start("RETRIEVE_ORDERABLES");
+      for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+        orderables.addAll(retrieveOrderables(partition));
+      }
+    } else {
+      profiler.start("RETRIEVE_ORDERABLES");
+      orderables = retrieveOrderables(searchParams, identityList);
     }
 
     profiler.stop().log();
@@ -188,6 +196,28 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       newQuery = (CriteriaQuery<E>) typeQuery.select(root.get(IDENTITY));
     }
 
+    Predicate where = prepareParams(root, newQuery, searchParams, identities);
+
+    newQuery.where(where);
+
+    if (!count) {
+      newQuery.groupBy(
+          root.get(IDENTITY).get(ID),
+          root.get(IDENTITY).get(VERSION_NUMBER),
+          root.get(FULL_PRODUCT_NAME));
+      newQuery.orderBy(builder.asc(root.get(FULL_PRODUCT_NAME)));
+
+      return entityManager.createQuery(query)
+          .setMaxResults(pageable.getPageSize())
+          .setFirstResult(Math.toIntExact(pageable.getOffset()));
+    }
+
+    return entityManager.createQuery(newQuery);
+  }
+
+  private <E> Predicate prepareParams(Root<Orderable> root, CriteriaQuery<E> query,
+      SearchParams searchParams, Collection<VersionIdentity> identities) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Predicate where = builder.conjunction();
 
     if (null != searchParams) {
@@ -199,7 +229,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       }
 
       if (isEmpty(identities)) {
-        Subquery<String> latestOrderablesQuery = createSubQuery(newQuery, builder);
+        Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
         where = builder.and(where, builder.in(builder.concat(
             root.get(IDENTITY).get(ID).as(String.class),
             root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
@@ -218,28 +248,14 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
             "%" + searchParams.getName().toLowerCase() + "%"));
       }
     } else {
-      Subquery<String> latestOrderablesQuery = createSubQuery(newQuery, builder);
+      Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
       where = builder.and(where, builder.in(builder.concat(
           root.get(IDENTITY).get(ID).as(String.class),
           root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
           .value(latestOrderablesQuery));
     }
 
-    newQuery.where(where);
-
-    if (!count) {
-      newQuery.groupBy(
-          root.get(IDENTITY).get(ID),
-          root.get(IDENTITY).get(VERSION_NUMBER),
-          root.get(FULL_PRODUCT_NAME));
-      newQuery.orderBy(builder.asc(root.get(FULL_PRODUCT_NAME)));
-
-      return entityManager.createQuery(query)
-          .setMaxResults(pageable.getPageSize())
-          .setFirstResult(Math.toIntExact(pageable.getOffset()));
-    }
-
-    return entityManager.createQuery(newQuery);
+    return where;
   }
 
   private Subquery<String> createSubQuery(CriteriaQuery query, CriteriaBuilder builder) {
@@ -294,8 +310,6 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     return entityManager.createNativeQuery(builder.toString());
   }
 
-  // appropriate class has been passed in the EntityManager.createQuery method
-  @SuppressWarnings("unchecked")
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Orderable> criteriaQuery =
@@ -303,13 +317,30 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     Root<Orderable> root = criteriaQuery.from(Orderable.class);
     criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
 
+    return retrieveOrderables(criteriaQuery);
+  }
+
+  private List<Orderable> retrieveOrderables(SearchParams searchParams,
+      Collection<VersionIdentity> identities) {
+    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Orderable> criteriaQuery =
+        criteriaBuilder.createQuery(Orderable.class);
+    Root<Orderable> root = criteriaQuery.from(Orderable.class);
+    criteriaQuery.select(root).where(prepareParams(root, criteriaQuery, searchParams, identities));
+
+    return retrieveOrderables(criteriaQuery);
+  }
+
+  // appropriate class has been passed in the EntityManager.createQuery method
+  @SuppressWarnings("unchecked")
+  private List<Orderable> retrieveOrderables(CriteriaQuery<Orderable> criteriaQuery) {
     return entityManager
         .createQuery(criteriaQuery)
-        .setHint("javax.persistence.loadgraph",
-            entityManager.getEntityGraphs(Orderable.class))
+        .setHint(QueryHints.HINT_READONLY, true)
+        .setHint("javax.persistence.fetchgraph",
+            entityManager.getEntityGraph("graph.Orderable"))
         .unwrap(org.hibernate.query.Query.class)
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
   }
-
 }

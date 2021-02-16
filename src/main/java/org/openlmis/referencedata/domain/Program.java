@@ -60,7 +60,7 @@ public class Program extends BaseEntity {
   @Column(nullable = false)
   private Boolean enableDatePhysicalStockCountCompleted;
 
-  private Program() {
+  public Program() {
     code = null;
   }
 

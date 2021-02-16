@@ -38,6 +38,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -75,11 +76,19 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @NoArgsConstructor
 @Cacheable
 @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
-@NamedEntityGraph(attributeNodes = {
-    @NamedAttributeNode("programOrderables"),
-    @NamedAttributeNode("children"),
-    @NamedAttributeNode("identifiers")
-})
+@NamedEntityGraph(
+    name = "graph.Orderable",
+    attributeNodes = {
+        @NamedAttributeNode(value = "programOrderables", subgraph = "programOrderables"),
+        @NamedAttributeNode(value = "dispensable", subgraph = "dispensable"),
+        @NamedAttributeNode("children"),
+        @NamedAttributeNode("identifiers")
+    },
+    subgraphs = {
+        @NamedSubgraph(name = "programOrderables",
+            attributeNodes = @NamedAttributeNode("orderableDisplayCategory")),
+        @NamedSubgraph(name = "dispensable", attributeNodes = @NamedAttributeNode("attributes"))
+    })
 public class Orderable implements Versionable {
 
   private static final int FETCH_SIZE = 1000;

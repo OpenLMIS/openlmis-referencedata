@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
@@ -44,7 +45,7 @@ import org.joda.money.Money;
 @TypeName("ProgramOrderable")
 public class ProgramOrderable extends BaseEntity {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "programId", nullable = false)
   @Getter
   @Setter
@@ -78,7 +79,7 @@ public class ProgramOrderable extends BaseEntity {
   @Setter
   @Type(type = "org.openlmis.referencedata.util.CustomSingleColumnMoneyUserType")
   private Money pricePerPack;
-  
+
   private ProgramOrderable(Program program,
                            Orderable product,
                            OrderableDisplayCategory orderableDisplayCategory) {
