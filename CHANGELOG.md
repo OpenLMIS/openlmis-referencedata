@@ -1,3 +1,10 @@
+15.2.1 / WIP
+==================
+
+Improvements:
+* [OLMIS-7192](https://openlmis.atlassian.net/browse/OLMIS-7192): Improve performance of orderables fetch.
+
+
 15.2.0 / 2020-11-16
 ===================
 
