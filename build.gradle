@@ -399,10 +399,10 @@ uploadArchives {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/OpenLMIS/openlmis-fulfillment.git'
-                    developerConnection = 'scm:git:ssh://github.com/OpenLMIS/openlmis-fulfillment' +
+                    connection = 'scm:git:git://github.com/OpenLMIS/openlmis-referencedata.git'
+                    developerConnection = 'scm:git:ssh://github.com/OpenLMIS/openlmis-referencedata' +
                             '.git'
-                    url = 'http://github.com/OpenLMIS/openlmis-fulfillment/'
+                    url = 'http://github.com/OpenLMIS/openlmis-referencedata/'
                 }
             }
         }
