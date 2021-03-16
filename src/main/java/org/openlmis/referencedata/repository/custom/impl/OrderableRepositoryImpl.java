@@ -133,7 +133,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
     List<Orderable> orderables = new ArrayList<>();
 
-    if (pageable.isPaged() && pageable.getPageSize() < total) {
+    if (!identityList.isEmpty() || (pageable.isPaged() && pageable.getPageSize() < total)) {
       profiler.start("GET_VERSION_IDENTITY");
       List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder,
           pageable);
