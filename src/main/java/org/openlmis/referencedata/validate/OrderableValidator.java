@@ -78,8 +78,8 @@ public class OrderableValidator implements BaseValidator {
 
     OrderableDto dto = (OrderableDto) target;
     Set<ProgramOrderableDto> programs = dto.getPrograms();
-    Iterator iterator = programs.iterator();
-    if (iterator.hasNext()) {
+    if (programs != null && !programs.isEmpty()) {
+      Iterator iterator = programs.iterator();
       ProgramOrderableDto programOrderableDto = (ProgramOrderableDto)iterator.next();
       Money pricePerPack = programOrderableDto.getPricePerPack();
       BigDecimal amount = pricePerPack.getAmount();
