@@ -131,20 +131,13 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       return Pagination.getPage(Collections.emptyList(), pageable,0);
     }
 
+    profiler.start("GET_VERSION_IDENTITY");
+    List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder, pageable);
+
+    profiler.start("RETRIEVE_ORDERABLES");
     List<Orderable> orderables = new ArrayList<>();
-
-    if (!identityList.isEmpty() || (pageable.isPaged() && pageable.getPageSize() < total)) {
-      profiler.start("GET_VERSION_IDENTITY");
-      List<VersionIdentity> identities = getIdentities(searchParams, identityList, builder,
-          pageable);
-
-      profiler.start("RETRIEVE_ORDERABLES");
-      for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
-        orderables.addAll(retrieveOrderables(partition));
-      }
-    } else {
-      profiler.start("RETRIEVE_ORDERABLES");
-      orderables = retrieveOrderables(searchParams, identityList);
+    for (List<VersionIdentity> partition : ListUtils.partition(identities, MAX_IDENTITIES_SIZE)) {
+      orderables.addAll(retrieveOrderables(partition));
     }
 
     profiler.stop().log();
@@ -316,17 +309,6 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         criteriaBuilder.createQuery(Orderable.class);
     Root<Orderable> root = criteriaQuery.from(Orderable.class);
     criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
-
-    return retrieveOrderables(criteriaQuery);
-  }
-
-  private List<Orderable> retrieveOrderables(SearchParams searchParams,
-      Collection<VersionIdentity> identities) {
-    CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Orderable> criteriaQuery =
-        criteriaBuilder.createQuery(Orderable.class);
-    Root<Orderable> root = criteriaQuery.from(Orderable.class);
-    criteriaQuery.select(root).where(prepareParams(root, criteriaQuery, searchParams, identities));
 
     return retrieveOrderables(criteriaQuery);
   }
