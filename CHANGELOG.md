@@ -6,7 +6,7 @@ Improvements:
 
 Bug fixes:
 * [OLMIS-7248](https://openlmis.atlassian.net/browse/OLMIS-7248): Fix product creation in Products view.
-
+* [OLMIS-7251](https://openlmis.atlassian.net/browse/OLMIS-7251): Fix fetching programs for product when filtering by program code.
 
 15.2.0 / 2020-11-16
 ===================

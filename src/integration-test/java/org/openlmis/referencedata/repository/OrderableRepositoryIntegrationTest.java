@@ -719,6 +719,40 @@ public class OrderableRepositoryIntegrationTest {
     assertEquals(lastUpdated, orderable3.getLastUpdated().withZoneSameLocal(ZoneId.of("GMT")));
   }
 
+  @Test
+  public void shouldReturnOrderableWitAllProgramsWhenSearchingByProgramCode() {
+    // given
+    List<ProgramOrderable> programOrderables = new ArrayList<>();
+    Orderable validOrderable = saveAndGetOrderable();
+    validOrderable.setProgramOrderables(programOrderables);
+    repository.save(validOrderable);
+
+    String programCode = SOME_CODE;
+    Program firstProgram = createProgram(programCode);
+    programOrderables.add(createProgramOrderable(firstProgram, validOrderable));
+
+    Program secondProgram = createProgram("second-program");
+    programOrderables.add(createProgramOrderable(secondProgram, validOrderable));
+
+    validOrderable = repository.save(validOrderable);
+
+    // when
+    Page<Orderable> foundOrderables = repository.search(
+        new TestSearchParams(null, null, programCode, null),
+        pageable);
+
+    // then
+    assertEquals(1, foundOrderables.getTotalElements());
+
+    Orderable foundOrderable = foundOrderables.getContent().get(0);
+    assertEquals(validOrderable.getId(), foundOrderable.getId());
+
+    assertEquals(programOrderables.get(0).getId(),
+        foundOrderable.getProgramOrderable(firstProgram).getId());
+    assertEquals(programOrderables.get(1).getId(),
+        foundOrderable.getProgramOrderable(secondProgram).getId());
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
       Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
