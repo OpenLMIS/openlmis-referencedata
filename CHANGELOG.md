@@ -4,6 +4,9 @@
 Improvements:
 * [OLMIS-7192](https://openlmis.atlassian.net/browse/OLMIS-7192): Improve performance of orderables fetch.
 
+Bug fixes:
+* [OLMIS-7248](https://openlmis.atlassian.net/browse/OLMIS-7248): Fix product creation in Products view.
+
 
 15.2.0 / 2020-11-16
 ===================

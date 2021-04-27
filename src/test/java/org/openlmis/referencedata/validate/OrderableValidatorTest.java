@@ -63,7 +63,7 @@ public class OrderableValidatorTest {
   }
 
   @Test
-  public void shouldNotFindErrorsWhenOrderableIsValid() throws Exception {
+  public void shouldNotFindErrorsWhenOrderableIsValid() {
     validator.validate(orderableDto, errors);
 
     assertThat(errors.getErrorCount()).isEqualTo(0);
@@ -166,5 +166,14 @@ public class OrderableValidatorTest {
     programs.add(programOrderableDto);
     orderableDto.setPrograms(programs);
     validator.validate(orderableDto,errors);
+  }
+
+  @Test
+  public void shouldNotNotThrowExceptionWhenProgramsIsNullAndOrderableIsValid() {
+    orderableDto.setPrograms(null);
+
+    validator.validate(orderableDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(0);
   }
 }
