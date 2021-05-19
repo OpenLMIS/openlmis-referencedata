@@ -3,6 +3,7 @@
 
 Improvements:
 * [OLMIS-7192](https://openlmis.atlassian.net/browse/OLMIS-7192): Improve performance of orderables fetch.
+* [OLMIS-7273](https://openlmis.atlassian.net/browse/OLMIS-7273): Improve performance of fetching orderables by ids.
 
 Bug fixes:
 * [OLMIS-7248](https://openlmis.atlassian.net/browse/OLMIS-7248): Fix product creation in Products view.
