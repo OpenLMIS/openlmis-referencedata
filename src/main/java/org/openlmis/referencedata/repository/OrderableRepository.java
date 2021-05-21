@@ -78,7 +78,7 @@ public interface OrderableRepository extends
   @QueryHints(value = {
       @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
       @QueryHint(name = "org.hibernate.readOnly", value = "true")
-  }, forCounting = false)
+      }, forCounting = false)
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
