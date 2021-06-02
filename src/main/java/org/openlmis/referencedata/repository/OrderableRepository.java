@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_REF
 import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_DISTINCT_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_LAST_UPDATED;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_LATEST_ORDERABLE;
@@ -27,14 +28,17 @@ import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_LA
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
+import javax.persistence.QueryHint;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 /**
@@ -58,8 +62,8 @@ public interface OrderableRepository extends
   boolean existsById(UUID id);
 
   boolean existsByProductCode(Code code);
-  
-  @Query(value = SELECT_ORDERABLE
+
+  @Query(value = SELECT_DISTINCT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
       + WHERE_LATEST_ORDERABLE
       + " AND o.identity.id IN :ids"
@@ -70,6 +74,11 @@ public interface OrderableRepository extends
       + " AND o.identity.id IN :ids"
       + ORDER_BY_PAGEABLE
   )
+  @EntityGraph("graph.Orderable")
+  @QueryHints(value = {
+      @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
+      @QueryHint(name = "org.hibernate.readOnly", value = "true")
+      }, forCounting = false)
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
@@ -92,11 +101,11 @@ public interface OrderableRepository extends
       + " AND VALUE(oi) = :value"
   )
   List<Orderable> findAllLatestByIdentifier(@Param("key") String key, @Param("value") String value);
-  
+
   Orderable findFirstByIdentityIdOrderByIdentityVersionNumberDesc(UUID id);
-  
+
   Orderable findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
-  
+
   @Query(value = SELECT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
       + WHERE_LATEST_ORDERABLE
