@@ -37,7 +37,7 @@ public class FacilityType extends BaseEntity {
   @Setter
   private String code;
 
-  @Column(columnDefinition = "text")
+  @Column(unique = true, columnDefinition = "text")
   @Getter
   @Setter
   private String name;

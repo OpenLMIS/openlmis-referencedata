@@ -22,4 +22,5 @@ public abstract class FacilityTypeMessageKeys extends MessageKeys {
   public static final String ERROR_DELETING_WITH_ID = join(ERROR, DELETING, WITH, ID);
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
+  public static final String ERROR_NAME_DUPLICATED = join(ERROR, NAME, DUPLICATED);
 }

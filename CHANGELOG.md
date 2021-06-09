@@ -4,6 +4,9 @@
 Improvements:
 * [OLMIS-7273](https://openlmis.atlassian.net/browse/OLMIS-7273): Improve performance of fetching orderables by ids.
 
+Bug fixes:
+* [OLMIS-6008](https://openlmis.atlassian.net/browse/OLMIS-6008): The ability to create a facility type with the same name has been removed.
+
 15.2.1 / 2021-05-27
 ==================
 

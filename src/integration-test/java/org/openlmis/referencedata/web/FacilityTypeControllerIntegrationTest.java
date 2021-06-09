@@ -194,6 +194,30 @@ public class FacilityTypeControllerIntegrationTest extends BaseWebIntegrationTes
   }
 
   @Test
+  public void shouldThrowExceptionIfNameIsDuplicated() {
+    mockUserHasRight(RightName.FACILITIES_MANAGE_RIGHT);
+
+    doThrow(new DataIntegrityViolationException("",
+            new ConstraintViolationException("", null, "unq_facility_type_name")))
+            .when(facilityTypeRepository).save(any(FacilityType.class));
+
+    String response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .body(facilityType)
+            .when()
+            .post(RESOURCE_URL)
+            .then()
+            .statusCode(400)
+            .extract()
+            .path(MESSAGE_KEY);
+
+    assertEquals(response, FacilityTypeMessageKeys.ERROR_NAME_DUPLICATED);
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldRejectUpdateRequestIfUserHasNoRight() {
     mockUserHasNoRight(RightName.FACILITIES_MANAGE_RIGHT);
 
