@@ -131,7 +131,6 @@ public class FacilityType extends BaseEntity {
     void setDisplayOrder(Integer displayOrder);
 
     void setActive(Boolean active);
-
   }
 
   public interface Importer extends BaseImporter {
@@ -145,6 +144,5 @@ public class FacilityType extends BaseEntity {
     Integer getDisplayOrder();
 
     Boolean getActive();
-
   }
 }
