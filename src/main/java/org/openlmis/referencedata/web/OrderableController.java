@@ -28,6 +28,10 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.extension.ExtensionManager;
+import org.openlmis.referencedata.extension.point.ExtensionPointId;
+import org.openlmis.referencedata.extension.point.OrderableCreatePostProcessor;
+import org.openlmis.referencedata.extension.point.OrderableUpdatePostProcessor;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.OrderableService;
 import org.openlmis.referencedata.util.OrderableBuilder;
@@ -80,6 +84,9 @@ public class OrderableController extends BaseController {
   @Autowired
   private OrderableValidator validator;
 
+  @Autowired
+  private ExtensionManager extensionManager;
+
   /**
    * Create an orderable.
    *
@@ -105,6 +112,10 @@ public class OrderableController extends BaseController {
 
     profiler.start("SAVE_ORDERABLE");
     repository.save(orderable);
+
+    OrderableCreatePostProcessor orderCreatePostProcessor = extensionManager.getExtension(
+            ExtensionPointId.ORDERABLE_CREATE_POST_POINT_ID, OrderableCreatePostProcessor.class);
+    orderCreatePostProcessor.process(orderable);
 
     profiler.stop().log();
 
@@ -144,6 +155,11 @@ public class OrderableController extends BaseController {
 
     Orderable savedOrderable = repository
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
+
+    OrderableUpdatePostProcessor orderUpdatePostProcessor = extensionManager.getExtension(
+            ExtensionPointId.ORDERABLE_UPDATE_POST_POINT_ID, OrderableUpdatePostProcessor.class);
+    orderUpdatePostProcessor.process(savedOrderable);
+
     XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
         id);
 
