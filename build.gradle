@@ -333,11 +333,6 @@ signing {
     sign configurations.archives
 }
 
-// task javadocJar(type: Jar) {
-//     classifier = 'javadoc'
-//     from javadoc
-// }
-
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -349,7 +344,6 @@ task execJar(type: Jar) {
 }
 
 artifacts {
-//    archives javadocJar, sourcesJar, execJar
     archives sourcesJar, execJar
 }
 
