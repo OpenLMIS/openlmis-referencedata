@@ -1,6 +1,9 @@
 15.2.2 / WIP
 ==================
 
+New functionality added in a backwards-compatible manner:
+* [OLMIS-7307](https://openlmis.atlassian.net/browse/OLMIS-7307): Added extension point for postprocess create and update products.
+  
 Improvements:
 * [OLMIS-7273](https://openlmis.atlassian.net/browse/OLMIS-7273): Improve performance of fetching orderables by ids.
 
