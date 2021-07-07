@@ -113,9 +113,9 @@ public class OrderableController extends BaseController {
     profiler.start("SAVE_ORDERABLE");
     repository.save(orderable);
 
-    OrderableCreatePostProcessor orderCreatePostProcessor = extensionManager.getExtension(
+    OrderableCreatePostProcessor orderableCreatePostProcessor = extensionManager.getExtension(
             ExtensionPointId.ORDERABLE_CREATE_POST_POINT_ID, OrderableCreatePostProcessor.class);
-    orderCreatePostProcessor.process(orderable);
+    orderableCreatePostProcessor.process(orderable);
 
     profiler.stop().log();
 
@@ -156,9 +156,9 @@ public class OrderableController extends BaseController {
     Orderable savedOrderable = repository
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
 
-    OrderableUpdatePostProcessor orderUpdatePostProcessor = extensionManager.getExtension(
+    OrderableUpdatePostProcessor orderableUpdatePostProcessor = extensionManager.getExtension(
             ExtensionPointId.ORDERABLE_UPDATE_POST_POINT_ID, OrderableUpdatePostProcessor.class);
-    orderUpdatePostProcessor.process(savedOrderable);
+    orderableUpdatePostProcessor.process(savedOrderable);
 
     XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
         id);

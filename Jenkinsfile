@@ -32,9 +32,9 @@ pipeline {
             agent any
             steps {
                 withCredentials([usernamePassword(
-                  credentialsId: "cad2f741-7b1e-4ddd-b5ca-2959d40f62c2",
-                  usernameVariable: "USER",
-                  passwordVariable: "PASS"
+                    credentialsId: "cad2f741-7b1e-4ddd-b5ca-2959d40f62c2",
+                    usernameVariable: "USER",
+                    passwordVariable: "PASS"
                 )]) {
                     sh 'set +x'
                     sh 'docker login -u $USER -p $PASS'
@@ -81,7 +81,7 @@ pipeline {
                                         )]) {
                     script {
                         try {
-                            sh( script: "./ci-buildImage.sh" )
+                            sh(script: "./ci-buildImage.sh")
                             currentBuild.result = processTestResults('SUCCESS')
                         }
                         catch (exc) {
