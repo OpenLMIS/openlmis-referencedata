@@ -131,10 +131,9 @@ public class Application {
    * Create and return an instance of JaVers precisely configured as necessary.
    * This is particularly helpful for getting JaVers to create and use tables
    * within a particular schema (specified via the withSchema method).
-   *
-   * @See <a href="https://github.com/javers/javers/blob/master/javers-spring-boot-starter-sql/src
-   * /main/java/org/javers/spring/boot/sql/JaversSqlAutoConfiguration.java">
-   * JaversSqlAutoConfiguration.java</a> for the default configuration upon which this code is based
+   * See https://github.com/javers/javers/blob/master/javers-spring-boot-starter-sql/src
+   * /main/java/org/javers/spring/boot/sql/JaversSqlAutoConfiguration.java
+   * - for the default configuration upon which this code is based
    */
   @Bean
   public Javers javersProvider(ConnectionProvider connectionProvider,

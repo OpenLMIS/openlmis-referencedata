@@ -65,6 +65,7 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.1'
     compile 'commons-io:commons-io:2.5'
     compile 'redis.clients:jedis'
+    compile group: 'javax.interceptor', name: 'javax.interceptor-api', version: '1.2'
 
     compile 'org.flywaydb:flyway-core'
     compile 'org.openlmis:openlmis-service-util:3.0.0'
@@ -338,6 +339,11 @@ signing {
     sign configurations.archives
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -349,7 +355,8 @@ task execJar(type: Jar) {
 }
 
 artifacts {
-    archives sourcesJar, execJar
+    archives javadocJar, sourcesJar, execJar
+    //archives sourcesJar, execJar
 }
 
 signArchives.onlyIf {project.findProperty("signing.keyId") && project.findProperty("signing.password")}

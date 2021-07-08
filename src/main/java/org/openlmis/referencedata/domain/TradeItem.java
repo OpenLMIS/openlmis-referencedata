@@ -37,7 +37,7 @@ import org.openlmis.referencedata.dto.TradeItemClassificationDto;
  * has one and only one manufacturer and is shipped in exactly one primary package.
  *
  * <p>TradeItem's also may:
- * <ul>tr
+ * <ul>
  *   <li>have a GlobalTradeItemNumber</li>
  *   <li>a MSRP</li>
  * </ul>

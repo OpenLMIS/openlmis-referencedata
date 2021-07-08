@@ -231,8 +231,8 @@ public class SupervisoryNode extends BaseEntity {
 
   /**
    * Get all facilities being supervised by this supervisory node, by program.
-   * <p/>
-   * Note, this does not get the facility attached to this supervisory node. "All supervised
+   *
+   * <p>Note, this does not get the facility attached to this supervisory node. "All supervised
    * facilities" means all facilities supervised by this node and all recursive child nodes.
    *
    * @param program program to check, can be null.
