@@ -22,7 +22,7 @@ import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.stereotype.Component;
 
-@Component("DefaultOrderUpdatePostProcessor")
+@Component("DefaultOrderableUpdatePostProcessor")
 public class DefaultOrderableUpdatePostProcessor implements OrderableUpdatePostProcessor {
 
   private static final XLogger XLOGGER = XLoggerFactory

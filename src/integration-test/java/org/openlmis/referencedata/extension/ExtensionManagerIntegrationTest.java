@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.extension.point.ExtensionPointId;
 import org.openlmis.referencedata.extension.point.OrderableCreatePostProcessor;
 import org.openlmis.referencedata.service.DefaultOrderableCreatePostProcessor;
@@ -35,7 +34,7 @@ public class ExtensionManagerIntegrationTest {
 
   private static final String invalidPointId = "InvalidExtensionPoint";
   private static final String invalidExtensionId = "InvalidExtension";
-  private static final String extensionId = "DefaultAdjustmentReasonValidator";
+  private static final String extensionId = "DefaultOrderableCreatePostProcessor";
 
   private HashMap<String, String> extensions;
 
@@ -55,7 +54,7 @@ public class ExtensionManagerIntegrationTest {
 
   @Test
   public void testShouldReturnExtensionWithGivenIdAndClass() {
-    Orderable orderable = (Orderable) extensionManager
+    OrderableCreatePostProcessor orderable = (OrderableCreatePostProcessor) extensionManager
         .getExtension(ExtensionPointId.ORDERABLE_CREATE_POST_POINT_ID,
                 OrderableCreatePostProcessor.class);
     Assert.assertEquals(orderable.getClass(), DefaultOrderableCreatePostProcessor.class);
@@ -63,8 +62,14 @@ public class ExtensionManagerIntegrationTest {
 
   @Test
   public void testShouldReturnExtensionWithGivenClassIfMappingDoesNotExist() {
-    Orderable orderable = (Orderable) extensionManager
+    OrderableCreatePostProcessor orderable = (OrderableCreatePostProcessor) extensionManager
         .getExtension("test", OrderableCreatePostProcessor.class);
     Assert.assertEquals(orderable.getClass(), DefaultOrderableCreatePostProcessor.class);
+  }
+
+  @Test(expected = ExtensionException.class)
+  public void testShouldNotReturnExtensionByPointIdWhenInvalidIdAndClass() {
+    OrderableCreatePostProcessor orderable = (OrderableCreatePostProcessor) extensionManager
+            .getExtension(invalidPointId, getClass());
   }
 }
