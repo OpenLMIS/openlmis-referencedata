@@ -1,3 +1,9 @@
+15.2.3 / WIP
+==================
+
+New functionality added in a backwards-compatible manner:
+* [OLMIS-7443](https://openlmis.atlassian.net/browse/OLMIS-7443): GET /lots can filter by orderableId
+
 15.2.2 / 2021-10-29
 ==================
 

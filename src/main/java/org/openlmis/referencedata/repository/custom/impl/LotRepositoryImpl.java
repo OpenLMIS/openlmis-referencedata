@@ -40,6 +40,8 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
   @PersistenceContext
   private EntityManager entityManager;
 
+  private static final String EXPIRATION_DATE_FIELD = "expirationDate";
+
   /**
    * This method is supposed to retrieve all lots with matched parameters.
    * Method is ignoring case for lot code.
@@ -117,7 +119,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     }
 
     if (expirationDate != null) {
-      predicate = builder.and(predicate, builder.equal(root.get("expirationDate"), expirationDate));
+      predicate = builder.and(predicate, builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate));
     }
 
     if (ids != null && ids.size() > 0) {
@@ -159,7 +161,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     }
 
     if (expirationDate != null) {
-      predicate = builder.and(predicate, builder.equal(root.get("expirationDate"), expirationDate));
+      predicate = builder.and(predicate, builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate));
     }
 
     if (ids != null && ids.size() > 0) {
@@ -167,11 +169,11 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     }
 
     if(expirationDateFrom != null) {
-      predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get("expirationDate"), expirationDateFrom));
+      predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get(EXPIRATION_DATE_FIELD), expirationDateFrom));
     }
 
     if(expirationDateTo != null) {
-      predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get("expirationDate"), expirationDateTo));
+      predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(EXPIRATION_DATE_FIELD), expirationDateTo));
     }
 
     query.where(predicate);

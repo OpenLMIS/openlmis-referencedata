@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -58,11 +56,15 @@ public class LotService {
    * @return the Page of lots found, or an empty page.
    */
   public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
-    List<UUID> tradeItemId = Optional.ofNullable(requestParams.getTradeItemId()).orElse(Collections.emptyList());
-    List<UUID> orderableId = Optional.ofNullable(requestParams.getOrderableId()).orElse(Collections.emptyList());
+    List<UUID> tradeItemId = Optional.ofNullable(requestParams.getTradeItemId())
+            .orElse(Collections.emptyList());
+    List<UUID> orderableId = Optional.ofNullable(requestParams.getOrderableId())
+            .orElse(Collections.emptyList());
 
     if (!tradeItemId.isEmpty() && !orderableId.isEmpty()) {
-      throw new ValidationMessageException(LotMessageKeys.ERROR_ORDERABLE_ID_AND_TRADE_ITEM_ID_USED_TOGETHER);
+      throw new ValidationMessageException(
+              LotMessageKeys.ERROR_ORDERABLE_ID_AND_TRADE_ITEM_ID_USED_TOGETHER
+      );
     }
 
     List<TradeItem> tradeItems = Collections.emptyList();
@@ -75,8 +77,11 @@ public class LotService {
       }
     }
 
-    if(!orderableId.isEmpty()) {
-      Page<Orderable> orderables = orderableRepository.findAllLatestByIds(requestParams.getOrderableId(), null);
+    if (!orderableId.isEmpty()) {
+      Page<Orderable> orderables = orderableRepository.findAllLatestByIds(
+              requestParams.getOrderableId(),
+              null
+      );
 
       tradeItemId = orderables.getContent().stream()
               .filter(o -> Objects.nonNull(o.getTradeItemIdentifier()))

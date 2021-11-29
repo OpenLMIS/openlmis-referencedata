@@ -57,9 +57,6 @@ public class LotServiceTest {
   @Mock
   private TradeItemRepository tradeItemRepository;
 
-  @Mock
-  private OrderableRepository orderableRepository;
-
   @InjectMocks
   private LotService lotService = new LotService();
 
