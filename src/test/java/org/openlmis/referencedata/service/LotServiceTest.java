@@ -170,9 +170,6 @@ public class LotServiceTest {
 
   @Test
   public void searchShouldNotThrowExceptionIfRequestParamsAreNotGiven() {
-    when(tradeItemRepository.findAllById(singletonList(tradeItem.getId()))).thenReturn(emptyList());
-    when(tradeItemRepository.findAllById(emptyList())).thenReturn(emptyList());
-    when(orderableRepository.findAllLatestByIds(singletonList(tradeItem.getId()), null)).thenReturn(Page.empty());
     when(lotRepository.search(
             emptyList(),
             null,
@@ -200,8 +197,6 @@ public class LotServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void searchShouldThrowValidationExceptionWhenTradeItemIdAndOrderableIdIsSet() {
-    when(tradeItemRepository.findAllById(singletonList(tradeItem.getId()))).thenReturn(emptyList());
-
     LotSearchParams lotSearchParams = new LotSearchParams(
             null,
             singletonList(UUID.randomUUID()),
