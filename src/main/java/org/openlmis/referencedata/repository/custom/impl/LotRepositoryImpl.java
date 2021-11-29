@@ -97,46 +97,9 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     return Pagination.getPage(orderableList, pageable, count);
   }
 
-  private <T> CriteriaQuery<T> prepareQuery(CriteriaQuery<T> query, Collection<TradeItem>
-      tradeItems, LocalDate expirationDate, String lotCode, List<UUID> ids, boolean count) {
-    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
-    Root<Lot> root = query.from(Lot.class);
-
-    if (count) {
-      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
-      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
-    }
-
-    Predicate predicate = builder.conjunction();
-
-    if (!isEmpty(tradeItems)) {
-      predicate = builder.and(predicate, root.get("tradeItem").in(tradeItems));
-    }
-
-    if (lotCode != null) {
-      predicate = builder.and(predicate,
-          builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
-    }
-
-    if (expirationDate != null) {
-      predicate = builder.and(
-              predicate,
-              builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate)
-      );
-    }
-
-    if (ids != null && ids.size() > 0) {
-      predicate = builder.and(predicate, root.get("id").in(ids));
-    }
-
-    query.where(predicate);
-    return query;
-  }
-
   private <T> CriteriaQuery<T> prepareQuery(
           CriteriaQuery<T> query,
-          Collection<TradeItem>
-          tradeItems,
+          Collection<TradeItem> tradeItems,
           LocalDate expirationDate,
           String lotCode,
           List<UUID> ids,
@@ -160,11 +123,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     if (lotCode != null) {
       predicate = builder.and(predicate,
-              builder.like(
-                      builder.upper(root.get("lotCode")),
-                      "%" + lotCode.toUpperCase() + "%"
-              )
-      );
+          builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
     }
 
     if (expirationDate != null) {
