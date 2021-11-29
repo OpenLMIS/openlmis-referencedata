@@ -3404,6 +3404,19 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: false
+              tradeItemIdIgnored:
+                displayName: tradeItemIdIgnored
+                description: When true, emptiness of tradeItemId is ignored. Default value is false
+                type: boolean
+                default: false
+                required: false
+                repeat: false
+              orderableId:
+                  displayName: orderableId
+                  description: The UUID of the Orderable.
+                  type: string
+                  required: false
+                  repeat: false
               expirationDate:
                   displayName: expirationDate
                   description: The expiration date of the Lot.

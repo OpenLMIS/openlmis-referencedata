@@ -39,7 +39,6 @@ import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
