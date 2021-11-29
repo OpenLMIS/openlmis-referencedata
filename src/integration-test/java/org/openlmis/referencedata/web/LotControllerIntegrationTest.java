@@ -226,18 +226,20 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindLots() {
     given(lotRepository.search(anyList(), any(LocalDate.class), anyString(),
-        nullable(List.class), null, null, any(Pageable.class)))
+        nullable(List.class), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(lot), pageable));
     when(tradeItemRepository.findAllById(anyList()))
         .thenReturn(Collections.singletonList(new TradeItem()));
 
+    String expirationDate = lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE);
     PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .queryParam("tradeItemId", lot.getTradeItem().getId())
         .queryParam("lotCode", lot.getLotCode())
-        .queryParam("expirationDate",
-            lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE))
+        .queryParam("expirationDate", expirationDate)
+        .queryParam("expirationDateFrom", expirationDate)
+        .queryParam("expirationDateTo", expirationDate)
         .when()
         .get(RESOURCE_URL)
         .then()

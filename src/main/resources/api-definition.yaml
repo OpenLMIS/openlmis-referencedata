@@ -3417,6 +3417,18 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: false
+              expirationDateFrom:
+                displayName: expirationDateFrom
+                description: The expiration date from of the Lot.
+                type: string
+                required: false
+                repeat: false
+              expirationDateTo:
+                displayName: expirationDateTo
+                description: The expiration date to of the Lot.
+                type: string
+                required: false
+                repeat: false
               expirationDate:
                   displayName: expirationDate
                   description: The expiration date of the Lot.
