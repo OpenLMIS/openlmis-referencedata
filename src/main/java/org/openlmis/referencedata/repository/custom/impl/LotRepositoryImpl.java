@@ -50,16 +50,40 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * @param lotCode Part of wanted code.
    * @return List of Facilities matching the parameters.
    */
-  public Page<Lot> search(Collection<TradeItem> tradeItems, LocalDate expirationDate,
-                          String lotCode, List<UUID> ids, Pageable pageable) {
-
+  public Page<Lot> search(
+          Collection<TradeItem> tradeItems,
+          LocalDate expirationDate,
+          String lotCode,
+          List<UUID> ids,
+          LocalDate expirationDateFrom,
+          LocalDate expirationDateTo,
+          Pageable pageable
+  ) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Lot> lotQuery = builder.createQuery(Lot.class);
-    lotQuery = prepareQuery(lotQuery, tradeItems, expirationDate, lotCode, ids, false);
+    lotQuery = prepareQuery(
+            lotQuery,
+            tradeItems,
+            expirationDate,
+            lotCode,
+            ids,
+            expirationDateFrom,
+            expirationDateTo,
+            false
+    );
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(countQuery, tradeItems, expirationDate, lotCode, ids, true);
+    countQuery = prepareQuery(
+            countQuery,
+            tradeItems,
+            expirationDate,
+            lotCode,
+            ids,
+            expirationDateFrom,
+            expirationDateTo,
+            true
+    );
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -98,6 +122,56 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     if (ids != null && ids.size() > 0) {
       predicate = builder.and(predicate, root.get("id").in(ids));
+    }
+
+    query.where(predicate);
+    return query;
+  }
+
+  private <T> CriteriaQuery<T> prepareQuery(
+          CriteriaQuery<T> query,
+          Collection<TradeItem>
+          tradeItems,
+          LocalDate expirationDate,
+          String lotCode,
+          List<UUID> ids,
+          LocalDate expirationDateFrom,
+          LocalDate expirationDateTo,
+          boolean count
+  ) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    Root<Lot> root = query.from(Lot.class);
+
+    if (count) {
+      CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
+      query = (CriteriaQuery<T>) countQuery.select(builder.count(root));
+    }
+
+    Predicate predicate = builder.conjunction();
+
+    if (!isEmpty(tradeItems)) {
+      predicate = builder.and(predicate, root.get("tradeItem").in(tradeItems));
+    }
+
+    if (lotCode != null) {
+      predicate = builder.and(predicate,
+              builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
+    }
+
+    if (expirationDate != null) {
+      predicate = builder.and(predicate, builder.equal(root.get("expirationDate"), expirationDate));
+    }
+
+    if (ids != null && ids.size() > 0) {
+      predicate = builder.and(predicate, root.get("id").in(ids));
+    }
+
+    if(expirationDateFrom != null) {
+      predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get("expirationDate"), expirationDateFrom));
+    }
+
+    if(expirationDateTo != null) {
+      predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get("expirationDate"), expirationDateTo));
     }
 
     query.where(predicate);

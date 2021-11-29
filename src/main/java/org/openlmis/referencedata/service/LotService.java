@@ -19,12 +19,20 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.openlmis.referencedata.domain.Lot;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +47,9 @@ public class LotService {
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
+  @Autowired
+  private OrderableRepository orderableRepository;
+
   /**
    * Returns page of lots matching the given request parameters.
    *
@@ -47,13 +58,35 @@ public class LotService {
    * @return the Page of lots found, or an empty page.
    */
   public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
+    List<UUID> tradeItemId = Optional.ofNullable(requestParams.getTradeItemId()).orElse(Collections.emptyList());
+    List<UUID> orderableId = Optional.ofNullable(requestParams.getOrderableId()).orElse(Collections.emptyList());
+
+    if (!tradeItemId.isEmpty() && !orderableId.isEmpty()) {
+      throw new ValidationMessageException(LotMessageKeys.ERROR_ORDERABLE_ID_AND_TRADE_ITEM_ID_USED_TOGETHER);
+    }
+
     List<TradeItem> tradeItems = Collections.emptyList();
 
-    if (!isEmpty(requestParams.getTradeItemId())) {
-      tradeItems = tradeItemRepository.findAllById(requestParams.getTradeItemId());
+    if (!tradeItemId.isEmpty() && !requestParams.isTradeItemIdIgnored()) {
+      tradeItems = tradeItemRepository.findAllById(tradeItemId);
 
       if (tradeItems.isEmpty()) {
-        return Pagination.getPage(Collections.emptyList(), pageable, 0);
+        return Pagination.getEmptyPage(pageable);
+      }
+    }
+
+    if(!orderableId.isEmpty()) {
+      Page<Orderable> orderables = orderableRepository.findAllLatestByIds(requestParams.getOrderableId(), null);
+
+      tradeItemId = orderables.getContent().stream()
+              .filter(o -> Objects.nonNull(o.getTradeItemIdentifier()))
+              .map(o -> UUID.fromString(o.getTradeItemIdentifier()))
+              .collect(Collectors.toList());
+
+      tradeItems = tradeItemRepository.findAllById(tradeItemId);
+
+      if (tradeItems.isEmpty()) {
+        return Pagination.getEmptyPage(pageable);
       }
     }
 
@@ -62,6 +95,8 @@ public class LotService {
         requestParams.getExpirationDate(),
         requestParams.getLotCode(),
         requestParams.getId(),
+        requestParams.getExpirationDateFrom(),
+        requestParams.getExpirationDateTo(),
         pageable
     );
   }

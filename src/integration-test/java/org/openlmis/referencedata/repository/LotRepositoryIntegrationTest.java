@@ -88,6 +88,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         expected.getLotCode(),
         null,
+        null,
+        null,
         pageRequest
     );
 
@@ -107,6 +109,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         lotOne.getLotCode(),
         null,
+        null,
+        null,
         pageRequest
     );
 
@@ -121,7 +125,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     expected.setExpirationDate(now);
     expected = lotRepository.save(expected);
 
-    Page<Lot> lotPage = lotRepository.search(null, now, null, null, pageRequest);
+    Page<Lot> lotPage = lotRepository.search(null, now, null, null, null, null, pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -133,6 +137,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
     Page<Lot> lotPage = lotRepository.search(
         Collections.singletonList(expected.getTradeItem()),
+        null,
+        null,
         null,
         null,
         null,
@@ -153,6 +159,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        null,
+        null,
         pageRequest
     );
 
@@ -165,6 +173,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldFindAllLotsIfSearchByEmptyTradeItemList() {
     Page<Lot> lotPage = lotRepository.search(
         Collections.emptyList(),
+        null,
+        null,
         null,
         null,
         null,
@@ -183,6 +193,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         expected.getExpirationDate(),
         expected.getLotCode(),
         Collections.singletonList(expected.getId()),
+        null,
+        null,
         pageRequest
     );
 
@@ -203,6 +215,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         Arrays.asList(instanceOne.getId(), instanceTwo.getId()),
+        null,
+        null,
         pageRequest
     );
 
@@ -212,7 +226,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldReturnAllIfNoParamIsGiven() {
-    Page<Lot> lotPage = lotRepository.search(null, null, null, null, pageRequest);
+    Page<Lot> lotPage = lotRepository.search(null, null, null, null, null, null, pageRequest);
 
     assertEquals(5, lotPage.getNumberOfElements());
   }
@@ -257,6 +271,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         entity.getLotCode(),
         null,
+        null,
+        null,
         pageRequest
     );
 
@@ -269,6 +285,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     Pageable pageable = PageRequest.of(1, 3);
 
     Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
         null,
         null,
         null,

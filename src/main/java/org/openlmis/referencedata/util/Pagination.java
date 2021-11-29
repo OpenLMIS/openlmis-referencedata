@@ -17,6 +17,7 @@ package org.openlmis.referencedata.util;
 
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -144,5 +145,9 @@ public class Pagination {
 
       pageable = pageable.next();
     }
+  }
+
+  public static <T> Page<T> getEmptyPage(Pageable pageable) {
+    return Pagination.getPage(Collections.emptyList(), pageable, 0);
   }
 }

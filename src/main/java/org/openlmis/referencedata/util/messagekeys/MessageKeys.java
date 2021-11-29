@@ -74,6 +74,7 @@ public abstract class MessageKeys {
   protected static final String MISSING = "missing";
   protected static final String PROVIDED = "provided";
   protected static final String ASSIGNED = "isAlreadyAssigned";
+  protected static final String NOT_TOGETHER = "notTogether";
 
   // Entities
   protected static final String LOT = "lot";

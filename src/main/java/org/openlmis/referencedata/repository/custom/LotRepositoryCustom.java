@@ -26,7 +26,13 @@ import org.springframework.data.domain.Pageable;
 
 public interface LotRepositoryCustom {
 
-  Page<Lot> search(Collection<TradeItem> tradeItems, LocalDate expirationDate, String code,
-                   List<UUID> ids, Pageable pageable);
-
+  Page<Lot> search(
+          Collection<TradeItem> tradeItems,
+          LocalDate expirationDate,
+          String code,
+          List<UUID> ids,
+          LocalDate expirationDateFrom,
+          LocalDate expirationDateTo,
+          Pageable pageable
+  );
 }

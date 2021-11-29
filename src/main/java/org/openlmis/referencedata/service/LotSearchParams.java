@@ -37,4 +37,12 @@ public class LotSearchParams {
   private String lotCode;
   private List<UUID> id;
 
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate expirationDateFrom;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+  private LocalDate expirationDateTo;
+
+  private List<UUID> orderableId;
+  private boolean isTradeItemIdIgnored = false;
 }

@@ -95,7 +95,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewLot() {
     mockUserHasRight(LOTS_MANAGE);
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null))
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
         .willReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -161,7 +161,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(LOTS_MANAGE);
     when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null))
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
         .willReturn(Pagination.getPage(Collections.singletonList(lot), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -226,7 +226,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindLots() {
     given(lotRepository.search(anyList(), any(LocalDate.class), anyString(),
-        nullable(List.class), any(Pageable.class)))
+        nullable(List.class), null, null, any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(lot), pageable));
     when(tradeItemRepository.findAllById(anyList()))
         .thenReturn(Collections.singletonList(new TradeItem()));
@@ -383,6 +383,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(null),
         eq(null),
         eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
+        eq(null),
+        eq(null),
         any(Pageable.class)
     )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 10)));
 
@@ -410,6 +412,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
     given(lotRepository.search(
         eq(emptyList()),
+        eq(null),
+        eq(null),
         eq(null),
         eq(null),
         eq(null),
