@@ -119,7 +119,10 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
     }
 
     if (expirationDate != null) {
-      predicate = builder.and(predicate, builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate));
+      predicate = builder.and(
+              predicate,
+              builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate)
+      );
     }
 
     if (ids != null && ids.size() > 0) {
@@ -157,7 +160,11 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     if (lotCode != null) {
       predicate = builder.and(predicate,
-              builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
+              builder.like(
+                      builder.upper(root.get("lotCode")),
+                      "%" + lotCode.toUpperCase() + "%"
+              )
+      );
     }
 
     if (expirationDate != null) {
@@ -171,7 +178,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
       predicate = builder.and(predicate, root.get("id").in(ids));
     }
 
-    if(expirationDateFrom != null) {
+    if (expirationDateFrom != null) {
       predicate = builder.and(
               predicate,
               builder.greaterThanOrEqualTo(
@@ -180,10 +187,12 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
       );
     }
 
-    if(expirationDateTo != null) {
+    if (expirationDateTo != null) {
       predicate = builder.and(
               predicate,
-              builder.lessThanOrEqualTo(root.get(EXPIRATION_DATE_FIELD), expirationDateTo)
+              builder.lessThanOrEqualTo(
+                      root.get(EXPIRATION_DATE_FIELD), expirationDateTo
+              )
       );
     }
 
