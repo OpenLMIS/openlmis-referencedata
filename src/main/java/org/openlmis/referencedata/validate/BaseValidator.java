@@ -26,6 +26,14 @@ import org.springframework.validation.Validator;
 
 public interface BaseValidator extends Validator {
 
+  /**
+   * Rejects if newData and oldData are different.
+   * @param errors Errors
+   * @param oldData Old data
+   * @param newData New data
+   * @param field Field
+   * @param message Message
+   */
   default void rejectIfNotEqual(Errors errors, Object oldData, Object newData, String field,
       String message) {
     if (!Objects.equals(oldData, newData)) {
@@ -33,10 +41,22 @@ public interface BaseValidator extends Validator {
     }
   }
 
+  /**
+   * Reject if value for the given field is empty.
+   * @param errors Errors
+   * @param field Field
+   * @param message Message
+   */
   default void rejectIfEmpty(Errors errors, String field, String message) {
     ValidationUtils.rejectIfEmpty(errors, field, message, message);
   }
 
+  /**
+   * Reject if value for the given field is empty or whitespace.
+   * @param errors Errors
+   * @param field Field
+   * @param message Message
+   */
   default void rejectIfEmptyOrWhitespace(Errors errors, String field, String message) {
     ValidationUtils.rejectIfEmptyOrWhitespace(errors, field, message, message);
   }
@@ -49,12 +69,24 @@ public interface BaseValidator extends Validator {
     errors.rejectValue(field, message, parameters, message);
   }
 
+  /**
+   * Reject if value for the given field is null.
+   * @param errors Errors
+   * @param field Field
+   * @param message Message
+   */
   default void rejectIfNull(Errors errors, String field, String message) {
     if (errors.getFieldValue(field) == null) {
       errors.rejectValue(field, message, message);
     }
   }
 
+  /**
+   * Checks if arguments are not null.
+   * @param target Target
+   * @param errors Errors
+   * @param errorNull errorNull Message if target param is null
+   */
   default void verifyArguments(Object target, Errors errors, String errorNull) {
     Message targetMessage = new Message(errorNull);
     checkNotNull(target, targetMessage.toString());

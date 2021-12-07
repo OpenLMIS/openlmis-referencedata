@@ -71,6 +71,10 @@ public class LotController extends BaseController {
   @Autowired
   private LotService lotService;
 
+  /**
+   * LotController constructor.
+   * @param extensionManager ExtensionManager
+   */
   public LotController(ExtensionManager extensionManager) {
     this.validator = extensionManager.getExtension(
             ExtensionPointId.LOT_VALIDATOR_POINT_ID, LotValidator.class

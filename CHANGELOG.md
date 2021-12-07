@@ -3,6 +3,7 @@
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7443](https://openlmis.atlassian.net/browse/OLMIS-7443): GET /lots can filter by orderableId
+* [OLMIS-7444](https://openlmis.atlassian.net/browse/OLMIS-7443): Add LotValidator extension
 
 15.2.2 / 2021-10-29
 ==================
