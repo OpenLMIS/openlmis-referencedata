@@ -13,13 +13,10 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
+
 package org.openlmis.referencedata.extension.point;
 
-public final class ExtensionPointId {
+import org.openlmis.referencedata.validate.BaseValidator;
 
-  public static final String ORDERABLE_CREATE_POST_POINT_ID = "OrderableCreatePostProcessor";
-  public static final String ORDERABLE_UPDATE_POST_POINT_ID = "OrderableUpdatePostProcessor";
-  public static final String LOT_VALIDATOR_POINT_ID = "LotValidator";
-
-  private ExtensionPointId() { }
+public interface LotValidator extends BaseValidator {
 }

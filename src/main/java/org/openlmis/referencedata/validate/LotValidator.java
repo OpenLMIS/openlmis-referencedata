@@ -32,8 +32,8 @@ import org.springframework.validation.Validator;
 /**
  * A validator for {@link LotDto} object.
  */
-@Component
-public class LotValidator implements BaseValidator {
+@Component(value = "LotValidator")
+public class LotValidator implements org.openlmis.referencedata.extension.point.LotValidator {
 
   // Lot fields
   static final String LOT_CODE = "lotCode";

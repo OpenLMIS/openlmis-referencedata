@@ -24,6 +24,9 @@ import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.extension.ExtensionManager;
+import org.openlmis.referencedata.extension.point.ExtensionPointId;
+import org.openlmis.referencedata.extension.point.LotValidator;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.service.LotSearchParams;
@@ -31,7 +34,6 @@ import org.openlmis.referencedata.service.LotService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
-import org.openlmis.referencedata.validate.LotValidator;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
@@ -64,11 +66,16 @@ public class LotController extends BaseController {
   @Autowired
   private TradeItemRepository tradeItemRepository;
 
-  @Autowired
-  private LotValidator validator;
+  private final LotValidator validator;
 
   @Autowired
   private LotService lotService;
+
+  public LotController(ExtensionManager extensionManager) {
+    this.validator = extensionManager.getExtension(
+            ExtensionPointId.LOT_VALIDATOR_POINT_ID, LotValidator.class
+    );
+  }
 
   /**
    * Allows creating new Lots.
