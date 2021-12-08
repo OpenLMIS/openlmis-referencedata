@@ -19,6 +19,7 @@ import java.util.UUID;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
+import org.openlmis.referencedata.extension.point.LotValidator;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
@@ -33,7 +34,7 @@ import org.springframework.validation.Validator;
  * A validator for {@link LotDto} object.
  */
 @Component(value = "LotValidator")
-public class LotValidator implements org.openlmis.referencedata.extension.point.LotValidator {
+public class LotValidatorImpl implements LotValidator {
 
   // Lot fields
   static final String LOT_CODE = "lotCode";

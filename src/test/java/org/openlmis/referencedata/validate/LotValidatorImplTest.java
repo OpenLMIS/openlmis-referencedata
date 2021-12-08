@@ -17,8 +17,8 @@ package org.openlmis.referencedata.validate;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.validate.LotValidator.LOT_CODE;
-import static org.openlmis.referencedata.validate.LotValidator.TRADE_ITEM_ID;
+import static org.openlmis.referencedata.validate.LotValidatorImpl.LOT_CODE;
+import static org.openlmis.referencedata.validate.LotValidatorImpl.TRADE_ITEM_ID;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import java.time.LocalDate;
@@ -47,7 +47,7 @@ import org.springframework.validation.Validator;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("PMD.TooManyMethods")
-public class LotValidatorTest {
+public class LotValidatorImplTest {
 
   private static final String CODE = "code";
 
@@ -58,7 +58,7 @@ public class LotValidatorTest {
   private LotRepository lotRepository;
 
   @InjectMocks
-  private Validator validator = new LotValidator();
+  private Validator validator = new LotValidatorImpl();
 
   private LotDto lotDto;
   private TradeItem tradeItem;
