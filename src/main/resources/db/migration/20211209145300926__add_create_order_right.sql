@@ -1,0 +1,1 @@
+INSERT INTO referencedata.rights (id, name, type) VALUES ('d86537ce-8822-47dd-94fc-9645e7e0bfb5', 'ORDER_CREATE', 'ORDER_FULFILLMENT');

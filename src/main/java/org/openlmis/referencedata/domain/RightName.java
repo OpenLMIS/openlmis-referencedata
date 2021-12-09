@@ -37,6 +37,7 @@ public class RightName {
   public static final String SUPPLY_PARTNERS_MANAGE = "SUPPLY_PARTNERS_MANAGE";
   public static final String SYSTEM_NOTIFICATIONS_MANAGE = "SYSTEM_NOTIFICATIONS_MANAGE";
   public static final String LOTS_MANAGE = "LOTS_MANAGE";
+  public static final String ORDER_CREATE = "ORDER_CREATE";
 
   private RightName() {
     throw new UnsupportedOperationException();
