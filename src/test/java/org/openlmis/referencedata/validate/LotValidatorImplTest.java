@@ -16,29 +16,28 @@
 package org.openlmis.referencedata.validate;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.LotValidatorImpl.LOT_CODE;
 import static org.openlmis.referencedata.validate.LotValidatorImpl.TRADE_ITEM_ID;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.openlmis.referencedata.testbuilder.LotDataBuilder;
-import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -61,7 +60,6 @@ public class LotValidatorImplTest {
   private Validator validator = new LotValidatorImpl();
 
   private LotDto lotDto;
-  private TradeItem tradeItem;
   private Errors errors;
 
   @Before
@@ -73,8 +71,7 @@ public class LotValidatorImplTest {
     lotDto.setActive(true);
     lotDto.setId(UUID.randomUUID());
 
-    tradeItem =
-        new TradeItem("manufacturer", null);
+    TradeItem tradeItem = new TradeItem("manufacturer", null);
     tradeItem.setId(UUID.randomUUID());
     lotDto.setTradeItemId(tradeItem.getId());
 
@@ -83,8 +80,14 @@ public class LotValidatorImplTest {
     errors = new BeanPropertyBindingResult(lotDto, "lotDto");
   }
 
+  @After
+  public void tearDown() {
+    Mockito.reset(lotRepository);
+    Mockito.reset(tradeItemRepository);
+  }
+
   @Test
-  public void shouldNotFindErrorsWhenLotIsValid() throws Exception {
+  public void shouldNotFindErrorsWhenLotIsValid() {
     when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
@@ -121,16 +124,12 @@ public class LotValidatorImplTest {
   }
 
   @Test
-  public void shouldRejectWhenLotCodeAlreadyExist() {
-    Lot lot = new Lot();
-    lot.setLotCode(CODE);
-    lot.setTradeItem(tradeItem);
-    lot.setId(UUID.randomUUID());
-    List<Lot> lots = new ArrayList<>();
-    lots.add(lot);
-
-    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lot.getLotCode(),
-        lot.getTradeItem().getId())).thenReturn(true);
+  public void shouldRejectWhenLotCodeAlreadyExistsForOtherLot() {
+    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemIdAndIdIsNot(
+            lotDto.getLotCode(),
+            lotDto.getTradeItemId(),
+            lotDto.getId()
+    )).thenReturn(true);
 
     validator.validate(lotDto, errors);
 
@@ -138,13 +137,35 @@ public class LotValidatorImplTest {
   }
 
   @Test
-  public void shouldNotFindErrorsWhenLotCodeAlreadyExistButIsTheSameLot() throws Exception {
-    Lot lot = new Lot();
-    lot.setLotCode(CODE);
-    lot.setId(lotDto.getId());
-    List<Lot> lots = new ArrayList<>();
-    lots.add(lot);
+  public void shouldRejectWhenLotCodeAlreadyExists() {
+    lotDto.setId(null);
 
+    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(
+            lotDto.getLotCode(),
+            lotDto.getTradeItemId()
+    )).thenReturn(true);
+
+    validator.validate(lotDto, errors);
+
+    assertErrorMessage(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
+  }
+
+  @Test
+  public void shouldNotRejectWhenLotCodeDoesNotExists() {
+    lotDto.setId(null);
+
+    when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(
+            lotDto.getLotCode(),
+            lotDto.getTradeItemId()
+    )).thenReturn(false);
+
+    validator.validate(lotDto, errors);
+
+    assertEquals(0, errors.getErrorCount());
+  }
+
+  @Test
+  public void shouldNotRejectWhenLotCodeIsTheSame() {
     when(lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(lotDto.getLotCode(),
         lotDto.getTradeItemId())).thenReturn(false);
 
@@ -154,14 +175,7 @@ public class LotValidatorImplTest {
   }
 
   @Test
-  public void shouldNotFindErrorsWhenLotCodeExistsButForDifferentTradeItem() throws Exception {
-    TradeItem tradeItem = new TradeItemDataBuilder().build();
-    Lot lot = new LotDataBuilder().build();
-    lot.setLotCode(CODE);
-    lot.setTradeItem(tradeItem);
-    List<Lot> lots = new ArrayList<>();
-    lots.add(lot);
-
+  public void shouldNotFindErrorsWhenLotCodeExistsButForDifferentTradeItem() {
     validator.validate(lotDto, errors);
 
     assertEquals(0, errors.getErrorCount());
@@ -183,5 +197,10 @@ public class LotValidatorImplTest {
     validator.validate(lotDto, errors);
 
     assertErrorMessage(errors, TRADE_ITEM_ID, TradeItemMessageKeys.ERROR_NOT_FOUND_WITH_ID);
+  }
+
+  @Test
+  public void shouldSupportLotDto() {
+    assertTrue(validator.supports(LotDto.class));
   }
 }

@@ -3495,7 +3495,7 @@ resourceTypes:
                   repeat: false
             put:
                 is: [ secured ]
-                description: Update existing lot. This endpoint is experimental.
+                description: Update existing lot.
                 body:
                     application/json:
                       schema: lotDto

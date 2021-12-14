@@ -99,7 +99,6 @@ public class LotController extends BaseController {
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
     lotToSave.setId(null);
 
-    //XLOGGER.debug("Creating new Lot");
     lotToSave = lotRepository.save(lotToSave);
     return exportToDto(lotToSave);
   }
@@ -122,11 +121,12 @@ public class LotController extends BaseController {
     if (existingLot == null) {
       throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
     }
+    lotDto.setId(lotId);
+
     validator.validate(lotDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
     TradeItem tradeItem = tradeItemRepository.findById(lotDto.getTradeItemId()).orElse(null);
     Lot lotToSave = Lot.newLot(lotDto, tradeItem);
-    lotToSave.setId(lotId);
 
     XLOGGER.debug("Updating Lot");
     lotToSave = lotRepository.save(lotToSave);

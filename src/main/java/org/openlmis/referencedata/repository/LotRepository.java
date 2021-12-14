@@ -28,6 +28,7 @@ public interface LotRepository
     BaseAuditableRepository<Lot, UUID> {
 
   boolean existsByLotCodeIgnoreCaseAndTradeItemId(String code, UUID tradeItemId);
+  boolean existsByLotCodeIgnoreCaseAndTradeItemIdAndIdIsNot(String code, UUID tradeItemId, UUID id);
 
   @Query(value = "SELECT\n"
       + "    l.*\n"

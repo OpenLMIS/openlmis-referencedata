@@ -77,11 +77,21 @@ public class LotValidatorImpl implements LotValidator {
   }
 
   private void verifyCode(LotDto lot, Errors errors) {
-    boolean existsByCodeAndTradeItem = lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(
-        lot.getLotCode(), lot.getTradeItemId());
+    boolean existsByCodeAndTradeItem;
+
+    if (lot.getId() == null) {
+      existsByCodeAndTradeItem = lotRepository.existsByLotCodeIgnoreCaseAndTradeItemId(
+              lot.getLotCode(), lot.getTradeItemId()
+      );
+    } else {
+      existsByCodeAndTradeItem = lotRepository.existsByLotCodeIgnoreCaseAndTradeItemIdAndIdIsNot(
+              lot.getLotCode(), lot.getTradeItemId(), lot.getId()
+      );
+    }
+
     if (existsByCodeAndTradeItem) {
       rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE, lot.getLotCode(),
-          String.valueOf(lot.getTradeItemId()));
+              String.valueOf(lot.getTradeItemId()));
     }
   }
 
