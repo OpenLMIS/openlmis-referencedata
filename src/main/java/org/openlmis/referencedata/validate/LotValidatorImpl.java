@@ -90,8 +90,7 @@ public class LotValidatorImpl implements LotValidator {
     }
 
     if (existsByCodeAndTradeItem) {
-      rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE, lot.getLotCode(),
-              String.valueOf(lot.getTradeItemId()));
+      rejectValue(errors, LOT_CODE, LotMessageKeys.ERROR_LOT_CODE_MUST_BE_UNIQUE);
     }
   }
 
