@@ -6,9 +6,6 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-7444](https://openlmis.atlassian.net/browse/OLMIS-7444): Add LotValidator extension
 * [OLMIS-7452](https://openlmis.atlassian.net/browse/OLMIS-7452): Add CREATE_ORDER right and assign to users with REQUISITION_APPROVE 
 
-Breaking changes:
-* [OLMIS-7472](https://openlmis.atlassian.net/browse/OLMIS-7472): Use postgres v12
-
 15.2.2 / 2021-10-29
 ==================
 
