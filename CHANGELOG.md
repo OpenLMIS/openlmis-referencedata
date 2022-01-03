@@ -5,6 +5,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-7443](https://openlmis.atlassian.net/browse/OLMIS-7443): GET /lots can filter by orderableId
 * [OLMIS-7444](https://openlmis.atlassian.net/browse/OLMIS-7444): Add LotValidator extension
 * [OLMIS-7452](https://openlmis.atlassian.net/browse/OLMIS-7452): Add CREATE_ORDER right and assign to users with REQUISITION_APPROVE 
+* [OLMIS-6546](https://openlmis.atlassian.net/browse/OLMIS-6546): Add product code unique validation rule to OrderableValidator
 
 15.2.2 / 2021-10-29
 ==================
