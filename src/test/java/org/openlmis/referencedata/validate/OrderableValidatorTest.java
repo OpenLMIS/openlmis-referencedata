@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.validate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.OrderableValidator.IN_BOX_CUBE_DIMENSION;
 import static org.openlmis.referencedata.validate.OrderableValidator.MAXIMUM_TEMPERATURE;
 import static org.openlmis.referencedata.validate.OrderableValidator.MINIMUM_TEMPERATURE;
@@ -27,22 +29,28 @@ import org.joda.money.Money;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TemperatureMeasurementDataBuilder;
 import org.openlmis.referencedata.testbuilder.VolumeMeasurementDataBuilder;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.validation.Validator;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class OrderableValidatorTest {
 
+  @Mock
+  private OrderableRepository orderableRepository;
+
   @InjectMocks
-  private Validator validator = new OrderableValidator();
+  private OrderableValidator validator;
 
   private Orderable orderable;
   private OrderableDto orderableDto;
@@ -50,14 +58,19 @@ public class OrderableValidatorTest {
 
   @Before
   public void setUp() {
+    MockitoAnnotations.initMocks(this);
+
     orderableDto = new OrderableDto();
 
     orderable = new OrderableDataBuilder()
+            .withProductCode(Code.code("PRODUCT_CODE"))
             .withMinimumTemperature("CEL", 2.0)
             .withMaximumTemperature("CEL", 8.0)
             .withInBoxCubeDimension("MLT", 200.0)
             .build();
     orderable.export(orderableDto);
+
+    when(orderableRepository.findFirstByProductCodeIgnoreCase(any())).thenReturn(null);
 
     errors = new BeanPropertyBindingResult(orderableDto, "orderableDto");
   }
@@ -175,5 +188,19 @@ public class OrderableValidatorTest {
     validator.validate(orderableDto, errors);
 
     assertThat(errors.getErrorCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldRejectIfProductCodeIsNotUnique() {
+    Orderable repositoryOrderable = new OrderableDataBuilder()
+            .withProductCode(Code.code(orderableDto.getProductCode().toLowerCase()))
+            .build();
+
+    when(orderableRepository.findFirstByProductCodeIgnoreCase(orderableDto.getProductCode()))
+            .thenReturn(repositoryOrderable);
+
+    validator.validate(orderableDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(1);
   }
 }

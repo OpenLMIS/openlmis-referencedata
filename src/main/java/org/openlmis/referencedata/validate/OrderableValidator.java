@@ -26,11 +26,13 @@ import java.util.Iterator;
 import java.util.Set;
 import org.joda.money.Money;
 
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.TemperatureMeasurementDto;
 import org.openlmis.referencedata.dto.VolumeMeasurementDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -46,6 +48,13 @@ public class OrderableValidator implements BaseValidator {
   static final String MINIMUM_TEMPERATURE = "minimumTemperature";
   static final String MAXIMUM_TEMPERATURE = "maximumTemperature";
   static final String IN_BOX_CUBE_DIMENSION = "inBoxCubeDimension";
+  static final String PRODUCT_CODE = "productCode";
+
+  private final OrderableRepository orderableRepository;
+
+  public OrderableValidator(OrderableRepository orderableRepository) {
+    this.orderableRepository = orderableRepository;
+  }
 
   /**
    * Checks if the given class definition is supported.
@@ -71,7 +80,7 @@ public class OrderableValidator implements BaseValidator {
   public void validate(Object target, Errors errors) {
     verifyArguments(target, errors, ERROR_NULL);
 
-    rejectIfEmptyOrWhitespace(errors, "productCode",ERROR_PRODUCT_CODE_REQUIRED);
+    rejectIfEmptyOrWhitespace(errors, PRODUCT_CODE,ERROR_PRODUCT_CODE_REQUIRED);
     rejectIfNull(errors, "packRoundingThreshold", ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED);
     rejectIfNull(errors, "roundToZero", ERROR_ROUND_TO_ZERO_REQUIRED);
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
@@ -89,6 +98,7 @@ public class OrderableValidator implements BaseValidator {
     }
     validateTemperature(dto, errors);
     validateVolumeMeasurement(dto, errors);
+    validateProductCode(dto, errors);
 
   }
 
@@ -161,6 +171,18 @@ public class OrderableValidator implements BaseValidator {
     }
   }
 
+  private void validateProductCode(OrderableDto dto, Errors errors) {
+    Orderable o = orderableRepository.findFirstByProductCodeIgnoreCase(dto.getProductCode());
+
+    if (o != null && o.getId() != dto.getId()) {
+      rejectValue(
+              errors,
+              PRODUCT_CODE,
+              OrderableMessageKeys.ERROR_PRODUCT_CODE_MUST_BE_UNIQUE
+      );
+    }
+  }
+
   private boolean isNotTemperatureCodeSupported(
           TemperatureMeasurementDto temperatureMeasurement) {
     return isGivenTemperature(temperatureMeasurement)
@@ -221,4 +243,5 @@ public class OrderableValidator implements BaseValidator {
             && volumeMeasurement.getMeasurementUnitCode() != null
             && volumeMeasurement.getValue() == null;
   }
+
 }

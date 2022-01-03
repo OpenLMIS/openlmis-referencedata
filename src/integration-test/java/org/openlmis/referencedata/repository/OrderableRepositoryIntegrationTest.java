@@ -424,6 +424,44 @@ public class OrderableRepositoryIntegrationTest {
     assertTrue(repository.existsByProductCode(productCode));
   }
 
+  @Test
+  public void shouldFindFirstByProductCodeIgnoreCase() {
+    String uppercaseCode = "PRODUCT_CODE";
+    String lowercaseCode = uppercaseCode.toLowerCase();
+
+    Orderable orderable = new OrderableDataBuilder()
+            .withProductCode(Code.code(uppercaseCode))
+            .buildAsNew();
+
+    assertNull(repository.findFirstByProductCodeIgnoreCase(lowercaseCode));
+
+    repository.save(orderable);
+
+    assertEquals(
+            orderable.getId(),
+            repository.findFirstByProductCodeIgnoreCase(lowercaseCode).getId()
+    );
+  }
+
+  @Test
+  public void shouldFindFirstByProductCodeIgnoreCaseReturnTheSameOrderableForDifferentCaseCode() {
+    String uppercaseCode = "PRODUCT_CODE";
+    String lowercaseCode = uppercaseCode.toLowerCase();
+
+    Orderable orderable = new OrderableDataBuilder()
+            .withProductCode(Code.code(uppercaseCode))
+            .buildAsNew();
+
+    assertNull(repository.findFirstByProductCodeIgnoreCase(lowercaseCode));
+
+    repository.save(orderable);
+
+    assertEquals(
+            repository.findFirstByProductCodeIgnoreCase(uppercaseCode).getId(),
+            repository.findFirstByProductCodeIgnoreCase(lowercaseCode).getId()
+    );
+  }
+
   @Test(expected = PersistenceException.class)
   public void shouldNotAllowDuplicates() {
     Orderable orderable1 = new OrderableDataBuilder()
@@ -431,6 +469,23 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable2 = new OrderableDataBuilder()
         .withProductCode(orderable1.getProductCode())
         .buildAsNew();
+
+    repository.save(orderable1);
+    repository.save(orderable2);
+
+    entityManager.flush();
+  }
+
+  @Test(expected = PersistenceException.class)
+  public void shouldNotAllowProductCodeDuplicateCaseInsensitive() {
+    String productCode = "abcdef";
+
+    Orderable orderable1 = new OrderableDataBuilder()
+            .withProductCode(Code.code(productCode))
+            .buildAsNew();
+    Orderable orderable2 = new OrderableDataBuilder()
+            .withProductCode(Code.code(productCode.toLowerCase()))
+            .buildAsNew();
 
     repository.save(orderable1);
     repository.save(orderable2);

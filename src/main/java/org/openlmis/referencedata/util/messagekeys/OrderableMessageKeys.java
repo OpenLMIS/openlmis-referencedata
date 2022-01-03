@@ -21,11 +21,12 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String VALUE = "value";
   private static final String NOT_SUPPORTED = "notSupported";
   private static final String NEGATIVE_PRICE_PER_PACK = "negativePricePerPackNotAllowed";
+  private static final String PRODUCT_CODE = "productCode";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
   public static final String ERROR_ID_MISMATCH = join(ERROR, ID_MISMATCH);
-  public static final String ERROR_PRODUCT_CODE_REQUIRED = join(ERROR, "productCode", REQUIRED);
+  public static final String ERROR_PRODUCT_CODE_REQUIRED = join(ERROR, PRODUCT_CODE, REQUIRED);
   public static final String ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED =
       join(ERROR, "packRoundingThreshold", REQUIRED);
   public static final String ERROR_ROUND_TO_ZERO_REQUIRED =
@@ -77,4 +78,6 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_IN_BOX_CUBE_DIMENSION_VALUE_REQUIRED =
           join(ERROR_IN_BOX_CUBE_DIMENSION_VALUE, REQUIRED);
   public static final String ERROR_NEGATIVE_PRICE_PER_PACK = join(ERROR, NEGATIVE_PRICE_PER_PACK);
+  public static final String ERROR_PRODUCT_CODE_MUST_BE_UNIQUE =
+          join(ERROR, PRODUCT_CODE, MUST_BE_UNIQUE);
 }

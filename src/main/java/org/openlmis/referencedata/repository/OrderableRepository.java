@@ -63,6 +63,9 @@ public interface OrderableRepository extends
 
   boolean existsByProductCode(Code code);
 
+  @Query("SELECT o FROM Orderable o WHERE LOWER(o.productCode) = LOWER(:code)")
+  Orderable findFirstByProductCodeIgnoreCase(@Param("code") String code);
+
   @Query(value = SELECT_DISTINCT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE
       + WHERE_LATEST_ORDERABLE
