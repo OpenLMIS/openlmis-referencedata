@@ -7,6 +7,9 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-7452](https://openlmis.atlassian.net/browse/OLMIS-7452): Add CREATE_ORDER right and assign to users with REQUISITION_APPROVE 
 * [OLMIS-6546](https://openlmis.atlassian.net/browse/OLMIS-6546): Add product code unique validation rule to OrderableValidator
 
+Breaking changes:
+* [OLMIS-7472](https://openlmis.atlassian.net/browse/OLMIS-7472): Use postgres v12
+
 15.2.2 / 2021-10-29
 ==================
 
