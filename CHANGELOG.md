@@ -10,6 +10,10 @@ New functionality added in a backwards-compatible manner:
 Breaking changes:
 * [OLMIS-7472](https://openlmis.atlassian.net/browse/OLMIS-7472): Use postgres v12
 
+Bux fixes:
+* [OLMIS-7496](https://openlmis.atlassian.net/browse/OLMIS-7496): Fix CREATE_ORDER right not working  for users who had Approve requisition
+
+
 15.2.2 / 2021-10-29
 ==================
 
