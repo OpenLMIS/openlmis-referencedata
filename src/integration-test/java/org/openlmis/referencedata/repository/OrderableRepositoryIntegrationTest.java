@@ -434,6 +434,7 @@ public class OrderableRepositoryIntegrationTest {
             .buildAsNew();
 
     assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L));
+    assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(uppercaseCode, 1L));
 
     repository.save(orderable);
 
@@ -442,24 +443,11 @@ public class OrderableRepositoryIntegrationTest {
         repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L)
             .getId()
     );
-  }
-
-  @Test
-  public void shouldFindFirstByVersionNumberAndProductCodeIgnoreCaseTheSameOrderableForDifferentCaseCode() {
-    String uppercaseCode = "PRODUCT_CODE";
-    String lowercaseCode = uppercaseCode.toLowerCase();
-
-    Orderable orderable = new OrderableDataBuilder()
-            .withProductCode(Code.code(uppercaseCode))
-            .buildAsNew();
-
-    assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L));
-
-    repository.save(orderable);
 
     assertEquals(
-            repository.findFirstByVersionNumberAndProductCodeIgnoreCase(uppercaseCode, 1L).getId(),
-            repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L).getId()
+        orderable.getId(),
+        repository.findFirstByVersionNumberAndProductCodeIgnoreCase(uppercaseCode, 1L)
+            .getId()
     );
   }
 
