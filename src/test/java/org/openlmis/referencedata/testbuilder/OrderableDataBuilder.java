@@ -74,6 +74,11 @@ public class OrderableDataBuilder {
     inBoxCubeDimension = null;
   }
 
+  public OrderableDataBuilder withId(UUID id) {
+    this.id = id;
+    return this;
+  }
+
   public OrderableDataBuilder withIdentifier(String key, Object valueToString) {
     this.identifiers.put(key, valueToString.toString());
     return this;

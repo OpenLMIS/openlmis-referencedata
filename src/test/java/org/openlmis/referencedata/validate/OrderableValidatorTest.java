@@ -24,6 +24,7 @@ import static org.openlmis.referencedata.validate.OrderableValidator.MINIMUM_TEM
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.joda.money.Money;
 import org.junit.Before;
@@ -70,7 +71,8 @@ public class OrderableValidatorTest {
             .build();
     orderable.export(orderableDto);
 
-    when(orderableRepository.findFirstByProductCodeIgnoreCase(any())).thenReturn(null);
+    when(orderableRepository.findFirstByVersionNumberAndProductCodeIgnoreCase(any(), any()))
+        .thenReturn(null);
 
     errors = new BeanPropertyBindingResult(orderableDto, "orderableDto");
   }
@@ -192,12 +194,61 @@ public class OrderableValidatorTest {
 
   @Test
   public void shouldRejectIfProductCodeIsNotUnique() {
+    orderableDto.setId(null);
+
     Orderable repositoryOrderable = new OrderableDataBuilder()
             .withProductCode(Code.code(orderableDto.getProductCode().toLowerCase()))
             .build();
 
-    when(orderableRepository.findFirstByProductCodeIgnoreCase(orderableDto.getProductCode()))
+    when(orderableRepository.findFirstByVersionNumberAndProductCodeIgnoreCase(
+        orderableDto.getProductCode(),
+        orderableDto.getVersionNumber()
+    ))
             .thenReturn(repositoryOrderable);
+
+    validator.validate(orderableDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldNotRejectIfProductCodeIsNotUniqueForOrderableMatchingVersionIdentity() {
+    UUID versionIdentityId = UUID.fromString("7f7b83db-580d-4269-88d2-7f9c80a591a9");
+
+    orderableDto.setId(versionIdentityId);
+
+    Orderable repositoryOrderable = new OrderableDataBuilder()
+        .withId(versionIdentityId)
+        .withVersionNumber(orderableDto.getVersionNumber())
+        .withProductCode(Code.code(orderableDto.getProductCode().toLowerCase()))
+        .build();
+
+    when(orderableRepository.findFirstByVersionNumberAndProductCodeIgnoreCase(
+        orderableDto.getProductCode(),
+        orderableDto.getVersionNumber()
+    ))
+        .thenReturn(repositoryOrderable);
+
+    validator.validate(orderableDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldReject() {
+    orderableDto.setId(UUID.fromString("7f7b83db-580d-4269-88d2-7f9c80a591a9"));
+
+    Orderable repositoryOrderable = new OrderableDataBuilder()
+        .withId(UUID.fromString("b659c6aa-37ad-4cb9-bf76-7e6669c04fed"))
+        .withVersionNumber(orderableDto.getVersionNumber())
+        .withProductCode(Code.code(orderableDto.getProductCode().toLowerCase()))
+        .build();
+
+    when(orderableRepository.findFirstByVersionNumberAndProductCodeIgnoreCase(
+        orderableDto.getProductCode(),
+        orderableDto.getVersionNumber()
+    ))
+        .thenReturn(repositoryOrderable);
 
     validator.validate(orderableDto, errors);
 

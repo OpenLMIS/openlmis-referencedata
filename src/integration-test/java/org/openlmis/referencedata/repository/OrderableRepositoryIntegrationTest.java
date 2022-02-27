@@ -425,7 +425,7 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindFirstByProductCodeIgnoreCase() {
+  public void shouldFindFirstByVersionNumberAndProductCodeIgnoreCase() {
     String uppercaseCode = "PRODUCT_CODE";
     String lowercaseCode = uppercaseCode.toLowerCase();
 
@@ -433,18 +433,19 @@ public class OrderableRepositoryIntegrationTest {
             .withProductCode(Code.code(uppercaseCode))
             .buildAsNew();
 
-    assertNull(repository.findFirstByProductCodeIgnoreCase(lowercaseCode));
+    assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L));
 
     repository.save(orderable);
 
     assertEquals(
-            orderable.getId(),
-            repository.findFirstByProductCodeIgnoreCase(lowercaseCode).getId()
+        orderable.getId(),
+        repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L)
+            .getId()
     );
   }
 
   @Test
-  public void shouldFindFirstByProductCodeIgnoreCaseReturnTheSameOrderableForDifferentCaseCode() {
+  public void shouldFindFirstByVersionNumberAndProductCodeIgnoreCaseTheSameOrderableForDifferentCaseCode() {
     String uppercaseCode = "PRODUCT_CODE";
     String lowercaseCode = uppercaseCode.toLowerCase();
 
@@ -452,13 +453,13 @@ public class OrderableRepositoryIntegrationTest {
             .withProductCode(Code.code(uppercaseCode))
             .buildAsNew();
 
-    assertNull(repository.findFirstByProductCodeIgnoreCase(lowercaseCode));
+    assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L));
 
     repository.save(orderable);
 
     assertEquals(
-            repository.findFirstByProductCodeIgnoreCase(uppercaseCode).getId(),
-            repository.findFirstByProductCodeIgnoreCase(lowercaseCode).getId()
+            repository.findFirstByVersionNumberAndProductCodeIgnoreCase(uppercaseCode, 1L).getId(),
+            repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L).getId()
     );
   }
 

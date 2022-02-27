@@ -24,6 +24,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.joda.money.Money;
 
 import org.openlmis.referencedata.domain.Orderable;
@@ -172,15 +173,24 @@ public class OrderableValidator implements BaseValidator {
   }
 
   private void validateProductCode(OrderableDto dto, Errors errors) {
-    Orderable o = orderableRepository.findFirstByProductCodeIgnoreCase(dto.getProductCode());
+    Orderable duplicate = orderableRepository.findFirstByVersionNumberAndProductCodeIgnoreCase(
+        dto.getProductCode(),
+        dto.getVersionNumber()
+    );
 
-    if (o != null && o.getId() != dto.getId()) {
-      rejectValue(
-              errors,
-              PRODUCT_CODE,
-              OrderableMessageKeys.ERROR_PRODUCT_CODE_MUST_BE_UNIQUE
-      );
+    if (duplicate == null) {
+      return;
     }
+
+    if (dto.getId() != null && duplicate.getId().compareTo(dto.getId()) == 0) {
+      return;
+    }
+
+    rejectValue(
+        errors,
+        PRODUCT_CODE,
+        OrderableMessageKeys.ERROR_PRODUCT_CODE_MUST_BE_UNIQUE
+    );
   }
 
   private boolean isNotTemperatureCodeSupported(

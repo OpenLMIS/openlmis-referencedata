@@ -24,6 +24,7 @@ import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_D
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_LAST_UPDATED;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_LATEST_ORDERABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -63,8 +64,14 @@ public interface OrderableRepository extends
 
   boolean existsByProductCode(Code code);
 
-  @Query("SELECT o FROM Orderable o WHERE LOWER(o.productCode) = LOWER(:code)")
-  Orderable findFirstByProductCodeIgnoreCase(@Param("code") String code);
+  @Query(SELECT_ORDERABLE
+      + FROM_ORDERABLES_CLAUSE
+      + WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE
+  )
+  Orderable findFirstByVersionNumberAndProductCodeIgnoreCase(
+      @Param("code") String code,
+      @Param("versionNumber") Long versionNumber
+  );
 
   @Query(value = SELECT_DISTINCT_ORDERABLE
       + FROM_ORDERABLES_CLAUSE

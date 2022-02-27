@@ -30,6 +30,8 @@ class RepositoryConstants {
   static final String SELECT_DISTINCT_ORDERABLE = "Select DISTINCT o";
   static final String SELECT_LAST_UPDATED = "SELECT o.lastupdated";
   static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated DESC LIMIT 1";
+  static final String WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE =
+      " WHERE LOWER(o.productCode) = LOWER(:code) AND o.identity.versionNumber = :versionNumber";
 
   private RepositoryConstants() {}
 }
