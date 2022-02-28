@@ -235,7 +235,7 @@ public class OrderableValidatorTest {
   }
 
   @Test
-  public void shouldReject() {
+  public void shouldRejectIfProductCodeIsNotUniqueForNonMatchingOrderable() {
     orderableDto.setId(UUID.fromString("7f7b83db-580d-4269-88d2-7f9c80a591a9"));
 
     Orderable repositoryOrderable = new OrderableDataBuilder()
