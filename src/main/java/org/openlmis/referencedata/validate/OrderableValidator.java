@@ -182,7 +182,7 @@ public class OrderableValidator implements BaseValidator {
       return;
     }
 
-    if (dto.getId() != null && duplicate.getId().compareTo(dto.getId()) == 0) {
+    if (dto.getId() != null && duplicate.getId().equals(dto.getId())) {
       return;
     }
 
