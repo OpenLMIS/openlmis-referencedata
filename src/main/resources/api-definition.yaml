@@ -1,4 +1,4 @@
-#%RAML 0.8
+#%RAML 1.0
 ---
 title: OpenLMIS Reference Data API
 version: "@version@"
