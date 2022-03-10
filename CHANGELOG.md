@@ -15,7 +15,6 @@ Bux fixes:
 * [OLMIS-7496](https://openlmis.atlassian.net/browse/OLMIS-7496): Fix CREATE_ORDER right not working  for users who had Approve requisition
 * [OLMIS-7534](https://openlmis.atlassian.net/browse/OLMIS-7534): OLMIS-7534 Fix unique code validation for existing orderable
 * [OLMIS-7525](https://openlmis.atlassian.net/browse/OLMIS-7525): Change values of orderable identifiers in demo data to lowercase
-* [OLMIS-6396](https://openlmis.atlassian.net/browse/OLMIS-6396): Update raml2html to v7.8.0
 
 
 15.2.2 / 2021-10-29
