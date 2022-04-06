@@ -16,6 +16,8 @@ Bux fixes:
 * [OLMIS-7534](https://openlmis.atlassian.net/browse/OLMIS-7534): OLMIS-7534 Fix unique code validation for existing orderable
 * [OLMIS-7525](https://openlmis.atlassian.net/browse/OLMIS-7525): Change values of orderable identifiers in demo data to lowercase
 
+Improvements:
+* [OLMIS-7568](https://openlmis.atlassian.net/browse/OLMIS-7568): Use openlmis/dev:7
 
 15.2.2 / 2021-10-29
 ==================
