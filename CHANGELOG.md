@@ -17,8 +17,7 @@ Bux fixes:
 * [OLMIS-7525](https://openlmis.atlassian.net/browse/OLMIS-7525): Change values of orderable identifiers in demo data to lowercase
 
 Improvements:
-* [OLMIS-7568](https://openlmis.atlassian.net/browse/OLMIS-7568): Use openlmis/dev:7
-* [OLMIS-7568](https://openlmis.atlassian.net/browse/OLMIS-7568): Use openlmis/service-base:6
+* [OLMIS-7568](https://openlmis.atlassian.net/browse/OLMIS-7568): Use openlmis/dev:7 and openlmis/service-base:6.1
 
 15.2.2 / 2021-10-29
 ==================
