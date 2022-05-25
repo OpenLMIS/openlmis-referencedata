@@ -1883,6 +1883,16 @@ resourceTypes:
                       type: string
                       required: false
                       repeat: true
+                  orderableName:
+                    displayName: Orderable name
+                    type: string
+                    required: false
+                    repeat: false
+                  orderableCode:
+                    displayName: Orderable code
+                    type: string
+                    required: false
+                    repeat: false
               responses:
                 200:
                     headers:

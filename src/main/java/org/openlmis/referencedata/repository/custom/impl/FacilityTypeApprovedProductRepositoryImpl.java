@@ -83,9 +83,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
       + FROM_FTAP_TABLE;
   private static final String NATIVE_PROGRAM_INNER_JOIN =
       " INNER JOIN referencedata.programs AS p ON p.id = ftap.programId";
-  private static final String NATIVE_ORDERABLE_INNER_JOIN =
+  private static final String NATIVE_ORDERABLE_INNER_JOIN_TEMPLATE =
       " INNER JOIN (SELECT id, MAX(versionNumber) AS versionNumber"
-          + "   FROM referencedata.orderables GROUP BY id) AS o"
+          + "   FROM referencedata.orderables o WHERE (%s) GROUP BY id) AS o"
           + "   ON o.id = ftap.orderableId";
   private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
       " INNER JOIN referencedata.program_orderables AS po"
@@ -120,9 +120,16 @@ public class FacilityTypeApprovedProductRepositoryImpl
   private EntityManager entityManager;
 
   @Override
-  public Page<FacilityTypeApprovedProduct> searchProducts(UUID facilityId, UUID programId,
-      Boolean fullSupply, List<UUID> orderableIds, Boolean active, Pageable pageable) {
-
+  public Page<FacilityTypeApprovedProduct> searchProducts(
+      UUID facilityId,
+      UUID programId,
+      Boolean fullSupply,
+      List<UUID> orderableIds,
+      Boolean active,
+      String orderableCode,
+      String orderableName,
+      Pageable pageable
+  ) {
     Profiler profiler = new Profiler("FTAP_REPOSITORY_SEARCH");
     profiler.setLogger(XLOGGER);
 
@@ -131,7 +138,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
     Query countNativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
-        active, true, pageable);
+        active, orderableCode, orderableName, true, pageable);
 
     int total = executeCountQuery(countNativeQuery);
 
@@ -142,7 +149,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
     profiler.start("GET_VERSION_IDENTITY");
     Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
-        active, false, pageable);
+        active, orderableCode, orderableName, false, pageable);
     List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
     profiler.start("RETRIEVE_FTAPS");
@@ -270,8 +277,17 @@ public class FacilityTypeApprovedProductRepositoryImpl
     return entityManager.createQuery(newQuery);
   }
 
-  private Query prepareNativeQuery(UUID facilityTypeId, UUID programId, Boolean fullSupply,
-      List<UUID> orderableIds, Boolean active, boolean count, Pageable pageable) {
+  private Query prepareNativeQuery(
+      UUID facilityTypeId,
+      UUID programId,
+      Boolean fullSupply,
+      List<UUID> orderableIds,
+      Boolean active,
+      String orderableCode,
+      String orderableName,
+      boolean count,
+      Pageable pageable
+  ) {
     String startNativeQuery = count ? NATIVE_COUNT_FTAPS : NATIVE_SELECT_FTAP_IDENTITIES;
     StringBuilder builder = new StringBuilder(startNativeQuery);
     Map<String, Object> params = Maps.newHashMap();
@@ -282,13 +298,26 @@ public class FacilityTypeApprovedProductRepositoryImpl
       params.put("programId", programId);
     }
 
-    builder.append(NATIVE_ORDERABLE_INNER_JOIN);
+    String orderablesCondition = "1=1";
+
     if (!isEmpty(orderableIds)) {
-      builder.append(" AND o.id in (:orderableIds)");
+      orderablesCondition += " AND o.id in (:orderableIds)";
       params.put("orderableIds", orderableIds);
     }
 
-    builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN);
+    if (isNotBlank(orderableCode)) {
+      orderablesCondition += " AND o.code = :orderableCode";
+      params.put("orderableCode", orderableCode);
+    }
+
+    if (isNotBlank(orderableName)) {
+      orderablesCondition += " AND o.fullproductname ILIKE :orderableName";
+      params.put("orderableName", '%' + orderableName + '%');
+    }
+
+    builder.append(String.format(NATIVE_ORDERABLE_INNER_JOIN_TEMPLATE, orderablesCondition))
+        .append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN);
+
     if (null != fullSupply) {
       builder.append(" AND po.fullSupply = :fullSupply");
       params.put("fullSupply", fullSupply);

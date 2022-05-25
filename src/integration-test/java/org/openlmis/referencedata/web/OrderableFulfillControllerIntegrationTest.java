@@ -126,7 +126,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
         .withOrderableId(commodityTypeOrderableId).build();
 
     given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any()))
+        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any(), any(),any()))
         .willReturn(getPage(ftap));
     given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
     given(factory.createFor(eq(orderable), any(), any()))
@@ -143,7 +143,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
 
     verify(orderableRepository, times(0)).findAllLatest(any());
     verify(facilityTypeApprovedProductRepository)
-        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any());
+        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any(), any(), any());
   }
 
   @SafeVarargs

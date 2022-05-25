@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import com.vividsolutions.jts.geom.Polygon;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -298,6 +299,8 @@ public class FacilityController extends BaseController {
       @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
       @RequestParam(required = false, value = "orderableId") List<UUID> orderablesId,
       @RequestParam(required = false, value = "active") Boolean active,
+      @RequestParam(required = false, value = "orderableCode") String orderableCode,
+      @RequestParam(required = false, value = "orderableName") String orderableName,
       @PageableDefault(size = Integer.MAX_VALUE) Pageable pageable) {
 
     Profiler profiler = new Profiler("GET_FACILITY_APPROVED_PRODUCTS");
@@ -305,7 +308,9 @@ public class FacilityController extends BaseController {
 
     profiler.start("FIND_APPROVED_PRODUCTS");
     Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facilityId, programId, fullSupply, orderablesId, active, pageable);
+        .searchProducts(facilityId, programId, fullSupply, orderablesId, active, orderableCode,
+            orderableName, pageable
+        );
 
     Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 

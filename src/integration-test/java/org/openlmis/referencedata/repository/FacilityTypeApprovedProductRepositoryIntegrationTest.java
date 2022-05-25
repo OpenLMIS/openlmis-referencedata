@@ -258,7 +258,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
+            null, null, pageable
+        );
 
     assertThat(page.getContent(), hasSize(2));
   }
@@ -274,7 +276,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         .newArrayList(orderableFullSupply.getId(), orderableNonFullSupply.getId());
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
+            null, null, pageable
+        );
 
     assertThat(page.getContent(), hasSize(2));
     assertEquals(page.getContent().get(0).getOrderableId(), orderableFullSupply.getId());
@@ -292,9 +296,12 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
+            null, null, pageable
+        );
 
-    assertThat(page.getContent(), hasSize(1));
+    assertThat(page.getContent(),
+        hasSize(1));
   }
 
   @Test
@@ -306,7 +313,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), true, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), true, orderableIds, null,
+            null, null, pageable
+        );
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -334,7 +343,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null,
+            null, null, pageable
+        );
 
     // At this point we have no non-full supply products
     assertEquals(0, page.getContent().size());
@@ -343,7 +354,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     saveAndGetProduct(facilityType1, false);
 
     page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null,
+            null, null, pageable
+        );
 
     // We should be able to find non-full supply product we have created
     assertEquals(1, page.getContent().size());
@@ -371,7 +384,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), null, true, orderableIds, null, pageable);
+        .searchProducts(facility.getId(), null, true, orderableIds, null,
+            null, null, pageable
+        );
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -390,7 +405,9 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     expectedException.expect(ValidationMessageException.class);
     expectedException.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
 
-    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), null, pageable);
+    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), null,
+        null, null, pageable
+    );
   }
 
   @Test(expected = PersistenceException.class)

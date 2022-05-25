@@ -127,8 +127,8 @@ public class OrderableFulfillController extends BaseController {
     if (queryMap.isSearchByFacilityIdAndProgramId()) {
       profiler.start("GET_ORDERABLES_IDS_BY_FACILITY_AND_PROGRAM");
       return ftapRepository
-          .searchProducts(queryMap.getFacilityId(), queryMap.getProgramId(), null, null, true,
-              noPaginationRequest)
+          .searchProducts(queryMap.getFacilityId(), queryMap.getProgramId(), null, null,
+              true, null, null, noPaginationRequest)
           .getContent()
           .stream()
           .map(FacilityTypeApprovedProduct::getOrderableId)
