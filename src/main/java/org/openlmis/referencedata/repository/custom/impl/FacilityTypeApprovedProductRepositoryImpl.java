@@ -306,8 +306,8 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
 
     if (isNotBlank(orderableCode)) {
-      orderablesCondition += " AND o.code = :orderableCode";
-      params.put("orderableCode", orderableCode);
+      orderablesCondition += " AND o.code ILIKE :orderableCode";
+      params.put("orderableCode", '%' + orderableCode + '%');
     }
 
     if (isNotBlank(orderableName)) {

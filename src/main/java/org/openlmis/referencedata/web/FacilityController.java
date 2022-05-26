@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import com.vividsolutions.jts.geom.Polygon;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -460,7 +462,9 @@ public class FacilityController extends BaseController {
         .map(FacilityTypeApprovedProduct::getOrderableId)
         .collect(Collectors.toSet());
 
-    Map<UUID, Orderable> orderables = orderableRepository
+    Map<UUID, Orderable> orderables = orderableId.isEmpty()
+        ? Collections.emptyMap()
+        : orderableRepository
         .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
         .getContent()
         .stream()
