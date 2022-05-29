@@ -28,8 +28,10 @@ import static org.openlmis.referencedata.repository.RepositoryConstants.WHERE_VE
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.persistence.QueryHint;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
@@ -157,5 +159,19 @@ public interface OrderableRepository extends
       nativeQuery = true
   )
   Timestamp findLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids);
+
+  @Query(
+      value = "SELECT"
+          + " CAST(oi.orderableid AS VARCHAR) AS id,"
+          + " CAST(oi.orderableversionnumber AS VARCHAR) AS versionNumber"
+          + " FROM referencedata.orderable_identifiers oi"
+          + " WHERE oi.key = :key"
+          + " AND oi.value IN :values",
+      nativeQuery = true
+  )
+  public List<Map<String, String>> getIdentitiesByIdentifier(
+      @Param("key") String key,
+      @Param("values") Iterable<String> values
+  );
 
 }

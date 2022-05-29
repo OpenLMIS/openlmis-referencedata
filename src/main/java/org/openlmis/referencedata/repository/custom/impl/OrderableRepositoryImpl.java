@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -40,6 +42,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
 import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
@@ -47,12 +50,14 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.util.Pagination;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -105,8 +110,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   private static final String PRODUCT_CODE = "productCode";
   private static final String LATEST_ORDERABLE_ALIAS = "latest";
 
+  private static final String TRADE_ITEM = "tradeItem";
+
   @PersistenceContext
   private EntityManager entityManager;
+  @Autowired
+  private OrderableRepository orderableRepository;
 
   /**
    * This method is supposed to retrieve all orderables with matched parameters. Method is ignoring
@@ -124,6 +133,16 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     List<VersionIdentity> identityList = new ArrayList<>();
     Set<Pair<UUID, Long>> identityPairs = searchParams.getIdentityPairs();
+
+    Set<UUID> tradeItemId = searchParams.getTradeItemId();
+    if (!tradeItemId.isEmpty()) {
+      Set<Pair<UUID, Long>> identitiesByTradeItemId = getIdentitiesByTradeItemId(tradeItemId);
+
+      identityPairs = identityPairs.isEmpty()
+          ? identitiesByTradeItemId
+          : SetUtils.intersection(identitiesByTradeItemId, identityPairs).toSet();
+    }
+
     Long total = getTotal(searchParams, identityPairs, identityList, builder, pageable);
 
     if (total < 1) {
@@ -325,4 +344,24 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
         .list();
   }
+
+  /**
+   * Returns identity pairs which correspond to supplied trade item ids.
+   * @param tradeItemId Ids of trade items
+   * @return Identity pairs matching supplied trade item ids
+   */
+  public Set<Pair<UUID, Long>> getIdentitiesByTradeItemId(Set<UUID> tradeItemId) {
+    List<Map<String, String>> tradeItem = orderableRepository.getIdentitiesByIdentifier(
+        TRADE_ITEM,
+        tradeItemId.stream().map(UUID::toString).collect(Collectors.toSet())
+    );
+
+    Set<Pair<UUID, Long>> result = tradeItem.stream()
+        .filter(item -> item.containsKey(ID) && item.containsKey(VERSION_NUMBER))
+        .map(item -> Pair.of(UUID.fromString(item.get(ID)), Long.valueOf(item.get(VERSION_NUMBER))))
+        .collect(Collectors.toSet());
+
+    return result;
+  }
+
 }

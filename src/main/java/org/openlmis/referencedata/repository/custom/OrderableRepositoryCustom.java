@@ -39,5 +39,7 @@ public interface OrderableRepositoryCustom {
 
     Set<Pair<UUID, Long>> getIdentityPairs();
 
+    Set<UUID> getTradeItemId();
+
   }
 }

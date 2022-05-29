@@ -39,12 +39,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   private static final String CODE = "code";
   private static final String NAME = "name";
   private static final String PROGRAM_CODE = "program";
+  private static final String TRADE_ITEM_ID = "tradeItemId";
   private static final String ID = "id";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, CODE, NAME, PROGRAM_CODE));
+      ID, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID));
 
-  private SearchParams queryParams;
+  private final SearchParams queryParams;
 
   /**
    * Wraps map of query params into an object. Remove parameters that should be managed by
@@ -103,6 +104,11 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   @Override
   public Set<Pair<UUID, Long>> getIdentityPairs() {
     return Collections.emptySet();
+  }
+
+  @Override
+  public Set<UUID> getTradeItemId() {
+    return queryParams.getUuids(TRADE_ITEM_ID);
   }
 
   /**
