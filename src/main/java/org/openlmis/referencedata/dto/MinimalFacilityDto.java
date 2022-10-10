@@ -64,11 +64,6 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
   }
 
   @Override
-  public void setCode(String code) {
-    // unsupported operation
-  }
-
-  @Override
   public void setDescription(String description) {
     // unsupported operation
   }
