@@ -37,7 +37,6 @@ import org.openlmis.referencedata.domain.GeographicZone;
 @EqualsAndHashCode(callSuper = true)
 public class BasicFacilityDto extends MinimalFacilityDto
     implements Facility.Importer, Facility.Exporter {
-  private String code;
   private Boolean active;
   private Boolean enabled;
   private FacilityTypeDto type;

@@ -37,6 +37,10 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Getter
   @Setter
+  private String code;
+
+  @Getter
+  @Setter
   private String name;
 
   /**
@@ -56,11 +60,6 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Override
   public void setType(FacilityType type) {
-    // unsupported operation
-  }
-
-  @Override
-  public void setCode(String code) {
     // unsupported operation
   }
 
