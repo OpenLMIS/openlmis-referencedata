@@ -37,6 +37,10 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Getter
   @Setter
+  private String code;
+
+  @Getter
+  @Setter
   private String name;
 
   /**

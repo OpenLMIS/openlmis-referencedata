@@ -144,7 +144,7 @@ public class FacilityController extends BaseController {
   }
 
   /**
-   * Get all facilities with minimal representation (id, name).
+   * Get all facilities with minimal representation (id, name, code).
    *
    * @param pageable A Pageable object that allows client to optionally add "page" (page number) and
    *                 "size" (page size) query parameters to the request.

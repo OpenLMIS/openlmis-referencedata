@@ -11,6 +11,10 @@
     "name": {
       "type": "string",
       "title": "name"
+    },
+    "code": {
+      "type": "string",
+      "title": "code"
     }
   }
 }
