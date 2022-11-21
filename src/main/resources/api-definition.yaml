@@ -1722,7 +1722,21 @@ resourceTypes:
                           body:
                             application/json:
                               schema: localizedErrorResponse
-
+  /exportData:
+      displayName: Export data
+      get:
+          is: [ secured ]
+          description: Export data to a file of a given format.
+          queryParameters:
+              data:
+                  description: Data type
+                  type: string
+                  required: true
+                  repeat: false
+          responses:
+              "200":
+                  headers:
+                    Keep-Alive:
   /facilities:
       displayName: Facility
       get:
