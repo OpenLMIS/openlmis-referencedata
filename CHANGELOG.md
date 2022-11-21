@@ -1,3 +1,9 @@
+15.2.5 / 2022-11-21
+==================
+
+New functionality added in a backwards-compatible manner:
+* [OLMIS-7643](https://openlmis.atlassian.net/browse/OLMIS-7643): Add DataExportController and `GET /exportData` endpoint
+
 15.2.4 / 2022-10-07
 ==================
 
