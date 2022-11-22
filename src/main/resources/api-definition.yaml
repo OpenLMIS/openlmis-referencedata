@@ -1726,7 +1726,7 @@ resourceTypes:
       displayName: Export data
       get:
           is: [ secured ]
-          description: Export data to a file of a given format.
+          description: Exports the given data to a file.
           queryParameters:
               data:
                   description: Data type
