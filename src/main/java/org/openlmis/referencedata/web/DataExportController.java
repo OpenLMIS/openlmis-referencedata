@@ -15,29 +15,25 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.web.DataExportController.RESOURCE_PATH;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
-@RequestMapping(RESOURCE_PATH)
+@RequestMapping("/api")
 public class DataExportController extends BaseController {
 
-  public static final String RESOURCE_PATH = "/exportData";
-
   /**
-   * Export data to a file of a given format.
+   * Exports the given data to a file.
    *
    * @param data   The names of the files to be exported.
    */
-  @GetMapping
+  @RequestMapping(value = "exportData", method = RequestMethod.GET)
   @ResponseBody
   public ResponseEntity exportData(@RequestParam(value = "data", required = true) String data) {
     return new ResponseEntity(HttpStatus.OK);
