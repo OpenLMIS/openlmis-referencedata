@@ -29,7 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DataExportController extends BaseController {
 
   /**
-   * Exports the given data to a file.
+   * Exports the given data to a ZIP with CSV files in OpenLMIS
+   * Configuration Data Export File format.
    *
    * @param data   The names of the files to be exported.
    */
