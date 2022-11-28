@@ -44,6 +44,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -71,24 +72,25 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
 @Entity
 @TypeName("Orderable")
 @Table(name = "orderables", schema = "referencedata",
-    uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
-        columnNames = {"code", "versionnumber"}))
+        uniqueConstraints = @UniqueConstraint(name = "unq_productcode_versionid",
+                columnNames = {"code", "versionnumber"}))
 @NoArgsConstructor
 @Cacheable
-@Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @NamedEntityGraph(
-    name = "graph.Orderable",
-    attributeNodes = {
-        @NamedAttributeNode(value = "programOrderables", subgraph = "programOrderables"),
-        @NamedAttributeNode(value = "dispensable", subgraph = "dispensable"),
-        @NamedAttributeNode("children"),
-        @NamedAttributeNode("identifiers")
-    },
-    subgraphs = {
-        @NamedSubgraph(name = "programOrderables",
-            attributeNodes = @NamedAttributeNode("orderableDisplayCategory")),
-        @NamedSubgraph(name = "dispensable", attributeNodes = @NamedAttributeNode("attributes"))
-    })
+        name = "graph.Orderable",
+        attributeNodes = {
+                @NamedAttributeNode(value = "programOrderables", subgraph = "programOrderables"),
+                @NamedAttributeNode(value = "dispensable", subgraph = "dispensable"),
+                @NamedAttributeNode("children"),
+                @NamedAttributeNode("identifiers")
+        },
+        subgraphs = {
+                @NamedSubgraph(name = "programOrderables",
+                        attributeNodes = @NamedAttributeNode("orderableDisplayCategory")),
+                @NamedSubgraph(name = "dispensable",
+                        attributeNodes = @NamedAttributeNode("attributes"))
+        })
 public class Orderable implements Versionable {
 
   private static final int FETCH_SIZE = 1000;
@@ -105,7 +107,7 @@ public class Orderable implements Versionable {
   @JoinColumn(name = "dispensableid", nullable = false)
   @DiffIgnore // same reason as one in Facility.supportedPrograms
   @Getter
-  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
+  @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
   private Dispensable dispensable;
 
   @Getter
@@ -129,7 +131,7 @@ public class Orderable implements Versionable {
   @BatchSize(size = FETCH_SIZE)
   @DiffIgnore
   @Setter
-  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
+  @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
   private List<ProgramOrderable> programOrderables;
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -137,7 +139,7 @@ public class Orderable implements Versionable {
   @DiffIgnore
   @Setter
   @Getter
-  @Cache(usage =  CacheConcurrencyStrategy.READ_WRITE)
+  @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
   private Set<OrderableChild> children;
 
   @ElementCollection
@@ -145,10 +147,11 @@ public class Orderable implements Versionable {
   @BatchSize(size = FETCH_SIZE)
   @Column(name = VALUE)
   @CollectionTable(
-      name = "orderable_identifiers",
-      joinColumns = {
-          @JoinColumn(name = "orderableId", referencedColumnName = "id"),
-          @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber")})
+          name = "orderable_identifiers",
+          joinColumns = {
+                  @JoinColumn(name = "orderableId", referencedColumnName = "id"),
+                  @JoinColumn(name = "orderableVersionNumber",
+                          referencedColumnName = "versionNumber")})
   @Setter
   private Map<String, String> identifiers;
 
@@ -198,16 +201,16 @@ public class Orderable implements Versionable {
   /**
    * Default constructor.
    *
-   * @param productCode product code
-   * @param dispensable dispensable
-   * @param netContent net content
+   * @param productCode           product code
+   * @param dispensable           dispensable
+   * @param netContent            net content
    * @param packRoundingThreshold pack rounding threshold
-   * @param roundToZero round to zero
-   * @param id id
-   * @param versionNumber version number
+   * @param roundToZero           round to zero
+   * @param id                    id
+   * @param versionNumber         version number
    */
   public Orderable(Code productCode, Dispensable dispensable, long netContent,
-      long packRoundingThreshold, boolean roundToZero, UUID id, Long versionNumber) {
+                   long packRoundingThreshold, boolean roundToZero, UUID id, Long versionNumber) {
     this.productCode = productCode;
     this.dispensable = dispensable;
     this.netContent = netContent;
@@ -221,13 +224,13 @@ public class Orderable implements Versionable {
    * Creates a new instance of orderable with an updated version from importer.
    *
    * @param persistedOrderable persisted orderable.
-   * @param importer importer.
+   * @param importer           importer.
    * @return a new Orderable.
    */
   public static Orderable updateFrom(Orderable persistedOrderable, Importer importer) {
     Orderable orderable = newInstance(importer);
     orderable.identity = new VersionIdentity(persistedOrderable.getId(),
-        persistedOrderable.getVersionNumber() + 1);
+            persistedOrderable.getVersionNumber() + 1);
     return orderable;
   }
 
@@ -297,7 +300,7 @@ public class Orderable implements Versionable {
    *
    * @param program the Program this product is (maybe) in.
    * @return the association to the given {@link Program}, or null if this product is not in the
-   *     given program or is marked inactive.
+   *        given program or is marked inactive.
    */
   public ProgramOrderable getProgramOrderable(Program program) {
     for (ProgramOrderable programOrderable : programOrderables) {
@@ -367,8 +370,8 @@ public class Orderable implements Versionable {
   @Override
   public final boolean equals(Object object) {
     return null != object
-        && object instanceof Orderable
-        && Objects.equals(productCode, ((Orderable) object).productCode);
+            && object instanceof Orderable
+            && Objects.equals(productCode, ((Orderable) object).productCode);
   }
 
   @Override
@@ -410,6 +413,22 @@ public class Orderable implements Versionable {
     }
   }
 
+  /**
+   * Export this object to the specified exporter (csv model).
+   *
+   * @param exporter exporter to export to
+   */
+  public void export(CsvExporter exporter) {
+    exporter.setId(identity.getId());
+    exporter.setProductCode(productCode.toString());
+    exporter.setDispensable(dispensable);
+    exporter.setFullProductName(fullProductName);
+    exporter.setDescription(description);
+    exporter.setNetContent(netContent);
+    exporter.setPackRoundingThreshold(packRoundingThreshold);
+    exporter.setRoundToZero(roundToZero);
+  }
+
   public void setExtraData(Map<String, Object> extraData) {
     this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
     this.extraData.updateFrom(extraData);
@@ -444,6 +463,24 @@ public class Orderable implements Versionable {
     void setMaximumTemperature(TemperatureMeasurement maximumTemperature);
 
     void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
+  }
+
+  public interface CsvExporter extends BaseExporter {
+
+    void setProductCode(String productCode);
+
+    void setDispensable(Dispensable dispensable);
+
+    void setFullProductName(String fullProductName);
+
+    void setDescription(String description);
+
+    void setNetContent(Long netContent);
+
+    void setPackRoundingThreshold(Long packRoundingThreshold);
+
+    void setRoundToZero(Boolean roundToZero);
+
   }
 
   public interface Importer extends BaseImporter, ExtraDataImporter, VersionImporter {
