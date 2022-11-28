@@ -15,13 +15,17 @@
 
 package org.openlmis.referencedata.dto;
 
-import lombok.*;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
+
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.web.csv.model.ImportField;
-
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
-import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -84,4 +88,3 @@ public class OrderableCsvModel extends BaseDto implements Orderable.CsvExporter 
     }
   }
 }
-
