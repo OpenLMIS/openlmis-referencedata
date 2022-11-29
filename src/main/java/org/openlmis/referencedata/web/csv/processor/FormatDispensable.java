@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
@@ -22,8 +24,6 @@ import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatDispensable extends CellProcessorAdaptor implements StringCellProcessor {
-
-  private static final String DISPENSING_UNIT = "dispensingUnit";
 
   @Override
   public Object execute(Object value, CsvContext context) {
@@ -33,7 +33,18 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
     if (value instanceof DispensableDto) {
       DispensableDto dispensable = (DispensableDto) value;
 
-      result = String.format("%s:%s", DISPENSING_UNIT, dispensable.getDispensingUnit());
+      if (StringUtils.isEmpty(dispensable.getDispensingUnit())
+              && StringUtils.isEmpty(dispensable.getSizeCode())) {
+        throw getSuperCsvCellProcessorException(dispensable, context);
+      }
+
+      if (StringUtils.isEmpty(dispensable.getDispensingUnit())) {
+        result = String.format("%s:%s", Dispensable.KEY_SIZE_CODE, dispensable.getSizeCode());
+      } else {
+        result = String.format("%s:%s", Dispensable.KEY_DISPENSING_UNIT,
+                dispensable.getDispensingUnit());
+      }
+
     } else {
       throw getSuperCsvCellProcessorException(value, context);
     }
@@ -44,7 +55,7 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
                                                                            CsvContext context) {
     return new SuperCsvCellProcessorException(
-            String.format("Cannot get dispensing unit from '%s'.", value.toString()),
+            String.format("Cannot get dispensing unit and size code from '%s'.", value.toString()),
             context, this);
   }
 

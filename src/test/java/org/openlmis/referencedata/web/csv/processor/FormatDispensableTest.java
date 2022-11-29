@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
@@ -39,7 +40,6 @@ public class FormatDispensableTest {
   private CsvContext csvContext;
 
   private FormatDispensable formatDispensable;
-  private static final String DISPENSING_UNIT = "dispensingUnit";
 
   @Before
   public void beforeEach() {
@@ -50,13 +50,28 @@ public class FormatDispensableTest {
   public void shouldFormatValidDispensable() throws Exception {
     DispensableDto dispensableDto = new DispensableDto();
     Map<String, String> dispensableAttributes = new HashMap<>();
-    dispensableAttributes.put(DISPENSING_UNIT, "dispensing-unit");
+    dispensableAttributes.put(Dispensable.KEY_DISPENSING_UNIT, "dispensing-unit");
     dispensableDto.setAttributes(dispensableAttributes);
 
     String result = (String) formatDispensable.execute(dispensableDto, csvContext);
 
-    assertEquals(StringUtils.joinWith(":", DISPENSING_UNIT,
+    assertEquals(StringUtils.joinWith(":", Dispensable.KEY_DISPENSING_UNIT,
             dispensableDto.getDispensingUnit()), result);
+  }
+
+  @Test
+  public void shouldThrownExceptionWhenDispensingUnitAndSizeCodeAreNull() {
+    DispensableDto dispensableDto = new DispensableDto();
+    Map<String, String> dispensableAttributes = new HashMap<>();
+    dispensableAttributes.put(Dispensable.KEY_DISPENSING_UNIT, null);
+    dispensableAttributes.put(Dispensable.KEY_SIZE_CODE, null);
+    dispensableDto.setAttributes(dispensableAttributes);
+
+    expectedException.expect(SuperCsvCellProcessorException.class);
+    expectedException.expectMessage(String.format("Cannot get dispensing unit and size code "
+            + "from '%s'.", dispensableDto.toString()));
+
+    formatDispensable.execute(dispensableDto, csvContext);
   }
 
   @Test
@@ -64,8 +79,8 @@ public class FormatDispensableTest {
     String invalid = "invalid-type";
 
     expectedException.expect(SuperCsvCellProcessorException.class);
-    expectedException.expectMessage(String.format("Cannot get dispensing unit from '%s'.",
-            invalid));
+    expectedException.expectMessage(String.format("Cannot get dispensing unit and size "
+            + "code from '%s'.", invalid));
 
     formatDispensable.execute(invalid, csvContext);
   }
