@@ -15,29 +15,39 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.MockitoAnnotations.initMocks;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.springframework.http.ResponseEntity;
 
+public class DataExportControllerTest {
 
-@ExtendWith(SpringExtension.class)
-class DataExportControllerTest {
+  private static final int HTTP_OK_STATUS_CODE = 200;
+  private static final String DATA_QUERY_PARAM_VALUE = "test-data-value";
+  private String queryParamValue;
 
-  private MockMvc mockMvc;
+  @InjectMocks
+  private DataExportController controller;
 
-  @BeforeAll
-  void init() {
-    mockMvc = MockMvcBuilders.standaloneSetup(DataExportController.class).build();
+  /**
+   * Constructor for test.
+   */
+  public DataExportControllerTest() {
+    initMocks(this);
   }
 
   @Test
-  void exportDataTest() throws Exception {
-    mockMvc.perform(get("*/exportData")).andExpect(status().isOk());
+  public void shouldReturnHttp200OkSuccessStatusResponse() {
+    //given
+    queryParamValue = DATA_QUERY_PARAM_VALUE;
+
+    //when
+    ResponseEntity response = controller.exportData(queryParamValue);
+
+    //then
+    assertThat(response.getStatusCode().value()).isEqualTo(HTTP_OK_STATUS_CODE);
   }
+
 }
