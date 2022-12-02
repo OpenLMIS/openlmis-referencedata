@@ -47,12 +47,12 @@ public class OrderableCsvModel extends BaseDto implements Orderable.CsvExporter 
 
   @Getter
   @Setter
-  @ImportField(name = NAME, mandatory = true)
+  @ImportField(name = NAME)
   private String fullProductName;
 
   @Getter
   @Setter
-  @ImportField(name = DESCRIPTION, mandatory = true)
+  @ImportField(name = DESCRIPTION)
   private String description;
 
   @Getter

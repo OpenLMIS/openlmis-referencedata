@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -43,14 +44,13 @@ public class DataExportService {
   /**
    * Parses orderables data into the csv model.
    *
-   * @param output input stream of csv file
+   * @return orderables data stream in csv format.
    */
-  public void generateOrderablesCsv(OutputStream output) throws IOException {
+  public ByteArrayOutputStream generateOrderablesCsv() throws IOException {
 
     List<Orderable> orderables = orderableRepository.findAll();
-
     List<OrderableCsvModel> items = toOrderableCsvDto(orderables);
-
+    ByteArrayOutputStream output = new ByteArrayOutputStream();
     try {
       csvFormatter.process(
               output, new ModelClass(OrderableCsvModel.class), items);
@@ -58,6 +58,7 @@ public class DataExportService {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
 
+    return output;
   }
 
   private List<OrderableCsvModel> toOrderableCsvDto(Iterable<Orderable> items) {
