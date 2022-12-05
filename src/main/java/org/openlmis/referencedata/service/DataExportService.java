@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.service;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
