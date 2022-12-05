@@ -20,13 +20,10 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class DataExportControllerTest {
-
-  private static final int HTTP_OK_STATUS_CODE = 200;
-  private static final String DATA_QUERY_PARAM_VALUE = "test-data-value";
-  private String queryParamValue;
 
   @InjectMocks
   private DataExportController controller;
@@ -41,13 +38,13 @@ public class DataExportControllerTest {
   @Test
   public void shouldReturnHttp200OkSuccessStatusResponse() {
     //given
-    queryParamValue = DATA_QUERY_PARAM_VALUE;
+    String queryParamValue = "test-data-value";
 
     //when
     ResponseEntity response = controller.exportData(queryParamValue);
 
     //then
-    assertThat(response.getStatusCode().value()).isEqualTo(HTTP_OK_STATUS_CODE);
+    assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
   }
 
 }
