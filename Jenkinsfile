@@ -288,6 +288,11 @@ pipeline {
                 }
             }
         }
+	cleanup {
+	    script {
+		sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
+	    }
+	}
     }
 }
 
