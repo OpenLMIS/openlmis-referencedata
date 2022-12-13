@@ -16,63 +16,86 @@
 package org.openlmis.referencedata.service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
+import lombok.AccessLevel;
+import lombok.Setter;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.dto.OrderableCsvModel;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.ExportableDataRepository;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
-import org.openlmis.referencedata.web.csv.format.CsvFormatter;
-import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DataExportService {
 
-  @Autowired
-  private OrderableRepository orderableRepository;
+  private static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
+  private static final String REPOSITORY_NAME_SUFFIX = "Repository";
+  @Setter(AccessLevel.PRIVATE)
+  private String format;
 
   @Autowired
-  private CsvFormatter csvFormatter;
+  private BeanFactory beanFactory;
 
   /**
-   * Parses orderables data into the csv model.
+   * Generate and return zip archive with files in specific format.
    *
-   * @return orderables data stream in csv format.
+   * @param format    format of the files
+   * @param filenames files to be included in the zip
+   * @return byte data in zip format
    */
-  public ByteArrayOutputStream generateOrderablesCsv() throws IOException {
+  public byte[] exportToZip(String format, String filenames) throws IOException {
+    String[] files = filenames.split(",");
+    setFormat(format);
 
-    List<Orderable> orderables = orderableRepository.findAll();
-    List<OrderableCsvModel> items = toOrderableCsvDto(orderables);
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ZipOutputStream zip = new ZipOutputStream(baos);
+
+    for (Map.Entry<String, ByteArrayOutputStream> file : generate(files).entrySet()) {
+      ZipEntry entry = new ZipEntry(file.getKey() + "." + format);
+      entry.setSize(file.getValue().toByteArray().length);
+      zip.putNextEntry(entry);
+      zip.write(file.getValue().toByteArray());
+    }
+    zip.closeEntry();
+    zip.close();
+
+    return baos.toByteArray();
+  }
+
+  private Map<String, ByteArrayOutputStream> generate(String[] filenames) {
+    Map<String, ByteArrayOutputStream> output = new HashMap<>();
+    for (String file : filenames) {
+      output.put(file, generate(file));
+    }
+    return output;
+  }
+
+  private ByteArrayOutputStream generate(String filename) {
+
+    DataFormatterService formatter = beanFactory.getBean(format + FORMATTER_SERVICE_NAME_SUFFIX,
+            DataFormatterService.class);
+
+    ExportableDataRepository repository = beanFactory.getBean(filename + REPOSITORY_NAME_SUFFIX,
+            ExportableDataRepository.class);
+    List data = repository.findAll();
+
     ByteArrayOutputStream output = new ByteArrayOutputStream();
+
     try {
-      csvFormatter.process(
-              output, new ModelClass(OrderableCsvModel.class), items);
+      formatter.process(output, data);
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
 
     return output;
   }
-
-  private List<OrderableCsvModel> toOrderableCsvDto(Iterable<Orderable> items) {
-    return StreamSupport
-            .stream(items.spliterator(), false)
-            .map(this::toOrderableCsvDto)
-            .collect(Collectors.toList());
-  }
-
-  private OrderableCsvModel toOrderableCsvDto(Orderable orderable) {
-    OrderableCsvModel dto = new OrderableCsvModel();
-    orderable.export(dto);
-    return dto;
-  }
-
 }
 
 

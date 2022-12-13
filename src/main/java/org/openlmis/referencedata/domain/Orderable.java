@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.domain.Orderable.DISPENSABLE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -45,7 +49,6 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -64,6 +67,7 @@ import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 /**
  * Products that are Orderable by Program.  An Orderable represent any medical commodities that may
@@ -81,14 +85,14 @@ import org.openlmis.referencedata.dto.ProgramOrderableDto;
         name = "graph.Orderable",
         attributeNodes = {
                 @NamedAttributeNode(value = "programOrderables", subgraph = "programOrderables"),
-                @NamedAttributeNode(value = "dispensable", subgraph = "dispensable"),
+                @NamedAttributeNode(value = DISPENSABLE, subgraph = DISPENSABLE),
                 @NamedAttributeNode("children"),
                 @NamedAttributeNode("identifiers")
         },
         subgraphs = {
                 @NamedSubgraph(name = "programOrderables",
                         attributeNodes = @NamedAttributeNode("orderableDisplayCategory")),
-                @NamedSubgraph(name = "dispensable",
+                @NamedSubgraph(name = DISPENSABLE,
                         attributeNodes = @NamedAttributeNode("attributes"))
         })
 public class Orderable implements Versionable {
@@ -98,34 +102,51 @@ public class Orderable implements Versionable {
   public static final String TRADE_ITEM = "tradeItem";
   public static final String COMMODITY_TYPE = "commodityType";
   public static final String VALUE = "value";
+  private static final String PRODUCT_CODE = "productCode";
+  private static final String NAME = "name";
+  private static final String DESCRIPTION = "description";
+  private static final String PACK_ROUNDING_THRESHOLD = "packRoundingThreshold";
+  private static final String PACK_SIZE = "packSize";
+  public static final String DISPENSABLE = "dispensable";
+  private static final String ROUND_TO_ZERO = "roundToZero";
 
   @Embedded
   @Getter
+  @ImportField(name = PRODUCT_CODE, mandatory = true)
   private Code productCode;
+
+  @Getter
+  @Setter
+  @ImportField(name = NAME)
+  private String fullProductName;
+
+  @Getter
+  @Setter
+  @ImportField(name = DESCRIPTION)
+  private String description;
+
+  @Getter
+  @Setter
+  @ImportField(name = PACK_ROUNDING_THRESHOLD, type = POSITIVE_LONG, mandatory = true)
+  private long packRoundingThreshold;
+
+  @Getter
+  @Setter
+  @ImportField(name = PACK_SIZE, type = POSITIVE_LONG, mandatory = true)
+  private long netContent;
+
+  @Getter
+  @Setter
+  @ImportField(name = ROUND_TO_ZERO, mandatory = true)
+  private boolean roundToZero;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "dispensableid", nullable = false)
   @DiffIgnore // same reason as one in Facility.supportedPrograms
   @Getter
   @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+  @ImportField(name = DISPENSABLE, type = DISPENSABLE_TYPE, mandatory = true)
   private Dispensable dispensable;
-
-  @Getter
-  @Setter
-  private String fullProductName;
-
-  @Getter
-  @Setter
-  private String description;
-
-  @Getter(AccessLevel.PACKAGE)
-  private long netContent;
-
-  @Getter(AccessLevel.PACKAGE)
-  private long packRoundingThreshold;
-
-  @Getter(AccessLevel.PACKAGE)
-  private boolean roundToZero;
 
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @BatchSize(size = FETCH_SIZE)
@@ -413,22 +434,6 @@ public class Orderable implements Versionable {
     }
   }
 
-  /**
-   * Export this object to the specified exporter (csv model).
-   *
-   * @param exporter exporter to export to
-   */
-  public void export(CsvExporter exporter) {
-    exporter.setId(identity.getId());
-    exporter.setProductCode(productCode.toString());
-    exporter.setDispensable(dispensable);
-    exporter.setFullProductName(fullProductName);
-    exporter.setDescription(description);
-    exporter.setNetContent(netContent);
-    exporter.setPackRoundingThreshold(packRoundingThreshold);
-    exporter.setRoundToZero(roundToZero);
-  }
-
   public void setExtraData(Map<String, Object> extraData) {
     this.extraData = ExtraDataEntity.defaultEntity(this.extraData);
     this.extraData.updateFrom(extraData);
@@ -463,24 +468,6 @@ public class Orderable implements Versionable {
     void setMaximumTemperature(TemperatureMeasurement maximumTemperature);
 
     void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
-  }
-
-  public interface CsvExporter extends BaseExporter {
-
-    void setProductCode(String productCode);
-
-    void setDispensable(Dispensable dispensable);
-
-    void setFullProductName(String fullProductName);
-
-    void setDescription(String description);
-
-    void setNetContent(Long netContent);
-
-    void setPackRoundingThreshold(Long packRoundingThreshold);
-
-    void setRoundToZero(Boolean roundToZero);
-
   }
 
   public interface Importer extends BaseImporter, ExtraDataImporter, VersionImporter {

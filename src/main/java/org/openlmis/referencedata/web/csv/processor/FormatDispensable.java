@@ -16,8 +16,10 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.ContainerDispensable;
+import org.openlmis.referencedata.domain.DefaultDispensable;
 import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.domain.VaccineDispensable;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
@@ -25,24 +27,42 @@ import org.supercsv.util.CsvContext;
 
 public class FormatDispensable extends CellProcessorAdaptor implements StringCellProcessor {
 
+  public static final String DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT = "%s:%s";
+
   @Override
   public Object execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
     String result;
-    if (value instanceof DispensableDto) {
-      DispensableDto dispensable = (DispensableDto) value;
+    if (value instanceof DefaultDispensable) {
+      DefaultDispensable dispensable = (DefaultDispensable) value;
 
-      if (StringUtils.isEmpty(dispensable.getDispensingUnit())
-              && StringUtils.isEmpty(dispensable.getSizeCode())) {
+      if (StringUtils.isEmpty(dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT))) {
         throw getSuperCsvCellProcessorException(dispensable, context);
+      } else {
+        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT,
+                Dispensable.KEY_DISPENSING_UNIT,
+                dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT));
       }
 
-      if (StringUtils.isEmpty(dispensable.getDispensingUnit())) {
-        result = String.format("%s:%s", Dispensable.KEY_SIZE_CODE, dispensable.getSizeCode());
+    } else if (value instanceof ContainerDispensable) {
+      ContainerDispensable dispensable = (ContainerDispensable) value;
+
+      if (StringUtils.isEmpty(dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE))) {
+        throw getSuperCsvCellProcessorException(dispensable, context);
       } else {
-        result = String.format("%s:%s", Dispensable.KEY_DISPENSING_UNIT,
-                dispensable.getDispensingUnit());
+        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, Dispensable.KEY_SIZE_CODE,
+                dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE));
+      }
+
+    } else if (value instanceof VaccineDispensable) {
+      VaccineDispensable dispensable = (VaccineDispensable) value;
+
+      if (StringUtils.isEmpty(dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE))) {
+        throw getSuperCsvCellProcessorException(dispensable, context);
+      } else {
+        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, Dispensable.KEY_SIZE_CODE,
+                dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE));
       }
 
     } else {
@@ -55,7 +75,7 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
                                                                            CsvContext context) {
     return new SuperCsvCellProcessorException(
-            String.format("Cannot get dispensing unit and size code from '%s'.", value.toString()),
+            String.format("Cannot get dispensing unit or size code from '%s'.", value.toString()),
             context, this);
   }
 

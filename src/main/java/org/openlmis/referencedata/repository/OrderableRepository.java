@@ -43,14 +43,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * Persistence repository for saving/finding {@link Orderable}.
  */
 @SuppressWarnings({"PMD.TooManyMethods"})
+@Repository
 public interface OrderableRepository extends
-    JpaRepository<Orderable, VersionIdentity>, OrderableRepositoryCustom,
-    BaseAuditableRepository<Orderable, VersionIdentity> {
+        JpaRepository<Orderable, VersionIdentity>, OrderableRepositoryCustom,
+        BaseAuditableRepository<Orderable, VersionIdentity>, ExportableDataRepository<Orderable> {
 
   @Override
   <S extends Orderable> S save(S entity);
@@ -59,58 +61,58 @@ public interface OrderableRepository extends
 
   // DATAJPA-1130
   @Query(value = "SELECT o.identity.id, o.identity.versionNumber"
-      + FROM_ORDERABLES_CLAUSE
-      + " WHERE o.identity.id = ?1"
+          + FROM_ORDERABLES_CLAUSE
+          + " WHERE o.identity.id = ?1"
   )
   boolean existsById(UUID id);
 
   boolean existsByProductCode(Code code);
 
   @Query(SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE
   )
   Orderable findFirstByVersionNumberAndProductCodeIgnoreCase(
-      @Param("code") String code,
-      @Param("versionNumber") Long versionNumber
+          @Param("code") String code,
+          @Param("versionNumber") Long versionNumber
   );
 
   @Query(value = SELECT_DISTINCT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + WHERE_LATEST_ORDERABLE
-      + " AND o.identity.id IN :ids"
-      + ORDER_BY_PAGEABLE,
-      countQuery = "SELECT COUNT(1)"
-      + FROM_ORDERABLES_CLAUSE
-      + WHERE_LATEST_ORDERABLE
-      + " AND o.identity.id IN :ids"
-      + ORDER_BY_PAGEABLE
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_LATEST_ORDERABLE
+          + " AND o.identity.id IN :ids"
+          + ORDER_BY_PAGEABLE,
+          countQuery = "SELECT COUNT(1)"
+                  + FROM_ORDERABLES_CLAUSE
+                  + WHERE_LATEST_ORDERABLE
+                  + " AND o.identity.id IN :ids"
+                  + ORDER_BY_PAGEABLE
   )
   @EntityGraph("graph.Orderable")
   @QueryHints(value = {
-      @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
-      @QueryHint(name = "org.hibernate.readOnly", value = "true")
+          @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
+          @QueryHint(name = "org.hibernate.readOnly", value = "true")
       }, forCounting = false)
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + WHERE_LATEST_ORDERABLE
-      + " AND o.lastUpdated = "
-      + " (SELECT MAX(lastUpdated)"
-      + " FROM Orderable"
-      + " WHERE identity.id IN :ids)"
-      + ORDER_BY_PAGEABLE
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_LATEST_ORDERABLE
+          + " AND o.lastUpdated = "
+          + " (SELECT MAX(lastUpdated)"
+          + " FROM Orderable"
+          + " WHERE identity.id IN :ids)"
+          + ORDER_BY_PAGEABLE
   )
   List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids,
-      Pageable pageable);
+                                                           Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + " JOIN o.identifiers oi"
-      + WHERE_LATEST_ORDERABLE
-      + " AND KEY(oi) = :key"
-      + " AND VALUE(oi) = :value"
+          + FROM_ORDERABLES_CLAUSE
+          + " JOIN o.identifiers oi"
+          + WHERE_LATEST_ORDERABLE
+          + " AND KEY(oi) = :key"
+          + " AND VALUE(oi) = :value"
   )
   List<Orderable> findAllLatestByIdentifier(@Param("key") String key, @Param("value") String value);
 
@@ -119,59 +121,60 @@ public interface OrderableRepository extends
   Orderable findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
 
   @Query(value = SELECT_ORDERABLE
-      + FROM_ORDERABLES_CLAUSE
-      + WHERE_LATEST_ORDERABLE
-      + ORDER_BY_PAGEABLE
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_LATEST_ORDERABLE
+          + ORDER_BY_PAGEABLE
   )
   Page<Orderable> findAllLatest(Pageable pageable);
 
   @Query(value = "SELECT\n"
-      + "    o.*\n"
-      + "FROM\n"
-      + "    referencedata.orderables o\n"
-      + "WHERE\n"
-      + "    id NOT IN (\n"
-      + "        SELECT\n"
-      + "            id\n"
-      + "        FROM\n"
-      + "            referencedata.orderables o\n"
-      + "            INNER JOIN referencedata.jv_global_id g "
-      + "ON CAST(o.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
-      + "            INNER JOIN referencedata.jv_snapshot s  ON g.global_id_pk = s.global_id_fk\n"
-      + "    )\n"
-      + ORDER_BY_PAGEABLE,
-      nativeQuery = true)
+          + "    o.*\n"
+          + "FROM\n"
+          + "    referencedata.orderables o\n"
+          + "WHERE\n"
+          + "    id NOT IN (\n"
+          + "        SELECT\n"
+          + "            id\n"
+          + "        FROM\n"
+          + "            referencedata.orderables o\n"
+          + "            INNER JOIN referencedata.jv_global_id g "
+          + "ON CAST(o.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+          + "            INNER JOIN referencedata.jv_snapshot s  "
+          + "ON g.global_id_pk = s.global_id_fk\n"
+          + "    )\n"
+          + ORDER_BY_PAGEABLE,
+          nativeQuery = true)
   Page<Orderable> findAllWithoutSnapshots(Pageable pageable);
 
   @Query(value = SELECT_LAST_UPDATED
-      + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
-      nativeQuery = true
+          + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
+          + JOIN_WITH_LATEST_ORDERABLE
+          + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
+          nativeQuery = true
   )
   Timestamp findLatestModifiedDateOfAll();
 
   @Query(value = SELECT_LAST_UPDATED
-      + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
-      + JOIN_WITH_LATEST_ORDERABLE
-      + " WHERE o.id IN :ids"
-      + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
-      nativeQuery = true
+          + FROM_REFERENCEDATA_ORDERABLES_CLAUSE
+          + JOIN_WITH_LATEST_ORDERABLE
+          + " WHERE o.id IN :ids"
+          + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
+          nativeQuery = true
   )
   Timestamp findLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids);
 
   @Query(
-      value = "SELECT"
-          + " CAST(oi.orderableid AS VARCHAR) AS id,"
-          + " CAST(oi.orderableversionnumber AS VARCHAR) AS versionNumber"
-          + " FROM referencedata.orderable_identifiers oi"
-          + " WHERE oi.key = :key"
-          + " AND oi.value IN :values",
-      nativeQuery = true
+          value = "SELECT"
+                  + " CAST(oi.orderableid AS VARCHAR) AS id,"
+                  + " CAST(oi.orderableversionnumber AS VARCHAR) AS versionNumber"
+                  + " FROM referencedata.orderable_identifiers oi"
+                  + " WHERE oi.key = :key"
+                  + " AND oi.value IN :values",
+          nativeQuery = true
   )
   public List<Map<String, String>> getIdentitiesByIdentifier(
-      @Param("key") String key,
-      @Param("values") Iterable<String> values
+          @Param("key") String key,
+          @Param("values") Iterable<String> values
   );
 
 }

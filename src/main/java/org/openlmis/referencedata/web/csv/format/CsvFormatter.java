@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
@@ -48,9 +47,9 @@ public class CsvFormatter {
    * @param outputStream input stream of csv file
    * @param modelClass   java model to which the csv row will be mapped
    */
-  public <T extends BaseDto> void process(OutputStream outputStream,
-                                          ModelClass<T> modelClass,
-                                          List<T> dtos) throws IOException {
+  public <T extends Object> void process(OutputStream outputStream,
+                                         ModelClass<T> modelClass,
+                                         List<T> dtos) throws IOException {
 
     Profiler profiler = new Profiler("CSV_PROCESS");
     profiler.setLogger(LOGGER);

@@ -15,19 +15,11 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
@@ -47,39 +39,11 @@ public class FormatDispensableTest {
   }
 
   @Test
-  public void shouldFormatValidDispensable() throws Exception {
-    DispensableDto dispensableDto = new DispensableDto();
-    Map<String, String> dispensableAttributes = new HashMap<>();
-    dispensableAttributes.put(Dispensable.KEY_DISPENSING_UNIT, "dispensing-unit");
-    dispensableDto.setAttributes(dispensableAttributes);
-
-    String result = (String) formatDispensable.execute(dispensableDto, csvContext);
-
-    assertEquals(StringUtils.joinWith(":", Dispensable.KEY_DISPENSING_UNIT,
-            dispensableDto.getDispensingUnit()), result);
-  }
-
-  @Test
-  public void shouldThrownExceptionWhenDispensingUnitAndSizeCodeAreNull() {
-    DispensableDto dispensableDto = new DispensableDto();
-    Map<String, String> dispensableAttributes = new HashMap<>();
-    dispensableAttributes.put(Dispensable.KEY_DISPENSING_UNIT, null);
-    dispensableAttributes.put(Dispensable.KEY_SIZE_CODE, null);
-    dispensableDto.setAttributes(dispensableAttributes);
-
-    expectedException.expect(SuperCsvCellProcessorException.class);
-    expectedException.expectMessage(String.format("Cannot get dispensing unit and size code "
-            + "from '%s'.", dispensableDto.toString()));
-
-    formatDispensable.execute(dispensableDto, csvContext);
-  }
-
-  @Test
   public void shouldThrownExceptionWhenValueIsNotBasicFacilityDtoType() {
     String invalid = "invalid-type";
 
     expectedException.expect(SuperCsvCellProcessorException.class);
-    expectedException.expectMessage(String.format("Cannot get dispensing unit and size "
+    expectedException.expectMessage(String.format("Cannot get dispensing unit or size "
             + "code from '%s'.", invalid));
 
     formatDispensable.execute(invalid, csvContext);
