@@ -224,6 +224,11 @@ pipeline {
                                 notifyAfterFailure()
                             }
                         }
+			cleanup {
+			    script {
+				sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
+			    }
+			}
                     }
                 }
             }
@@ -288,11 +293,6 @@ pipeline {
                 }
             }
         }
-	cleanup {
-	    script {
-		sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
-	    }
-	}
     }
 }
 
