@@ -226,7 +226,7 @@ pipeline {
                         }
 			cleanup {
 			    script {
-				sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
+				sh "sudo rm -rf ${env.WORKSPACE}/{*,.*} || true"
 			    }
 			}
                     }
