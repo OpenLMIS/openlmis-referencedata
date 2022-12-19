@@ -224,11 +224,6 @@ pipeline {
                                 notifyAfterFailure()
                             }
                         }
-			cleanup {
-			    script {
-				sh "sudo rm -rf ${env.WORKSPACE}/{*,.*} || true"
-			    }
-			}
                     }
                 }
             }
