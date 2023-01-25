@@ -21,4 +21,6 @@ public interface ExportableDataRepository<T> {
 
   List<T> findAll();
 
+  Class<T> getType();
+
 }

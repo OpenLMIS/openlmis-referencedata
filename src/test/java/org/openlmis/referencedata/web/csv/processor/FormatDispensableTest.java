@@ -15,11 +15,16 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.junit.Assert.assertEquals;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.openlmis.referencedata.domain.DefaultDispensable;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
@@ -36,6 +41,16 @@ public class FormatDispensableTest {
   @Before
   public void beforeEach() {
     formatDispensable = new FormatDispensable();
+  }
+
+  @Test
+  public void shouldFormatValidDispensable() throws Exception {
+    Dispensable dispensable = (DefaultDispensable) Dispensable.createNew("dispensing-unit");
+
+    String result = (String) formatDispensable.execute(dispensable, csvContext);
+
+    assertEquals(StringUtils.joinWith(":", Dispensable.KEY_DISPENSING_UNIT,
+            dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT)), result);
   }
 
   @Test

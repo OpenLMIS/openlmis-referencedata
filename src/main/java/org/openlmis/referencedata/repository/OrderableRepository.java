@@ -177,4 +177,8 @@ public interface OrderableRepository extends
           @Param("values") Iterable<String> values
   );
 
+  @Override
+  default Class<Orderable> getType() {
+    return Orderable.class;
+  }
 }

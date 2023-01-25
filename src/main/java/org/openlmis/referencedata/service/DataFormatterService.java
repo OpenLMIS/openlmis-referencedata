@@ -21,6 +21,6 @@ import java.util.List;
 
 public interface DataFormatterService {
 
-  <T> void process(OutputStream outputStream, List<T> data) throws IOException;
+  <T> void process(OutputStream outputStream, List<T> data, Class<T> type) throws IOException;
 
 }

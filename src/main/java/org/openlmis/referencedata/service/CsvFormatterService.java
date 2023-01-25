@@ -35,16 +35,14 @@ public class CsvFormatterService implements DataFormatterService {
    * specific model.
    *
    * @param outputStream output stream to which the data will be written
-   * @param data list of objects to be parsed
-   * @param <T> type of objects contained in data
+   * @param data         list of objects to be parsed
+   * @param type         class type of objects
+   * @param <T>          type of objects contained in data
    */
   @Override
-  public <T> void process(OutputStream outputStream, List<T> data) throws IOException {
-    csvFormatter.process(outputStream, getModelClass(data), data);
-  }
-
-  private ModelClass getModelClass(List data) {
-    return new ModelClass(data.get(0).getClass());
+  public <T> void process(OutputStream outputStream, List<T> data, Class<T> type)
+          throws IOException {
+    csvFormatter.process(outputStream, new ModelClass(type), data);
   }
 
 }
