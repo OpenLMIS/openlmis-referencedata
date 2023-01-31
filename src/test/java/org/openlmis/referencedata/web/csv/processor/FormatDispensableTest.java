@@ -23,8 +23,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.openlmis.referencedata.domain.ContainerDispensable;
 import org.openlmis.referencedata.domain.DefaultDispensable;
 import org.openlmis.referencedata.domain.Dispensable;
+import org.openlmis.referencedata.domain.VaccineDispensable;
+import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
@@ -44,8 +47,8 @@ public class FormatDispensableTest {
   }
 
   @Test
-  public void shouldFormatValidDispensable() throws Exception {
-    Dispensable dispensable = (DefaultDispensable) Dispensable.createNew("dispensing-unit");
+  public void shouldFormatValidDefaultDispensable() throws Exception {
+    DefaultDispensable dispensable = (DefaultDispensable) Dispensable.createNew("dispensing-unit");
 
     String result = (String) formatDispensable.execute(dispensable, csvContext);
 
@@ -54,7 +57,30 @@ public class FormatDispensableTest {
   }
 
   @Test
-  public void shouldThrownExceptionWhenValueIsNotBasicFacilityDtoType() {
+  public void shouldFormatValidContainerDispensable() throws Exception {
+    DispensableDto dto = new DispensableDto(null, "size-code", null, "display-unit");
+    ContainerDispensable dispensable = (ContainerDispensable) Dispensable.createNew(dto);
+
+    String result = (String) formatDispensable.execute(dispensable, csvContext);
+
+    assertEquals(StringUtils.joinWith(":", Dispensable.KEY_SIZE_CODE,
+            dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE)), result);
+  }
+
+  @Test
+  public void shouldFormatValidVaccineDispensable() throws Exception {
+    DispensableDto dto = new DispensableDto(null, "size-code", "route-of-administration",
+            "display-unit");
+    VaccineDispensable dispensable = (VaccineDispensable) Dispensable.createNew(dto);
+
+    String result = (String) formatDispensable.execute(dispensable, csvContext);
+
+    assertEquals(StringUtils.joinWith(":", Dispensable.KEY_SIZE_CODE,
+            dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE)), result);
+  }
+
+  @Test
+  public void shouldThrownExceptionWhenValueIsNotDispensableType() {
     String invalid = "invalid-type";
 
     expectedException.expect(SuperCsvCellProcessorException.class);

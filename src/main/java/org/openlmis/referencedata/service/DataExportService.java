@@ -21,12 +21,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import lombok.AccessLevel;
-import lombok.Setter;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.ExportableDataRepository;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
+import org.openlmis.referencedata.web.DataExportParams;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,7 @@ import org.springframework.stereotype.Service;
 public class DataExportService {
 
   private static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
-  private static final String REPOSITORY_NAME_SUFFIX = "Repository";
-  @Setter(AccessLevel.PRIVATE)
-  private String format;
+  private static final String REPOSITORY_NAME_SUFFIX = "Service";
 
   @Autowired
   private BeanFactory beanFactory;
@@ -46,65 +43,67 @@ public class DataExportService {
   /**
    * Return zip archive with files in specific format.
    *
-   * @param format    format of the files
-   * @param filenames files to be included in the zip
+   * @param params query parameters.
    * @return byte data in zip format
    */
-  public byte[] exportData(String format, String filenames) {
-    String[] files = filenames.split(",");
-    setFormat(format);
-    ByteArrayOutputStream outputStream = toZip(files);
+  public byte[] exportData(DataExportParams params) {
+    try (ByteArrayOutputStream outputStream = toZip(params)) {
 
-    return outputStream.toByteArray();
+      return outputStream.toByteArray();
+    } catch (IOException ex) {
+      throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    }
   }
 
-  private ByteArrayOutputStream toZip(String[] files) {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-    try (ZipOutputStream zip = new ZipOutputStream(baos)) {
-      for (Map.Entry<String, ByteArrayOutputStream> file : generateFiles(files).entrySet()) {
-        ZipEntry entry = new ZipEntry(file.getKey() + "." + format);
+  private ByteArrayOutputStream toZip(DataExportParams params) {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+         ZipOutputStream zip = new ZipOutputStream(baos)) {
+      for (Map.Entry<String, ByteArrayOutputStream> file : generateFiles(params).entrySet()) {
+        ZipEntry entry = new ZipEntry(file.getKey() + "." + params.getFormat());
         entry.setSize(file.getValue().toByteArray().length);
         zip.putNextEntry(entry);
         zip.write(file.getValue().toByteArray());
       }
-
       zip.closeEntry();
+
+      return baos;
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
-
-    return baos;
   }
 
-  private Map<String, ByteArrayOutputStream> generateFiles(String[] filenames) {
+  private Map<String, ByteArrayOutputStream> generateFiles(DataExportParams params) {
     Map<String, ByteArrayOutputStream> output = new HashMap<>();
+    String[] filenames = params.getData().split(",");
     for (String file : filenames) {
-      output.put(file, generateFile(file));
+      output.put(file, generateFile(params.getFormat(), file));
     }
     return output;
   }
 
-  private <T> ByteArrayOutputStream generateFile(String filename) {
-    DataFormatterService formatter;
-    ExportableDataRepository<T> repository;
-    ByteArrayOutputStream output;
-    try {
-      formatter = beanFactory.getBean(format + FORMATTER_SERVICE_NAME_SUFFIX,
-              DataFormatterService.class);
+  private <T> ByteArrayOutputStream generateFile(String format, String filename) {
+    try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+      DataFormatterService formatter = beanFactory.getBean(format
+              + FORMATTER_SERVICE_NAME_SUFFIX, DataFormatterService.class);
 
-      repository = beanFactory.getBean(filename
-              + REPOSITORY_NAME_SUFFIX, ExportableDataRepository.class);
+      ExportableDataService<T> service = beanFactory.getBean(filename
+              + REPOSITORY_NAME_SUFFIX, ExportableDataService.class);
 
-      List<T> data = repository.findAll();
-      output = new ByteArrayOutputStream();
+      List<T> data = service.findAll();
 
-      formatter.process(output, data, repository.getType());
+      formatter.process(output, data, service.getType());
+      return output;
     } catch (IOException | BeansException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
+  }
 
-    return output;
+  public interface ExportParams {
+
+    String getFormat();
+
+    String getData();
+
   }
 
 }

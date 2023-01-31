@@ -52,7 +52,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface OrderableRepository extends
         JpaRepository<Orderable, VersionIdentity>, OrderableRepositoryCustom,
-        BaseAuditableRepository<Orderable, VersionIdentity>, ExportableDataRepository<Orderable> {
+        BaseAuditableRepository<Orderable, VersionIdentity> {
 
   @Override
   <S extends Orderable> S save(S entity);
@@ -177,8 +177,4 @@ public interface OrderableRepository extends
           @Param("values") Iterable<String> values
   );
 
-  @Override
-  default Class<Orderable> getType() {
-    return Orderable.class;
-  }
 }

@@ -13,11 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.service;
 
 import java.util.List;
 
-public interface ExportableDataRepository<T> {
+public interface ExportableDataService<T> {
 
   List<T> findAll();
 
