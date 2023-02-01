@@ -124,9 +124,4 @@ public class BasicFacilityDto extends MinimalFacilityDto
     // unsupported operation
     return Maps.newHashMap();
   }
-
-  @Override
-  public void setExtraData(Map<String, Object> extraData) {
-    // unsupported operation
-  }
 }
