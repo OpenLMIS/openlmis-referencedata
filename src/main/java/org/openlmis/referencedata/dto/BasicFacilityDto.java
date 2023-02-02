@@ -17,6 +17,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
@@ -121,6 +122,6 @@ public class BasicFacilityDto extends MinimalFacilityDto
   @Override
   public Map<String, Object> getExtraData() {
     // unsupported operation
-    return null;
+    return Maps.newHashMap();
   }
 }
