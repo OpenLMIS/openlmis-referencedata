@@ -3,6 +3,7 @@
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7643](https://openlmis.atlassian.net/browse/OLMIS-7643): Add DataExportController and `GET /exportData` endpoint
+* [TZUP-280](https://openlmis.atlassian.net/browse/TZUP-280): Added ExtraData property in basic facility dto to enable extra data column in facility search API.
 * [OLMIS-7644](https://openlmis.atlassian.net/browse/OLMIS-7644): Add DataExportService and functionality to generate orderable.csv
 
 15.2.4 / 2022-10-07
@@ -14,7 +15,7 @@ New functionality added in a backwards-compatible manner:
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7443](https://openlmis.atlassian.net/browse/OLMIS-7443): GET /lots can filter by orderableId
 * [OLMIS-7444](https://openlmis.atlassian.net/browse/OLMIS-7444): Add LotValidator extension
-* [OLMIS-7452](https://openlmis.atlassian.net/browse/OLMIS-7452): Add CREATE_ORDER right and assign to users with REQUISITION_APPROVE
+* [OLMIS-7452](https://openlmis.atlassian.net/browse/OLMIS-7452): Add CREATE_ORDER right and assign to users with REQUISITION_APPROVE 
 * [OLMIS-6546](https://openlmis.atlassian.net/browse/OLMIS-6546): Add product code unique validation rule to OrderableValidator
 * [OLMIS-7501](https://openlmis.atlassian.net/browse/OLMIS-7501): Add CCE_INVENTORY_TRANSFER right
 
@@ -34,7 +35,7 @@ Improvements:
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7307](https://openlmis.atlassian.net/browse/OLMIS-7307): Added extension point for postprocess create and update products.
-
+  
 Improvements:
 * [OLMIS-7273](https://openlmis.atlassian.net/browse/OLMIS-7273): Improve performance of fetching orderables by ids.
 
@@ -71,7 +72,7 @@ New functionality added in a backwards-compatible manner:
   * Remove order by pageable SQL (not necessary in Spring Boot 2)
 * [OLMIS-3100](https://openlmis.atlassian.net/browse/OLMIS-3100): Removed stock adjustment reasons endpoint
 * [OLMIS-6941](https://openlmis.atlassian.net/browse/OLMIS-6941): Added missing pageable parameter when no supply partners configured.
-  Bug fixes:
+Bug fixes:
 * [OLMIS-6943](https://openlmis.atlassian.net/browse/OLMIS-6943): Added missing Json annotation to restore child orderables support
 * [OLMIS-6950](https://openlmis.atlassian.net/browse/OLMIS-6950): Added missing pagable parameter to fix users filter.
 
@@ -266,7 +267,7 @@ Improvements:
 
 Breaking changes:
 * [OLMIS-3600](https://openlmis.atlassian.net/browse/OLMIS-3600): Paginate and add get by ids
-  parameters to get users endpoint
+parameters to get users endpoint
 * [OLMIS-3448](https://openlmis.atlassian.net/browse/OLMIS-3448): Paginate minimal facilities endpoint
 * [OLMIS-2695](https://openlmis.atlassian.net/browse/OLMIS-2695): Paginate get all processing schedules endpoint.
 * [OLMIS-2695](https://openlmis.atlassian.net/browse/OLMIS-2695): Merged processing period search endpoints with get all periods endpoint. Convert endpoint to be pageable.
@@ -411,9 +412,9 @@ Bug fixes, security and performance improvements, also backwards-compatible:
 ==================
 
 * [OLMIS-2628](https://openlmis.atlassian.net/browse/OLMIS-2628):
-  Fixes 6.0.0 Reference Data migrations with wrong timestamps - this fixes problems with the database
-  migration from 5.0.0/5.0.1, by fixing wrong timestamps in migrations. It makes migrating from 6.0.0
-  to 6.0.1 problematic, hence we advise migrating straight to this version.
+Fixes 6.0.0 Reference Data migrations with wrong timestamps - this fixes problems with the database
+migration from 5.0.0/5.0.1, by fixing wrong timestamps in migrations. It makes migrating from 6.0.0
+ to 6.0.1 problematic, hence we advise migrating straight to this version.
 
 
 6.0.0 / 2017-05-26
@@ -430,8 +431,8 @@ New functionality added in a backwards-compatible manner:
 Breaking changes:
 
 * [OLMIS-1696](https://openlmis.atlassian.net/browse/OLMIS-1696):
-  In our medical commodities model, we changed how Orderables, TradeItems and CommodityTypes are associated - both internally to the Reference Data service, but also to external services.
-  Before, the code modeled this relationship as Orderables being an abstract base class to TradeItem and CommodityType. Orderable no longer are abstract, and TradeItem/CommodityType are not inherited, but rather having a "has a" relationship to Orderable.
+In our medical commodities model, we changed how Orderables, TradeItems and CommodityTypes are associated - both internally to the Reference Data service, but also to external services.
+Before, the code modeled this relationship as Orderables being an abstract base class to TradeItem and CommodityType. Orderable no longer are abstract, and TradeItem/CommodityType are not inherited, but rather having a "has a" relationship to Orderable.
   * CommodityType and TradeItem no longer inherit from Orderable.
   * Orderable, TradeItem and CommodityType all migrated to separate tables.
   * Orderable is no longer an abstract class - objects may be instantiated from it.
@@ -503,7 +504,7 @@ Dev and tooling updates made in a backwards-compatible manner:
 
 Breaking changes:
 * [OLMIS-2143](https://openlmis.atlassian.net/browse/OLMIS-2143),
-  [OLMIS-2202](https://openlmis.atlassian.net/browse/OLMIS-2202): Add pagination to the users search endpoint
+[OLMIS-2202](https://openlmis.atlassian.net/browse/OLMIS-2202): Add pagination to the users search endpoint
 * [OLMIS-1776](https://openlmis.atlassian.net/browse/OLMIS-1776): Trade Item: rename manufacturer for GS1.
   * TradeItem.manufacturer => TradeItem.manufacturerOfTradeItem
 * [OLMIS-1773](https://openlmis.atlassian.net/browse/OLMIS-1773): Orderable: rename packSize and name for GS1.
@@ -528,10 +529,10 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-1965](https://openlmis.atlassian.net/browse/OLMIS-1965): Add validation for existing products that are not a commodity type
 * [OLMIS-2027](https://openlmis.atlassian.net/browse/OLMIS-2027): Create unit and integration tests for repository/service/controller methods added during reporting rate/timeliness report development
 * [OLMIS-2148](https://openlmis.atlassian.net/browse/OLMIS-2148),
-  [OLMIS-633](https://openlmis.atlassian.net/browse/OLMIS-633),
-  [OLMIS-632](https://openlmis.atlassian.net/browse/OLMIS-632),
-  [OLMIS-629](https://openlmis.atlassian.net/browse/OLMIS-629)
-  Add new rights for stock manager role:
+[OLMIS-633](https://openlmis.atlassian.net/browse/OLMIS-633),
+[OLMIS-632](https://openlmis.atlassian.net/browse/OLMIS-632),
+[OLMIS-629](https://openlmis.atlassian.net/browse/OLMIS-629)
+Add new rights for stock manager role:
   * STOCK_INVENTORIES_EDIT
   * STOCK_ADJUST
   * STOCK_CARDS_VIEW
