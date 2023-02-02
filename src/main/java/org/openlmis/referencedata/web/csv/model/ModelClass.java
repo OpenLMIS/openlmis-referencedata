@@ -19,14 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.openlmis.referencedata.dto.BaseDto;
 
 /**
  * This class represents a Java model to which the csv row is mapped.
  */
 @Data
 @NoArgsConstructor
-public class ModelClass<T extends BaseDto> {
+public class ModelClass<T extends Object> {
 
   private Class<T> clazz;
 

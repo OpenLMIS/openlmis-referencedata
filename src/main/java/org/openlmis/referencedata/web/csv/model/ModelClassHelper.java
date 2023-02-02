@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.openlmis.referencedata.dto.BaseDto;
 
 /**
  * This class contains a list of {@link ModelField} for each dto class. It only retrieve class
@@ -30,7 +29,7 @@ import org.openlmis.referencedata.dto.BaseDto;
 class ModelClassHelper {
   private static final Map<Class<?>, List<ModelField>> MAP = Maps.newConcurrentMap();
 
-  static List<ModelField> getModelFields(Class<? extends BaseDto> clazz) {
+  static List<ModelField> getModelFields(Class<? extends Object> clazz) {
     return MAP.computeIfAbsent(clazz, ModelClassHelper::fieldsWithImportFieldAnnotation);
   }
 

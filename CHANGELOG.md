@@ -4,6 +4,7 @@
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7643](https://openlmis.atlassian.net/browse/OLMIS-7643): Add DataExportController and `GET /exportData` endpoint
 * [TZUP-280](https://openlmis.atlassian.net/browse/TZUP-280): Added ExtraData property in basic facility dto to enable extra data column in facility search API.
+* [OLMIS-7644](https://openlmis.atlassian.net/browse/OLMIS-7644): Add DataExportService and functionality to generate orderable.csv
 
 15.2.4 / 2022-10-07
 ==================

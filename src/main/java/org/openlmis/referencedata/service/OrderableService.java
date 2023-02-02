@@ -18,10 +18,10 @@ package org.openlmis.referencedata.service;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
-
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
@@ -34,7 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderableService {
+public class OrderableService implements ExportableDataService<Orderable> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderableService.class);
 
@@ -51,7 +51,7 @@ public class OrderableService {
    * @return the Page of orderables found, or an empty page.
    */
   public Page<Orderable> searchOrderables(@NotNull QueryOrderableSearchParams queryMap,
-      Pageable pageable) {
+                                          Pageable pageable) {
     LOGGER.info("search orderable query params: {}", queryMap);
 
     if (queryMap.isEmpty()) {
@@ -84,7 +84,7 @@ public class OrderableService {
    * @return the ZonedDateTime of latest last updated date.
    */
   public ZonedDateTime getLatestLastUpdatedDate(@NotNull QueryOrderableSearchParams queryParams,
-      Profiler profiler) {
+                                                Profiler profiler) {
 
     if (queryParams.isEmpty()) {
       LOGGER.info("Find latest modified date out of all orderables");
@@ -114,6 +114,16 @@ public class OrderableService {
               ZoneId.of(GMT));
     }
     return null;
+  }
+
+  @Override
+  public List<Orderable> findAll() {
+    return orderableRepository.findAll();
+  }
+
+  @Override
+  public Class<Orderable> getType() {
+    return Orderable.class;
   }
 
 }

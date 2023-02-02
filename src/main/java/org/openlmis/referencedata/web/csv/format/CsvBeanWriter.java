@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 import lombok.Getter;
-import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
@@ -37,7 +36,7 @@ import org.supercsv.prefs.CsvPreference;
 /**
  * This class has responsibility to instantiate a csvDozerBeanWriter from given inputStream.
  */
-class CsvBeanWriter<T extends BaseDto> {
+class CsvBeanWriter<T extends Object> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CsvBeanWriter.class);
 
@@ -65,7 +64,7 @@ class CsvBeanWriter<T extends BaseDto> {
     profiler.stop().log();
   }
 
-  void writeWithCellProcessors(List<? extends BaseDto> dtos) throws IOException {
+  void writeWithCellProcessors(List<? extends Object> dtos) throws IOException {
     Profiler profiler = new Profiler("CSV_WRITE_CELLS");
     profiler.setLogger(LOGGER);
 

@@ -36,6 +36,8 @@ public class CsvCellProcessors {
   public static final String COMMODITY_TYPE = "CommodityType";
   public static final String PROCESSING_PERIOD_TYPE = "ProcessingPeriod";
   public static final String POSITIVE_INT = "int";
+  public static final String POSITIVE_LONG = "long";
+  public static final String DISPENSABLE_TYPE = "Dispensable";
 
   private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
@@ -44,6 +46,7 @@ public class CsvCellProcessors {
     typeExportMappings.put(FACILITY_TYPE, new FormatFacility());
     typeExportMappings.put(COMMODITY_TYPE, new FormatCommodityType());
     typeExportMappings.put(PROCESSING_PERIOD_TYPE, new FormatProcessingPeriod());
+    typeExportMappings.put(DISPENSABLE_TYPE, new FormatDispensable());
 
     typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
@@ -55,7 +58,7 @@ public class CsvCellProcessors {
    * Get all parse processors for given headers.
    */
   public static List<CellProcessor> getParseProcessors(ModelClass modelClass,
-                                                        List<String> headers) {
+                                                       List<String> headers) {
     return getProcessors(modelClass, headers, true);
   }
 
@@ -63,7 +66,7 @@ public class CsvCellProcessors {
    * Get all format processors for given headers.
    */
   public static List<CellProcessor> getFormatProcessors(ModelClass modelClass,
-                                                   List<String> headers) {
+                                                        List<String> headers) {
     return getProcessors(modelClass, headers, false);
   }
 
