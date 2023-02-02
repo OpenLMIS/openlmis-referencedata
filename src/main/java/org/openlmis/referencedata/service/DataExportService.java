@@ -21,11 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
-import org.openlmis.referencedata.web.DataExportParams;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +44,7 @@ public class DataExportService {
    * @param params query parameters.
    * @return byte data in zip format
    */
-  public byte[] exportData(DataExportParams params) {
+  public byte[] exportData(ExportParams params) {
     try (ByteArrayOutputStream outputStream = toZip(params)) {
 
       return outputStream.toByteArray();
@@ -55,7 +53,7 @@ public class DataExportService {
     }
   }
 
-  private ByteArrayOutputStream toZip(DataExportParams params) {
+  private ByteArrayOutputStream toZip(ExportParams params) {
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
          ZipOutputStream zip = new ZipOutputStream(baos)) {
       for (Map.Entry<String, ByteArrayOutputStream> file : generateFiles(params).entrySet()) {
@@ -72,7 +70,7 @@ public class DataExportService {
     }
   }
 
-  private Map<String, ByteArrayOutputStream> generateFiles(DataExportParams params) {
+  private Map<String, ByteArrayOutputStream> generateFiles(ExportParams params) {
     Map<String, ByteArrayOutputStream> output = new HashMap<>();
     String[] filenames = params.getData().split(",");
     for (String file : filenames) {
