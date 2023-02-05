@@ -38,6 +38,10 @@ public class CsvCellProcessors {
   public static final String POSITIVE_INT = "int";
   public static final String POSITIVE_LONG = "long";
   public static final String DISPENSABLE_TYPE = "Dispensable";
+  public static final String PROGRAM_TYPE = "Program";
+  public static final String ORDERABLE_TYPE = "Orderable";
+  public static final String ORDERABLE_DISPLAY_CATEGORY_TYPE = "OrderableDisplayCategory";
+  public static final String MONEY_TYPE = "Money";
 
   private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
@@ -47,6 +51,10 @@ public class CsvCellProcessors {
     typeExportMappings.put(COMMODITY_TYPE, new FormatCommodityType());
     typeExportMappings.put(PROCESSING_PERIOD_TYPE, new FormatProcessingPeriod());
     typeExportMappings.put(DISPENSABLE_TYPE, new FormatDispensable());
+    typeExportMappings.put(PROGRAM_TYPE, new FormatProgram());
+    typeExportMappings.put(ORDERABLE_TYPE, new FormatOrderable());
+    typeExportMappings.put(ORDERABLE_DISPLAY_CATEGORY_TYPE, new FormatOrderableDisplayCategory());
+    typeExportMappings.put(MONEY_TYPE, new FormatMoney());
 
     typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());

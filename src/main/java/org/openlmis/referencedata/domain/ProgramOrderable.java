@@ -15,6 +15,12 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.MONEY_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.ORDERABLE_DISPLAY_CATEGORY_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.ORDERABLE_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_INT;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROGRAM_TYPE;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,51 +39,72 @@ import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @Entity
 @Table(name = "program_orderables", schema = "referencedata",
-    uniqueConstraints = @UniqueConstraint(
-        name = "unq_programid_orderableid_orderableversionnumber",
-        columnNames = {"programid", "orderableid", "orderableversionnumber"})
-    )
+        uniqueConstraints = @UniqueConstraint(
+                name = "unq_programid_orderableid_orderableversionnumber",
+                columnNames = {"programid", "orderableid", "orderableversionnumber"})
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("ProgramOrderable")
 public class ProgramOrderable extends BaseEntity {
 
+  private static final String CODE = "code";
+  private static final String PROGRAM = "program";
+  private static final String CATEGORY = "category";
+  private static final String DOSES_PER_PATIENT = "dosesPerPatient";
+  private static final String ACTIVE = "active";
+  private static final String FULL_SUPPLY = "fullSupply";
+  private static final String DISPLAY_ORDER = "displayOrder";
+  private static final String PRICE_PER_PACK = "pricePerPack";
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "programId", nullable = false)
   @Getter
   @Setter
+  @ImportField(name = PROGRAM, type = PROGRAM_TYPE, mandatory = true)
   private Program program;
 
   @ManyToOne
   @JoinColumns({
-      @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber",
-          nullable = false)
-      })
+          @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
+          @JoinColumn(name = "orderableVersionNumber", referencedColumnName = "versionNumber",
+                  nullable = false)
+  })
   @Getter
   @Setter
+  @ImportField(name = CODE, type = ORDERABLE_TYPE, mandatory = true)
   private Orderable product;
 
+  @Getter
+  @ImportField(name = DOSES_PER_PATIENT, type = POSITIVE_INT)
   private Integer dosesPerPatient;
 
   @Getter
+  @ImportField(name = ACTIVE, mandatory = true)
   private boolean active;
 
   @ManyToOne
   @JoinColumn(name = "orderableDisplayCategoryId", nullable = false)
   @Getter
+  @ImportField(name = CATEGORY, type = ORDERABLE_DISPLAY_CATEGORY_TYPE, mandatory = true)
   private OrderableDisplayCategory orderableDisplayCategory;
 
   @Getter
+  @ImportField(name = FULL_SUPPLY, mandatory = true)
   private boolean fullSupply;
+
+  @Getter
+  @ImportField(name = DISPLAY_ORDER, type = POSITIVE_INT, mandatory = true)
   private int displayOrder;
 
   @Getter
   @Setter
   @Type(type = "org.openlmis.referencedata.util.CustomSingleColumnMoneyUserType")
+  @ImportField(name = PRICE_PER_PACK, type = MONEY_TYPE)
   private Money pricePerPack;
 
   private ProgramOrderable(Program program,
@@ -173,7 +200,7 @@ public class ProgramOrderable extends BaseEntity {
     ProgramOrderable otherProgProduct = (ProgramOrderable) other;
 
     return Objects.equals(program, otherProgProduct.program)
-        && Objects.equals(product, otherProgProduct.product);
+            && Objects.equals(product, otherProgProduct.product);
   }
 
   @Override
@@ -190,7 +217,7 @@ public class ProgramOrderable extends BaseEntity {
   public static ProgramOrderable newInstance(Importer importer) {
     ProgramOrderable programOrderable = new ProgramOrderable();
     programOrderable.orderableDisplayCategory =
-        new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
+            new OrderableDisplayCategory(importer.getOrderableDisplayCategoryId());
     programOrderable.active = importer.isActive();
     programOrderable.fullSupply = importer.isFullSupply();
     programOrderable.displayOrder = importer.getDisplayOrder();
@@ -207,12 +234,12 @@ public class ProgramOrderable extends BaseEntity {
    */
   public void export(Exporter exporter) {
     exporter.setOrderableDisplayCategoryId(
-        orderableDisplayCategory.getId());
+            orderableDisplayCategory.getId());
     if (orderableDisplayCategory.getOrderedDisplayValue() != null) {
       exporter.setOrderableCategoryDisplayName(
-          orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
+              orderableDisplayCategory.getOrderedDisplayValue().getDisplayName());
       exporter.setOrderableCategoryDisplayOrder(
-          orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
+              orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder());
     }
     exporter.setProgramId(program.getId());
     exporter.setActive(active);

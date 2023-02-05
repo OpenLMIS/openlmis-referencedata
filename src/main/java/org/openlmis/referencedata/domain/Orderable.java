@@ -112,6 +112,7 @@ public class Orderable implements Versionable {
 
   @Embedded
   @Getter
+  @Setter
   @ImportField(name = PRODUCT_CODE, mandatory = true)
   private Code productCode;
 
