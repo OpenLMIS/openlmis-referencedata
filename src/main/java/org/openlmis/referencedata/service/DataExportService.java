@@ -32,8 +32,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataExportService {
 
-  private static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
-  private static final String REPOSITORY_NAME_SUFFIX = "Service";
+  public static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
+  public static final String SERVICE_NAME_SUFFIX = "Service";
 
   @Autowired
   private BeanFactory beanFactory;
@@ -85,7 +85,7 @@ public class DataExportService {
               + FORMATTER_SERVICE_NAME_SUFFIX, DataFormatterService.class);
 
       ExportableDataService<T> service = beanFactory.getBean(filename
-              + REPOSITORY_NAME_SUFFIX, ExportableDataService.class);
+              + SERVICE_NAME_SUFFIX, ExportableDataService.class);
 
       List<T> data = service.findAll();
 

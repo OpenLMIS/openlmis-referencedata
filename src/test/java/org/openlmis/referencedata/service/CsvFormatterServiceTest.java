@@ -15,34 +15,42 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.web.csv.format.CsvFormatter;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class CsvFormatterService implements DataFormatterService {
+@RunWith(MockitoJUnitRunner.class)
+public class CsvFormatterServiceTest {
 
-  @Autowired
+  @Mock
   private CsvFormatter csvFormatter;
 
-  /**
-   * Calls the process method of the {@link CsvFormatter} class that parses data into
-   * specific model.
-   *
-   * @param outputStream output stream to which the data will be written
-   * @param data         list of objects to be parsed
-   * @param type         class type of objects
-   * @param <T>          type of objects contained in data
-   */
-  @Override
-  public <T> void process(OutputStream outputStream, List<T> data, Class<T> type)
-          throws IOException {
-    csvFormatter.process(outputStream, new ModelClass(type), data);
+  @InjectMocks
+  private CsvFormatterService service;
+
+  @Test
+  public void shouldCallFormatterProcessMethod() throws IOException {
+    // given
+    OutputStream outputStream = mock(OutputStream.class);
+    List data = mock(List.class);
+    Class type = mock(Object.class).getClass();
+    ModelClass modelClass = new ModelClass<>(type);
+
+    // when
+    service.process(outputStream, data, type);
+
+    // then
+    verify(csvFormatter).process(outputStream, modelClass, data);
   }
 
 }
