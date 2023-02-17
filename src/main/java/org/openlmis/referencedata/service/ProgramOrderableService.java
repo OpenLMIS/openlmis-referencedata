@@ -15,34 +15,26 @@
 
 package org.openlmis.referencedata.service;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
-
-import org.openlmis.referencedata.web.csv.format.CsvFormatter;
-import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CsvFormatterService implements DataFormatterService {
+public class ProgramOrderableService implements ExportableDataService<ProgramOrderable> {
 
   @Autowired
-  private CsvFormatter csvFormatter;
+  private ProgramOrderableRepository programOrderableRepository;
 
-  /**
-   * Calls the process method of the {@link CsvFormatter} class that parses data into
-   * specific model.
-   *
-   * @param outputStream output stream to which the data will be written
-   * @param data         list of objects to be parsed
-   * @param type         class type of objects
-   * @param <T>          type of objects contained in data
-   */
   @Override
-  public <T> void process(OutputStream outputStream, List<T> data, Class<T> type)
-          throws IOException {
-    csvFormatter.process(outputStream, new ModelClass(type), data);
+  public List<ProgramOrderable> findAll() {
+    return programOrderableRepository.findAll();
+  }
+
+  @Override
+  public Class<ProgramOrderable> getType() {
+    return ProgramOrderable.class;
   }
 
 }

@@ -41,6 +41,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
@@ -306,4 +308,32 @@ public class OrderableServiceTest {
     verify(orderableRepository).findLatestModifiedDateByIds(queryMap.getIds());
     assertEquals(orderable2.getLastUpdated(), lastUpdated);
   }
+
+  @Test
+  public void shouldFindAllOrderables() {
+    // given
+    final int orderableListSize = orderableList.size();
+    when(orderableRepository.findAll()).thenReturn(orderableList);
+
+    // when
+    List<Orderable> allOrderables = orderableService.findAll();
+
+    // then
+    verify(orderableRepository).findAll();
+    assertEquals(orderableListSize, allOrderables.size());
+  }
+
+  @Test
+  public void shouldReturnOrderableType() {
+    // given
+    Orderable product = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"), 10, 4,
+            false, UUID.randomUUID(), 1L);
+
+    // when
+    Class<?> resultType = orderableService.getType();
+
+    // then
+    assertEquals(product.getClass(), resultType);
+  }
+
 }
