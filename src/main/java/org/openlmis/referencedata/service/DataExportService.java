@@ -27,6 +27,8 @@ import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,9 +36,14 @@ public class DataExportService {
 
   public static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
   public static final String SERVICE_NAME_SUFFIX = "Service";
+  public static final String DATA_EXPORT_MAPPING_PATH = "classpath:data-export/mapping/";
+  public static final String MAPPING_FILE_SUFFIX = "_mapping";
 
   @Autowired
   private BeanFactory beanFactory;
+
+  @Autowired
+  private ResourceLoader loader;
 
   /**
    * Return zip archive with files in specific format.
@@ -70,12 +77,16 @@ public class DataExportService {
     }
   }
 
-  private Map<String, ByteArrayOutputStream> generateFiles(ExportParams params) {
+  private Map<String, ByteArrayOutputStream> generateFiles(ExportParams params)
+          throws IOException {
     Map<String, ByteArrayOutputStream> output = new HashMap<>();
     String[] filenames = params.getData().split(",");
+
     for (String file : filenames) {
       output.put(file, generateFile(params.getFormat(), file));
+      output.put(file + MAPPING_FILE_SUFFIX, getMappingFile(params.getFormat(), file));
     }
+
     return output;
   }
 
@@ -92,6 +103,19 @@ public class DataExportService {
       formatter.process(output, data, service.getType());
       return output;
     } catch (IOException | BeansException ex) {
+      throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    }
+  }
+
+  private ByteArrayOutputStream getMappingFile(String format, String filename) throws IOException {
+    try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+      String mappingFilePath = String.format("%s/%s.%s", DATA_EXPORT_MAPPING_PATH + format,
+              filename + MAPPING_FILE_SUFFIX, format);
+      Resource resource = loader.getResource(mappingFilePath);
+      output.write(resource.getInputStream());
+
+      return output;
+    } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
   }
