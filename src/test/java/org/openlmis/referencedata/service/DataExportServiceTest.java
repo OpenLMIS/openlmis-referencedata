@@ -154,6 +154,15 @@ public class DataExportServiceTest {
     dataExportService.exportData(new DataExportParams(queryParamsMap));
   }
 
+  @Test(expected = ValidationMessageException.class)
+  public void shouldReturnExceptionIfFilenameContainsParentDirectoryIndicators() {
+    final String dataWithParentDirIndicator = "../../../data-value";
+    queryParamsMap.replace("data", dataWithParentDirIndicator);
+    setPreconditionsForServices();
+
+    dataExportService.exportData(new DataExportParams(queryParamsMap));
+  }
+
   private void setPreconditionsForServices() {
     doAnswer(invocation -> orderableService).when(beanFactory).getBean(anyString(),
             eq(ExportableDataService.class));

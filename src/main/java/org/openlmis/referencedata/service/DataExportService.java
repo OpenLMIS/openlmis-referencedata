@@ -16,11 +16,14 @@
 package org.openlmis.referencedata.service;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
@@ -36,7 +39,7 @@ public class DataExportService {
 
   public static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
   public static final String SERVICE_NAME_SUFFIX = "Service";
-  public static final String DATA_EXPORT_MAPPING_PATH = "classpath:data-export/mapping/";
+  public static final String DATA_EXPORT_MAPPING_PATH = "data-export/mapping/";
   public static final String MAPPING_FILE_SUFFIX = "_mapping";
 
   @Autowired
@@ -108,9 +111,8 @@ public class DataExportService {
   }
 
   private ByteArrayOutputStream getMappingFile(String format, String filename) throws IOException {
+    String mappingFilePath = buildFilePath(format, filename);
     try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
-      String mappingFilePath = String.format("%s/%s.%s", DATA_EXPORT_MAPPING_PATH + format,
-              filename + MAPPING_FILE_SUFFIX, format);
       Resource resource = loader.getResource(mappingFilePath);
       output.write(resource.getInputStream());
 
@@ -118,6 +120,17 @@ public class DataExportService {
     } catch (IOException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
+  }
+
+  private String buildFilePath(String format, String filename) {
+    String basePath = String.format("%s%s/", DATA_EXPORT_MAPPING_PATH, format);
+    String file = String.format("%s%s.%s", filename, MAPPING_FILE_SUFFIX, format);
+    Path filePath = Paths.get(basePath, file);
+
+    if (!filePath.normalize().startsWith(basePath)) {
+      throw new ValidationMessageException("The filename \"" + filename + "\" is invalid");
+    }
+    return "classpath:" + filePath;
   }
 
   public interface ExportParams {
