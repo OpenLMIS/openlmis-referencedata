@@ -7,6 +7,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-7644](https://openlmis.atlassian.net/browse/OLMIS-7644): Add DataExportService and functionality to generate orderable.csv
 * [OLMIS-7646](https://openlmis.atlassian.net/browse/OLMIS-7646): Add functionality to generate programOrderable.csv
 * [OLMIS-7645](https://openlmis.atlassian.net/browse/OLMIS-7645): Add functionality to generate orderableIdentifier.csv
+* [OLMIS-7647](https://openlmis.atlassian.net/browse/OLMIS-7647): Add functionality to generate tradeItem.csv
 
 15.2.4 / 2022-10-07
 ==================
