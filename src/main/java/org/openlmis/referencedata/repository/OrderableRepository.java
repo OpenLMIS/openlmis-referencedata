@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.persistence.QueryHint;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
+import org.openlmis.referencedata.dto.OrderableIdentifierCsvModel;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -176,5 +176,8 @@ public interface OrderableRepository extends
           @Param("key") String key,
           @Param("values") Iterable<String> values
   );
+
+  @Query(nativeQuery = true)
+  List<OrderableIdentifierCsvModel> findAllOrderableIdentifierCsvModels();
 
 }
