@@ -33,6 +33,8 @@ import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -42,10 +44,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
@@ -66,6 +72,7 @@ import org.openlmis.referencedata.domain.VersionIdentity.VersionImporter;
 import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableChildDto;
+import org.openlmis.referencedata.dto.OrderableIdentifierCsvModel;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.web.csv.model.ImportField;
 
@@ -95,6 +102,28 @@ import org.openlmis.referencedata.web.csv.model.ImportField;
                 @NamedSubgraph(name = DISPENSABLE,
                         attributeNodes = @NamedAttributeNode("attributes"))
         })
+@NamedNativeQueries(
+        @NamedNativeQuery(name = "Orderable.findAllOrderableIdentifierCsvModels",
+                query = "select oig.key, o.code \n"
+                        + "from (select key , value, orderableid, max(orderableversionnumber) \n"
+                        + "from referencedata.orderable_identifiers \n"
+                        + "group by key, value, orderableid) oig \n"
+                        + "left outer join referencedata.orderables o \n"
+                        + "on oig.orderableid = o.id ",
+                resultSetMapping = "Orderable.orderableIdentifierCsvModel")
+)
+@SqlResultSetMappings(
+        @SqlResultSetMapping(
+                name = "Orderable.orderableIdentifierCsvModel",
+                classes = @ConstructorResult(
+                        targetClass = OrderableIdentifierCsvModel.class,
+                        columns = {
+                                @ColumnResult(name = "key", type = String.class),
+                                @ColumnResult(name = "code", type = String.class)
+                        }
+                )
+        )
+)
 public class Orderable implements Versionable {
 
   private static final int FETCH_SIZE = 1000;
@@ -127,17 +156,14 @@ public class Orderable implements Versionable {
   private String description;
 
   @Getter
-  @Setter
   @ImportField(name = PACK_ROUNDING_THRESHOLD, type = POSITIVE_LONG, mandatory = true)
   private long packRoundingThreshold;
 
   @Getter
-  @Setter
   @ImportField(name = PACK_SIZE, type = POSITIVE_LONG, mandatory = true)
   private long netContent;
 
   @Getter
-  @Setter
   @ImportField(name = ROUND_TO_ZERO, mandatory = true)
   private boolean roundToZero;
 
@@ -322,7 +348,7 @@ public class Orderable implements Versionable {
    *
    * @param program the Program this product is (maybe) in.
    * @return the association to the given {@link Program}, or null if this product is not in the
-   *        given program or is marked inactive.
+   *     given program or is marked inactive.
    */
   public ProgramOrderable getProgramOrderable(Program program) {
     for (ProgramOrderable programOrderable : programOrderables) {
@@ -500,3 +526,4 @@ public class Orderable implements Versionable {
     VolumeMeasurement.Importer getInBoxCubeDimension();
   }
 }
+
