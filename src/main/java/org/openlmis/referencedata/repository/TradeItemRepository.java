@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.repository.custom.TradeItemRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +46,8 @@ public interface TradeItemRepository
       + " ",
       nativeQuery = true)
   Page<TradeItem> findAllWithoutSnapshots(Pageable pageable);
+
+  @Query(nativeQuery = true)
+  List<TradeItemCsvModel> findAllTradeItemCsvModels();
+
 }

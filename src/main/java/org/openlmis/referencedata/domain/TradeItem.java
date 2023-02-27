@@ -20,16 +20,24 @@ import java.util.List;
 import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SqlResultSetMapping;
+import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.openlmis.referencedata.dto.TradeItemClassificationDto;
+import org.openlmis.referencedata.dto.TradeItemCsvModel;
 
 /**
  * TradeItems represent branded/produced/physical products.  A TradeItem is used for Product's that
@@ -42,6 +50,32 @@ import org.openlmis.referencedata.dto.TradeItemClassificationDto;
  *   <li>a MSRP</li>
  * </ul>
  */
+@NamedNativeQueries(
+        @NamedNativeQuery(name = "TradeItem.findAllTradeItemCsvModels",
+                query = "select ti.manufactureroftradeitem, oio.code \n"
+                        + "from referencedata.trade_items ti, \n"
+                        + "(select oi.value, o.code, MAX(o.versionnumber) \n"
+                        + "from referencedata.orderable_identifiers oi \n"
+                        + "inner join referencedata.orderables o \n"
+                        + "on oi.orderableid = o.id \n"
+                        + "where oi.\"key\" = 'tradeItem' \n"
+                        + "group by oi.value, o.code) as oio \n"
+                        + "where ti.id = cast(oio.value as uuid) ",
+                resultSetMapping = "TradeItem.tradeItemCsvModel")
+)
+@SqlResultSetMappings(
+        @SqlResultSetMapping(
+                name = "TradeItem.tradeItemCsvModel",
+                classes = @ConstructorResult(
+                        targetClass = TradeItemCsvModel.class,
+                        columns = {
+                                @ColumnResult(name = "code", type = String.class),
+                                @ColumnResult(name = "manufacturerOfTradeItem",
+                                        type = String.class)
+                        }
+                )
+        )
+)
 @Entity
 @Table(name = "trade_items", schema = "referencedata")
 @NoArgsConstructor
