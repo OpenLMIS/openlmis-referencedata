@@ -27,7 +27,9 @@ import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.service.DataExportService.FORMATTER_SERVICE_NAME_SUFFIX;
 import static org.openlmis.referencedata.service.DataExportService.SERVICE_NAME_SUFFIX;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +49,8 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.web.DataExportParams;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataExportServiceTest {
@@ -55,8 +59,22 @@ public class DataExportServiceTest {
 
   private Map<String, String> queryParamsMap;
 
+  private final InputStream inputStream = new ByteArrayInputStream("test-input-data".getBytes());
+
   @Mock
   private BeanFactory beanFactory;
+
+  @Mock
+  private ResourceLoader loader;
+
+  @Mock
+  private CsvFormatterService csvFormatterService;
+
+  @Mock
+  private OrderableService orderableService;
+
+  @Mock
+  private Resource resource;
 
   @InjectMocks
   private DataExportService dataExportService;
@@ -78,15 +96,12 @@ public class DataExportServiceTest {
     Orderable product2 = new Orderable(Code.code("paracetamol"), Dispensable.createNew(EACH), 10, 4,
             false, UUID.randomUUID(), 1L);
     List<Orderable> productList = Arrays.asList(product1, product2);
-    CsvFormatterService csvFormatterService = mock(CsvFormatterService.class);
-    OrderableService orderableService = mock(OrderableService.class);
 
-    doAnswer(invocation -> orderableService).when(beanFactory).getBean(anyString(),
-            eq(ExportableDataService.class));
-    doAnswer(invocation -> csvFormatterService).when(beanFactory).getBean(anyString(),
-            eq(DataFormatterService.class));
+    setPreconditionsForServices();
     when(orderableService.findAll()).thenReturn(productList);
     when(orderableService.getType()).thenReturn(Orderable.class);
+    when(loader.getResource(anyString())).thenReturn(resource);
+    when(resource.getInputStream()).thenReturn(inputStream);
 
     byte[] result = dataExportService.exportData(new DataExportParams(queryParamsMap));
 
@@ -116,21 +131,43 @@ public class DataExportServiceTest {
   }
 
   @Test
-  public void shouldReturnArrayOfBytesIfNoDataFound() {
+  public void shouldReturnArrayOfBytesIfNoDataFound() throws IOException {
     List<Orderable> emptyProductList = Lists.emptyList();
-    CsvFormatterService csvFormatterService = mock(CsvFormatterService.class);
-    OrderableService orderableService = mock(OrderableService.class);
 
-    doAnswer(invocation -> orderableService).when(beanFactory).getBean(anyString(),
-            eq(ExportableDataService.class));
-    doAnswer(invocation -> csvFormatterService).when(beanFactory).getBean(anyString(),
-            eq(DataFormatterService.class));
+    setPreconditionsForServices();
     when(orderableService.findAll()).thenReturn(emptyProductList);
+    when(loader.getResource(anyString())).thenReturn(resource);
+    when(resource.getInputStream()).thenReturn(inputStream);
 
     byte[] result = dataExportService.exportData(new DataExportParams(queryParamsMap));
 
     assertThat(result, is(notNullValue()));
     assertThat(result, is(instanceOf(byte[].class)));
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldReturnExceptionIfNoMappingFileFound() throws IOException {
+    setPreconditionsForServices();
+    when(loader.getResource(anyString())).thenReturn(resource);
+    when(resource.getInputStream()).thenThrow(IOException.class);
+
+    dataExportService.exportData(new DataExportParams(queryParamsMap));
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldReturnExceptionIfFilenameContainsParentDirectoryIndicators() {
+    final String dataWithParentDirIndicator = "../../../data-value";
+    queryParamsMap.replace("data", dataWithParentDirIndicator);
+    setPreconditionsForServices();
+
+    dataExportService.exportData(new DataExportParams(queryParamsMap));
+  }
+
+  private void setPreconditionsForServices() {
+    doAnswer(invocation -> orderableService).when(beanFactory).getBean(anyString(),
+            eq(ExportableDataService.class));
+    doAnswer(invocation -> csvFormatterService).when(beanFactory).getBean(anyString(),
+            eq(DataFormatterService.class));
   }
 
 }

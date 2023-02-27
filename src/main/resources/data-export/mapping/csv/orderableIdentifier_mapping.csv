@@ -1,0 +1,4 @@
+from,to,type,entityName,defaultValue
+key,key,DIRECT,,
+productCode,value,TO_ID_BY_PRODUCT_CODE,TradeItem,
+productCode,orderableId,TO_ID_BY_PRODUCT_CODE,Orderable,

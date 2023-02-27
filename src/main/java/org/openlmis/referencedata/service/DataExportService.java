@@ -16,17 +16,22 @@
 package org.openlmis.referencedata.service;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,9 +39,14 @@ public class DataExportService {
 
   public static final String FORMATTER_SERVICE_NAME_SUFFIX = "FormatterService";
   public static final String SERVICE_NAME_SUFFIX = "Service";
+  public static final String DATA_EXPORT_MAPPING_PATH = "data-export/mapping/";
+  public static final String MAPPING_FILE_SUFFIX = "_mapping";
 
   @Autowired
   private BeanFactory beanFactory;
+
+  @Autowired
+  private ResourceLoader loader;
 
   /**
    * Return zip archive with files in specific format.
@@ -70,12 +80,16 @@ public class DataExportService {
     }
   }
 
-  private Map<String, ByteArrayOutputStream> generateFiles(ExportParams params) {
+  private Map<String, ByteArrayOutputStream> generateFiles(ExportParams params)
+          throws IOException {
     Map<String, ByteArrayOutputStream> output = new HashMap<>();
     String[] filenames = params.getData().split(",");
+
     for (String file : filenames) {
       output.put(file, generateFile(params.getFormat(), file));
+      output.put(file + MAPPING_FILE_SUFFIX, getMappingFile(params.getFormat(), file));
     }
+
     return output;
   }
 
@@ -94,6 +108,29 @@ public class DataExportService {
     } catch (IOException | BeansException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
     }
+  }
+
+  private ByteArrayOutputStream getMappingFile(String format, String filename) throws IOException {
+    String mappingFilePath = buildFilePath(format, filename);
+    try (ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+      Resource resource = loader.getResource(mappingFilePath);
+      output.write(resource.getInputStream());
+
+      return output;
+    } catch (IOException ex) {
+      throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
+    }
+  }
+
+  private String buildFilePath(String format, String filename) {
+    String basePath = String.format("%s%s/", DATA_EXPORT_MAPPING_PATH, format);
+    String file = String.format("%s%s.%s", filename, MAPPING_FILE_SUFFIX, format);
+    Path filePath = Paths.get(basePath, file);
+
+    if (!filePath.normalize().startsWith(basePath)) {
+      throw new ValidationMessageException("The filename \"" + filename + "\" is invalid");
+    }
+    return "classpath:" + filePath;
   }
 
   public interface ExportParams {
