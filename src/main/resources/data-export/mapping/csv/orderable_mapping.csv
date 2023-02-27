@@ -1,0 +1,10 @@
+from,to,type,entityName,defaultValue
+productCode,productCode,DIRECT,,
+description,description,DIRECT,,
+name,fullProductName,DIRECT,,
+packRoundingThreshold,packRoundingThreshold,DIRECT,,
+packSize,netContent,DIRECT,,
+roundToZero,roundToZero,DIRECT,,
+dispensable,dispensable,TO_OBJECT,,
+productCode,identifiers,FIND_TRADE_ITEM_FROM_FILE_BY_PRODUCT_CODE,TradeItems.csv,
+productCode,programs,TO_ARRAY_FROM_FILE_BY_CODE,ProgramOrderables.csv,
