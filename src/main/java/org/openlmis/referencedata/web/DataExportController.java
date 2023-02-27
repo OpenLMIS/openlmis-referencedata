@@ -29,6 +29,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.DataExportService;
 import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -43,6 +44,7 @@ public class DataExportController extends BaseController {
 
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/exportData";
   public static final String ZIP_MEDIA_TYPE = "application/zip";
+  private static final String RESPONSE_FILE_NAME = "OLMIS_configuration_data.zip";
 
   @Autowired
   DataExportService dataExportService;
@@ -64,6 +66,7 @@ public class DataExportController extends BaseController {
 
     return ResponseEntity.ok()
             .contentType(MediaType.valueOf(ZIP_MEDIA_TYPE))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + RESPONSE_FILE_NAME)
             .body(dataExportService.exportData(new DataExportParams(requestParams)));
   }
 
