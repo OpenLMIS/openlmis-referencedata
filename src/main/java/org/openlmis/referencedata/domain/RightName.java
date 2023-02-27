@@ -38,6 +38,7 @@ public class RightName {
   public static final String SYSTEM_NOTIFICATIONS_MANAGE = "SYSTEM_NOTIFICATIONS_MANAGE";
   public static final String LOTS_MANAGE = "LOTS_MANAGE";
   public static final String ORDER_CREATE = "ORDER_CREATE";
+  public static final String DATA_EXPORT = "DATA_EXPORT";
 
   private RightName() {
     throw new UnsupportedOperationException();

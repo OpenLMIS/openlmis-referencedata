@@ -16,7 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
-import static org.openlmis.referencedata.util.messagekeys.SystemNotificationMessageKeys.ERROR_INVALID_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_INVALID_PARAMS;
 
 import java.util.List;
 import java.util.Map;
@@ -28,8 +28,8 @@ import org.openlmis.referencedata.util.Message;
 @ToString
 public final class DataExportParams implements DataExportService.ExportParams {
 
-  private static final String FORMAT = "format";
-  private static final String DATA = "data";
+  public static final String FORMAT = "format";
+  public static final String DATA = "data";
 
   private static final List<String> ALL_PARAMETERS = asList(FORMAT, DATA);
 
@@ -57,7 +57,8 @@ public final class DataExportParams implements DataExportService.ExportParams {
   }
 
   /**
-   * Checks if query params are valid. Returns false if any provided param is not on supported list.
+   * Checks if query params are valid. Throws an exception if any provided param is not on
+   * supported list.
    */
   private void validate() {
     if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
