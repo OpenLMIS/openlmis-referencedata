@@ -75,6 +75,8 @@ public abstract class MessageKeys {
   protected static final String PROVIDED = "provided";
   protected static final String ASSIGNED = "isAlreadyAssigned";
   protected static final String NOT_TOGETHER = "notTogether";
+  protected static final String PARAMETER = "parameter";
+  protected static final String DATA = "data";
 
   // Entities
   protected static final String LOT = "lot";
@@ -107,6 +109,7 @@ public abstract class MessageKeys {
   protected static final String FHIR = "fhir";
   protected static final String SUPPLY_PARTNER = "supplyPartner";
   protected static final String SYSTEM_NOTIFICATION = "systemNotification";
+  protected static final String DATA_EXPORT = "dataExport";
 
   // Common to subclasses
   protected static final String EMAIL = "email";

@@ -13,38 +13,21 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.util.messagekeys;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.MockitoAnnotations.initMocks;
+public abstract class DataExportMessageKeys extends MessageKeys {
 
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+  private static final String ERROR = join(SERVICE_ERROR, DATA_EXPORT);
 
-public class DataExportControllerTest {
+  private static final String ERROR_MISSING = join(ERROR, MISSING);
 
-  @InjectMocks
-  private DataExportController controller;
+  public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
+  public static final String ERROR_MISSING_FORMAT_PARAMETER =
+          join(ERROR_MISSING, FORMAT, PARAMETER);
 
-  /**
-   * Constructor for test.
-   */
-  public DataExportControllerTest() {
-    initMocks(this);
-  }
+  public static final String ERROR_MISSING_DATA_PARAMETER =
+          join(ERROR_MISSING, DATA, PARAMETER);
 
-  @Test
-  public void shouldReturnHttp200OkSuccessStatusResponse() {
-    //given
-    String queryParamValue = "test-data-value";
-
-    //when
-    ResponseEntity response = controller.exportData(queryParamValue);
-
-    //then
-    assertThat(response.getStatusCode().value()).isEqualTo(HttpStatus.OK.value());
-  }
+  public static final String ERROR_LACK_PARAMS = join(ERROR, LACKS_PARAMETERS);
 
 }
