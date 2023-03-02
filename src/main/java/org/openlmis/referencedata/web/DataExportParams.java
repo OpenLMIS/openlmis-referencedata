@@ -15,10 +15,10 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Arrays.asList;
-import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_INVALID_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_LACK_PARAMS;
+import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_MISSING_DATA_PARAMETER;
+import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_MISSING_FORMAT_PARAMETER;
 
-import java.util.List;
 import java.util.Map;
 import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -31,8 +31,6 @@ public final class DataExportParams implements DataExportService.ExportParams {
   public static final String FORMAT = "format";
   public static final String DATA = "data";
 
-  private static final List<String> ALL_PARAMETERS = asList(FORMAT, DATA);
-
   private final Map<String, String> queryParams;
 
   public DataExportParams(Map<String, String> queryParams) {
@@ -42,27 +40,24 @@ public final class DataExportParams implements DataExportService.ExportParams {
 
   @Override
   public String getFormat() {
-    if (!queryParams.containsKey(FORMAT)) {
-      return null;
-    }
     return queryParams.get(FORMAT);
   }
 
   @Override
   public String getData() {
-    if (!queryParams.containsKey(DATA)) {
-      return null;
-    }
     return queryParams.get(DATA);
   }
 
   /**
-   * Checks if query params are valid. Throws an exception if any provided param is not on
-   * supported list.
+   * Checks if all params are present. Throws an exception if any parameter is missing.
    */
   private void validate() {
-    if (!ALL_PARAMETERS.containsAll(queryParams.keySet())) {
-      throw new ValidationMessageException(new Message(ERROR_INVALID_PARAMS));
+    if (queryParams.isEmpty()) {
+      throw new ValidationMessageException(new Message(ERROR_LACK_PARAMS));
+    } else if (!queryParams.containsKey(DATA)) {
+      throw new ValidationMessageException(new Message(ERROR_MISSING_DATA_PARAMETER));
+    } else if (!queryParams.containsKey(FORMAT)) {
+      throw new ValidationMessageException(new Message(ERROR_MISSING_FORMAT_PARAMETER));
     }
   }
 }
