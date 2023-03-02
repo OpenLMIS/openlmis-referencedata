@@ -116,15 +116,6 @@ public class DataExportControllerIntegrationTest extends BaseWebIntegrationTest 
   }
 
   @Test
-  public void shouldReturnBadRequestWhenUnsupportedParameterIsProvided() {
-    queryParamsMap.put("redundant-param-key", "redundant-param-value");
-
-    String response = getPathAsString();
-
-    assertEquals(response, DataExportMessageKeys.ERROR_INVALID_PARAMS);
-  }
-
-  @Test
   public void shouldReturnBadRequestWhenNoParametersProvided() {
     queryParamsMap.clear();
 

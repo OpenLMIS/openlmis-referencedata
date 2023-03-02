@@ -15,19 +15,11 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_LACK_PARAMS;
-import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_MISSING_DATA_PARAMETER;
-import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_MISSING_FORMAT_PARAMETER;
 import static org.openlmis.referencedata.web.DataExportController.RESOURCE_PATH;
-import static org.openlmis.referencedata.web.DataExportParams.DATA;
-import static org.openlmis.referencedata.web.DataExportParams.FORMAT;
 
 import java.util.Map;
-
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.service.DataExportService;
-import org.openlmis.referencedata.util.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -62,22 +54,11 @@ public class DataExportController extends BaseController {
   @ResponseBody
   public ResponseEntity<byte[]> exportData(@RequestParam Map<String, String> requestParams) {
     rightService.checkAdminRight(RightName.DATA_EXPORT);
-    checkRequiredParams(requestParams);
 
     return ResponseEntity.ok()
             .contentType(MediaType.valueOf(ZIP_MEDIA_TYPE))
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + RESPONSE_FILE_NAME)
             .body(dataExportService.exportData(new DataExportParams(requestParams)));
-  }
-
-  private void checkRequiredParams(Map<String, String> params) {
-    if (params.isEmpty()) {
-      throw new ValidationMessageException(new Message(ERROR_LACK_PARAMS));
-    } else if (!params.containsKey(DATA)) {
-      throw new ValidationMessageException(new Message(ERROR_MISSING_DATA_PARAMETER));
-    } else if (!params.containsKey(FORMAT)) {
-      throw new ValidationMessageException(new Message(ERROR_MISSING_FORMAT_PARAMETER));
-    }
   }
 
 }
