@@ -17,59 +17,56 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.openlmis.referencedata.web.DataExportParams.DATA;
+import static org.openlmis.referencedata.web.DataExportParams.FORMAT;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
 public class DataExportParamsTest {
 
-  private static final String VALUE = "test";
+  private static final String VALUE = "test-value";
+
+  private Map<String, String> queryMap;
+
+  @Before
+  public void setUp() {
+    queryMap = new HashMap<>();
+    queryMap.put(FORMAT, "init-format-value");
+    queryMap.put(DATA, "init-data-value");
+  }
 
   @Test
   public void getFormatShouldReturnValueForKeyFormat() {
-    Map<String, String> queryParamsMap = new HashMap<String, String>() {{
-        put("format", VALUE);
-      }
-    };
-    DataExportParams params = new DataExportParams(queryParamsMap);
+    queryMap.replace(FORMAT, VALUE);
+    DataExportParams params = new DataExportParams(queryMap);
 
     assertEquals(VALUE, params.getFormat());
   }
 
   @Test
-  public void getFormatShouldReturnNullIfMapDoesNotContainKeyFormat() {
-    DataExportParams params = new DataExportParams(new HashMap<>());
-
-    assertNull(VALUE, params.getFormat());
-  }
-
-  @Test
   public void getDataShouldReturnValueForKeyData() {
-    Map<String, String> queryParamsMap = new HashMap<String, String>() {{
-        put("data", VALUE);
-      }
-    };
-    DataExportParams params = new DataExportParams(queryParamsMap);
+    queryMap.replace(DATA, VALUE);
+    DataExportParams params = new DataExportParams(queryMap);
 
     assertEquals(VALUE, params.getData());
   }
 
-  @Test
-  public void getDataShouldReturnNullIfMapDoesNotContainKeyData() {
-    DataExportParams params = new DataExportParams(new HashMap<>());
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrownExceptionWhenFormatParameterIsMissing() {
+    queryMap.remove(FORMAT);
+    DataExportParams params = new DataExportParams(queryMap);
 
-    assertNull(VALUE, params.getData());
+    assertNull(params);
   }
 
   @Test(expected = ValidationMessageException.class)
-  public void shouldThrownExceptionWhenProvidedParamIsNotOnSupportedList() {
-    Map<String, String> queryParamsMap = new HashMap<String, String>() {{
-        put("some-param", VALUE);
-      }
-    };
-    DataExportParams params = new DataExportParams(queryParamsMap);
+  public void shouldThrownExceptionWhenDataParameterIsMissing() {
+    queryMap.remove(DATA);
+    DataExportParams params = new DataExportParams(queryMap);
 
     assertNull(params);
   }

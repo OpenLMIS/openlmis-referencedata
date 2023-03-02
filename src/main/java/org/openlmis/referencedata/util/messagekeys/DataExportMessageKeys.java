@@ -21,7 +21,6 @@ public abstract class DataExportMessageKeys extends MessageKeys {
 
   private static final String ERROR_MISSING = join(ERROR, MISSING);
 
-  public static final String ERROR_INVALID_PARAMS = join(ERROR, INVALID_PARAMS);
   public static final String ERROR_MISSING_FORMAT_PARAMETER =
           join(ERROR_MISSING, FORMAT, PARAMETER);
 
