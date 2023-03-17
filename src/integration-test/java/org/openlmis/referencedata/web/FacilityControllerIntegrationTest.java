@@ -88,6 +88,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String PROGRAM_ID = "programId";
   private static final String RESOURCE_URL = "/api/facilities";
   private static final String MINIMAL_URL = RESOURCE_URL + "/minimal";
+  private static final String FULL_URL = RESOURCE_URL + "/full";
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String SEARCH_FACILITIES = RESOURCE_URL + "/search";
   private static final String BYBOUNDARY_URL = RESOURCE_URL + "/byBoundary";
@@ -514,6 +515,70 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(200)
         .extract().as(PageDto.class);
+
+    assertEquals(storedFacilities.size(), response.getContent().size());
+    assertEquals(storedFacilities.size(), response.getNumberOfElements());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
+  }
+
+  @Test
+  public void getFullRepresentationFacilitiesShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured.given()
+            .when()
+            .get(FULL_URL)
+            .then()
+            .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getFullRepresentationFacilitiesShouldSearchWithEmptyParamsWhenNoParamsProvided() {
+    List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
+            .withSupportedProgram(program).build());
+    given(facilityService.searchFacilities(new FacilitySearchParams(new LinkedMultiValueMap<>()),
+            pageable)).willReturn(Pagination.getPage(storedFacilities, PageRequest.of(0, 10)));
+
+    PageDto response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .when()
+            .get(FULL_URL)
+            .then()
+            .statusCode(200)
+            .extract().as(PageDto.class);
+
+    assertEquals(storedFacilities.size(), response.getContent().size());
+    assertEquals(storedFacilities.size(), response.getNumberOfElements());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+    verifyZeroInteractions(rightService);
+  }
+
+  @Test
+  public void getFullRepresentationFacilitiesShouldSearchWithParamsWhenParamsProvided() {
+    List<Facility> storedFacilities = asList(facility, new FacilityDataBuilder()
+            .withSupportedProgram(program).build());
+    MultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    UUID facilityIdOne = UUID.randomUUID();
+    UUID facilityIdTwo = UUID.randomUUID();
+    queryMap.add("id", facilityIdOne.toString());
+    queryMap.add("id", facilityIdTwo.toString());
+
+    given(facilityService.searchFacilities(new FacilitySearchParams(queryMap), pageable))
+            .willReturn(Pagination.getPage(storedFacilities, PageRequest.of(0, 10)));
+
+    PageDto response = restAssured
+            .given()
+            .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+            .queryParam("id", facilityIdOne)
+            .queryParam("id", facilityIdTwo)
+            .when()
+            .get(FULL_URL)
+            .then()
+            .statusCode(200)
+            .extract().as(PageDto.class);
 
     assertEquals(storedFacilities.size(), response.getContent().size());
     assertEquals(storedFacilities.size(), response.getNumberOfElements());

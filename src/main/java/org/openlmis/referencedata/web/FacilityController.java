@@ -176,6 +176,33 @@ public class FacilityController extends BaseController {
     return minimalFacilities;
   }
 
+  /**
+   * Retrieves all facilities with full representation ({@link FacilityDto}) that are matching
+   * given request parameters. If no parameters, all facilities are returned.
+   *
+   * @param requestParams request parameters (id, code, name, zone, recurse).
+   * @return List of wanted Facilities matching query parameters.
+   */
+  @RequestMapping(value = RESOURCE_PATH + "/full", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Page<FacilityDto> getFullRepresentationFacilities(
+          @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
+    Profiler profiler = new Profiler("GET_FACILITIES");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("FIND_FACILITIES");
+    FacilitySearchParams params = new FacilitySearchParams(requestParams);
+
+    profiler.start("SERVICE_SEARCH");
+    Page<Facility> foundFacilities = facilityService.searchFacilities(params, pageable);
+
+    profiler.start("EXPORT_TO_DTO");
+    Page<FacilityDto> dto = toFacilityDto(foundFacilities, pageable, profiler);
+
+    profiler.stop().log();
+    return dto;
+  }
 
   /**
    * Get the audit information related to facilities.
@@ -507,4 +534,15 @@ public class FacilityController extends BaseController {
     return toPage(facilityDtos, pageable, facilities.getTotalElements(), profiler);
   }
 
+  private Page<FacilityDto> toFacilityDto(Page<Facility> facilities, Pageable pageable,
+                                  Profiler profiler) {
+    profiler.start("EXPORT_FACILITIES_TO_DTO");
+
+    List<FacilityDto> facilityDtos = facilities.getContent()
+            .stream()
+            .map(FacilityDto::newInstance)
+            .collect(Collectors.toList());
+
+    return toPage(facilityDtos, pageable, facilities.getTotalElements(), profiler);
+  }
 }
