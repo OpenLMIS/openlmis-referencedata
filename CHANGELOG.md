@@ -10,6 +10,7 @@ New functionality added in a backwards-compatible manner:
 * [OLMIS-7647](https://openlmis.atlassian.net/browse/OLMIS-7647): Add functionality to generate tradeItem.csv
 * [OLMIS-7648](https://openlmis.atlassian.net/browse/OLMIS-7648): Add mapping files
 * [OLMIS-7706](https://openlmis.atlassian.net/browse/OLMIS-7706): Add data export right, modify DataExportController
+* [OLMIS-7718](https://openlmis.atlassian.net/browse/OLMIS-7718): Add `GET /facilities/full` endpoint
 
 15.2.4 / 2022-10-07
 ==================
