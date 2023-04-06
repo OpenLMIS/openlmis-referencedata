@@ -84,6 +84,8 @@ dependencies {
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
 
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
     implementation 'org.togglz:togglz-spring-boot-starter:2.6.1.Final'
     compile 'org.togglz:togglz-console:2.6.1.Final'
     compile 'org.togglz:togglz-spring-security:2.6.1.Final'
@@ -105,6 +107,8 @@ dependencies {
     testCompile 'org.togglz:togglz-testing:2.6.1.Final'
     testCompile 'org.togglz:togglz-junit:2.6.1.Final'
     testCompile "com.github.tomakehurst:wiremock:2.22.0"
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
 
     runtime fileTree(dir: '/extensions/', include: '*.jar')
 }
@@ -267,13 +271,6 @@ test {
         events 'started', 'passed'
         exceptionFormat = 'full'
     }
-
-    if (checkForDocker()) dockerCompose.isRequiredBy(test)
-    doFirst {
-        if(checkForDocker()) {
-            configureForDockerCompose(test)
-        }
-    }
 }
 
 jacocoTestReport {
@@ -285,7 +282,7 @@ jacocoTestReport {
         csv.enabled false
     }
 
-    additionalSourceDirs = files(sourceSets.main.allJava.srcDirs)
+    additionalSourceDirs(files(sourceSets.main.allJava.srcDirs))
 }
 
 checkstyle {
