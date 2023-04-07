@@ -1754,6 +1754,34 @@ resourceTypes:
                 body:
                   application/json:
                     schema: localizedErrorResponse
+
+  /importData:
+    displayName: Import data
+    post:
+      is: [ secured ]
+      description: Imports data.
+      body:
+        multipart/form-data:
+          formParameters:
+            file:
+              displayName: File with .zip format
+              type: file
+              required: true
+              repeat: false
+      responses:
+        "200":
+          headers:
+            Keep-Alive:
+        "400":
+          body:
+            application/json:
+              schema: localizedErrorResponse
+        "403":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
   /facilities:
       displayName: Facility
       get:
