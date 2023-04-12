@@ -46,7 +46,7 @@ public class DataExportController extends BaseController {
    * Exports the given data to a ZIP with CSV files in OpenLMIS
    * Configuration Data Export File format.
    *
-   * @param requestParams Required parameters: format (utput format for files) and date
+   * @param requestParams Required parameters: format (output format for files) and date
    *                      (names of requested files).
    * @return Zip archive bytes containing formatted files
    */

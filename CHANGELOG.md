@@ -1,3 +1,9 @@
+15.2.6-SNAPSHOT / WIP
+==================
+
+New functionality added in a backwards-compatible manner:
+* [OLMIS-7670](https://openlmis.atlassian.net/browse/OLMIS-7670): Add `POST api/importData` endpoint
+
 15.2.5 / 2023-04-05
 ==================
 
