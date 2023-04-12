@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DataImportService {
 
-    public void importData(MultipartFile zipFile) throws IOException {}
+  public void importData(MultipartFile zipFile) throws IOException {
+
+  }
 
 }

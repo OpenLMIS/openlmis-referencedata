@@ -28,33 +28,38 @@ import org.springframework.web.multipart.MultipartFile;
 
 public final class FileHelper {
 
-    private FileHelper() {
-        throw new UnsupportedOperationException();
-    }
+  private FileHelper() {
+    throw new UnsupportedOperationException();
+  }
 
-    /**
-     * Converts a multipart file containing a zip archive to a map of file names to input streams of
-     * the corresponding file contents.
-     *
-     * @param multipartFile the multipart file containing the zip archive
-     * @return a map of file names to input streams of the corresponding file contents
-     * @throws ValidationMessageException if an error occurs while reading the multipart file or
-     * parsing the zip archive
-     */
-    public static Map<String, InputStream> convertMultipartFileToZipFileMap(MultipartFile multipartFile) {
-        try (ZipInputStream zipInputStream = new ZipInputStream(multipartFile.getInputStream())) {
-            Map<String, InputStream> zipFileMap = new HashMap<>();
-            ZipEntry zipEntry;
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (!zipEntry.isDirectory()) {
-                    zipFileMap.put(zipEntry.getName(), zipInputStream);
-                }
-            }
+  /**
+   * Converts a multipart file containing a zip archive to a map of file names to input streams of
+   * the corresponding file contents.
+   *
+   * @param multipartFile the multipart file containing the zip archive
+   * @return a map of file names to input streams of the corresponding file contents
+   * @throws ValidationMessageException if an error occurs while reading the multipart file or
+   *                                    parsing the zip archive
+   */
+  public static Map<String, InputStream> convertMultipartFileToZipFileMap(
+          MultipartFile multipartFile) {
+    try (ZipInputStream zipInputStream = new ZipInputStream(multipartFile.getInputStream())) {
+      Map<String, InputStream> zipFileMap = new HashMap<>();
+      ZipEntry zipEntry;
+      if ((zipEntry = zipInputStream.getNextEntry()) == null) {
+        throw new ValidationMessageException(MessageKeys.ERROR_IO);
+      } else {
+        zipFileMap.put(zipEntry.getName(), zipInputStream);
+      }
+      while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+        zipFileMap.put(zipEntry.getName(), zipInputStream);
+      }
 
-            return zipFileMap;
-        } catch (IOException e) {
-            throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
-        }
+      return zipFileMap;
+    } catch (IOException e) {
+      throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
     }
+  }
+
 }
 
