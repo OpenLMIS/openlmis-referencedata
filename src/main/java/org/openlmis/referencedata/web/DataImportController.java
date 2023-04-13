@@ -39,7 +39,7 @@ public class DataImportController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<?> importData(@RequestPart("file") MultipartFile file) {
+  public ResponseEntity importData(@RequestPart("file") MultipartFile file) {
     return ResponseEntity.ok().build();
   }
 
