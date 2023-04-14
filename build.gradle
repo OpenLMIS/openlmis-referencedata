@@ -148,6 +148,8 @@ sourceSets {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
+            annotationProcessorPath += main.output + test.output
+            annotationProcessorPath += sourceSets.test.runtimeClasspath
             srcDir file('src/integration-test/java')
         }
         resources.srcDir file('src/integration-test/resources')
