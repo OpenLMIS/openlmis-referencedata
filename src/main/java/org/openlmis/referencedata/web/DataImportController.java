@@ -17,13 +17,11 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -38,8 +36,7 @@ public class DataImportController extends BaseController {
    * @param file ZIP archive being imported.
    */
   @PostMapping
-  @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<?> importData(@RequestPart("file") MultipartFile file) {
+  public ResponseEntity<String> importData(@RequestPart("file") MultipartFile file) {
     return ResponseEntity.ok().build();
   }
 
