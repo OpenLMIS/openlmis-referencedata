@@ -22,6 +22,7 @@ import java.util.Map;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
+import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.Trim;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -42,6 +43,8 @@ public class CsvCellProcessors {
   public static final String ORDERABLE_TYPE = "Orderable";
   public static final String ORDERABLE_DISPLAY_CATEGORY_TYPE = "OrderableDisplayCategory";
   public static final String MONEY_TYPE = "Money";
+  public static final String CODE_TYPE = "Code";
+  public static final String BOOLEAN_TYPE = "Boolean";
 
   private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
@@ -60,6 +63,10 @@ public class CsvCellProcessors {
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
     typeParseMappings.put(PROCESSING_PERIOD_TYPE, new ParseProcessingPeriod());
     typeParseMappings.put(POSITIVE_INT, new ParsePositiveInteger());
+    typeParseMappings.put(CODE_TYPE, new ParseCode());
+    typeParseMappings.put(POSITIVE_LONG, new ParsePositiveLong());
+    typeParseMappings.put(BOOLEAN_TYPE, new ParseBool());
+    typeParseMappings.put(DISPENSABLE_TYPE, new ParseDispensable());
   }
 
   /**

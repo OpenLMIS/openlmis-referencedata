@@ -15,12 +15,12 @@
 
 package org.openlmis.referencedata.web.csv.recordhandler;
 
-import org.openlmis.referencedata.domain.BaseEntity;
+import org.openlmis.referencedata.domain.Identifiable;
 
 /**
  * This interface is implemented by all record handlers.
  */
-public interface RecordWriter<T extends BaseEntity> {
+public interface RecordWriter<T extends Identifiable> {
 
   void write(Iterable<T> entities);
 }

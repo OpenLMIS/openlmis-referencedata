@@ -51,7 +51,7 @@ public final class VolumeMeasurement extends Measurement {
    * @param importer the Volume Measurement importer (DTO)
    */
   public static VolumeMeasurement newVolumeMeasurement(
-          VolumeMeasurement.Importer importer) {
+          Importer importer) {
     VolumeMeasurement newVolumeMeasurement = new VolumeMeasurement();
     newVolumeMeasurement.setMeasurementUnitCode(importer.getMeasurementUnitCode());
     newVolumeMeasurement.setValue(importer.getValue());
@@ -63,7 +63,7 @@ public final class VolumeMeasurement extends Measurement {
    *
    * @param exporter exporter to export to
    */
-  public void export(VolumeMeasurement.Exporter exporter) {
+  public void export(Exporter exporter) {
     exporter.setMeasurementUnitCode(getMeasurementUnitCode());
     exporter.setValue(getValue());
     exporter.setCodeListVersion(getCodeListVersion());

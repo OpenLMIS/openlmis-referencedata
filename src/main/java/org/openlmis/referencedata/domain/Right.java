@@ -92,7 +92,7 @@ public class Right extends BaseEntity {
     Right newRight = new Right(importer.getName(), importer.getType());
     newRight.id = importer.getId();
     newRight.description = importer.getDescription();
-    for (Right.Importer attachmentImporter : importer.getAttachments()) {
+    for (Importer attachmentImporter : importer.getAttachments()) {
       Right newAttachment = newRight(attachmentImporter);
       newRight.attach(newAttachment);
     }
@@ -180,6 +180,6 @@ public class Right extends BaseEntity {
 
     String getDescription();
 
-    Set<Right.Importer> getAttachments();
+    Set<Importer> getAttachments();
   }
 }

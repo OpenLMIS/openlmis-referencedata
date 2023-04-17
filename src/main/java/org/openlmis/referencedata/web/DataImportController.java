@@ -17,11 +17,19 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
+import java.io.IOException;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.validate.CsvHeaderValidator;
+import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -30,13 +38,27 @@ public class DataImportController extends BaseController {
 
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/importData";
 
+  @Autowired
+  private CsvHeaderValidator validator;
+
   /**
    * Imports the data from a ZIP with CSV files.
    *
    * @param file ZIP archive being imported.
    */
   @PostMapping
-  public ResponseEntity<String> importData(@RequestPart("file") MultipartFile file) {
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<?> importData(@RequestPart("file") MultipartFile file) throws IOException {
+
+    ModelClass model = new ModelClass<>(Orderable.class);
+
+    CsvBeanReader<Orderable> reader = new CsvBeanReader<>(
+            model,
+            file.getInputStream(),
+            validator);
+
+    Orderable orderable = reader.readWithCellProcessors();
+    orderable.getDescription();
     return ResponseEntity.ok().build();
   }
 

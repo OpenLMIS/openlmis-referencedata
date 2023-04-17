@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.domain;
 
 import static org.openlmis.referencedata.domain.Orderable.DISPENSABLE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.BOOLEAN_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.CODE_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
 
@@ -142,7 +144,7 @@ public class Orderable implements Versionable {
   @Embedded
   @Getter
   @Setter
-  @ImportField(name = PRODUCT_CODE, mandatory = true)
+  @ImportField(name = PRODUCT_CODE, type = CODE_TYPE, mandatory = true)
   private Code productCode;
 
   @Getter
@@ -156,21 +158,25 @@ public class Orderable implements Versionable {
   private String description;
 
   @Getter
+  @Setter
   @ImportField(name = PACK_ROUNDING_THRESHOLD, type = POSITIVE_LONG, mandatory = true)
   private long packRoundingThreshold;
 
   @Getter
+  @Setter
   @ImportField(name = PACK_SIZE, type = POSITIVE_LONG, mandatory = true)
   private long netContent;
 
   @Getter
-  @ImportField(name = ROUND_TO_ZERO, mandatory = true)
+  @Setter
+  @ImportField(name = ROUND_TO_ZERO, type = BOOLEAN_TYPE, mandatory = true)
   private boolean roundToZero;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "dispensableid", nullable = false)
   @DiffIgnore // same reason as one in Facility.supportedPrograms
   @Getter
+  @Setter
   @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
   @ImportField(name = DISPENSABLE, type = DISPENSABLE_TYPE, mandatory = true)
   private Dispensable dispensable;

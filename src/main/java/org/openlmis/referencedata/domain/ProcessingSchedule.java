@@ -70,7 +70,7 @@ public class ProcessingSchedule extends BaseEntity {
    *
    * @param importer the importer (DTO)
    */
-  public static ProcessingSchedule newProcessingSchedule(ProcessingSchedule.Importer importer) {
+  public static ProcessingSchedule newProcessingSchedule(Importer importer) {
     ProcessingSchedule newProcessingSchedule = new ProcessingSchedule(
         Code.code(importer.getCode()), importer.getName());
     newProcessingSchedule.id = importer.getId();

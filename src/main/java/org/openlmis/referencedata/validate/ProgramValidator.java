@@ -23,7 +23,7 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
- * A validator for {@link org.openlmis.referencedata.dto.ProgramDto} object.
+ * A validator for {@link ProgramDto} object.
  */
 @Component
 public class ProgramValidator implements BaseValidator {
