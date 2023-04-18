@@ -273,6 +273,10 @@ test {
         events 'started', 'passed'
         exceptionFormat = 'full'
     }
+    dependsOn checkstyleMain
+    dependsOn checkstyleTest
+    dependsOn pmdMain
+    dependsOn pmdTest
 }
 
 jacocoTestReport {
