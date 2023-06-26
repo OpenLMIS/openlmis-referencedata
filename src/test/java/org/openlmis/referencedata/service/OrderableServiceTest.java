@@ -41,9 +41,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
@@ -151,13 +150,13 @@ public class OrderableServiceTest {
   public void shouldReturnAllElementsIfNoSearchCriteriaProvided() {
     // given
     Page<Orderable> thePage = Pagination.getPage(orderableList,
-        PageRequest.of(0, orderableList.size()));
+            PageRequest.of(0, orderableList.size()));
     when(orderableRepository.findAllLatest(nullable(Pageable.class)))
-        .thenReturn(thePage);
+            .thenReturn(thePage);
 
     // when
     Page<Orderable> actual = orderableService.searchOrderables(new QueryOrderableSearchParams(
-        searchParams), null);
+            searchParams), null);
 
     // then
     verify(orderableRepository).findAllLatest(isNull());
@@ -168,13 +167,13 @@ public class OrderableServiceTest {
   public void shouldReturnAllElementsIfQueryMapIsNull() {
     // given
     Page<Orderable> thePage = Pagination.getPage(orderableList,
-        PageRequest.of(0, orderableList.size()));
+            PageRequest.of(0, orderableList.size()));
     when(orderableRepository.findAllLatest(nullable(Pageable.class)))
-        .thenReturn(thePage);
+            .thenReturn(thePage);
 
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(new QueryOrderableSearchParams(null), null);
+            orderableService.searchOrderables(new QueryOrderableSearchParams(null), null);
 
     // then
     verify(orderableRepository).findAllLatest(isNull());
@@ -188,10 +187,10 @@ public class OrderableServiceTest {
     final String name = "Orderable";
 
     given(orderableRepository.search(
-        any(SearchParams.class),
-        any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2),
-            PageRequest.of(0, 2)));
+            any(SearchParams.class),
+            any(Pageable.class)))
+            .willReturn(Pagination.getPage(Lists.newArrayList(orderable1, orderable2),
+                    PageRequest.of(0, 2)));
 
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
@@ -201,7 +200,7 @@ public class OrderableServiceTest {
 
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(queryMap, pageable);
+            orderableService.searchOrderables(queryMap, pageable);
 
     //then
     verify(orderableRepository).search(queryMap, pageable);
@@ -215,7 +214,7 @@ public class OrderableServiceTest {
   public void shouldFindOrderablesByIds() {
     // given
     given(orderableRepository.findAllLatestByIds(anySetOf(UUID.class), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable2), PageRequest.of(0, 1)));
+            .willReturn(Pagination.getPage(Lists.newArrayList(orderable2), PageRequest.of(0, 1)));
 
     searchParams.add(ID, orderableId.toString());
     UUID orderableId2 = UUID.randomUUID();
@@ -223,11 +222,12 @@ public class OrderableServiceTest {
 
     // when
     final Page<Orderable> actual =
-        orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), pageable);
+            orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams),
+                    pageable);
 
     // then
     verify(orderableRepository).findAllLatestByIds(
-        new HashSet<>(Arrays.asList(orderableId, orderableId2)), pageable);
+            new HashSet<>(Arrays.asList(orderableId, orderableId2)), pageable);
 
     assertEquals(1, actual.getTotalElements());
     assertThat(actual, hasItem(orderable2));
@@ -241,7 +241,7 @@ public class OrderableServiceTest {
 
     // when
     ZonedDateTime lastUpdated = orderableService.getLatestLastUpdatedDate(
-              new QueryOrderableSearchParams(searchParams), profiler);
+            new QueryOrderableSearchParams(searchParams), profiler);
 
     // then
     verify(orderableRepository).findLatestModifiedDateOfAll();
@@ -316,7 +316,7 @@ public class OrderableServiceTest {
     when(orderableRepository.findAll()).thenReturn(orderableList);
 
     // when
-    List<Orderable> allOrderables = orderableService.findAll();
+    List<OrderableDto> allOrderables = orderableService.findAll();
 
     // then
     verify(orderableRepository).findAll();
@@ -326,8 +326,7 @@ public class OrderableServiceTest {
   @Test
   public void shouldReturnOrderableType() {
     // given
-    Orderable product = new Orderable(Code.code("ibuprofen"), Dispensable.createNew("each"), 10, 4,
-            false, UUID.randomUUID(), 1L);
+    OrderableDto product = new OrderableDto();
 
     // when
     Class<?> resultType = orderableService.getType();

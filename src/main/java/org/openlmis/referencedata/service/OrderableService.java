@@ -21,8 +21,11 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.validation.constraints.NotNull;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.Logger;
@@ -34,7 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OrderableService implements ExportableDataService<Orderable> {
+public class OrderableService implements ExportableDataService<OrderableDto> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(OrderableService.class);
 
@@ -117,13 +120,26 @@ public class OrderableService implements ExportableDataService<Orderable> {
   }
 
   @Override
-  public List<Orderable> findAll() {
-    return orderableRepository.findAll();
+  public List<OrderableDto> findAll() {
+    List<Orderable> orderables = orderableRepository.findAll();
+
+    return toDto(orderables);
   }
 
   @Override
-  public Class<Orderable> getType() {
-    return Orderable.class;
+  public Class<OrderableDto> getType() {
+    return OrderableDto.class;
+  }
+
+  private List<OrderableDto> toDto(Iterable<Orderable> items) {
+    return StreamSupport
+            .stream(items.spliterator(), false)
+            .map(o -> {
+              OrderableDto dto = new OrderableDto();
+              o.export(dto);
+              return dto;
+            })
+            .collect(Collectors.toList());
   }
 
 }

@@ -15,11 +15,8 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.apache.commons.lang3.StringUtils;
-import org.openlmis.referencedata.domain.ContainerDispensable;
-import org.openlmis.referencedata.domain.DefaultDispensable;
 import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.domain.VaccineDispensable;
+import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
@@ -34,33 +31,25 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
     validateInputNotNull(value, context);
 
     String result;
-    if (value instanceof DefaultDispensable) {
-      DefaultDispensable dispensable = (DefaultDispensable) value;
+    if (value instanceof DispensableDto) {
+      DispensableDto dispensable = (DispensableDto) value;
 
-      result = getFormattingResult(dispensable, Dispensable.KEY_DISPENSING_UNIT, context);
-    } else if (value instanceof ContainerDispensable) {
-      ContainerDispensable dispensable = (ContainerDispensable) value;
+      if (dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE) != null) {
+        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, Dispensable.KEY_SIZE_CODE,
+                dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE));
+      } else if (dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT) != null) {
+        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT,
+                Dispensable.KEY_DISPENSING_UNIT,
+                dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT));
+      } else {
+        throw getSuperCsvCellProcessorException(dispensable, context);
+      }
 
-      result = getFormattingResult(dispensable, Dispensable.KEY_SIZE_CODE, context);
-    } else if (value instanceof VaccineDispensable) {
-      VaccineDispensable dispensable = (VaccineDispensable) value;
-
-      result = getFormattingResult(dispensable, Dispensable.KEY_SIZE_CODE, context);
     } else {
       throw getSuperCsvCellProcessorException(value, context);
     }
 
     return next.execute(result, context);
-  }
-
-  private String getFormattingResult(Dispensable dispensable, String dispensableAttributeKey,
-                                     CsvContext context) {
-    if (StringUtils.isEmpty(dispensable.getAttributes().get(dispensableAttributeKey))) {
-      throw getSuperCsvCellProcessorException(dispensable, context);
-    } else {
-      return String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, dispensableAttributeKey,
-              dispensable.getAttributes().get(dispensableAttributeKey));
-    }
   }
 
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,

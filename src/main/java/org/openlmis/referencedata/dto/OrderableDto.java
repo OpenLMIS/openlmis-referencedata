@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import java.time.ZonedDateTime;
@@ -33,6 +36,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @Getter
 @Setter
@@ -43,18 +47,25 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 public final class OrderableDto extends BaseDto implements Orderable.Importer,
     Orderable.Exporter {
 
+  @ImportField(name = "productCode", type = "code", mandatory = true)
   private String productCode;
 
+  @ImportField(name = "dispensable", type = DISPENSABLE_TYPE, mandatory = true)
   private DispensableDto dispensable;
 
+  @ImportField(name = "name")
   private String fullProductName;
 
+  @ImportField(name = "description")
   private String description;
 
+  @ImportField(name = "packSize", type = POSITIVE_LONG, mandatory = true)
   private Long netContent;
 
+  @ImportField(name = "packRoundingThreshold", type = POSITIVE_LONG, mandatory = true)
   private Long packRoundingThreshold;
 
+  @ImportField(name = "roundToZero", type = "Boolean", mandatory = true)
   private Boolean roundToZero;
 
   private Set<ProgramOrderableDto> programs;

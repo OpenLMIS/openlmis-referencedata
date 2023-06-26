@@ -18,7 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
 import java.io.IOException;
-import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
@@ -48,18 +48,18 @@ public class DataImportController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<?> importData(@RequestPart("file") MultipartFile file) throws IOException {
+  public ResponseEntity<OrderableDto> importData(@RequestPart("file") MultipartFile file)
+          throws IOException {
 
-    ModelClass model = new ModelClass<>(Orderable.class);
+    ModelClass model = new ModelClass<>(OrderableDto.class);
 
-    CsvBeanReader<Orderable> reader = new CsvBeanReader<>(
+    CsvBeanReader<OrderableDto> reader = new CsvBeanReader<>(
             model,
             file.getInputStream(),
             validator);
 
-    Orderable orderable = reader.readWithCellProcessors();
-    orderable.getDescription();
-    return ResponseEntity.ok().build();
+    OrderableDto orderable = reader.readWithCellProcessors();
+    return ResponseEntity.ok().body(orderable);
   }
 
 }
