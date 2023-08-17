@@ -46,12 +46,12 @@ public class CsvBeanReader<T extends Identifiable> {
   private String[] headers;
 
   /**
-   * Oasodoasodasodsao.
+   * Constructs new CsvBeanReader.
    *
-   * @param modelClass Osdaas
-   * @param inputStream asdasdsa
-   * @param csvHeaderValidator asdasdas
-   * @throws IOException sadasd
+   * @param modelClass Model describing how the csv rows are mapped.
+   * @param inputStream Input stream containing data retrieved from csv file.
+   * @param csvHeaderValidator Checks whether headers and fields are being correct.
+   * @throws IOException If the resource can't be processed.
    */
   public CsvBeanReader(ModelClass<T> modelClass,
                 InputStream inputStream,
@@ -96,4 +96,5 @@ public class CsvBeanReader<T extends Identifiable> {
         CsvCellProcessors.getParseProcessors(modelClass, asList(headers));
     processors = cellProcessors.toArray(new CellProcessor[cellProcessors.size()]);
   }
+
 }
