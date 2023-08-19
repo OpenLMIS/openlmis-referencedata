@@ -18,12 +18,9 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.validate.CsvHeaderValidator;
-import org.openlmis.referencedata.web.csv.model.ModelClass;
-import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
+import org.openlmis.referencedata.service.DataImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,31 +38,17 @@ public class DataImportController extends BaseController {
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/importData";
 
   @Autowired
-  private CsvHeaderValidator validator;
+  private DataImportService dataImportService;
 
   /**
    * Imports the data from a ZIP with CSV files.
    *
-   * @param file ZIP archive being imported.
+   * @param zipFile ZIP archive being imported.
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<List<OrderableDto>> importData(@RequestPart("file") MultipartFile file)
-          throws IOException {
-    ModelClass model = new ModelClass<>(OrderableDto.class);
-
-    CsvBeanReader<OrderableDto> reader = new CsvBeanReader<>(
-            model,
-            file.getInputStream(),
-            validator);
-
-    OrderableDto orderable;
-    List<OrderableDto> orderableDtoList = new ArrayList<>();
-
-    while ((orderable = reader.readWithCellProcessors()) != null) {
-      orderableDtoList.add(orderable);
-    }
-
+  public ResponseEntity<List<OrderableDto>> importData(@RequestPart("file") MultipartFile zipFile) {
+    List<OrderableDto> orderableDtoList = dataImportService.importData(zipFile);
     return ResponseEntity.ok().body(orderableDtoList);
   }
 

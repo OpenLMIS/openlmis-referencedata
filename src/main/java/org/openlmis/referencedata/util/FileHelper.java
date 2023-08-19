@@ -15,13 +15,14 @@
 
 package org.openlmis.referencedata.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,16 +44,25 @@ public final class FileHelper {
    */
   public static Map<String, InputStream> convertMultipartFileToZipFileMap(
           MultipartFile multipartFile) {
+    byte[] buffer = new byte[1024];
+
     try (ZipInputStream zipInputStream = new ZipInputStream(multipartFile.getInputStream())) {
       Map<String, InputStream> zipFileMap = new HashMap<>();
       ZipEntry zipEntry;
-      if ((zipEntry = zipInputStream.getNextEntry()) == null) {
-        throw new ValidationMessageException(MessageKeys.ERROR_IO);
-      } else {
-        zipFileMap.put(zipEntry.getName(), zipInputStream);
-      }
+      int bytesRead;
+
       while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-        zipFileMap.put(zipEntry.getName(), zipInputStream);
+        // Read bytes from zip file and write it to output stream
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        while ((bytesRead = zipInputStream.read(buffer)) != -1) {
+          outputStream.write(buffer, 0, bytesRead);
+        }
+
+        zipFileMap.put(zipEntry.getName(), new ByteArrayInputStream(outputStream.toByteArray()));
+      }
+
+      if (zipFileMap.isEmpty()) {
+        throw new ValidationMessageException(MessageKeys.ERROR_IO);
       }
 
       return zipFileMap;
