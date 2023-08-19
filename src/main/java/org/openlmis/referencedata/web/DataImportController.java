@@ -17,9 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
-import java.io.IOException;
 import java.util.List;
-import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.service.DataImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,8 +45,8 @@ public class DataImportController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<List<OrderableDto>> importData(@RequestPart("file") MultipartFile zipFile) {
-    List<OrderableDto> orderableDtoList = dataImportService.importData(zipFile);
+  public ResponseEntity<List<?>> importData(@RequestPart("file") MultipartFile zipFile) {
+    List<?> orderableDtoList = dataImportService.importData(zipFile);
     return ResponseEntity.ok().body(orderableDtoList);
   }
 

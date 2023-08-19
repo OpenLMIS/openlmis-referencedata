@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.transaction.Transactional;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Transactional
 public class DataImportService {
 
   private static final String ORDERABLE_CSV = "orderable.csv";
@@ -44,28 +47,32 @@ public class DataImportService {
    *
    * @param zipFile ZIP archive being imported.
    */
-  public List<OrderableDto> importData(MultipartFile zipFile) {
-    ModelClass<OrderableDto> model = new ModelClass<>(OrderableDto.class);
-    List<OrderableDto> orderableDtoList = new ArrayList<>();
-
+  public List<?> importData(MultipartFile zipFile) {
     Map<String, InputStream> fileMap = FileHelper.convertMultipartFileToZipFileMap(zipFile);
     InputStream csvStream = fileMap.get(ORDERABLE_CSV);
 
+    return readCsv(OrderableDto.class, csvStream);
+  }
+
+  private <T extends Identifiable> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
+    ModelClass<T> model = new ModelClass<>(clazz);
+    List<T> dtoList = new ArrayList<>();
+
     try {
-      CsvBeanReader<OrderableDto> reader = new CsvBeanReader<>(
+      CsvBeanReader<T> reader = new CsvBeanReader<>(
           model,
           csvStream,
           validator);
 
-      OrderableDto orderable;
-      while ((orderable = reader.readWithCellProcessors()) != null) {
-        orderableDtoList.add(orderable);
+      T readObject;
+      while ((readObject = reader.readWithCellProcessors()) != null) {
+        dtoList.add(readObject);
       }
     } catch (IOException e) {
       throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
     }
 
-    return orderableDtoList;
+    return dtoList;
   }
 
 }
