@@ -118,6 +118,8 @@ public interface OrderableRepository extends
 
   Orderable findFirstByIdentityIdOrderByIdentityVersionNumberDesc(UUID id);
 
+  Orderable findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code code);
+
   Orderable findByIdentityIdAndIdentityVersionNumber(UUID id, Long versionNumber);
 
   @Query(value = SELECT_ORDERABLE

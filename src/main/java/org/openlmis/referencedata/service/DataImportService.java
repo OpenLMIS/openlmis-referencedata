@@ -20,21 +20,24 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.transaction.Transactional;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Identifiable;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-@Transactional
 public class DataImportService {
 
   private static final String ORDERABLE_CSV = "orderable.csv";
@@ -42,16 +45,45 @@ public class DataImportService {
   @Autowired
   private CsvHeaderValidator validator;
 
+  @Autowired
+  private OrderableRepository orderableRepository;
+
+  @Autowired
+  private OrderableBuilder orderableBuilder;
+
   /**
    * Imports the data from a ZIP with CSV files.
    *
    * @param zipFile ZIP archive being imported.
    */
+  @Transactional
   public List<?> importData(MultipartFile zipFile) {
+    List<Object> result = new ArrayList<>();
     Map<String, InputStream> fileMap = FileHelper.convertMultipartFileToZipFileMap(zipFile);
-    InputStream csvStream = fileMap.get(ORDERABLE_CSV);
 
-    return readCsv(OrderableDto.class, csvStream);
+    for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
+      if (entry.getKey().equals(ORDERABLE_CSV)) {
+        List<Orderable> persistList = new ArrayList<>();
+        List<OrderableDto> importedDtos = readCsv(OrderableDto.class, entry.getValue());
+
+        for (OrderableDto orderableDto: importedDtos) {
+          Orderable latestOrderable = orderableRepository
+              .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
+                  Code.code(orderableDto.getProductCode()));
+
+          if (latestOrderable == null) {
+            persistList.add(orderableBuilder.newOrderable(orderableDto, null));
+          } else {
+            persistList.add(orderableBuilder.newOrderable(orderableDto, latestOrderable));
+          }
+        }
+
+        result.addAll(OrderableDto.newInstance(
+            orderableRepository.saveAll(persistList)));
+      }
+    }
+
+    return result;
   }
 
   private <T extends Identifiable> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
