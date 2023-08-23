@@ -40,7 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DataImportService {
 
-  private static final String ORDERABLE_CSV = "orderable.csv";
+  public static final String ORDERABLE_CSV = "orderable.csv";
 
   @Autowired
   private CsvHeaderValidator validator;
@@ -63,27 +63,32 @@ public class DataImportService {
 
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
       if (entry.getKey().equals(ORDERABLE_CSV)) {
-        List<Orderable> persistList = new ArrayList<>();
-        List<OrderableDto> importedDtos = readCsv(OrderableDto.class, entry.getValue());
-
-        for (OrderableDto orderableDto: importedDtos) {
-          Orderable latestOrderable = orderableRepository
-              .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-                  Code.code(orderableDto.getProductCode()));
-
-          if (latestOrderable == null) {
-            persistList.add(orderableBuilder.newOrderable(orderableDto, null));
-          } else {
-            persistList.add(orderableBuilder.newOrderable(orderableDto, latestOrderable));
-          }
-        }
-
+        List<Orderable> persistList = processOrderables(entry.getValue());
         result.addAll(OrderableDto.newInstance(
             orderableRepository.saveAll(persistList)));
       }
     }
 
     return result;
+  }
+
+  private List<Orderable> processOrderables(InputStream dataStream) {
+    List<Orderable> persistList = new ArrayList<>();
+    List<OrderableDto> importedDtos = readCsv(OrderableDto.class, dataStream);
+
+    for (OrderableDto orderableDto: importedDtos) {
+      Orderable latestOrderable = orderableRepository
+          .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
+              Code.code(orderableDto.getProductCode()));
+
+      if (latestOrderable == null) {
+        persistList.add(orderableBuilder.newOrderable(orderableDto, null));
+      } else {
+        persistList.add(orderableBuilder.newOrderable(orderableDto, latestOrderable));
+      }
+    }
+
+    return persistList;
   }
 
   private <T extends Identifiable> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
