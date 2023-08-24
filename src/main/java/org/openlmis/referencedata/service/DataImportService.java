@@ -23,6 +23,7 @@ import java.util.Map;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
@@ -57,8 +58,8 @@ public class DataImportService {
    * @param zipFile ZIP archive being imported.
    */
   @Transactional
-  public List<?> importData(MultipartFile zipFile) {
-    List<Object> result = new ArrayList<>();
+  public List<BaseDto> importData(MultipartFile zipFile) {
+    List<BaseDto> result = new ArrayList<>();
     Map<String, InputStream> fileMap = FileHelper.convertMultipartFileToZipFileMap(zipFile);
 
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
