@@ -64,39 +64,40 @@ public class DataImportService {
 
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
       if (entry.getKey().equals(ORDERABLE_CSV)) {
-        List<Orderable> persistList = processOrderables(entry.getValue());
-        result.addAll(OrderableDto.newInstance(
-            orderableRepository.saveAll(persistList)));
+        result.addAll(processAndPersistOrderables(entry.getValue()));
       }
     }
 
     return result;
   }
 
-  private List<Orderable> processOrderables(InputStream dataStream) {
-    List<Orderable> persistList = new ArrayList<>();
+  private List<OrderableDto> processAndPersistOrderables(InputStream dataStream) {
     List<OrderableDto> importedDtos = readCsv(OrderableDto.class, dataStream);
+    List<Orderable> persistedObjects = orderableRepository.saveAll(
+        createOrUpdateOrderables(importedDtos));
 
-    for (OrderableDto orderableDto: importedDtos) {
+    return OrderableDto.newInstance(persistedObjects);
+  }
+
+  private List<Orderable> createOrUpdateOrderables(List<OrderableDto> dtoList) {
+    List<Orderable> persistList = new ArrayList<>();
+
+    for (OrderableDto orderableDto: dtoList) {
       Orderable latestOrderable = orderableRepository
           .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
               Code.code(orderableDto.getProductCode()));
 
-      if (latestOrderable == null) {
-        persistList.add(orderableBuilder.newOrderable(orderableDto, null));
-      } else {
-        persistList.add(orderableBuilder.newOrderable(orderableDto, latestOrderable));
-      }
+      persistList.add(orderableBuilder.newOrderable(orderableDto, latestOrderable));
     }
 
     return persistList;
   }
 
   private <T extends Identifiable> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
-    ModelClass<T> model = new ModelClass<>(clazz);
     List<T> dtoList = new ArrayList<>();
 
     try {
+      ModelClass<T> model = new ModelClass<>(clazz);
       CsvBeanReader<T> reader = new CsvBeanReader<>(
           model,
           csvStream,

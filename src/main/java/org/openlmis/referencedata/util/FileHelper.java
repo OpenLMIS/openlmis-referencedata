@@ -62,7 +62,7 @@ public final class FileHelper {
       }
 
       if (zipFileMap.isEmpty()) {
-        throw new ValidationMessageException(MessageKeys.ERROR_IO);
+        throw new ValidationMessageException(MessageKeys.ERROR_IO, "Empty archive");
       }
 
       return zipFileMap;

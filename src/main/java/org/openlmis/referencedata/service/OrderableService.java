@@ -120,14 +120,14 @@ public class OrderableService implements ExportableDataService<OrderableDto> {
   }
 
   @Override
-  public List<OrderableDto> findAll() {
+  public List<OrderableDto> findAllExportableItems() {
     List<Orderable> orderables = orderableRepository.findAll();
 
     return toDto(orderables);
   }
 
   @Override
-  public Class<OrderableDto> getType() {
+  public Class<OrderableDto> getExportableType() {
     return OrderableDto.class;
   }
 

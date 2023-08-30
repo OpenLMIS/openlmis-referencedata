@@ -58,7 +58,7 @@ public class ProgramOrderableServiceTest {
     final Integer programOrderableListSize = programOrderableList.size();
     when(programOrderableRepository.findAll()).thenReturn(programOrderableList);
 
-    List<ProgramOrderable> result = programOrderableService.findAll();
+    List<ProgramOrderable> result = programOrderableService.findAllExportableItems();
 
     assertEquals(Integer.valueOf(result.size()), programOrderableListSize);
   }
@@ -67,7 +67,7 @@ public class ProgramOrderableServiceTest {
   public void shouldReturnEmptyListIfNoProgramOrderablesWasFound() {
     when(programOrderableRepository.findAll()).thenReturn(Collections.emptyList());
 
-    List<ProgramOrderable> result = programOrderableService.findAll();
+    List<ProgramOrderable> result = programOrderableService.findAllExportableItems();
 
     assertThat(result, is(empty()));
   }
@@ -76,8 +76,8 @@ public class ProgramOrderableServiceTest {
   public void shouldReturnTypeThatMatchesTypeOfFoundItems() {
     when(programOrderableRepository.findAll()).thenReturn(programOrderableList);
 
-    List<ProgramOrderable> resultList = programOrderableService.findAll();
-    Class<?> resultType = programOrderableService.getType();
+    List<ProgramOrderable> resultList = programOrderableService.findAllExportableItems();
+    Class<?> resultType = programOrderableService.getExportableType();
 
     assertThat(resultList, Every.everyItem(instanceOf(resultType)));
   }

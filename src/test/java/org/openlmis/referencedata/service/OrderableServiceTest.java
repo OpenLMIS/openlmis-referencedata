@@ -316,7 +316,7 @@ public class OrderableServiceTest {
     when(orderableRepository.findAll()).thenReturn(orderableList);
 
     // when
-    List<OrderableDto> allOrderables = orderableService.findAll();
+    List<OrderableDto> allOrderables = orderableService.findAllExportableItems();
 
     // then
     verify(orderableRepository).findAll();
@@ -329,7 +329,7 @@ public class OrderableServiceTest {
     OrderableDto product = new OrderableDto();
 
     // when
-    Class<?> resultType = orderableService.getType();
+    Class<?> resultType = orderableService.getExportableType();
 
     // then
     assertEquals(product.getClass(), resultType);

@@ -29,12 +29,12 @@ public class OrderableIdentifierService implements
   private OrderableRepository orderableRepository;
 
   @Override
-  public List<OrderableIdentifierCsvModel> findAll() {
+  public List<OrderableIdentifierCsvModel> findAllExportableItems() {
     return orderableRepository.findAllOrderableIdentifierCsvModels();
   }
 
   @Override
-  public Class<OrderableIdentifierCsvModel> getType() {
+  public Class<OrderableIdentifierCsvModel> getExportableType() {
     return OrderableIdentifierCsvModel.class;
   }
 

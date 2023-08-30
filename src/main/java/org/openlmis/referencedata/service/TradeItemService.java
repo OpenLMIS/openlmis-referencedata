@@ -28,12 +28,12 @@ public class TradeItemService implements ExportableDataService<TradeItemCsvModel
   private TradeItemRepository tradeItemRepository;
 
   @Override
-  public List<TradeItemCsvModel> findAll() {
+  public List<TradeItemCsvModel> findAllExportableItems() {
     return tradeItemRepository.findAllTradeItemCsvModels();
   }
 
   @Override
-  public Class<TradeItemCsvModel> getType() {
+  public Class<TradeItemCsvModel> getExportableType() {
     return TradeItemCsvModel.class;
   }
 

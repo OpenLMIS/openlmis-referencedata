@@ -88,8 +88,8 @@ public class DataExportServiceTest {
     List<OrderableDto> productList = mock(List.class);
 
     setPreconditionsForServices();
-    when(orderableService.findAll()).thenReturn(productList);
-    when(orderableService.getType()).thenReturn(OrderableDto.class);
+    when(orderableService.findAllExportableItems()).thenReturn(productList);
+    when(orderableService.getExportableType()).thenReturn(OrderableDto.class);
     when(loader.getResource(anyString())).thenReturn(resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 
@@ -125,7 +125,7 @@ public class DataExportServiceTest {
     List<OrderableDto> emptyProductList = Lists.emptyList();
 
     setPreconditionsForServices();
-    when(orderableService.findAll()).thenReturn(emptyProductList);
+    when(orderableService.findAllExportableItems()).thenReturn(emptyProductList);
     when(loader.getResource(anyString())).thenReturn(resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 

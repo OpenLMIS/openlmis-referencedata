@@ -19,8 +19,8 @@ import java.util.List;
 
 public interface ExportableDataService<T> {
 
-  List<T> findAll();
+  List<T> findAllExportableItems();
 
-  Class<T> getType();
+  Class<T> getExportableType();
 
 }
