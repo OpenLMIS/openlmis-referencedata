@@ -54,7 +54,7 @@ public final class TemperatureMeasurement extends BaseMeasurement {
    * @param importer the TemperatureMeasurement importer (DTO)
    */
   public static TemperatureMeasurement newTemperatureMeasurement(
-          TemperatureMeasurement.Importer importer) {
+          Importer importer) {
     TemperatureMeasurement newTemperatureMeasurement = new TemperatureMeasurement();
     newTemperatureMeasurement.temperatureMeasurementUnitCode =
             importer.getTemperatureMeasurementUnitCode();
@@ -67,7 +67,7 @@ public final class TemperatureMeasurement extends BaseMeasurement {
    *
    * @param exporter exporter to export to
    */
-  public void export(TemperatureMeasurement.Exporter exporter) {
+  public void export(Exporter exporter) {
     exporter.setTemperatureMeasurementUnitCode(temperatureMeasurementUnitCode);
     exporter.setValue(getValue());
     exporter.setCodeListVersion(getCodeListVersion());

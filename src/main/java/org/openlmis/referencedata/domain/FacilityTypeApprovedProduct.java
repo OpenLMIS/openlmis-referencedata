@@ -119,9 +119,9 @@ public class FacilityTypeApprovedProduct implements Versionable {
 
   /**
    * Creates new FacilityTypeApprovedProduct based on data from {@link
-   * FacilityTypeApprovedProduct.Importer}.
+   * Importer}.
    *
-   * @param importer instance of {@link FacilityTypeApprovedProduct.Importer}
+   * @param importer instance of {@link Importer}
    * @return new instance of FacilityTypeApprovedProduct.
    */
   public static FacilityTypeApprovedProduct newFacilityTypeApprovedProduct(Importer importer) {

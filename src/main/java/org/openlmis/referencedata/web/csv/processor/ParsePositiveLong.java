@@ -15,48 +15,42 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class FormatDispensable extends CellProcessorAdaptor implements StringCellProcessor {
-
-  public static final String DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT = "%s:%s";
+public class ParsePositiveLong extends CellProcessorAdaptor implements StringCellProcessor {
 
   @Override
-  public Object execute(Object value, CsvContext context) {
+  public <T> T execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    String result;
-    if (value instanceof DispensableDto) {
-      DispensableDto dispensable = (DispensableDto) value;
+    Long result;
+    if (value instanceof String) {
+      String textValue = String.valueOf(value);
 
-      if (dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE) != null) {
-        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, Dispensable.KEY_SIZE_CODE,
-                dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE));
-      } else if (dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT) != null) {
-        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT,
-                Dispensable.KEY_DISPENSING_UNIT,
-                dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT));
-      } else {
-        throw getSuperCsvCellProcessorException(dispensable, context);
+      try {
+        result = Long.valueOf(textValue);
+      } catch (NumberFormatException ex) {
+        throw getSuperCsvCellProcessorException(textValue, context, ex);
       }
 
+      if (result < 0) {
+        throw new SuperCsvCellProcessorException(
+                String.format("'%s' is less than 0", value), context, this, null);
+      }
     } else {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getSuperCsvCellProcessorException(value, context, null);
     }
 
     return next.execute(result, context);
   }
 
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
+                                                                           CsvContext context,
+                                                                           Exception cause) {
     return new SuperCsvCellProcessorException(
-            String.format("Cannot get dispensing unit or size code from '%s'.", value.toString()),
-            context, this);
+            String.format("'%s' could not be parsed to long value", value), context, this, cause);
   }
-
 }

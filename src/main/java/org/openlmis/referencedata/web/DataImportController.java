@@ -17,11 +17,17 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.web.DataImportController.RESOURCE_PATH;
 
+import java.util.List;
+import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.service.DataImportService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -30,14 +36,19 @@ public class DataImportController extends BaseController {
 
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/importData";
 
+  @Autowired
+  private DataImportService dataImportService;
+
   /**
    * Imports the data from a ZIP with CSV files.
    *
-   * @param file ZIP archive being imported.
+   * @param zipFile ZIP archive being imported.
    */
   @PostMapping
-  public ResponseEntity<String> importData(@RequestPart("file") MultipartFile file) {
-    return ResponseEntity.ok().build();
+  @ResponseStatus(HttpStatus.OK)
+  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile zipFile) {
+    List<BaseDto> importedData = dataImportService.importData(zipFile);
+    return ResponseEntity.ok().body(importedData);
   }
 
 }

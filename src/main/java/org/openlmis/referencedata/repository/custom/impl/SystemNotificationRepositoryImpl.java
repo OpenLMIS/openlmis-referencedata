@@ -73,7 +73,7 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
    * This method is supposed to retrieve all system notifications with matched parameters.
    */
   public Page<SystemNotification> search(
-      SystemNotificationRepositoryCustom.SearchParams searchParams, Pageable pageable) {
+      SearchParams searchParams, Pageable pageable) {
     Map<String, Object> params = Maps.newHashMap();
     Query countQuery = entityManager.createQuery(prepareQuery(
         HQL_COUNT, params, searchParams), Long.class);
@@ -100,7 +100,7 @@ public class SystemNotificationRepositoryImpl implements SystemNotificationRepos
   }
 
   private String prepareQuery(String baseSql, Map<String, Object> params,
-      SystemNotificationRepositoryCustom.SearchParams searchParams) {
+      SearchParams searchParams) {
 
     List<String> sql = Lists.newArrayList(baseSql);
     List<String> where = Lists.newArrayList();

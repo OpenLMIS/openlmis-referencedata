@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
@@ -22,41 +24,36 @@ import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
-public class FormatDispensable extends CellProcessorAdaptor implements StringCellProcessor {
-
-  public static final String DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT = "%s:%s";
+public class ParseDispensable extends CellProcessorAdaptor implements StringCellProcessor {
 
   @Override
-  public Object execute(Object value, CsvContext context) {
+  public <T> T execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    String result;
-    if (value instanceof DispensableDto) {
-      DispensableDto dispensable = (DispensableDto) value;
-
-      if (dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE) != null) {
-        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT, Dispensable.KEY_SIZE_CODE,
-                dispensable.getAttributes().get(Dispensable.KEY_SIZE_CODE));
-      } else if (dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT) != null) {
-        result = String.format(DISPENSABLE_ATTRIBUTE_DISPLAY_FORMAT,
-                Dispensable.KEY_DISPENSING_UNIT,
-                dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT));
-      } else {
-        throw getSuperCsvCellProcessorException(dispensable, context);
+    Dispensable result;
+    if (value instanceof String) {
+      String[] parts = ((String) value).split(":", 2);
+      if (parts.length != 2) {
+        throw getSuperCsvCellProcessorException(value, context, null);
       }
 
+      DispensableDto dto = new DispensableDto();
+      Map<String, String> attributes = new HashMap<>();
+      attributes.put(parts[0], parts[1]);
+      dto.setAttributes(attributes);
+
+      result = Dispensable.createNew(dto);
     } else {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getSuperCsvCellProcessorException(value, context, null);
     }
 
     return next.execute(result, context);
   }
 
   private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-            String.format("Cannot get dispensing unit or size code from '%s'.", value.toString()),
-            context, this);
+                                                                           CsvContext context,
+                                                                           Exception cause) {
+    return new SuperCsvCellProcessorException(String.format(
+            "'%s' could not be parsed to Dispensable", value), context, this, cause);
   }
-
 }

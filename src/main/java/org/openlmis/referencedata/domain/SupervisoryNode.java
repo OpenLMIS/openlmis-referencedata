@@ -281,7 +281,7 @@ public class SupervisoryNode extends BaseEntity {
    *
    * @param importer importer with new values.
    */
-  public void updateFrom(SupervisoryNode.Importer importer) {
+  public void updateFrom(Importer importer) {
     this.code = importer.getCode();
     this.name = importer.getName();
     this.description = importer.getDescription();

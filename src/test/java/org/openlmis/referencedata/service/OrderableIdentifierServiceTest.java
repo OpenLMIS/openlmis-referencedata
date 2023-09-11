@@ -48,7 +48,7 @@ public class OrderableIdentifierServiceTest {
     final int modelListSize = modelList.size();
     when(orderableRepository.findAllOrderableIdentifierCsvModels()).thenReturn(modelList);
 
-    List<OrderableIdentifierCsvModel> result = service.findAll();
+    List<OrderableIdentifierCsvModel> result = service.findAllExportableItems();
 
     verify(orderableRepository).findAllOrderableIdentifierCsvModels();
     assertEquals(result.size(), modelListSize);
@@ -58,7 +58,7 @@ public class OrderableIdentifierServiceTest {
   public void shouldReturnOrderableIdentifierCsvModelType() {
     OrderableIdentifierCsvModel model = new OrderableIdentifierCsvModel();
 
-    Class<?> resultType = service.getType();
+    Class<?> resultType = service.getExportableType();
 
     assertEquals(model.getClass(), resultType);
   }

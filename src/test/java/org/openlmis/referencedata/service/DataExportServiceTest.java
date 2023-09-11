@@ -30,11 +30,9 @@ import static org.openlmis.referencedata.service.DataExportService.SERVICE_NAME_
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,9 +40,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Dispensable;
-import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.web.DataExportParams;
 import org.springframework.beans.BeansException;
@@ -54,8 +50,6 @@ import org.springframework.core.io.ResourceLoader;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataExportServiceTest {
-
-  private static final String EACH = "each";
 
   private Map<String, String> queryParamsMap;
 
@@ -91,15 +85,11 @@ public class DataExportServiceTest {
 
   @Test
   public void shouldReturnArrayOfBytes() throws IOException {
-    Orderable product1 = new Orderable(Code.code("ibuprofen"), Dispensable.createNew(EACH), 10, 4,
-            false, UUID.randomUUID(), 1L);
-    Orderable product2 = new Orderable(Code.code("paracetamol"), Dispensable.createNew(EACH), 10, 4,
-            false, UUID.randomUUID(), 1L);
-    List<Orderable> productList = Arrays.asList(product1, product2);
+    List<OrderableDto> productList = mock(List.class);
 
     setPreconditionsForServices();
-    when(orderableService.findAll()).thenReturn(productList);
-    when(orderableService.getType()).thenReturn(Orderable.class);
+    when(orderableService.findAllExportableItems()).thenReturn(productList);
+    when(orderableService.getExportableType()).thenReturn(OrderableDto.class);
     when(loader.getResource(anyString())).thenReturn(resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 
@@ -132,10 +122,10 @@ public class DataExportServiceTest {
 
   @Test
   public void shouldReturnArrayOfBytesIfNoDataFound() throws IOException {
-    List<Orderable> emptyProductList = Lists.emptyList();
+    List<OrderableDto> emptyProductList = Lists.emptyList();
 
     setPreconditionsForServices();
-    when(orderableService.findAll()).thenReturn(emptyProductList);
+    when(orderableService.findAllExportableItems()).thenReturn(emptyProductList);
     when(loader.getResource(anyString())).thenReturn(resource);
     when(resource.getInputStream()).thenReturn(inputStream);
 

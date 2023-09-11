@@ -92,7 +92,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
    * @return new RequisitionGroupProgramSchedule
    */
   public static RequisitionGroupProgramSchedule newRequisitionGroupProgramSchedule(
-      RequisitionGroupProgramSchedule.Importer importer) {
+      Importer importer) {
     RequisitionGroup requisitionGroup = null;
 
     if (importer.getRequisitionGroup() != null) {
@@ -137,7 +137,7 @@ public class RequisitionGroupProgramSchedule extends BaseEntity {
    *
    * @param exporter exporter to export to
    */
-  public void export(RequisitionGroupProgramSchedule.Exporter exporter) {
+  public void export(Exporter exporter) {
     exporter.setId(id);
     exporter.setRequisitionGroup(requisitionGroup);
     exporter.setProcessingSchedule(processingSchedule);

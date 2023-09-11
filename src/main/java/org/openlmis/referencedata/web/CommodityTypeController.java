@@ -104,7 +104,7 @@ public class CommodityTypeController extends BaseController {
    *
    * @param commodityTypeId the CommodityType's persistence Id.
    * @param tradeItemIds    the persistence id's of the TradeItems
-   *                        {@link org.springframework.http.HttpStatus#NOT_FOUND}
+   *                        {@link HttpStatus#NOT_FOUND}
    *                        if any of the given persistence ids are not found.
    */
   @Transactional
@@ -146,7 +146,7 @@ public class CommodityTypeController extends BaseController {
    * Gets the TradeItem's persistence ids that may fulfill for the given CommodityType.
    *
    * @param commodityTypeId persistence id of the CommodityType.
-   * @return {@link org.springframework.http.HttpStatus#OK} and a set of persistence ids for the
+   * @return {@link HttpStatus#OK} and a set of persistence ids for the
    *     commodity type, or an empty set.
    */
   @Transactional

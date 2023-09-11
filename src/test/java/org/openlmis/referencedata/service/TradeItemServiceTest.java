@@ -46,7 +46,7 @@ public class TradeItemServiceTest {
     final int modelListSize = modelList.size();
     when(tradeItemRepository.findAllTradeItemCsvModels()).thenReturn(modelList);
 
-    List<TradeItemCsvModel> result = service.findAll();
+    List<TradeItemCsvModel> result = service.findAllExportableItems();
 
     verify(tradeItemRepository).findAllTradeItemCsvModels();
     assertEquals(result.size(), modelListSize);
@@ -56,7 +56,7 @@ public class TradeItemServiceTest {
   public void shouldReturnTradeItemCsvModelType() {
     TradeItemCsvModel model = new TradeItemCsvModel();
 
-    Class<?> resultType = service.getType();
+    Class<?> resultType = service.getExportableType();
 
     assertEquals(model.getClass(), resultType);
   }

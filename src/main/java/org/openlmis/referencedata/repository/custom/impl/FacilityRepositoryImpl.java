@@ -80,16 +80,17 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
    * @param pageable object used to encapsulate the pagination related values: page, size and sort.
    * @return Page of Facilities matching the parameters.
    */
-  public Page<Facility> search(FacilityRepositoryCustom.SearchParams searchParams,
-      Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
+  public Page<Facility> search(SearchParams searchParams,
+                               Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
     if (null != extraData) {
       return searchWithExtraData(searchParams, geographicZoneIds, extraData, pageable);
     }
     return searchWithoutExtraData(searchParams, geographicZoneIds, pageable);
   }
 
-  private Page<Facility> searchWithExtraData(FacilityRepositoryCustom.SearchParams searchParams,
-      Set<UUID> geographicZoneIds, String extraData, Pageable pageable) {
+  private Page<Facility> searchWithExtraData(SearchParams searchParams,
+                                             Set<UUID> geographicZoneIds,
+                                             String extraData, Pageable pageable) {
 
     Map<String, Object> params = Maps.newHashMap();
     String query =
@@ -122,8 +123,8 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     return Pagination.getPage(facilities, pageable, ids.size());
   }
 
-  private Page<Facility> searchWithoutExtraData(FacilityRepositoryCustom.SearchParams searchParams,
-      Set<UUID> geographicZoneIds, Pageable pageable) {
+  private Page<Facility> searchWithoutExtraData(SearchParams searchParams,
+                                                Set<UUID> geographicZoneIds, Pageable pageable) {
 
     Map<String, Object> params = Maps.newHashMap();
     Query countQuery = entityManager.createQuery(prepareQuery(
@@ -150,7 +151,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
     return Pagination.getPage(facilities, pageable, count);
   }
 
-  private String prepareQuery(String baseSql, FacilityRepositoryCustom.SearchParams searchParams,
+  private String prepareQuery(String baseSql, SearchParams searchParams,
       Set<UUID> geographicZoneIds, String extraData, Map<String, Object> params) {
 
     List<String> sql = Lists.newArrayList(baseSql);

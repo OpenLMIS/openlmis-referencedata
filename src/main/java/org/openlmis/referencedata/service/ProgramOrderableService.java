@@ -28,12 +28,12 @@ public class ProgramOrderableService implements ExportableDataService<ProgramOrd
   private ProgramOrderableRepository programOrderableRepository;
 
   @Override
-  public List<ProgramOrderable> findAll() {
+  public List<ProgramOrderable> findAllExportableItems() {
     return programOrderableRepository.findAll();
   }
 
   @Override
-  public Class<ProgramOrderable> getType() {
+  public Class<ProgramOrderable> getExportableType() {
     return ProgramOrderable.class;
   }
 

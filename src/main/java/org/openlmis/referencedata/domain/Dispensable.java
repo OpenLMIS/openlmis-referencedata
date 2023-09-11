@@ -75,7 +75,7 @@ public abstract class Dispensable extends BaseEntity {
    *
    * @param exporter exporter to export to
    */
-  public void export(Dispensable.Exporter exporter) {
+  public void export(Exporter exporter) {
     exporter.setAttributes(Collections.unmodifiableMap(new HashMap<>(attributes)));
     exporter.setToString(toString());
   }
@@ -90,10 +90,10 @@ public abstract class Dispensable extends BaseEntity {
    * a ContainerDispensable. If there is a dispensingUnit, create a DefaultDispensable. If none of
    * these are provided, or the Map is null, throw an Exception indicating dispensable is required.
    *
-   * @param importer instance of {@link Dispensable.Importer}
+   * @param importer instance of {@link Importer}
    * @return appropriate dispensable
    */
-  public static Dispensable createNew(Dispensable.Importer importer) {
+  public static Dispensable createNew(Importer importer) {
     if (null == importer || null == importer.getAttributes()) {
       throw new ValidationMessageException(OrderableMessageKeys.ERROR_DISPENSABLE_REQUIRED);
     }

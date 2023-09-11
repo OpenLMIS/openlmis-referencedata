@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import lombok.Getter;
-import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
@@ -35,7 +35,7 @@ import org.supercsv.prefs.CsvPreference;
  * This class has responsibility to instantiate a dozerBeanReader from given inputStream,
  * and CsvPreferences. Also is responsible for validating headers.
  */
-class CsvBeanReader<T extends BaseDto> {
+public class CsvBeanReader<T extends Identifiable> {
 
   private ModelClass<T> modelClass;
   private CsvDozerBeanReader dozerBeanReader;
@@ -45,7 +45,15 @@ class CsvBeanReader<T extends BaseDto> {
   @Getter
   private String[] headers;
 
-  CsvBeanReader(ModelClass<T> modelClass,
+  /**
+   * Constructs new CsvBeanReader.
+   *
+   * @param modelClass Model describing how the csv rows are mapped.
+   * @param inputStream Input stream containing data retrieved from csv file.
+   * @param csvHeaderValidator Checks whether headers and fields are being correct.
+   * @throws IOException If the resource can't be processed.
+   */
+  public CsvBeanReader(ModelClass<T> modelClass,
                 InputStream inputStream,
                 CsvHeaderValidator csvHeaderValidator) throws IOException {
     this.modelClass = modelClass;
@@ -54,7 +62,7 @@ class CsvBeanReader<T extends BaseDto> {
     configureProcessors();
   }
 
-  T readWithCellProcessors() throws IOException {
+  public T readWithCellProcessors() throws IOException {
     return dozerBeanReader.read(modelClass.getClazz(), processors);
   }
 
@@ -88,4 +96,5 @@ class CsvBeanReader<T extends BaseDto> {
         CsvCellProcessors.getParseProcessors(modelClass, asList(headers));
     processors = cellProcessors.toArray(new CellProcessor[cellProcessors.size()]);
   }
+
 }

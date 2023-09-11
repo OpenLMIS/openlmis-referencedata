@@ -101,9 +101,9 @@ public class DataExportService {
       ExportableDataService<T> service = beanFactory.getBean(filename
               + SERVICE_NAME_SUFFIX, ExportableDataService.class);
 
-      List<T> data = service.findAll();
+      List<T> data = service.findAllExportableItems();
 
-      formatter.process(output, data, service.getType());
+      formatter.process(output, data, service.getExportableType());
       return output;
     } catch (IOException | BeansException ex) {
       throw new ValidationMessageException(ex, MessageKeys.ERROR_IO, ex.getMessage());
