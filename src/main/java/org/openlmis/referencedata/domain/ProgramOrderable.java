@@ -287,4 +287,5 @@ public class ProgramOrderable extends BaseEntity {
 
     Money getPricePerPack();
   }
+
 }

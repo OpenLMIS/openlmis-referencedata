@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import lombok.Getter;
-import org.openlmis.referencedata.domain.Identifiable;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
@@ -35,7 +34,7 @@ import org.supercsv.prefs.CsvPreference;
  * This class has responsibility to instantiate a dozerBeanReader from given inputStream,
  * and CsvPreferences. Also is responsible for validating headers.
  */
-public class CsvBeanReader<T extends Identifiable> {
+public class CsvBeanReader<T> {
 
   private ModelClass<T> modelClass;
   private CsvDozerBeanReader dozerBeanReader;

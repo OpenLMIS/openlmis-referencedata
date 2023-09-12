@@ -18,8 +18,24 @@ package org.openlmis.referencedata.repository;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProgramOrderableRepository extends JpaRepository<ProgramOrderable, UUID> {
+
+  @Query(value = "SELECT po.* FROM referencedata.program_orderables po\n"
+      + "JOIN referencedata.orderables o ON o.id = po.orderableid \n"
+      + "JOIN referencedata.orderable_display_categories odc "
+      + "ON odc.id = po.orderabledisplaycategoryid \n"
+      + "JOIN referencedata.programs p ON p.id = po.programid \n"
+      + "WHERE p.code = :program_code AND o.code = :orderable_code AND odc.code = :category_code\n"
+      + "ORDER BY po.orderableversionnumber DESC FETCH FIRST 1 ROWS ONLY",
+      nativeQuery = true)
+  ProgramOrderable findByProgramCodeOrderableCodeCategoryCode(
+      @Param("program_code") String programCode,
+      @Param("orderable_code") String orderableCode,
+      @Param("category_code") String categoryCode);
+
 }

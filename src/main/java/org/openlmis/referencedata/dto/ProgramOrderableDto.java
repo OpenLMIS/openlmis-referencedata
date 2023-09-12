@@ -37,7 +37,8 @@ import org.openlmis.referencedata.serializer.MoneySerializer;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class ProgramOrderableDto implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
+public class ProgramOrderableDto extends BaseDto
+    implements ProgramOrderable.Importer, ProgramOrderable.Exporter {
 
   private UUID programId;
 
