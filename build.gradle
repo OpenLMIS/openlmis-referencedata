@@ -107,6 +107,7 @@ dependencies {
     testCompile 'org.togglz:togglz-testing:2.6.1.Final'
     testCompile 'org.togglz:togglz-junit:2.6.1.Final'
     testCompile "com.github.tomakehurst:wiremock:2.22.0"
+    testCompile "com.github.stefanbirkner:system-rules:1.19.0"
 
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
 
