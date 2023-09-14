@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.web;
+package org.openlmis.referencedata.web.export;
 
 import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_LACK_PARAMS;
 import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.ERROR_MISSING_DATA_PARAMETER;
@@ -22,7 +22,7 @@ import static org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys.
 import java.util.Map;
 import lombok.ToString;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.service.DataExportService;
+import org.openlmis.referencedata.service.export.DataExportService;
 import org.openlmis.referencedata.util.Message;
 
 @ToString

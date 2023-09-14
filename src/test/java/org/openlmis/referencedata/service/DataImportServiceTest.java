@@ -19,8 +19,8 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.service.DataImportService.ORDERABLE_CSV;
-import static org.openlmis.referencedata.service.DataImportService.PROGRAM_ORDERABLE_CSV;
+import static org.openlmis.referencedata.service.export.DataImportService.ORDERABLE_CSV;
+import static org.openlmis.referencedata.service.export.DataImportService.PROGRAM_ORDERABLE_CSV;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -51,6 +51,7 @@ import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.util.OrderableBuilder;
 import org.springframework.mock.web.MockMultipartFile;
 

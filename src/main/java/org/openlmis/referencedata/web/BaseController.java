@@ -58,7 +58,7 @@ public abstract class BaseController {
   public static final String API_PATH = "/api";
 
   @Autowired
-  RightService rightService;
+  protected RightService rightService;
 
   @Resource(name = "javersProvider")
   private Javers javers;
