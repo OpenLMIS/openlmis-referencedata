@@ -15,35 +15,14 @@
 
 package org.openlmis.referencedata.service.export;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.joda.money.CurrencyUnit;
-import org.joda.money.Money;
-import org.openlmis.referencedata.domain.Code;
-import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.dto.BaseDto;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.dto.ProgramOrderableCsvModel;
-import org.openlmis.referencedata.dto.ProgramOrderableDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
-import org.openlmis.referencedata.repository.OrderableRepository;
-import org.openlmis.referencedata.repository.ProgramOrderableRepository;
-import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.FileHelper;
-import org.openlmis.referencedata.util.OrderableBuilder;
-import org.openlmis.referencedata.util.messagekeys.MessageKeys;
-import org.openlmis.referencedata.validate.CsvHeaderValidator;
-import org.openlmis.referencedata.web.csv.model.ModelClass;
-import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,26 +31,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class DataImportService {
 
-  public static final String ORDERABLE_CSV = "orderable.csv";
-  public static final String PROGRAM_ORDERABLE_CSV = "programOrderable.csv";
+  @Autowired
+  private FileHelper fileHelper;
 
   @Autowired
-  private CsvHeaderValidator validator;
-
-  @Autowired
-  private OrderableRepository orderableRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private ProgramOrderableRepository programOrderableRepository;
-
-  @Autowired
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
-
-  @Autowired
-  private OrderableBuilder orderableBuilder;
+  private BeanFactory beanFactory;
 
   /**
    * Imports the data from a ZIP with CSV files.
@@ -80,113 +44,21 @@ public class DataImportService {
    */
   @Transactional
   public List<BaseDto> importData(MultipartFile zipFile) {
-    List<BaseDto> result = new ArrayList<>();
-    Map<String, InputStream> fileMap = FileHelper.convertMultipartFileToZipFileMap(zipFile);
+    Map<String, InputStream> fileMap = fileHelper.convertMultipartFileToZipFileMap(zipFile);
 
+    List<BaseDto> result = new ArrayList<>();
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
-      if (entry.getKey().equals(ORDERABLE_CSV)) {
-        result.addAll(processAndPersistOrderables(entry.getValue()));
-      } else if (entry.getKey().equals(PROGRAM_ORDERABLE_CSV)) {
-        result.addAll(processAndPersistProgramOrderables(entry.getValue()));
+      if (!beanFactory.containsBean(entry.getKey())) {
+        throw new NoSuchBeanDefinitionException(
+            "Bean for parsing " + entry.getKey() + " not found!");
       }
+
+      DataImportPersister<?, ?, ? extends BaseDto> persister =
+          beanFactory.getBean(entry.getKey(), DataImportPersister.class);
+      result.addAll(persister.processAndPersist(entry.getValue()));
     }
 
     return result;
-  }
-
-  private List<OrderableDto> processAndPersistOrderables(InputStream dataStream) {
-    List<OrderableDto> importedDtos = readCsv(OrderableDto.class, dataStream);
-    List<Orderable> persistedObjects = orderableRepository.saveAll(
-        createOrUpdateOrderables(importedDtos));
-
-    return OrderableDto.newInstance(persistedObjects);
-  }
-
-  private List<Orderable> createOrUpdateOrderables(List<OrderableDto> dtoList) {
-    List<Orderable> persistList = new ArrayList<>();
-
-    for (OrderableDto dto: dtoList) {
-      Orderable latestOrderable = orderableRepository
-          .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-              Code.code(dto.getProductCode()));
-
-      persistList.add(orderableBuilder.newOrderable(dto, latestOrderable));
-    }
-
-    return persistList;
-  }
-
-  private Set<ProgramOrderableDto> processAndPersistProgramOrderables(InputStream dataStream) {
-    List<ProgramOrderableCsvModel> importedDtos =
-        readCsv(ProgramOrderableCsvModel.class, dataStream);
-    List<ProgramOrderable> persistedObjects = programOrderableRepository.saveAll(
-        createOrUpdateProgramOrderables(importedDtos)
-    );
-
-    return ProgramOrderableDto.newInstance(persistedObjects);
-  }
-
-  private Set<ProgramOrderable> createOrUpdateProgramOrderables(
-      List<ProgramOrderableCsvModel> dtoList) {
-    Set<ProgramOrderable> persistList = new HashSet<>();
-
-    for (ProgramOrderableCsvModel dto: dtoList) {
-      Program program = programRepository.findByCode(Code.code(dto.getProgramCode()));
-      Orderable orderable = orderableRepository
-          .findByProductCode(Code.code(dto.getOrderableCode()));
-      OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
-          .findByCode(Code.code(dto.getCategoryCode()));
-
-      CurrencyUnit currency = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
-
-      ProgramOrderableDto programOrderableDto = new ProgramOrderableDto(
-          program.getId(),
-          orderableDisplayCategory.getId(),
-          orderableDisplayCategory.getOrderedDisplayValue().getDisplayName(),
-          dto.getDisplayOrder(),
-          dto.isActive(),
-          dto.isFullSupply(),
-          dto.getDisplayOrder(),
-          dto.getDosesPerPatient(),
-          Money.of(currency, Double.parseDouble(dto.getPricePerPack()))
-      );
-
-      ProgramOrderable programOrderable = programOrderableRepository
-          .findByProgramCodeOrderableCodeCategoryCode(dto.getProgramCode(),
-              dto.getOrderableCode(), dto.getCategoryCode()
-      );
-
-      if (programOrderable == null) {
-        programOrderable = ProgramOrderable.createNew(program, orderableDisplayCategory,
-            orderable, currency);
-      }
-
-      programOrderable.export(programOrderableDto);
-      persistList.add(programOrderable);
-    }
-
-    return persistList;
-  }
-
-  private <T> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
-    List<T> dtoList = new ArrayList<>();
-
-    try {
-      ModelClass<T> model = new ModelClass<>(clazz);
-      CsvBeanReader<T> reader = new CsvBeanReader<>(
-          model,
-          csvStream,
-          validator);
-
-      T readObject;
-      while ((readObject = reader.readWithCellProcessors()) != null) {
-        dtoList.add(readObject);
-      }
-    } catch (IOException e) {
-      throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
-    }
-
-    return dtoList;
   }
 
 }

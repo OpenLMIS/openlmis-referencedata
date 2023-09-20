@@ -19,18 +19,55 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
+import org.openlmis.referencedata.validate.CsvHeaderValidator;
+import org.openlmis.referencedata.web.csv.model.ModelClass;
+import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-public final class FileHelper {
+@Component
+public class FileHelper {
 
-  private FileHelper() {
-    throw new UnsupportedOperationException();
+  @Autowired
+  private CsvHeaderValidator validator;
+
+  /**
+   * Reads CSV data from an input stream and maps it to a list of objects of the specified class.
+   *
+   * @param clazz the class representing the target type for mapping CSV data
+   * @param csvStream the input stream containing the CSV data to be read
+   * @return a list of objects populated from the CSV
+   * @throws ValidationMessageException if an error occurs while reading the multipart file or
+   *                                    parsing the zip archive
+   */
+  public <T> List<T> readCsv(Class<T> clazz, InputStream csvStream) {
+    List<T> dtoList = new ArrayList<>();
+
+    try {
+      ModelClass<T> model = new ModelClass<>(clazz);
+      CsvBeanReader<T> reader = new CsvBeanReader<>(
+          model,
+          csvStream,
+          validator);
+
+      T readObject;
+      while ((readObject = reader.readWithCellProcessors()) != null) {
+        dtoList.add(readObject);
+      }
+    } catch (IOException e) {
+      throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
+    }
+
+    return dtoList;
   }
 
   /**
@@ -42,7 +79,7 @@ public final class FileHelper {
    * @throws ValidationMessageException if an error occurs while reading the multipart file or
    *                                    parsing the zip archive
    */
-  public static Map<String, InputStream> convertMultipartFileToZipFileMap(
+  public Map<String, InputStream> convertMultipartFileToZipFileMap(
           MultipartFile multipartFile) {
     byte[] buffer = new byte[1024];
 
