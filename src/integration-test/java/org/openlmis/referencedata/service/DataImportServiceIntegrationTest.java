@@ -33,7 +33,9 @@ import org.apache.commons.csv.CSVPrinter;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.Code;
@@ -147,6 +149,9 @@ public class DataImportServiceIntegrationTest {
   private Program persistedProgram;
   private OrderableDisplayCategory persistedOrderableDisplayCategory;
 
+  @Rule
+  public EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
   @Autowired
   private DataImportService dataImportService;
 
@@ -164,6 +169,7 @@ public class DataImportServiceIntegrationTest {
 
   @Before
   public void setUp() {
+    environmentVariables.set("CURRENCY_CODE", "USD");
     persistedProgram = createAndPersistProgram(PROGRAM_CODE);
     persistedOrderableDisplayCategory =
         createAndPersistOrderableDisplayCategory(ORDERABLE_DISPLAY_CATEGORY);
