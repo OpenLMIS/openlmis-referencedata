@@ -108,11 +108,11 @@ pipeline {
                         notifyAfterFailure()
                     }
                 }
-                cleanup {
-                    script {
-                        sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
-                    }
-                }
+//                cleanup {
+//                    script {
+//                        sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
+//                    }
+//                }
             }
         }
         stage('Build demo-data') {
@@ -193,11 +193,11 @@ pipeline {
                                 notifyAfterFailure()
                             }
                         }
-                        cleanup {
-                            script {
-                                sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
-                            }
-                        }
+//                        cleanup {
+//                            script {
+//                                sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
+//                            }
+//                        }
                     }
                 }
             }
