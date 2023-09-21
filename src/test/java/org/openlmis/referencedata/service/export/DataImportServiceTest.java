@@ -37,9 +37,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.web.multipart.MultipartFile;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -72,7 +72,6 @@ public class DataImportServiceTest {
     // Given
     when(fileHelper.convertMultipartFileToZipFileMap(any(MultipartFile.class)))
         .thenReturn(fileMap);
-    when(beanFactory.containsBean(anyString())).thenReturn(true);
     when(beanFactory.getBean(anyString(), eq(DataImportPersister.class))).thenReturn(
         dataImportPersister);
     when(dataImportPersister.processAndPersist(any(InputStream.class)))
@@ -86,14 +85,15 @@ public class DataImportServiceTest {
     assertEquals(1, result.size());
   }
 
-  @Test(expected = NoSuchBeanDefinitionException.class)
+  @Test(expected = ValidationMessageException.class)
   public void shouldThrowErrorIfBeanNotFound() {
     // given
     when(fileHelper.convertMultipartFileToZipFileMap(any(MultipartFile.class)))
         .thenReturn(fileMap);
-    when(beanFactory.containsBean(anyString())).thenReturn(false);
+    when(beanFactory.getBean(anyString(), eq(DataImportPersister.class)))
+        .thenThrow(ValidationMessageException.class);
 
-    // When
+    // when
     dataImportService.importData(mock(MultipartFile.class));
   }
 

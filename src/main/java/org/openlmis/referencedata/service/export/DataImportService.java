@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -48,14 +49,14 @@ public class DataImportService {
 
     List<BaseDto> result = new ArrayList<>();
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
-      if (!beanFactory.containsBean(entry.getKey())) {
-        throw new NoSuchBeanDefinitionException(
-            "Bean for parsing " + entry.getKey() + " not found!");
+      try {
+        DataImportPersister<?, ?, ? extends BaseDto> persister =
+            beanFactory.getBean(entry.getKey(), DataImportPersister.class);
+        result.addAll(persister.processAndPersist(entry.getValue()));
+      } catch (NoSuchBeanDefinitionException e) {
+        throw new ValidationMessageException(
+            "Bean for parsing " + entry.getKey() + " not found!", e);
       }
-
-      DataImportPersister<?, ?, ? extends BaseDto> persister =
-          beanFactory.getBean(entry.getKey(), DataImportPersister.class);
-      result.addAll(persister.processAndPersist(entry.getValue()));
     }
 
     return result;
