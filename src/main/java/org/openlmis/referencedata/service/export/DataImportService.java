@@ -55,7 +55,8 @@ public class DataImportService {
         result.addAll(persister.processAndPersist(entry.getValue()));
       } catch (NoSuchBeanDefinitionException e) {
         throw new ValidationMessageException(
-            "Bean for parsing " + entry.getKey() + " not found!", e);
+            "Failed to parse '" + entry.getKey() + "'. Class for parsing not found. "
+                + "Ensure that a corresponding DataImportPersister bean is properly defined.", e);
       }
     }
 
