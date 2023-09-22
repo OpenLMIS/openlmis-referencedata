@@ -26,17 +26,24 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.mock.web.MockMultipartFile;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FileHelperTest {
+
+  @InjectMocks
+  private FileHelper fileHelper;
 
   @Test
   public void shouldConvertMultipartFileToZipFileMapWithValidZipFile() throws IOException {
     byte[] fileContent = createValidZipFileContent();
     MockMultipartFile mockMultipartFile = new MockMultipartFile("test.zip", fileContent);
 
-    Map<String, InputStream> result = FileHelper
+    Map<String, InputStream> result = fileHelper
             .convertMultipartFileToZipFileMap(mockMultipartFile);
 
     assertNotNull(result);
@@ -51,7 +58,7 @@ public class FileHelperTest {
     String fileContent = "This is not a valid zip file.";
     MockMultipartFile mockMultipartFile = new MockMultipartFile(fileName, fileName,
             "application/zip", fileContent.getBytes());
-    FileHelper.convertMultipartFileToZipFileMap(mockMultipartFile);
+    fileHelper.convertMultipartFileToZipFileMap(mockMultipartFile);
   }
 
   private byte[] createValidZipFileContent() throws IOException {

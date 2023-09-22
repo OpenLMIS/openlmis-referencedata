@@ -13,14 +13,23 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.service.export;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Set;
 
-public interface ExportableDataService<T> {
+/**
+ * This interface handle importing data from files to database.
+ *
+ * @param <E> The entity type being imported.
+ * @param <D> The DTO type containing parsed data.
+ * @param <U> The DTO type for data retrieved from files.
+ */
+public interface DataImportPersister<E, D, U> {
 
-  List<T> findAllExportableItems();
+  List<U> processAndPersist(InputStream dataStream);
 
-  Class<T> getExportableType();
+  Set<E> createOrUpdate(List<D> dtoList);
 
 }

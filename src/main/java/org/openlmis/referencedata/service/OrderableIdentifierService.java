@@ -18,12 +18,13 @@ package org.openlmis.referencedata.service;
 import java.util.List;
 import org.openlmis.referencedata.dto.OrderableIdentifierCsvModel;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.service.export.ExportableDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class OrderableIdentifierService implements
-        ExportableDataService<OrderableIdentifierCsvModel> {
+    ExportableDataService<OrderableIdentifierCsvModel> {
 
   @Autowired
   private OrderableRepository orderableRepository;

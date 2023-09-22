@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.service.export;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -26,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.openlmis.referencedata.service.export.CsvFormatterService;
 import org.openlmis.referencedata.web.csv.format.CsvFormatter;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 

@@ -17,14 +17,15 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.openlmis.referencedata.web.DataExportParams.DATA;
-import static org.openlmis.referencedata.web.DataExportParams.FORMAT;
+import static org.openlmis.referencedata.web.export.DataExportParams.DATA;
+import static org.openlmis.referencedata.web.export.DataExportParams.FORMAT;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.web.export.DataExportParams;
 
 public class DataExportParamsTest {
 

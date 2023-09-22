@@ -13,7 +13,7 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.service.export;
 
 import java.io.IOException;
 import java.io.OutputStream;

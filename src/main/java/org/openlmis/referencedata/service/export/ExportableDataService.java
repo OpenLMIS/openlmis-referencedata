@@ -13,29 +13,14 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.service.export;
 
 import java.util.List;
-import org.openlmis.referencedata.dto.TradeItemCsvModel;
-import org.openlmis.referencedata.repository.TradeItemRepository;
-import org.openlmis.referencedata.service.export.ExportableDataService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
-public class TradeItemService implements ExportableDataService<TradeItemCsvModel> {
+public interface ExportableDataService<T> {
 
-  @Autowired
-  private TradeItemRepository tradeItemRepository;
+  List<T> findAllExportableItems();
 
-  @Override
-  public List<TradeItemCsvModel> findAllExportableItems() {
-    return tradeItemRepository.findAllTradeItemCsvModels();
-  }
-
-  @Override
-  public Class<TradeItemCsvModel> getExportableType() {
-    return TradeItemCsvModel.class;
-  }
+  Class<T> getExportableType();
 
 }

@@ -24,10 +24,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.openlmis.referencedata.domain.RightName.DATA_EXPORT;
-import static org.openlmis.referencedata.web.DataExportController.RESOURCE_PATH;
-import static org.openlmis.referencedata.web.DataExportController.ZIP_MEDIA_TYPE;
-import static org.openlmis.referencedata.web.DataExportParams.DATA;
-import static org.openlmis.referencedata.web.DataExportParams.FORMAT;
+import static org.openlmis.referencedata.web.export.DataExportController.RESOURCE_PATH;
+import static org.openlmis.referencedata.web.export.DataExportController.ZIP_MEDIA_TYPE;
+import static org.openlmis.referencedata.web.export.DataExportParams.DATA;
+import static org.openlmis.referencedata.web.export.DataExportParams.FORMAT;
 
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -38,6 +38,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.util.messagekeys.DataExportMessageKeys;
+import org.openlmis.referencedata.web.export.DataExportParams;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 

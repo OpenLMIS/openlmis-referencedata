@@ -120,6 +120,19 @@ public class ProgramOrderable extends BaseEntity {
   }
 
   /**
+   * Updates an instance of programOrderable with an updated version from importer.
+   *
+   * @param importer importer to update from.
+   */
+  public void updateFrom(ProgramOrderable.Importer importer) {
+    this.active = importer.isActive();
+    this.fullSupply = importer.isFullSupply();
+    this.displayOrder = importer.getDisplayOrder();
+    this.dosesPerPatient = importer.getDosesPerPatient();
+    this.pricePerPack = importer.getPricePerPack();
+  }
+
+  /**
    * Returns true if this association is for given Program.
    * @param program the {@link Program} to ask about
    * @return true if this association is for the given Program, false otherwise.
@@ -287,4 +300,5 @@ public class ProgramOrderable extends BaseEntity {
 
     Money getPricePerPack();
   }
+
 }
