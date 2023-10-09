@@ -207,6 +207,7 @@ public class Orderable implements Versionable {
                   @JoinColumn(name = "orderableVersionNumber",
                           referencedColumnName = "versionNumber")})
   @Setter
+  @Getter
   private Map<String, String> identifiers;
 
   @Embedded

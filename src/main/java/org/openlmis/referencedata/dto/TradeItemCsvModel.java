@@ -18,12 +18,14 @@ package org.openlmis.referencedata.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.openlmis.referencedata.web.csv.model.ImportField;
 
 /**
  * This class represents the data model retrieved from the db for the data export functionality.
  */
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class TradeItemCsvModel {
@@ -31,7 +33,7 @@ public class TradeItemCsvModel {
   private static final String PRODUCT_CODE = "productCode";
   private static final String MANUFACTURER_OF_TRADE_ITEM = "manufacturerOfTradeItem";
 
-  @ImportField(name = PRODUCT_CODE, mandatory = true)
+  @ImportField(name = PRODUCT_CODE, type = "code", mandatory = true)
   private String code;
 
   @ImportField(name = MANUFACTURER_OF_TRADE_ITEM)

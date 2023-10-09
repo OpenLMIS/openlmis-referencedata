@@ -82,6 +82,8 @@ import org.openlmis.referencedata.dto.TradeItemCsvModel;
 @TypeName("TradeItem")
 public final class TradeItem extends BaseEntity {
 
+  @Getter
+  @Setter
   private String manufacturerOfTradeItem;
 
   @OneToMany(mappedBy = "tradeItem", cascade = CascadeType.ALL)
