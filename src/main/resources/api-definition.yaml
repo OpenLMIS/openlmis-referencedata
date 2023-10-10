@@ -1766,7 +1766,6 @@ resourceTypes:
             file:
               displayName: File with .zip format
               type: file
-              required: false
               repeat: false
       responses:
         "200":
