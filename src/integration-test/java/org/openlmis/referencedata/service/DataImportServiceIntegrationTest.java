@@ -294,7 +294,6 @@ public class DataImportServiceIntegrationTest {
     // given
     final TradeItem persistedTradeItem1 = createAndPersistTradeItem(TEST_MANUFACTURER);
     final TradeItem persistedTradeItem2 = createAndPersistTradeItem(TEST_MANUFACTURER);
-    final TradeItem persistedTradeItem3 = createAndPersistTradeItem(TEST_MANUFACTURER);
 
     createAndPersistOrderable(
         ORDERABLE_CODE_1, TEST_NAME, TEST_DISPENSABLE,
