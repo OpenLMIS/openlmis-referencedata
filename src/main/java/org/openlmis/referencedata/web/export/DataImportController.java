@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web.export;
 import static org.openlmis.referencedata.web.export.DataImportController.RESOURCE_PATH;
 
 import java.util.List;
+import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.web.BaseController;
@@ -43,12 +44,13 @@ public class DataImportController extends BaseController {
   /**
    * Imports the data from a ZIP with CSV files.
    *
-   * @param zipFile ZIP archive being imported.
+   * @param file ZIP archive being imported.
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile zipFile) {
-    List<BaseDto> importedData = dataImportService.importData(zipFile);
+  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile file) {
+    rightService.checkAdminRight(RightName.DATA_IMPORT);
+    List<BaseDto> importedData = dataImportService.importData(file);
     return ResponseEntity.ok().body(importedData);
   }
 

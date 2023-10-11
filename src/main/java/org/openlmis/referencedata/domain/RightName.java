@@ -39,6 +39,7 @@ public class RightName {
   public static final String LOTS_MANAGE = "LOTS_MANAGE";
   public static final String ORDER_CREATE = "ORDER_CREATE";
   public static final String DATA_EXPORT = "DATA_EXPORT";
+  public static final String DATA_IMPORT = "DATA_IMPORT";
 
   private RightName() {
     throw new UnsupportedOperationException();

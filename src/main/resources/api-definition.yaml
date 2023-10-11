@@ -1766,10 +1766,11 @@ resourceTypes:
             file:
               displayName: File with .zip format
               type: file
-              required: true
               repeat: false
       responses:
         "200":
+          body:
+            application/json:
           headers:
             Keep-Alive:
         "400":

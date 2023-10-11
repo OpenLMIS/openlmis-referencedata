@@ -103,6 +103,7 @@ import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.service.SupplyPartnerBuilder;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.service.export.DataExportService;
+import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
@@ -327,6 +328,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected DataExportService dataExportService;
+
+  @MockBean
+  protected DataImportService dataImportService;
 
   /**
    * Constructor for test.
