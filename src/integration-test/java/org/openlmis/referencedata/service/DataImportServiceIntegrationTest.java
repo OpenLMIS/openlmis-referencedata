@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.transaction.Transactional;
@@ -44,19 +46,23 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramOrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.util.Pair;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -65,10 +71,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = {Application.class, DataImportService.class})
 @ActiveProfiles("test")
 @Transactional
+@SuppressWarnings({"PMD.TooManyMethods"})
 public class DataImportServiceIntegrationTest {
 
   private static final String ORDERABLES_FILE = "orderable.csv";
   private static final String PROGRAM_ORDERABLES_FILE = "programOrderable.csv";
+  private static final String TRADE_ITEM_FILE = "tradeItem.csv";
 
   private static final List<String> ORDERABLE_CORRECT_HEADERS = Arrays.asList(
       "productCode", "name", "description", "packRoundingThreshold",
@@ -78,16 +86,23 @@ public class DataImportServiceIntegrationTest {
       "program", "code", "dosesPerPatient", "active",
       "category", "fullSupply", "displayOrder", "pricePerPack");
 
+  private static final List<String> TRADE_ITEM_CORRECT_HEADERS = Arrays.asList(
+      "productCode", "manufacturerOfTradeItem");
+
   private static final String TEST_NAME = "test-name";
   private static final String ORDERABLE_CODE_1 = "0002-1975";
   private static final String ORDERABLE_CODE_2 = "0002-8400";
+  private static final String ORDERABLE_CODE_3 = "0009-0050";
   private static final String ORDERABLE_NAME_1 = "Levonorgestrel";
   private static final String ORDERABLE_NAME_2 = "Glucagon";
+  private static final String ORDERABLE_NAME_3 = "Medrol";
   private static final String ORDERABLE_DESCRIPTION = "Product description goes here.";
   private static final long ORDERABLE_PACK_ROUNDING_THRESHOLD_1 = 0;
   private static final long ORDERABLE_PACK_ROUNDING_THRESHOLD_2 = 3;
+  private static final long ORDERABLE_PACK_ROUNDING_THRESHOLD_3 = 12;
   private static final long ORDERABLE_PACK_SIZE_1 = 1;
   private static final long ORDERABLE_PACK_SIZE_2 = 94;
+  private static final long ORDERABLE_PACK_SIZE_3 = 150;
   private static final boolean ORDERABLE_IS_ROUND_TO_ZERO = false;
   private static final String DISPENSING_UNIT_KEY = "dispensingUnit";
   private static final String SIZE_CODE_KEY = "sizeCode";
@@ -115,6 +130,12 @@ public class DataImportServiceIntegrationTest {
       Money.of(CurrencyUnit.USD, PRICE_PER_PACK_1);
   private static final Money PROGRAM_ORDERABLE_PRICE_PER_PACK_2 =
       Money.of(CurrencyUnit.USD, PRICE_PER_PACK_2);
+  private static final String TEST_MANUFACTURER = "TestManufacturer";
+  private static final String ITEM_MANUFACTURER_1 = "GlaxoSmithKline";
+  private static final String ITEM_MANUFACTURER_2 = "Scandinavian Formulas";
+  private static final String ITEM_MANUFACTURER_3 = "Merck";
+  private static final String TRADE_ITEM = "tradeItem";
+  private static final String COMMODITY_TYPE = "commodityType";
 
   private static final List<List<String>> ORDERABLE_CORRECT_RECORDS = Arrays.asList(
       Arrays.asList(
@@ -128,7 +149,13 @@ public class DataImportServiceIntegrationTest {
           String.valueOf(ORDERABLE_PACK_ROUNDING_THRESHOLD_2),
           String.valueOf(ORDERABLE_PACK_SIZE_2),
           String.valueOf(ORDERABLE_IS_ROUND_TO_ZERO),
-          SIZE_CODE_KEY + ":" + SIZE_CODE_VALUE)
+          SIZE_CODE_KEY + ":" + SIZE_CODE_VALUE),
+      Arrays.asList(
+          ORDERABLE_CODE_3, ORDERABLE_NAME_3, ORDERABLE_DESCRIPTION,
+          String.valueOf(ORDERABLE_PACK_ROUNDING_THRESHOLD_3),
+          String.valueOf(ORDERABLE_PACK_SIZE_3),
+          String.valueOf(ORDERABLE_IS_ROUND_TO_ZERO),
+          DISPENSING_UNIT_KEY + ":" + DISPENSING_UNIT_VALUE)
   );
 
   private static final List<List<String>> PROGRAM_ORDERABLE_CORRECT_RECORDS = Arrays.asList(
@@ -144,6 +171,12 @@ public class DataImportServiceIntegrationTest {
           String.valueOf(PROGRAM_ORDERABLE_IS_FULL_SUPPLY_2),
           String.valueOf(PROGRAM_ORDERABLE_DISPLAY_ORDER_2),
           String.valueOf(PRICE_PER_PACK_2))
+  );
+
+  private static final List<List<String>> TRADE_ITEM_CORRECT_RECORDS = Arrays.asList(
+      Arrays.asList(ORDERABLE_CODE_1, ITEM_MANUFACTURER_1),
+      Arrays.asList(ORDERABLE_CODE_2, ITEM_MANUFACTURER_2),
+      Arrays.asList(ORDERABLE_CODE_3, ITEM_MANUFACTURER_3)
   );
 
   private Program persistedProgram;
@@ -166,6 +199,9 @@ public class DataImportServiceIntegrationTest {
 
   @Autowired
   private ProgramOrderableRepository programOrderableRepository;
+
+  @Autowired
+  private TradeItemRepository tradeItemRepository;
 
   @Before
   public void setUp() {
@@ -207,7 +243,7 @@ public class DataImportServiceIntegrationTest {
         ORDERABLE_IS_ROUND_TO_ZERO, ORDERABLE_DISPENSABLE_1);
 
     // then check if orderable was created
-    assertOrderables(importedOrderable2,ORDERABLE_NAME_2, ORDERABLE_DESCRIPTION,
+    assertOrderables(importedOrderable2, ORDERABLE_NAME_2, ORDERABLE_DESCRIPTION,
         ORDERABLE_PACK_ROUNDING_THRESHOLD_2, ORDERABLE_PACK_SIZE_2,
         ORDERABLE_IS_ROUND_TO_ZERO, ORDERABLE_DISPENSABLE_2);
   }
@@ -253,6 +289,68 @@ public class DataImportServiceIntegrationTest {
         PROGRAM_ORDERABLE_DISPLAY_ORDER_2, PROGRAM_ORDERABLE_PRICE_PER_PACK_2);
   }
 
+  @Test
+  public void shouldImportTradeItemFromValidCsvFile() throws IOException {
+    // given
+    final TradeItem persistedTradeItem1 = createAndPersistTradeItem(TEST_MANUFACTURER);
+    final TradeItem persistedTradeItem2 = createAndPersistTradeItem(TEST_MANUFACTURER);
+
+    createAndPersistOrderable(
+        ORDERABLE_CODE_1, TEST_NAME, TEST_DISPENSABLE,
+        Pair.of(COMMODITY_TYPE, persistedTradeItem1.getId().toString()));
+
+    createAndPersistOrderable(
+        ORDERABLE_CODE_2, TEST_NAME, TEST_DISPENSABLE,
+        Pair.of(TRADE_ITEM, persistedTradeItem2.getId().toString()));
+
+    createAndPersistOrderable(
+        ORDERABLE_CODE_3, TEST_NAME, TEST_DISPENSABLE);
+
+    MockMultipartFile multipartFile = createZippedCsv(TRADE_ITEM_CORRECT_RECORDS,
+        TRADE_ITEM_CORRECT_HEADERS, TRADE_ITEM_FILE);
+
+    // when
+    List<BaseDto> result = dataImportService.importData(multipartFile);
+
+    // then check if result is present
+    assertNotNull(result);
+    assertEquals(ORDERABLE_CORRECT_RECORDS.size(), result.size());
+
+    // then fetch imported objects
+    final Orderable importedOrderable1 = orderableRepository
+        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_1));
+    final TradeItem importedTradeItem1 = tradeItemRepository.findById(
+        UUID.fromString(importedOrderable1.getTradeItemIdentifier())).get();
+
+    final Orderable importedOrderable2 = orderableRepository
+        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_2));
+    final TradeItem importedTradeItem2 = tradeItemRepository.findById(
+        UUID.fromString(importedOrderable2.getTradeItemIdentifier())).get();
+
+    final Orderable importedOrderable3 = orderableRepository
+        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_3));
+    final TradeItem importedTradeItem3 = tradeItemRepository.findById(
+        UUID.fromString(importedOrderable3.getTradeItemIdentifier())).get();
+
+    // then check if orderable with commodityType identifier was updated
+    assertTrue(importedOrderable1.getIdentifiers().containsKey(TRADE_ITEM));
+    assertEquals(importedOrderable1.getTradeItemIdentifier(),
+        importedTradeItem1.getId().toString());
+    assertEquals(importedTradeItem1.getManufacturerOfTradeItem(), ITEM_MANUFACTURER_1);
+
+    // then check if orderable with existing trade item was updated
+    assertTrue(importedOrderable2.getIdentifiers().containsKey(TRADE_ITEM));
+    assertEquals(importedOrderable2.getTradeItemIdentifier(),
+        importedTradeItem2.getId().toString());
+    assertEquals(importedTradeItem2.getManufacturerOfTradeItem(), ITEM_MANUFACTURER_2);
+
+    // then check if orderable without any identifiers was updated
+    assertTrue(importedOrderable3.getIdentifiers().containsKey(TRADE_ITEM));
+    assertEquals(importedOrderable3.getTradeItemIdentifier(),
+        importedTradeItem3.getId().toString());
+    assertEquals(importedTradeItem3.getManufacturerOfTradeItem(), ITEM_MANUFACTURER_3);
+  }
+
   private void assertOrderables(Orderable importedOrderable, String name, String description,
                                 long packRoundingThreshold, long packSize,
                                 boolean isRoundToZero, Dispensable dispensable) {
@@ -295,7 +393,19 @@ public class DataImportServiceIntegrationTest {
 
   private Orderable createAndPersistOrderable(String code, String name, Dispensable dispensable) {
     Orderable orderable = new OrderableDataBuilder().withProductCode(Code.code(code))
-        .withFullProductName(name).withDispensable(dispensable)
+        .withFullProductName(name)
+        .withDispensable(dispensable)
+        .buildAsNew();
+    orderableRepository.saveAndFlush(orderable);
+    return orderable;
+  }
+
+  private Orderable createAndPersistOrderable(String code, String name, Dispensable dispensable,
+                                              Pair<String, Object> identifier) {
+    Orderable orderable = new OrderableDataBuilder().withProductCode(Code.code(code))
+        .withFullProductName(name)
+        .withDispensable(dispensable)
+        .withIdentifier(identifier.getFirst(), identifier.getSecond())
         .buildAsNew();
     orderableRepository.saveAndFlush(orderable);
     return orderable;
@@ -315,6 +425,14 @@ public class DataImportServiceIntegrationTest {
               orderableDisplayCategory).buildAsNew();
     programOrderableRepository.saveAndFlush(programOrderable);
     return programOrderable;
+  }
+
+  private TradeItem createAndPersistTradeItem(String manufacturer) {
+    TradeItem tradeItem = new TradeItemDataBuilder()
+        .withManufacturerOfTradeItem(manufacturer)
+        .buildAsNew();
+    tradeItemRepository.saveAndFlush(tradeItem);
+    return tradeItem;
   }
 
   private MockMultipartFile createZippedCsv(List<List<String>> fields,
