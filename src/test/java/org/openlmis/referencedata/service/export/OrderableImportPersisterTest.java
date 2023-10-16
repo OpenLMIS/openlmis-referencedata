@@ -34,6 +34,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
 import org.openlmis.referencedata.util.OrderableBuilder;
 
@@ -59,7 +60,7 @@ public class OrderableImportPersisterTest {
   @Before
   public void setUp() {
     dataStream = mock(InputStream.class);
-    orderable = mock(Orderable.class);
+    orderable = new OrderableDataBuilder().build();
     dto = OrderableDto.newInstance(orderable);
   }
 
@@ -87,5 +88,4 @@ public class OrderableImportPersisterTest {
     when(orderableRepository.saveAll(any())).thenReturn(
         Collections.singletonList(orderable));
   }
-
 }

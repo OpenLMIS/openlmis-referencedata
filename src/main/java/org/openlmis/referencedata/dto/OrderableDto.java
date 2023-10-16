@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.BOOLEAN_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.CODE_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.DISPENSABLE_TYPE;
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POSITIVE_LONG;
 
@@ -47,7 +49,7 @@ import org.openlmis.referencedata.web.csv.model.ImportField;
 public final class OrderableDto extends BaseDto implements Orderable.Importer,
     Orderable.Exporter {
 
-  @ImportField(name = "productCode", type = "code", mandatory = true)
+  @ImportField(name = "productCode", type = CODE_TYPE, mandatory = true)
   private String productCode;
 
   @ImportField(name = "dispensable", type = DISPENSABLE_TYPE, mandatory = true)
@@ -65,7 +67,7 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
   @ImportField(name = "packRoundingThreshold", type = POSITIVE_LONG, mandatory = true)
   private Long packRoundingThreshold;
 
-  @ImportField(name = "roundToZero", type = "Boolean", mandatory = true)
+  @ImportField(name = "roundToZero", type = BOOLEAN_TYPE, mandatory = true)
   private Boolean roundToZero;
 
   private Set<ProgramOrderableDto> programs;
