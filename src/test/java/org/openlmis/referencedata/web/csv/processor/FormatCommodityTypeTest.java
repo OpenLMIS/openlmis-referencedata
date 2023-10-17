@@ -22,9 +22,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatCommodityTypeTest {
@@ -32,10 +31,14 @@ public class FormatCommodityTypeTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatCommodityType formatCommodityType;
+  private CommodityTypeDto commodityType = new CommodityTypeDto();
+
+  private static final String EXPECTED_MESSAGE =
+      "Could not get classification system and id from '%s'. "
+      + "Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -44,12 +47,11 @@ public class FormatCommodityTypeTest {
   }
 
   @Test
-  public void shouldFormatValidCommodityType() throws Exception {
-    CommodityTypeDto commodityType = new CommodityTypeDto();
+  public void shouldFormatValidCommodityType() {
     commodityType.setClassificationId("classification-id");
     commodityType.setClassificationSystem("classification-system");
 
-    String result = (String) formatCommodityType.execute(commodityType, csvContext);
+    String result = (String) formatCommodityType.execute(commodityType, context);
 
     assertEquals(StringUtils.joinWith("|", commodityType.getClassificationSystem(),
         commodityType.getClassificationId()), result);
@@ -57,36 +59,41 @@ public class FormatCommodityTypeTest {
 
   @Test
   public void shouldThrownExceptionWhenClassificationIdIsNull() {
-    CommodityTypeDto commodityType = new CommodityTypeDto();
     commodityType.setClassificationId(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
-        commodityType.toString()));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            commodityType.toString(), context.getColumnNumber(), context.getRowNumber()
+    ));
 
-    formatCommodityType.execute(commodityType, csvContext);
+    formatCommodityType.execute(commodityType, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenClassificationSystemIsNull() {
-    CommodityTypeDto commodityType = new CommodityTypeDto();
     commodityType.setClassificationSystem(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
-        commodityType.toString()));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            commodityType.toString(), context.getColumnNumber(), context.getRowNumber()
+        ));
 
-    formatCommodityType.execute(commodityType, csvContext);
+    formatCommodityType.execute(commodityType, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenValueIsNotOrderableDtoType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Could not get classification system and id from '%s'.",
-        invalid));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            invalid, context.getColumnNumber(), context.getRowNumber()
+        ));
 
-    formatCommodityType.execute(invalid, csvContext);
+    formatCommodityType.execute(invalid, context);
   }
+
 }

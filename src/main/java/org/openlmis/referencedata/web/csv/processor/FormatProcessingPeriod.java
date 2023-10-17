@@ -17,9 +17,9 @@ package org.openlmis.referencedata.web.csv.processor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
@@ -37,22 +37,24 @@ public class FormatProcessingPeriod extends CellProcessorAdaptor implements Stri
 
       if (period.getName() == null || period.getProcessingSchedule() == null
           || period.getProcessingSchedule().getCode() == null) {
-        throw getSuperCsvCellProcessorException(period, context);
+        throw getParseException(period, context);
       }
 
       result = StringUtils.joinWith(SEPARATOR, period.getProcessingSchedule().getCode(),
           period.getName());
     } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-        String.format("Cannot format '%s' name or processing schedule.", value.toString()),
-        context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        String.format("Cannot format '%s' name or processing schedule. "
+            + "Error occurred in column '%s', in row '%s'", value.toString(),
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

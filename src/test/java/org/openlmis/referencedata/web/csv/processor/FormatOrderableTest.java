@@ -21,10 +21,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatOrderableTest {
@@ -32,10 +31,12 @@ public class FormatOrderableTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatOrderable formatOrderable;
+
+  private static final String EXPECTED_MESSAGE =
+      "Cannot get product code from '%s'. Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -47,7 +48,7 @@ public class FormatOrderableTest {
     Orderable orderable = new Orderable();
     orderable.setProductCode(Code.code("orderable-product-code"));
 
-    String result = formatOrderable.execute(orderable, csvContext);
+    String result = formatOrderable.execute(orderable, context);
 
     assertEquals("orderable-product-code", result);
   }
@@ -57,21 +58,26 @@ public class FormatOrderableTest {
     Orderable orderable = new Orderable();
     orderable.setProductCode(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get product code from '%s'.",
-            orderable.toString()));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            orderable, context.getColumnNumber(), context.getRowNumber()
+        ));
 
-    formatOrderable.execute(orderable, csvContext);
+    formatOrderable.execute(orderable, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenValueIsNotOrderableType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get product code from '%s'.", invalid));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            invalid, context.getColumnNumber(), context.getRowNumber()
+        ));
 
-    formatOrderable.execute(invalid, csvContext);
+    formatOrderable.execute(invalid, context);
   }
 
 }

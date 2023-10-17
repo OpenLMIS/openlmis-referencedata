@@ -16,9 +16,9 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import org.joda.money.Money;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatMoney extends CellProcessorAdaptor implements StringCellProcessor {
@@ -32,22 +32,23 @@ public class FormatMoney extends CellProcessorAdaptor implements StringCellProce
       Money money = (Money) value;
 
       if (money.getAmount() == null) {
-        throw getSuperCsvCellProcessorException(money, context);
+        throw getParseException(money, context);
       }
 
       result = money.getAmount().toString();
     } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-            String.format("Cannot get amount from '%s'.", value.toString()),
-            context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+            String.format("Cannot get amount from '%s'. "
+                    + "Error occurred in column '%s', in row '%s'",
+                value.toString(), context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

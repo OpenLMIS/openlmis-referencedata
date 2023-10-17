@@ -21,10 +21,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatProcessingPeriodTest {
@@ -32,10 +31,13 @@ public class FormatProcessingPeriodTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatProcessingPeriod formatProcessingPeriod;
+
+  private static final String EXPECTED_MESSAGE =
+      "Cannot format '%s' name or processing schedule. "
+          + "Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -44,14 +46,14 @@ public class FormatProcessingPeriodTest {
   }
 
   @Test
-  public void shouldFormatValidProcessingPeriod() throws Exception {
+  public void shouldFormatValidProcessingPeriod() {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
     ProcessingScheduleDto schedule = new ProcessingScheduleDto();
     schedule.setCode("schedule");
     period.setName("period");
     period.setProcessingSchedule(schedule);
 
-    String result = (String) formatProcessingPeriod.execute(period, csvContext);
+    String result = (String) formatProcessingPeriod.execute(period, context);
 
     assertEquals("schedule|period", result);
   }
@@ -61,10 +63,10 @@ public class FormatProcessingPeriodTest {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
     period.setName(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expect(ValidationMessageException.class);
     expectedEx.expectMessage(getExceptionMessage(period));
 
-    formatProcessingPeriod.execute(period, csvContext);
+    formatProcessingPeriod.execute(period, context);
   }
 
   @Test
@@ -72,10 +74,10 @@ public class FormatProcessingPeriodTest {
     ProcessingPeriodDto period = new ProcessingPeriodDto();
     period.setProcessingSchedule(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expect(ValidationMessageException.class);
     expectedEx.expectMessage(getExceptionMessage(period));
 
-    formatProcessingPeriod.execute(period, csvContext);
+    formatProcessingPeriod.execute(period, context);
   }
 
   @Test
@@ -85,23 +87,27 @@ public class FormatProcessingPeriodTest {
     schedule.setCode(null);
     period.setProcessingSchedule(schedule);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expect(ValidationMessageException.class);
     expectedEx.expectMessage(getExceptionMessage(period));
 
-    formatProcessingPeriod.execute(period, csvContext);
+    formatProcessingPeriod.execute(period, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenTriplePartIsNotAnIntegerType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
+    expectedEx.expect(ValidationMessageException.class);
     expectedEx.expectMessage(getExceptionMessage(invalid));
 
-    formatProcessingPeriod.execute(invalid, csvContext);
+    formatProcessingPeriod.execute(invalid, context);
   }
 
   private String getExceptionMessage(Object object) {
-    return String.format("Cannot format '%s' name or processing schedule.", object.toString());
+    return String.format(
+        String.format(EXPECTED_MESSAGE,
+            object.toString(), context.getColumnNumber(), context.getRowNumber()
+    ));
   }
+
 }

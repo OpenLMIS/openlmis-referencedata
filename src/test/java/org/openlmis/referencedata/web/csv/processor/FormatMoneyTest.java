@@ -22,8 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatMoneyTest {
@@ -31,10 +30,12 @@ public class FormatMoneyTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatMoney formatMoney;
+
+  private static final String EXPECTED_MESSAGE =
+      "Cannot get amount from '%s'. Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -45,7 +46,7 @@ public class FormatMoneyTest {
   public void shouldFormatValidMoney() {
     Money money = Money.parse("USD 1.23");
 
-    String result = formatMoney.execute(money, csvContext);
+    String result = formatMoney.execute(money, context);
 
     assertEquals("1.23", result);
   }
@@ -54,10 +55,13 @@ public class FormatMoneyTest {
   public void shouldThrownExceptionWhenValueIsNotMoneyType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get amount from '%s'.", invalid));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(
+        String.format(EXPECTED_MESSAGE,
+            invalid, context.getColumnNumber(), context.getRowNumber()
+        ));
 
-    formatMoney.execute(invalid, csvContext);
+    formatMoney.execute(invalid, context);
   }
 
 }

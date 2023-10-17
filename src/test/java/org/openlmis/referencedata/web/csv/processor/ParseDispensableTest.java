@@ -22,7 +22,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.domain.ContainerDispensable;
 import org.supercsv.util.CsvContext;
 
@@ -31,8 +30,7 @@ public class ParseDispensableTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParseDispensable parseDispensable;
 
@@ -43,8 +41,7 @@ public class ParseDispensableTest {
 
   @Test
   public void shouldParseValidDispensable() {
-    ContainerDispensable dispensable =
-            (ContainerDispensable) parseDispensable.execute("sizeCode:A", csvContext);
+    ContainerDispensable dispensable = parseDispensable.execute("sizeCode:A", context);
     assertNotNull(dispensable);
     assertEquals(dispensable.getAttributes().get("sizeCode"), "A");
   }

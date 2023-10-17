@@ -16,9 +16,9 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import org.openlmis.referencedata.dto.BasicFacilityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 /**
@@ -37,16 +37,18 @@ public class ParseFacility extends CellProcessorAdaptor implements StringCellPro
       result = new BasicFacilityDto();
       result.setCode(code);
     } else {
-      throw getSuperCsvCellProcessorException(value, context, null);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context,
-                                                                           Exception cause) {
-    return new SuperCsvCellProcessorException(
-        String.format("'%s' could not be parsed to Facility code", value), context, this, cause);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        String.format("'%s' could not be parsed to Facility code. "
+            + "Error occurred in column '%s', in row '%s'", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

@@ -16,9 +16,9 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import org.openlmis.referencedata.dto.BasicFacilityDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatFacility extends CellProcessorAdaptor implements StringCellProcessor {
@@ -33,21 +33,23 @@ public class FormatFacility extends CellProcessorAdaptor implements StringCellPr
       BasicFacilityDto facility = (BasicFacilityDto) value;
 
       if (facility.getCode() == null) {
-        throw getSuperCsvCellProcessorException(facility, context);
+        throw getParseException(facility, context);
       }
 
       result = facility.getCode();
     } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-        String.format("Cannot get code from '%s'.", value.toString()),
-        context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        String.format("Cannot get code from '%s'. "
+            + "Error occurred in column '%s', in row '%s'", value.toString(),
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }
