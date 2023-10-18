@@ -32,6 +32,7 @@ public class FacilityTypeDto extends BaseDto
   private String description;
   private Integer displayOrder;
   private Boolean active;
+  private boolean primaryHealthCare;
 
   /**
    * Creates new facilityTypeDto based on given {@link FacilityType}.

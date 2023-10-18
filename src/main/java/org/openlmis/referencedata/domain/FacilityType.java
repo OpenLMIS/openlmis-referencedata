@@ -55,6 +55,10 @@ public class FacilityType extends BaseEntity {
   @Setter
   private Boolean active;
 
+  @Getter
+  @Setter
+  private boolean primaryHealthCare;
+
   public FacilityType(String code) {
     this.code = code;
   }
@@ -69,6 +73,7 @@ public class FacilityType extends BaseEntity {
     this.description = facilityType.description;
     this.displayOrder = facilityType.displayOrder;
     this.active = facilityType.active;
+    this.primaryHealthCare = facilityType.primaryHealthCare;
   }
 
   @Override
@@ -102,6 +107,7 @@ public class FacilityType extends BaseEntity {
     facilityType.setDescription(importer.getDescription());
     facilityType.setDisplayOrder(importer.getDisplayOrder());
     facilityType.setActive(importer.getActive());
+    facilityType.setPrimaryHealthCare(importer.isPrimaryHealthCare());
 
     return facilityType;
   }
@@ -118,6 +124,7 @@ public class FacilityType extends BaseEntity {
     exporter.setDescription(description);
     exporter.setDisplayOrder(displayOrder);
     exporter.setActive(active);
+    exporter.setPrimaryHealthCare(primaryHealthCare);
   }
 
   public interface Exporter extends BaseExporter {
@@ -131,6 +138,8 @@ public class FacilityType extends BaseEntity {
     void setDisplayOrder(Integer displayOrder);
 
     void setActive(Boolean active);
+
+    void setPrimaryHealthCare(boolean isPrimaryHealthCare);
   }
 
   public interface Importer extends BaseImporter {
@@ -144,5 +153,8 @@ public class FacilityType extends BaseEntity {
     Integer getDisplayOrder();
 
     Boolean getActive();
+
+    boolean isPrimaryHealthCare();
+
   }
 }
