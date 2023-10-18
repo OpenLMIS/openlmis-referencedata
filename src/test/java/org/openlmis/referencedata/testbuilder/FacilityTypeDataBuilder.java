@@ -28,6 +28,7 @@ public class FacilityTypeDataBuilder {
   private String description;
   private Integer displayOrder;
   private Boolean active;
+  private boolean primaryHealthCare;
 
   /**
    * Returns instance of {@link FacilityTypeDataBuilder} with sample data.
@@ -41,13 +42,14 @@ public class FacilityTypeDataBuilder {
     displayOrder = 1;
     active = true;
     description = "description";
+    primaryHealthCare = false;
   }
 
   /**
    * Builds instance of {@link FacilityType} without id.
    */
   public FacilityType buildAsNew() {
-    return new FacilityType(code, name, description, displayOrder, active);
+    return new FacilityType(code, name, description, displayOrder, active, primaryHealthCare);
   }
 
   /**
