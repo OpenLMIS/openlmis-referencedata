@@ -456,7 +456,7 @@ public class DataImportServiceIntegrationTest {
     zip.write(csvOutputStream.toByteArray());
     zip.closeEntry();
 
-    return new MockMultipartFile(fileName, fileName,
+    return new MockMultipartFile("test.zip", "test.zip",
         "application/zip", zipOutputStream.toByteArray());
   }
 

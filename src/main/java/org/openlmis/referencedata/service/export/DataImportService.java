@@ -22,6 +22,8 @@ import java.util.Map;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,18 +48,19 @@ public class DataImportService {
    */
   @Transactional
   public List<BaseDto> importData(MultipartFile zipFile) {
+    fileHelper.validateMultipartFile(zipFile);
     Map<String, InputStream> fileMap = fileHelper.convertMultipartFileToZipFileMap(zipFile);
 
     List<BaseDto> result = new ArrayList<>();
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
       try {
+        fileHelper.isCsvFile(entry.getKey());
         DataImportPersister<?, ?, ? extends BaseDto> persister =
             beanFactory.getBean(entry.getKey(), DataImportPersister.class);
         result.addAll(persister.processAndPersist(entry.getValue()));
       } catch (NoSuchBeanDefinitionException e) {
-        throw new ValidationMessageException(
-            "Failed to parse '" + entry.getKey() + "'. Class for parsing not found. "
-                + "Ensure that a corresponding DataImportPersister bean is properly defined.", e);
+          throw new ValidationMessageException(e, new Message(
+                  CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, entry.getKey()));
       } catch (SuperCsvConstraintViolationException e) {
         throw new ValidationMessageException("Import error in column: "
         + e.getCsvContext().getColumnNumber() + ", in row: "

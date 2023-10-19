@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +41,9 @@ public class FileHelper {
 
   @Autowired
   private CsvHeaderValidator validator;
+
+  @Autowired
+  private Environment env;
 
   /**
    * Reads CSV data from an input stream and maps it to a list of objects of the specified class.
@@ -105,6 +110,56 @@ public class FileHelper {
       return zipFileMap;
     } catch (IOException e) {
       throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
+    }
+  }
+
+  /**
+   * Validates given multipartFile. Checks if file has zip extension and
+   * size does not exceed maximum size.
+   *
+   * @param multipartFile the multipart file containing the zip archive
+   * @throws ValidationMessageException if any of check fails
+   */
+  public void validateMultipartFile(MultipartFile multipartFile) {
+    isZipFile(multipartFile);
+    hasValidSize(multipartFile);
+  }
+
+  /**
+   * Checks if given fileName contains appropriate extension.
+   *
+   * @param fileName name of csv file to validate
+   * @throws ValidationMessageException if file has inappropriate extension
+   */
+  public void isCsvFile(String fileName) {
+    String fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    if (!fileExtension.equalsIgnoreCase(".csv")) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName, fileExtension, ".csv"));
+    }
+  }
+
+  private void isZipFile(MultipartFile file) {
+    String fileName = file.getOriginalFilename();
+    if (null == fileName) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_RETRIEVE_FILE_NAME));
+    }
+    String fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    if (!fileExtension.equalsIgnoreCase(".zip")) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName, fileExtension, ".zip"));
+    }
+  }
+
+  private void hasValidSize(MultipartFile file) {
+    String zipMaxSize = env.getProperty("zipMaxSize");
+    long zipMaxSizeLong = (null == zipMaxSize) ? 1000000 : Long.parseLong(zipMaxSize);
+    long fileSize = file.getSize();
+
+    if (fileSize > zipMaxSizeLong) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_FILE_TOO_LARGE, zipMaxSizeLong, fileSize));
     }
   }
 
