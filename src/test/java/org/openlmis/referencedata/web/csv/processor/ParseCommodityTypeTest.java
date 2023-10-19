@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,9 +34,6 @@ public class ParseCommodityTypeTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParseCommodityType parseCommodityType;
-
-  private static final String EXPECTED_MESSAGE =
-      "'%s' could not be parsed to Commodity Type. Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -56,12 +54,9 @@ public class ParseCommodityTypeTest {
     String value = "1";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            value, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
-    parseCommodityType.execute(1, context);
+    parseCommodityType.execute(value, context);
   }
 
   @Test
@@ -69,10 +64,7 @@ public class ParseCommodityTypeTest {
     String value = "something";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            value, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
     parseCommodityType.execute(value, context);
   }
@@ -82,10 +74,7 @@ public class ParseCommodityTypeTest {
     String value = "one|two|three";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            value, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
     parseCommodityType.execute(value, context);
   }

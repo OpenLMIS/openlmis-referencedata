@@ -16,14 +16,19 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ParsePositiveIntegerTest {
 
   @Rule
@@ -32,12 +37,6 @@ public class ParsePositiveIntegerTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParsePositiveInteger parseAmount;
-
-  private static final String EXPECTED_MESSAGE =
-      "'%s' could not be parsed to integer amount. Error occurred in column '%s', in row '%s'";
-
-  private static final String EXPECTED_MESSAGE_NEGATIVE =
-      "'%s' must be a positive number or zero. Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -55,10 +54,7 @@ public class ParsePositiveIntegerTest {
     String value = "abc";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            value, context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
     parseAmount.execute(value, context);
   }
@@ -68,10 +64,7 @@ public class ParsePositiveIntegerTest {
     String value = "-1000";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE_NEGATIVE,
-            value, context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedEx.expectMessage(ERROR_UPLOAD_POSITIVE_OR_ZERO);
 
     parseAmount.execute(value, context);
   }

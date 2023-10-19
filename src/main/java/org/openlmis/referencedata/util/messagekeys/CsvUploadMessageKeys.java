@@ -15,21 +15,23 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
-import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
+public class CsvUploadMessageKeys extends MessageKeys {
 
-public class CsvUploadMessageKeys {
+  private static final String ERROR_PREFIX = join(SERVICE_ERROR, UPLOAD);
 
-  private static final String ERROR_PREFIX = SERVICE_ERROR + ".upload";
+  public static final String ERROR_UPLOAD_RECORD_INVALID = join(ERROR_PREFIX, RECORD, INVALID);
+  public static final String ERROR_FILE_IS_EMPTY = join(ERROR_PREFIX, FILE, EMPTY);
+  public static final String ERROR_INCORRECT_FILE_FORMAT = join(
+      ERROR_PREFIX, FILE, FORMAT, INCORRECT);
+  public static final String ERROR_UPLOAD_HEADER_MISSING = join(ERROR_PREFIX, HEADER, MISSING);
+  public static final String ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS = join(
+      ERROR_PREFIX, MANDATORY, COLUMNS, MISSING);
+  public static final String ERROR_UPLOAD_HEADER_INVALID = join(ERROR_PREFIX, HEADER, INVALID);
+  public static final String ERROR_UPLOAD_FORMATTING_FAILED = join(
+      ERROR_PREFIX, RECORD, FORMATTING, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_FAILED = join(
+      ERROR_PREFIX, RECORD, PARSING, FAILED);
+  public static final String ERROR_UPLOAD_POSITIVE_OR_ZERO = join(
+      ERROR_PREFIX, RECORD, MUST_BE_POSITIVE_OR_ZERO);
 
-  public static final String ERROR_UPLOAD_RECORD_INVALID = ERROR_PREFIX + ".record.invalid";
-  public static final String ERROR_FILE_IS_EMPTY = ERROR_PREFIX + ".file.empty";
-  public static final String ERROR_INCORRECT_FILE_FORMAT = ERROR_PREFIX + ".file.format.incorrect";
-  public static final String ERROR_UPLOAD_HEADER_MISSING = ERROR_PREFIX + ".header.missing";
-  public static final String ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS = ERROR_PREFIX
-      + ".mandatory.columns.missing";
-  public static final String ERROR_UPLOAD_HEADER_INVALID = ERROR_PREFIX + ".header.invalid";
-
-  private CsvUploadMessageKeys() {
-    throw new UnsupportedOperationException();
-  }
 }

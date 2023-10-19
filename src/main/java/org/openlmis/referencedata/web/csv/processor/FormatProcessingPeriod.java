@@ -15,9 +15,12 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -52,8 +55,7 @@ public class FormatProcessingPeriod extends CellProcessorAdaptor implements Stri
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
     return new ValidationMessageException(
-        String.format("Cannot format '%s' name or processing schedule. "
-            + "Error occurred in column '%s', in row '%s'", value.toString(),
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "name or processing schedule", value,
             context.getColumnNumber(), context.getRowNumber()));
   }
 

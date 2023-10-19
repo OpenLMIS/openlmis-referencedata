@@ -15,9 +15,12 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -55,9 +58,8 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
     return new ValidationMessageException(
-            String.format("Cannot get dispensing unit or size code from '%s'. "
-                + "Error occurred in column '%s', in row '%s'", value.toString(),
-                context.getColumnNumber(), context.getRowNumber()));
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "dispensing unit or size code", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

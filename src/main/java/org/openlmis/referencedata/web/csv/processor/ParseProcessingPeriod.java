@@ -15,10 +15,13 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+
 import java.util.regex.Pattern;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
 import org.openlmis.referencedata.dto.ProcessingScheduleDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -57,10 +60,9 @@ public class ParseProcessingPeriod extends CellProcessorAdaptor implements Strin
 
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
-    return new ValidationMessageException(String.format(
-        "'%s' could not be parsed to Processing Period. "
-            + "Error occurred in column '%s', in row '%s'", value,
-        context.getColumnNumber(), context.getRowNumber()));
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_PARSING_FAILED, value, "Processing Period",
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,9 +35,6 @@ public class FormatProgramTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatProgram formatProgram;
-
-  private static final String EXPECTED_MESSAGE =
-      "Cannot get code from '%s'. Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -59,10 +57,7 @@ public class FormatProgramTest {
     program.setCode(null);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            program, context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProgram.execute(program, context);
   }
@@ -72,10 +67,7 @@ public class FormatProgramTest {
     String invalid = "invalid-type";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            invalid, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProgram.execute(invalid, context);
   }

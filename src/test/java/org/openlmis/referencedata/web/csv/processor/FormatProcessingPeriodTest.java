@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,10 +35,6 @@ public class FormatProcessingPeriodTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatProcessingPeriod formatProcessingPeriod;
-
-  private static final String EXPECTED_MESSAGE =
-      "Cannot format '%s' name or processing schedule. "
-          + "Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -64,7 +61,7 @@ public class FormatProcessingPeriodTest {
     period.setName(null);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(getExceptionMessage(period));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProcessingPeriod.execute(period, context);
   }
@@ -75,7 +72,7 @@ public class FormatProcessingPeriodTest {
     period.setProcessingSchedule(null);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(getExceptionMessage(period));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProcessingPeriod.execute(period, context);
   }
@@ -88,7 +85,7 @@ public class FormatProcessingPeriodTest {
     period.setProcessingSchedule(schedule);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(getExceptionMessage(period));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProcessingPeriod.execute(period, context);
   }
@@ -98,16 +95,9 @@ public class FormatProcessingPeriodTest {
     String invalid = "invalid-type";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(getExceptionMessage(invalid));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatProcessingPeriod.execute(invalid, context);
-  }
-
-  private String getExceptionMessage(Object object) {
-    return String.format(
-        String.format(EXPECTED_MESSAGE,
-            object.toString(), context.getColumnNumber(), context.getRowNumber()
-    ));
   }
 
 }

@@ -77,6 +77,20 @@ public abstract class MessageKeys {
   protected static final String NOT_TOGETHER = "notTogether";
   protected static final String PARAMETER = "parameter";
   protected static final String DATA = "data";
+  protected static final String EXPORT = "export";
+  protected static final String RECORD = "record";
+  protected static final String IDEAL_STOCK_AMOUNT = "idealStockAmount";
+  protected static final String NOT_ALLOWED = "notAllowed";
+  protected static final String FIELD = "field";
+  protected static final String UPLOAD = "upload";
+  protected static final String FILE = "file";
+  protected static final String INCORRECT = "incorrect";
+  protected static final String HEADER = "header";
+  protected static final String MANDATORY = "mandatory";
+  protected static final String COLUMNS = "columns";
+  protected static final String FORMATTING = "formatting";
+  protected static final String PARSING = "parsing";
+  protected static final String MUST_BE_POSITIVE_OR_ZERO = "mustBePositiveOrZero";
 
   // Entities
   protected static final String LOT = "lot";
@@ -136,4 +150,5 @@ public abstract class MessageKeys {
   protected static String join(String... params) {
     return String.join(DELIMITER, Arrays.asList(params));
   }
+
 }

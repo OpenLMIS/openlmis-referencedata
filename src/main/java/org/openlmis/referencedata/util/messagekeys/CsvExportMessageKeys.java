@@ -15,15 +15,10 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
-import static org.openlmis.referencedata.util.messagekeys.MessageKeys.SERVICE_ERROR;
+public class CsvExportMessageKeys extends MessageKeys {
 
-public class CsvExportMessageKeys {
+  private static final String ERROR_PREFIX = join(SERVICE_ERROR, EXPORT);
 
-  private static final String ERROR_PREFIX = SERVICE_ERROR + ".export";
+  public static final String ERROR_EXPORT_RECORD_INVALID = join(ERROR_PREFIX, RECORD, INVALID);
 
-  public static final String ERROR_EXPORT_RECORD_INVALID = ERROR_PREFIX + ".record.invalid";
-
-  private CsvExportMessageKeys() {
-    throw new UnsupportedOperationException();
-  }
 }

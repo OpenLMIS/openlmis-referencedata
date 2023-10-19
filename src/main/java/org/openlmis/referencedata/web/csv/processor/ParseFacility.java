@@ -15,8 +15,11 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+
 import org.openlmis.referencedata.dto.BasicFacilityDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -46,8 +49,7 @@ public class ParseFacility extends CellProcessorAdaptor implements StringCellPro
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
     return new ValidationMessageException(
-        String.format("'%s' could not be parsed to Facility code. "
-            + "Error occurred in column '%s', in row '%s'", value,
+        new Message(ERROR_UPLOAD_PARSING_FAILED, value, "Facility code",
             context.getColumnNumber(), context.getRowNumber()));
   }
 

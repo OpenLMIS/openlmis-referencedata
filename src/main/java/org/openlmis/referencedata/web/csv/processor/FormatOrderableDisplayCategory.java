@@ -15,8 +15,11 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -47,9 +50,8 @@ public class FormatOrderableDisplayCategory extends CellProcessorAdaptor
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
     return new ValidationMessageException(
-            String.format("Cannot get code from '%s'. "
-                + "Error occurred in column '%s', in row '%s'", value.toString(),
-                context.getColumnNumber(), context.getRowNumber()));
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "code", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

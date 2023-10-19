@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -34,16 +35,13 @@ public class FormatCommodityTypeTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatCommodityType formatCommodityType;
-  private CommodityTypeDto commodityType = new CommodityTypeDto();
-
-  private static final String EXPECTED_MESSAGE =
-      "Could not get classification system and id from '%s'. "
-      + "Error occurred in column '%s', in row '%s'";
+  private CommodityTypeDto commodityType;
 
   @Before
   public void beforeEach() {
     FormatCommodityType.SEPARATOR = "|";
     formatCommodityType = new FormatCommodityType();
+    commodityType = new CommodityTypeDto();
   }
 
   @Test
@@ -62,10 +60,7 @@ public class FormatCommodityTypeTest {
     commodityType.setClassificationId(null);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            commodityType.toString(), context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatCommodityType.execute(commodityType, context);
   }
@@ -75,10 +70,7 @@ public class FormatCommodityTypeTest {
     commodityType.setClassificationSystem(null);
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            commodityType.toString(), context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatCommodityType.execute(commodityType, context);
   }
@@ -88,10 +80,7 @@ public class FormatCommodityTypeTest {
     String invalid = "invalid-type";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            invalid, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatCommodityType.execute(invalid, context);
   }

@@ -15,9 +15,12 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -52,8 +55,7 @@ public class FormatCommodityType extends CellProcessorAdaptor implements StringC
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context) {
     return new ValidationMessageException(
-        String.format("Could not get classification system and id from '%s'. "
-            + "Error occurred in column '%s', in row '%s'", value.toString(),
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "classification system and id", value,
             context.getColumnNumber(), context.getRowNumber()));
   }
 

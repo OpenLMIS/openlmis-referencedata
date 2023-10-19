@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
@@ -35,10 +36,6 @@ public class FormatDispensableTest {
   private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatDispensable formatDispensable;
-
-  private static final String EXPECTED_MESSAGE =
-      "Cannot get dispensing unit or size code from '%s'. "
-          + "Error occurred in column '%s', in row '%s'";
 
   @Before
   public void beforeEach() {
@@ -70,10 +67,7 @@ public class FormatDispensableTest {
     String invalid = "invalid-type";
 
     expectedException.expect(ValidationMessageException.class);
-    expectedException.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            invalid, context.getColumnNumber(), context.getRowNumber()
-        ));
+    expectedException.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatDispensable.execute(invalid, context);
   }
@@ -83,10 +77,7 @@ public class FormatDispensableTest {
     DispensableDto dto = new DispensableDto(null, null, null, "display-unit");
 
     expectedException.expect(ValidationMessageException.class);
-    expectedException.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            dto, context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedException.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
     formatDispensable.execute(dto, context);
   }

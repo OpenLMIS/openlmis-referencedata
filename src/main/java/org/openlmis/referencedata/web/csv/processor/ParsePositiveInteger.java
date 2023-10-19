@@ -15,7 +15,11 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
+
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
@@ -52,19 +56,15 @@ public class ParsePositiveInteger extends CellProcessorAdaptor implements String
 
   private ValidationMessageException getNegativeValueException(Object value,
                                                                CsvContext context) {
-    return new ValidationMessageException(
-        String.format("'%s' must be a positive number or zero."
-                + " Error occurred in column '%s', in row '%s'", value,
-            context.getColumnNumber(), context.getRowNumber()));
+    return new ValidationMessageException(new Message(ERROR_UPLOAD_POSITIVE_OR_ZERO,
+        value, context.getColumnNumber(), context.getRowNumber()));
   }
 
   private ValidationMessageException getParseException(Object value,
                                                        CsvContext context,
                                                        Exception ex) {
-    return new ValidationMessageException(ex,
-        String.format("'%s' could not be parsed to integer amount. "
-            + "Error occurred in column '%s', in row '%s'", value,
-            context.getColumnNumber(), context.getRowNumber()));
+    return new ValidationMessageException(ex, new Message(ERROR_UPLOAD_PARSING_FAILED,
+        value, "integer value", context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

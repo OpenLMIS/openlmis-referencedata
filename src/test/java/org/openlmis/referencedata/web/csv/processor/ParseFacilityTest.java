@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,9 +35,6 @@ public class ParseFacilityTest {
 
   private ParseFacility parseFacility;
 
-  private static final String EXPECTED_MESSAGE =
-      "'%s' could not be parsed to Facility code. Error occurred in column '%s', in row '%s'";
-
   @Before
   public void beforeEach() {
     parseFacility = new ParseFacility();
@@ -50,15 +48,12 @@ public class ParseFacilityTest {
 
   @Test
   public void shouldThrownExceptionWhenParameterIsNotString() {
-    String value = "1";
+    int value = 1;
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(
-        String.format(EXPECTED_MESSAGE,
-            value, context.getColumnNumber(), context.getRowNumber()
-    ));
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
-    parseFacility.execute(1, context);
+    parseFacility.execute(value, context);
   }
 
 }
