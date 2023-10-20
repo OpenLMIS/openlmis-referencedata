@@ -22,7 +22,6 @@ import java.util.Set;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.FileHelper;
 import org.openlmis.referencedata.util.OrderableBuilder;
@@ -54,12 +53,7 @@ public class OrderableImportPersister
   @Override
   public Set<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
     Set<Orderable> persistList = new HashSet<>();
-
     for (OrderableDto dto: dtoList) {
-      if (dto.getProductCode() == null || dto.getProductCode().isEmpty()) {
-        throw new ValidationMessageException("Product code cannot be empty");
-      }
-
       Orderable latestOrderable = orderableRepository
           .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
               Code.code(dto.getProductCode()));

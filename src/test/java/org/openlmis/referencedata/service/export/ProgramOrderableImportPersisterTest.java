@@ -113,7 +113,8 @@ public class ProgramOrderableImportPersisterTest {
     when(fileHelper.readCsv(ProgramOrderableCsvModel.class, dataStream))
         .thenReturn(Collections.singletonList(csvModel));
     when(programRepository.findByCode(any(Code.class))).thenReturn(mock(Program.class));
-    when(orderableRepository.findByProductCode(any(Code.class))).thenReturn(mock(Orderable.class));
+    when(orderableRepository.findFirstByProductCodeOrderByIdentityVersionNumberDesc(
+        any(Code.class))).thenReturn(mock(Orderable.class));
     when(orderableDisplayCategoryRepository.findByCode(any(Code.class))).thenReturn(
         orderableDisplayCategory);
     when(programOrderableRepository.saveAll(any()))

@@ -59,10 +59,11 @@ public class DataImportService {
             "Failed to parse '" + entry.getKey() + "'. Class for parsing not found. "
                 + "Ensure that a corresponding DataImportPersister bean is properly defined.", e);
       } catch (SuperCsvConstraintViolationException e) {
-        throw new ValidationMessageException("Empty field in column: "
-            + e.getCsvContext().getColumnNumber() + ", in row: "
-            + e.getCsvContext().getLineNumber()
-            + ", in file: " + entry.getKey(), e);
+        throw new ValidationMessageException("Import error in column: "
+        + e.getCsvContext().getColumnNumber() + ", in row: "
+        + e.getCsvContext().getLineNumber()
+        + ", in file: " + entry.getKey() + ". Reason: "
+        + e.getMessage(), e);
       }
     }
 
