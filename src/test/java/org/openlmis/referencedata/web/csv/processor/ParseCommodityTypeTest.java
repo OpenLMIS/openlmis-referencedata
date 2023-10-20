@@ -16,14 +16,14 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class ParseCommodityTypeTest {
@@ -31,8 +31,7 @@ public class ParseCommodityTypeTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParseCommodityType parseCommodityType;
 
@@ -43,34 +42,41 @@ public class ParseCommodityTypeTest {
   }
 
   @Test
-  public void shouldParseValidCommodityType() throws Exception {
+  public void shouldParseValidCommodityType() {
     CommodityTypeDto result = (CommodityTypeDto) parseCommodityType
-        .execute("system|id", csvContext);
+        .execute("system|id", context);
     assertEquals("system", result.getClassificationSystem());
     assertEquals("id", result.getClassificationId());
   }
 
   @Test
   public void shouldThrownExceptionWhenParameterIsNotString() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'1' could not be parsed to Commodity Type");
+    String value = "1";
 
-    parseCommodityType.execute(1, csvContext);
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
+
+    parseCommodityType.execute(value, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenParameterHasNoSeparator() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'something' could not be parsed to Commodity Type");
+    String value = "something";
 
-    parseCommodityType.execute("something", csvContext);
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
+
+    parseCommodityType.execute(value, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenParameterHasMoreThanTwoParts() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'one|two|three' could not be parsed to Commodity Type");
+    String value = "one|two|three";
 
-    parseCommodityType.execute("one|two|three", csvContext);
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
+
+    parseCommodityType.execute(value, context);
   }
+
 }

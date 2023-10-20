@@ -74,7 +74,8 @@ public class ProgramOrderableImportPersister implements DataImportPersister<Prog
     for (ProgramOrderableCsvModel dto: dtoList) {
       Program program = programRepository.findByCode(Code.code(dto.getProgramCode()));
       Orderable orderable = orderableRepository
-          .findByProductCode(Code.code(dto.getOrderableCode()));
+          .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
+              Code.code(dto.getOrderableCode()));
       OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
           .findByCode(Code.code(dto.getCategoryCode()));
 

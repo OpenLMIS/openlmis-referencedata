@@ -15,10 +15,13 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class ParseCode extends CellProcessorAdaptor implements StringCellProcessor {
@@ -32,15 +35,16 @@ public class ParseCode extends CellProcessorAdaptor implements StringCellProcess
       String code = String.valueOf(value);
       result = Code.code(code);
     } else {
-      throw getSuperCsvCellProcessorException(value, context, null);
+      throw getParseException(value, context);
     }
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context,
-                                                                           Exception cause) {
-    return new SuperCsvCellProcessorException(
-            String.format("'%s' could not be parsed to Code", value), context, this, cause);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_PARSING_FAILED, value, "Code",
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

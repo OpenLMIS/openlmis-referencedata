@@ -16,15 +16,15 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatOrderableDisplayCategoryTest {
@@ -32,8 +32,7 @@ public class FormatOrderableDisplayCategoryTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatOrderableDisplayCategory formatOrderableDisplayCategory;
 
@@ -47,7 +46,7 @@ public class FormatOrderableDisplayCategoryTest {
     OrderableDisplayCategory category = OrderableDisplayCategory.createNew(Code
             .code("orderable-display-category-code"));
 
-    String result = formatOrderableDisplayCategory.execute(category, csvContext);
+    String result = formatOrderableDisplayCategory.execute(category, context);
 
     assertEquals("orderable-display-category-code", result);
   }
@@ -56,10 +55,10 @@ public class FormatOrderableDisplayCategoryTest {
   public void shouldThrownExceptionWhenValueIsNotOrderableDisplayCategoryType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get code from '%s'.", invalid));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
-    formatOrderableDisplayCategory.execute(invalid, csvContext);
+    formatOrderableDisplayCategory.execute(invalid, context);
   }
 
 }

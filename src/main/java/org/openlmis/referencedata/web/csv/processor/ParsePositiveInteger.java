@@ -15,9 +15,13 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
+
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 /**
@@ -37,24 +41,30 @@ public class ParsePositiveInteger extends CellProcessorAdaptor implements String
       try {
         result = Integer.valueOf(textValue);
       } catch (NumberFormatException ex) {
-        throw getSuperCsvCellProcessorException(textValue, context, ex);
+        throw getParseException(textValue, context, ex);
       }
 
       if (result < 0) {
-        throw new SuperCsvCellProcessorException(
-            String.format("'%s' is less than 0", value), context, this, null);
+        throw getNegativeValueException(value, context);
       }
     } else {
-      throw getSuperCsvCellProcessorException(value, context, null);
+      throw getParseException(value, context, null);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context,
-                                                                           Exception cause) {
-    return new SuperCsvCellProcessorException(
-        String.format("'%s' could not be parsed to integer amount", value), context, this, cause);
+  private ValidationMessageException getNegativeValueException(Object value,
+                                                               CsvContext context) {
+    return new ValidationMessageException(new Message(ERROR_UPLOAD_POSITIVE_OR_ZERO,
+        value, context.getColumnNumber(), context.getRowNumber()));
   }
+
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context,
+                                                       Exception ex) {
+    return new ValidationMessageException(ex, new Message(ERROR_UPLOAD_PARSING_FAILED,
+        value, "integer value", context.getColumnNumber(), context.getRowNumber()));
+  }
+
 }

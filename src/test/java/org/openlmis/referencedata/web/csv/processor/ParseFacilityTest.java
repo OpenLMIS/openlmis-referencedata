@@ -16,14 +16,14 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.dto.BasicFacilityDto;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class ParseFacilityTest {
@@ -31,8 +31,7 @@ public class ParseFacilityTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParseFacility parseFacility;
 
@@ -42,16 +41,19 @@ public class ParseFacilityTest {
   }
 
   @Test
-  public void shouldParseValidFacility() throws Exception {
-    BasicFacilityDto result = (BasicFacilityDto) parseFacility.execute("facility-code", csvContext);
+  public void shouldParseValidFacility() {
+    BasicFacilityDto result = (BasicFacilityDto) parseFacility.execute("facility-code", context);
     assertEquals("facility-code", result.getCode());
   }
 
   @Test
   public void shouldThrownExceptionWhenParameterIsNotString() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'1' could not be parsed to Facility code");
+    int value = 1;
 
-    parseFacility.execute(1, csvContext);
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
+
+    parseFacility.execute(value, context);
   }
+
 }

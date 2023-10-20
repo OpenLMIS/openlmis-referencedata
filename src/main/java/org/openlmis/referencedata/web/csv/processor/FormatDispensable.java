@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatDispensable extends CellProcessorAdaptor implements StringCellProcessor {
@@ -42,21 +45,21 @@ public class FormatDispensable extends CellProcessorAdaptor implements StringCel
                 Dispensable.KEY_DISPENSING_UNIT,
                 dispensable.getAttributes().get(Dispensable.KEY_DISPENSING_UNIT));
       } else {
-        throw getSuperCsvCellProcessorException(dispensable, context);
+        throw getParseException(dispensable, context);
       }
 
     } else {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-            String.format("Cannot get dispensing unit or size code from '%s'.", value.toString()),
-            context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "dispensing unit or size code", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

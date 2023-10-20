@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+
 import java.util.regex.Pattern;
 import org.openlmis.referencedata.dto.CommodityTypeDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class ParseCommodityType extends CellProcessorAdaptor implements StringCellProcessor {
@@ -35,23 +38,24 @@ public class ParseCommodityType extends CellProcessorAdaptor implements StringCe
       String[] parts = String.valueOf(value).split(Pattern.quote(SEPARATOR));
 
       if (parts.length != 2) {
-        throw getSuperCsvCellProcessorException(value, context, null);
+        throw getParseException(value, context);
       }
 
       result = new CommodityTypeDto();
       result.setClassificationSystem(parts[0].trim());
       result.setClassificationId(parts[1].trim());
     } else {
-      throw getSuperCsvCellProcessorException(value, context, null);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context,
-                                                                           Exception cause) {
-    return new SuperCsvCellProcessorException(
-        String.format("'%s' could not be parsed to Commodity Type", value), context, this, cause);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_PARSING_FAILED, value, "Commodity Type",
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

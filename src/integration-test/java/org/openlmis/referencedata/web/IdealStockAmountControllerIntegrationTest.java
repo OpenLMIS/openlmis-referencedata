@@ -27,7 +27,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_RECORD_INVALID;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
 
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.response.ValidatableResponse;
@@ -226,7 +226,7 @@ public class IdealStockAmountControllerIntegrationTest extends BaseWebIntegratio
         .extract()
         .path(MESSAGE_KEY);
 
-    assertThat(messageKey, Matchers.is(equalTo(ERROR_UPLOAD_RECORD_INVALID)));
+    assertThat(messageKey, Matchers.is(equalTo(ERROR_UPLOAD_PARSING_FAILED)));
     verify(idealStockAmountRepository, never()).save(any(IdealStockAmount.class));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.responseChecks());
   }

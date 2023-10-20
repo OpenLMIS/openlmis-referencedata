@@ -58,6 +58,7 @@ public class CsvBeanReader<T> {
     this.modelClass = modelClass;
     this.csvHeaderValidator = csvHeaderValidator;
     configureDozerBeanReader(inputStream);
+    validateHeaders();
     configureProcessors();
   }
 

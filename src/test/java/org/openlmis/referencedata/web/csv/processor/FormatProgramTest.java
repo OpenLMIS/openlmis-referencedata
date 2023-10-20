@@ -16,15 +16,15 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Program;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
 public class FormatProgramTest {
@@ -32,8 +32,7 @@ public class FormatProgramTest {
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private FormatProgram formatProgram;
 
@@ -47,7 +46,7 @@ public class FormatProgramTest {
     Program program = new Program();
     program.setCode(Code.code("program-code"));
 
-    String result = formatProgram.execute(program, csvContext);
+    String result = formatProgram.execute(program, context);
 
     assertEquals("program-code", result);
   }
@@ -57,20 +56,20 @@ public class FormatProgramTest {
     Program program = new Program();
     program.setCode(null);
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get code from '%s'.", program.toString()));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
-    formatProgram.execute(program, csvContext);
+    formatProgram.execute(program, context);
   }
 
   @Test
   public void shouldThrownExceptionWhenValueIsNotProgramType() {
     String invalid = "invalid-type";
 
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage(String.format("Cannot get code from '%s'.", invalid));
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_FORMATTING_FAILED);
 
-    formatProgram.execute(invalid, csvContext);
+    formatProgram.execute(invalid, context);
   }
 
 }

@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.util.messagekeys;
 
-public abstract class RightMessageKeys  extends MessageKeys {
+public abstract class RightMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, RIGHT);
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);

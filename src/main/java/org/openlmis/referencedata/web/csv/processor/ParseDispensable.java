@@ -15,13 +15,16 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class ParseDispensable extends CellProcessorAdaptor implements StringCellProcessor {
@@ -34,7 +37,7 @@ public class ParseDispensable extends CellProcessorAdaptor implements StringCell
     if (value instanceof String) {
       String[] parts = ((String) value).split(":", 2);
       if (parts.length != 2) {
-        throw getSuperCsvCellProcessorException(value, context, null);
+        throw getParseException(value, context);
       }
 
       DispensableDto dto = new DispensableDto();
@@ -44,16 +47,17 @@ public class ParseDispensable extends CellProcessorAdaptor implements StringCell
 
       result = Dispensable.createNew(dto);
     } else {
-      throw getSuperCsvCellProcessorException(value, context, null);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context,
-                                                                           Exception cause) {
-    return new SuperCsvCellProcessorException(String.format(
-            "'%s' could not be parsed to Dispensable", value), context, this, cause);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_PARSING_FAILED, value, "Dispensable",
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

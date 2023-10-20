@@ -15,10 +15,13 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatOrderableDisplayCategory extends CellProcessorAdaptor
@@ -33,22 +36,22 @@ public class FormatOrderableDisplayCategory extends CellProcessorAdaptor
       OrderableDisplayCategory category = (OrderableDisplayCategory) value;
 
       if (category.getCode() == null) {
-        throw getSuperCsvCellProcessorException(category, context);
+        throw getParseException(category, context);
       }
 
       result = category.getCode().toString();
     } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-            String.format("Cannot get code from '%s'.", value.toString()),
-            context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "code", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

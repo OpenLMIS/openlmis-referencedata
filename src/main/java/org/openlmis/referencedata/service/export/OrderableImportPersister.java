@@ -53,7 +53,6 @@ public class OrderableImportPersister
   @Override
   public Set<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
     Set<Orderable> persistList = new HashSet<>();
-
     for (OrderableDto dto: dtoList) {
       Orderable latestOrderable = orderableRepository
           .findFirstByProductCodeOrderByIdentityVersionNumberDesc(

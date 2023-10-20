@@ -16,22 +16,25 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
-import org.supercsv.exception.SuperCsvCellProcessorException;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.supercsv.util.CsvContext;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ParsePositiveIntegerTest {
 
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
 
-  @Mock
-  private CsvContext csvContext;
+  private final CsvContext context = new CsvContext(1, 1, 1);
 
   private ParsePositiveInteger parseAmount;
 
@@ -41,33 +44,29 @@ public class ParsePositiveIntegerTest {
   }
 
   @Test
-  public void shouldParseValidAmount() throws Exception {
-    Integer result = (Integer) parseAmount.execute("1000", csvContext);
+  public void shouldParseValidAmount() {
+    Integer result = (Integer) parseAmount.execute("1000", context);
     assertEquals(Integer.valueOf(1000), result);
   }
 
   @Test
   public void shouldThrownExceptionWhenParameterIsNotInteger() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'abc' could not be parsed to integer amount");
+    String value = "abc";
 
-    parseAmount.execute("abc", csvContext);
-  }
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
 
-  @Test
-  public void shouldThrownExceptionWhenParameterIsNull() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("this processor does not accept null input - "
-        + "if the column is optional then chain an Optional() processor before this one");
-
-    parseAmount.execute(null, csvContext);
+    parseAmount.execute(value, context);
   }
   
   @Test
   public void shouldThrownExceptionWhenParameterIsNegativeInteger() {
-    expectedEx.expect(SuperCsvCellProcessorException.class);
-    expectedEx.expectMessage("'-1000' is less than 0");
+    String value = "-1000";
 
-    parseAmount.execute("-1000", csvContext);
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(ERROR_UPLOAD_POSITIVE_OR_ZERO);
+
+    parseAmount.execute(value, context);
   }
+
 }

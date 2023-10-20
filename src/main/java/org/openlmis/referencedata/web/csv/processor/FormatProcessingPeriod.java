@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_FORMATTING_FAILED;
+
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.dto.ProcessingPeriodDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
-import org.supercsv.exception.SuperCsvCellProcessorException;
 import org.supercsv.util.CsvContext;
 
 public class FormatProcessingPeriod extends CellProcessorAdaptor implements StringCellProcessor {
@@ -37,22 +40,23 @@ public class FormatProcessingPeriod extends CellProcessorAdaptor implements Stri
 
       if (period.getName() == null || period.getProcessingSchedule() == null
           || period.getProcessingSchedule().getCode() == null) {
-        throw getSuperCsvCellProcessorException(period, context);
+        throw getParseException(period, context);
       }
 
       result = StringUtils.joinWith(SEPARATOR, period.getProcessingSchedule().getCode(),
           period.getName());
     } else  {
-      throw getSuperCsvCellProcessorException(value, context);
+      throw getParseException(value, context);
     }
 
     return next.execute(result, context);
   }
 
-  private SuperCsvCellProcessorException getSuperCsvCellProcessorException(Object value,
-                                                                           CsvContext context) {
-    return new SuperCsvCellProcessorException(
-        String.format("Cannot format '%s' name or processing schedule.", value.toString()),
-        context, this);
+  private ValidationMessageException getParseException(Object value,
+                                                       CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_FORMATTING_FAILED, "name or processing schedule", value,
+            context.getColumnNumber(), context.getRowNumber()));
   }
+
 }

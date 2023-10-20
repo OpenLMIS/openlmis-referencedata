@@ -39,7 +39,7 @@ public class ProgramOrderableCsvModel {
   @ImportField(name = "code", mandatory = true)
   private String orderableCode;
 
-  @ImportField(name = "dosesPerPatient", type = POSITIVE_INT, mandatory = true)
+  @ImportField(name = "dosesPerPatient", type = POSITIVE_INT)
   private Integer dosesPerPatient;
 
   @ImportField(name = "active", type = BOOLEAN_TYPE, mandatory = true)
@@ -54,7 +54,7 @@ public class ProgramOrderableCsvModel {
   @ImportField(name = "displayOrder", type = POSITIVE_INT, mandatory = true)
   private Integer displayOrder;
 
-  @ImportField(name = "pricePerPack", mandatory = true)
+  @ImportField(name = "pricePerPack")
   private String pricePerPack;
 
 }
