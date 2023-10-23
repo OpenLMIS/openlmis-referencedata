@@ -32,7 +32,6 @@ import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,9 +40,6 @@ public class FileHelper {
 
   @Autowired
   private CsvHeaderValidator validator;
-
-  @Autowired
-  private Environment env;
 
   /**
    * Reads CSV data from an input stream and maps it to a list of objects of the specified class.
@@ -145,7 +141,7 @@ public class FileHelper {
   }
 
   private void hasValidSize(MultipartFile file) {
-    final long zipMaxSize = Long.parseLong(env.getProperty("zipMaxSize"));
+    final long zipMaxSize = Long.parseLong(System.getenv("zipMaxSize"));
     long fileSize = file.getSize();
     if (fileSize > zipMaxSize) {
       throw new ValidationMessageException(new Message(

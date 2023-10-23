@@ -17,6 +17,8 @@ package org.openlmis.referencedata.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,18 +27,30 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileHelperTest {
 
   @InjectMocks
   private FileHelper fileHelper;
+
+  @Rule
+  public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+  @Before
+  public void setUp() {
+    environmentVariables.set("zipMaxSize", "1000000");
+  }
 
   @Test
   public void shouldConvertMultipartFileToZipFileMapWithValidZipFile() throws IOException {
@@ -78,4 +92,26 @@ public class FileHelperTest {
     zipOutputStream.close();
     return baos.toByteArray();
   }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionWhenValidateCsvWithWrongExtension() {
+    String fileName = "test.txt";
+    fileHelper.validateCsvFile(fileName);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionWhenValidateZipWithWrongExtension() {
+    MultipartFile multipartFile = mock(MultipartFile.class);
+    when(multipartFile.getOriginalFilename()).thenReturn("test.txt");
+    fileHelper.validateMultipartFile(multipartFile);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionWhenZipIsTooLarge() {
+    MultipartFile multipartFile = mock(MultipartFile.class);
+    when(multipartFile.getOriginalFilename()).thenReturn("test.zip");
+    when(multipartFile.getSize()).thenReturn(5000000L);
+    fileHelper.validateMultipartFile(multipartFile);
+  }
+
 }

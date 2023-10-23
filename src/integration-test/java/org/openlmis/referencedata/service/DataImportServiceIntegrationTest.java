@@ -206,6 +206,7 @@ public class DataImportServiceIntegrationTest {
   @Before
   public void setUp() {
     environmentVariables.set("CURRENCY_CODE", "USD");
+    environmentVariables.set("zipMaxSize", "1000000");
     persistedProgram = createAndPersistProgram(PROGRAM_CODE);
     persistedOrderableDisplayCategory =
         createAndPersistOrderableDisplayCategory(ORDERABLE_DISPLAY_CATEGORY);
