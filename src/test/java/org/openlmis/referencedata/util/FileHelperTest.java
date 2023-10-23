@@ -27,10 +27,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -43,14 +40,6 @@ public class FileHelperTest {
 
   @InjectMocks
   private FileHelper fileHelper;
-
-  @Rule
-  public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-  @Before
-  public void setUp() {
-    environmentVariables.set("zipMaxSize", "1000000");
-  }
 
   @Test
   public void shouldConvertMultipartFileToZipFileMapWithValidZipFile() throws IOException {
@@ -111,6 +100,7 @@ public class FileHelperTest {
     MultipartFile multipartFile = mock(MultipartFile.class);
     when(multipartFile.getOriginalFilename()).thenReturn("test.zip");
     when(multipartFile.getSize()).thenReturn(5000000L);
+    fileHelper.setZipMaxSize("1000000");
     fileHelper.validateMultipartFile(multipartFile);
   }
 

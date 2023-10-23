@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import lombok.Setter;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
@@ -32,6 +34,7 @@ import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.parser.CsvBeanReader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,6 +43,10 @@ public class FileHelper {
 
   @Autowired
   private CsvHeaderValidator validator;
+
+  @Setter
+  @Value("${zipMaxSize}")
+  protected String zipMaxSize;
 
   /**
    * Reads CSV data from an input stream and maps it to a list of objects of the specified class.
@@ -141,9 +148,8 @@ public class FileHelper {
   }
 
   private void hasValidSize(MultipartFile file) {
-    final long zipMaxSize = Long.parseLong(System.getenv("zipMaxSize"));
     long fileSize = file.getSize();
-    if (fileSize > zipMaxSize) {
+    if (fileSize > Long.parseLong(zipMaxSize)) {
       throw new ValidationMessageException(new Message(
               CsvUploadMessageKeys.ERROR_FILE_TOO_LARGE, zipMaxSize, fileSize));
     }
