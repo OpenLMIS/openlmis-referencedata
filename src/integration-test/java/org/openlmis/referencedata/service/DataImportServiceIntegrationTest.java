@@ -206,6 +206,7 @@ public class DataImportServiceIntegrationTest {
   @Before
   public void setUp() {
     environmentVariables.set("CURRENCY_CODE", "USD");
+    environmentVariables.set("zipMaxSize", "1000000");
     persistedProgram = createAndPersistProgram(PROGRAM_CODE);
     persistedOrderableDisplayCategory =
         createAndPersistOrderableDisplayCategory(ORDERABLE_DISPLAY_CATEGORY);
@@ -456,9 +457,8 @@ public class DataImportServiceIntegrationTest {
     zip.write(csvOutputStream.toByteArray());
     zip.closeEntry();
 
-    return new MockMultipartFile(fileName, fileName,
+    return new MockMultipartFile("test.zip", "test.zip",
         "application/zip", zipOutputStream.toByteArray());
   }
-
 
 }

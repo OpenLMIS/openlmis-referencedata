@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
@@ -105,6 +106,46 @@ public class FileHelper {
       return zipFileMap;
     } catch (IOException e) {
       throw new ValidationMessageException(e, MessageKeys.ERROR_IO, e.getMessage());
+    }
+  }
+
+  /**
+   * Validates given multipartFile. Checks if file has .zip extension and
+   * size does not exceed maximum size.
+   *
+   * @param multipartFile the multipart file containing the zip archive
+   * @throws ValidationMessageException if any of check fails
+   */
+  public void validateMultipartFile(MultipartFile multipartFile) {
+    hasExpectedExtension(multipartFile.getOriginalFilename(), ".zip");
+    hasValidSize(multipartFile);
+  }
+
+  /**
+   * Validates given CSV file. Checks if file has .csv
+   *
+   * @param fileName the name of CSV file
+   * @throws ValidationMessageException if any of check fails
+   */
+  public void validateCsvFile(String fileName) {
+    hasExpectedExtension(fileName, ".csv");
+  }
+
+  private void hasExpectedExtension(String fileName, String expectedExtension) {
+    String fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+    if (!fileExtension.equals(expectedExtension)) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName,
+              fileExtension, expectedExtension));
+    }
+  }
+
+  private void hasValidSize(MultipartFile file) {
+    final long zipMaxSize = Long.parseLong(System.getenv("zipMaxSize"));
+    long fileSize = file.getSize();
+    if (fileSize > zipMaxSize) {
+      throw new ValidationMessageException(new Message(
+              CsvUploadMessageKeys.ERROR_FILE_TOO_LARGE, zipMaxSize, fileSize));
     }
   }
 
