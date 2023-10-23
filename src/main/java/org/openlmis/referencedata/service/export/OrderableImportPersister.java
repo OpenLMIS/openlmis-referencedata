@@ -16,9 +16,8 @@
 package org.openlmis.referencedata.service.export;
 
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -51,14 +50,16 @@ public class OrderableImportPersister
   }
 
   @Override
-  public Set<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
-    Set<Orderable> persistList = new HashSet<>();
+  public List<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
+    List<Orderable> persistList = new LinkedList<>();
     for (OrderableDto dto: dtoList) {
       Orderable latestOrderable = orderableRepository
           .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
               Code.code(dto.getProductCode()));
 
-      persistList.add(orderableBuilder.newOrderable(dto, latestOrderable));
+      if (!Orderable.isEqualForCsvFields(dto, latestOrderable)) {
+        persistList.add(orderableBuilder.newOrderable(dto, latestOrderable));
+      }
     }
 
     return persistList;

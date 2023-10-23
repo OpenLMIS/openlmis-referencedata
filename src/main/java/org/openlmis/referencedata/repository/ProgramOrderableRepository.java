@@ -31,7 +31,7 @@ public interface ProgramOrderableRepository extends JpaRepository<ProgramOrderab
       + "ON odc.id = po.orderabledisplaycategoryid \n"
       + "JOIN referencedata.programs p ON p.id = po.programid \n"
       + "WHERE p.code = :program_code AND o.code = :orderable_code AND odc.code = :category_code\n"
-      + "ORDER BY po.orderableversionnumber DESC FETCH FIRST 1 ROWS ONLY",
+      + "ORDER BY po.orderableversionnumber, po.active DESC FETCH FIRST 1 ROWS ONLY",
       nativeQuery = true)
   ProgramOrderable findByProgramCodeOrderableCodeCategoryCode(
       @Param("program_code") String programCode,

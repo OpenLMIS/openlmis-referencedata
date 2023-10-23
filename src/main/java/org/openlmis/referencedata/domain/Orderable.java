@@ -74,6 +74,7 @@ import org.openlmis.referencedata.domain.VersionIdentity.VersionImporter;
 import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 import org.openlmis.referencedata.dto.OrderableChildDto;
+import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.OrderableIdentifierCsvModel;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.web.csv.model.ImportField;
@@ -432,6 +433,23 @@ public class Orderable implements Versionable {
   @Override
   public final int hashCode() {
     return Objects.hashCode(productCode);
+  }
+
+  /**
+   * This method checks whether fields imported from csv are the same as in object.
+   */
+  public static boolean isEqualForCsvFields(OrderableDto dto, Orderable orderable) {
+    if (dto == null || orderable == null) {
+      return false;
+    }
+
+    return dto.getProductCode().equals(orderable.getProductCode().toString())
+        && dto.getFullProductName().equals(orderable.getFullProductName())
+        && dto.getDescription().equals(orderable.getDescription())
+        && dto.getPackRoundingThreshold().equals(orderable.getPackRoundingThreshold())
+        && dto.getNetContent().equals(orderable.getNetContent())
+        && dto.getRoundToZero().equals(orderable.isRoundToZero())
+        && Dispensable.createNew(dto.getDispensable()).equals(orderable.getDispensable());
   }
 
   /**

@@ -17,7 +17,6 @@ package org.openlmis.referencedata.service.export;
 
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 /**
  * This interface handle importing data from files to database.
@@ -30,6 +29,6 @@ public interface DataImportPersister<E, D, U> {
 
   List<U> processAndPersist(InputStream dataStream);
 
-  Set<E> createOrUpdate(List<D> dtoList);
+  List<E> createOrUpdate(List<D> dtoList);
 
 }

@@ -18,12 +18,11 @@ package org.openlmis.referencedata.service.export;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
@@ -64,7 +63,7 @@ public class TradeItemImportPersister implements DataImportPersister<Orderable,
   }
 
   @Override
-  public Set<Orderable> createOrUpdate(List<TradeItemCsvModel> dtoList) {
+  public List<Orderable> createOrUpdate(List<TradeItemCsvModel> dtoList) {
     Map<Orderable, TradeItem> tradeItemPersistMap = prepareTradeItems(dtoList);
     List<TradeItem> tradeItems = tradeItemRepository.saveAll(tradeItemPersistMap.values());
 
@@ -83,8 +82,8 @@ public class TradeItemImportPersister implements DataImportPersister<Orderable,
     return prepareOrderables(updatedMap);
   }
 
-  private Set<Orderable> prepareOrderables(Map<Orderable, TradeItem> entityMap) {
-    Set<Orderable> orderablePersistList = new HashSet<>();
+  private List<Orderable> prepareOrderables(Map<Orderable, TradeItem> entityMap) {
+    List<Orderable> orderablePersistList = new LinkedList<>();
 
     for (Map.Entry<Orderable, TradeItem> entry : entityMap.entrySet()) {
       Orderable orderable = entry.getKey();

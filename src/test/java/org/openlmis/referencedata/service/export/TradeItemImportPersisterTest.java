@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,7 +109,7 @@ public class TradeItemImportPersisterTest {
     orderable.setIdentifiers(null);
 
     // When
-    Set<Orderable> result = tradeItemImportPersister
+    List<Orderable> result = tradeItemImportPersister
         .createOrUpdate(Collections.singletonList(csvModel));
 
     // Then
@@ -123,7 +122,7 @@ public class TradeItemImportPersisterTest {
     setupMocksForSuccess();
 
     // When
-    Set<Orderable> result = tradeItemImportPersister
+    List<Orderable> result = tradeItemImportPersister
         .createOrUpdate(Collections.singletonList(csvModel));
 
     // Then

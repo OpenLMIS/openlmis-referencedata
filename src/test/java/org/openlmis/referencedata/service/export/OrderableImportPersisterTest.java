@@ -36,7 +36,6 @@ import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
-import org.openlmis.referencedata.util.OrderableBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableImportPersisterTest {
@@ -50,9 +49,6 @@ public class OrderableImportPersisterTest {
 
   @Mock
   private OrderableRepository orderableRepository;
-
-  @Mock
-  private OrderableBuilder orderableBuilder;
 
   @InjectMocks
   private OrderableImportPersister orderableImportPersister;
@@ -83,9 +79,8 @@ public class OrderableImportPersisterTest {
         Collections.singletonList(dto));
     when(orderableRepository.findFirstByProductCodeOrderByIdentityVersionNumberDesc(
         any(Code.class))).thenReturn(orderable);
-    when(orderableBuilder.newOrderable(any(OrderableDto.class), any(Orderable.class)))
-        .thenReturn(orderable);
     when(orderableRepository.saveAll(any())).thenReturn(
         Collections.singletonList(orderable));
   }
+
 }

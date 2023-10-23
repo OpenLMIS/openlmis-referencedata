@@ -17,9 +17,8 @@ package org.openlmis.referencedata.service.export;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Code;
@@ -68,8 +67,8 @@ public class ProgramOrderableImportPersister implements DataImportPersister<Prog
   }
 
   @Override
-  public Set<ProgramOrderable> createOrUpdate(List<ProgramOrderableCsvModel> dtoList) {
-    Set<ProgramOrderable> persistList = new HashSet<>();
+  public List<ProgramOrderable> createOrUpdate(List<ProgramOrderableCsvModel> dtoList) {
+    List<ProgramOrderable> persistList = new LinkedList<>();
 
     for (ProgramOrderableCsvModel dto: dtoList) {
       Program program = programRepository.findByCode(Code.code(dto.getProgramCode()));
