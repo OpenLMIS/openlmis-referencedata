@@ -114,52 +114,42 @@ public class FileHelper {
   }
 
   /**
-   * Validates given multipartFile. Checks if file has zip extension and
+   * Validates given multipartFile. Checks if file has .zip extension and
    * size does not exceed maximum size.
    *
    * @param multipartFile the multipart file containing the zip archive
    * @throws ValidationMessageException if any of check fails
    */
   public void validateMultipartFile(MultipartFile multipartFile) {
-    isZipFile(multipartFile);
+    hasExpectedExtension(multipartFile.getOriginalFilename(), ".zip");
     hasValidSize(multipartFile);
   }
 
   /**
-   * Checks if given fileName contains appropriate extension.
+   * Validates given CSV file. Checks if file has .csv
    *
-   * @param fileName name of csv file to validate
-   * @throws ValidationMessageException if file has inappropriate extension
+   * @param fileName the name of CSV file
+   * @throws ValidationMessageException if any of check fails
    */
-  public void isCsvFile(String fileName) {
-    String fileExtension = fileName.substring(fileName.lastIndexOf('.'));
-    if (!fileExtension.equalsIgnoreCase(".csv")) {
-      throw new ValidationMessageException(new Message(
-              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName, fileExtension, ".csv"));
-    }
+  public void validateCsvFile(String fileName) {
+    hasExpectedExtension(fileName, ".csv");
   }
 
-  private void isZipFile(MultipartFile file) {
-    String fileName = file.getOriginalFilename();
-    if (null == fileName) {
-      throw new ValidationMessageException(new Message(
-              CsvUploadMessageKeys.ERROR_RETRIEVE_FILE_NAME));
-    }
+  private void hasExpectedExtension(String fileName, String expectedExtension) {
     String fileExtension = fileName.substring(fileName.lastIndexOf('.'));
-    if (!fileExtension.equalsIgnoreCase(".zip")) {
+    if (!fileExtension.equals(expectedExtension)) {
       throw new ValidationMessageException(new Message(
-              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName, fileExtension, ".zip"));
+              CsvUploadMessageKeys.ERROR_FILE_EXTENSION, fileName,
+              fileExtension, expectedExtension));
     }
   }
 
   private void hasValidSize(MultipartFile file) {
-    String zipMaxSize = env.getProperty("zipMaxSize");
-    long zipMaxSizeLong = (null == zipMaxSize) ? 1000000 : Long.parseLong(zipMaxSize);
+    final long zipMaxSize = Long.parseLong(env.getProperty("zipMaxSize"));
     long fileSize = file.getSize();
-
-    if (fileSize > zipMaxSizeLong) {
+    if (fileSize > zipMaxSize) {
       throw new ValidationMessageException(new Message(
-              CsvUploadMessageKeys.ERROR_FILE_TOO_LARGE, zipMaxSizeLong, fileSize));
+              CsvUploadMessageKeys.ERROR_FILE_TOO_LARGE, zipMaxSize, fileSize));
     }
   }
 

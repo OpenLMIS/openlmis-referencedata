@@ -54,7 +54,7 @@ public class DataImportService {
     List<BaseDto> result = new ArrayList<>();
     for (Map.Entry<String, InputStream> entry: fileMap.entrySet()) {
       try {
-        fileHelper.isCsvFile(entry.getKey());
+        fileHelper.validateCsvFile(entry.getKey());
         DataImportPersister<?, ?, ? extends BaseDto> persister =
             beanFactory.getBean(entry.getKey(), DataImportPersister.class);
         result.addAll(persister.processAndPersist(entry.getValue()));
