@@ -56,11 +56,11 @@ public class DataImportService {
       try {
         fileHelper.validateCsvFile(entry.getKey());
         DataImportPersister<?, ?, ? extends BaseDto> persister =
-            beanFactory.getBean(entry.getKey(), DataImportPersister.class);
+                beanFactory.getBean(entry.getKey(), DataImportPersister.class);
         result.addAll(persister.processAndPersist(entry.getValue()));
       } catch (NoSuchBeanDefinitionException e) {
-          throw new ValidationMessageException(e, new Message(
-                  CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, entry.getKey()));
+        throw new ValidationMessageException(e, new Message(
+                CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, entry.getKey()));
       } catch (SuperCsvConstraintViolationException e) {
         throw new ValidationMessageException("Import error in column: "
         + e.getCsvContext().getColumnNumber() + ", in row: "

@@ -33,8 +33,7 @@ public class CsvUploadMessageKeys extends MessageKeys {
       ERROR_PREFIX, RECORD, PARSING, FAILED);
   public static final String ERROR_UPLOAD_POSITIVE_OR_ZERO = join(
       ERROR_PREFIX, RECORD, MUST_BE_POSITIVE_OR_ZERO);
-
-  public static final String ERROR_FILE_EXTENSION = ERROR_PREFIX + ".file.extension.invalid";
-  public static final String ERROR_FILE_TOO_LARGE = ERROR_PREFIX + ".file.too.large";
-  public static final String ERROR_FILE_NAME_INVALID = ERROR_PREFIX + ".file.name.invalid";
+  public static final String ERROR_FILE_EXTENSION = join(ERROR_PREFIX, FILE, EXTENSION, INVALID);
+  public static final String ERROR_FILE_TOO_LARGE = join(ERROR_PREFIX, FILE, TOO, LARGE);
+  public static final String ERROR_FILE_NAME_INVALID = join(ERROR_PREFIX, FILE, NAME, INVALID);
 }

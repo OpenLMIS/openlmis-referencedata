@@ -124,6 +124,9 @@ public abstract class MessageKeys {
   protected static final String SUPPLY_PARTNER = "supplyPartner";
   protected static final String SYSTEM_NOTIFICATION = "systemNotification";
   protected static final String DATA_EXPORT = "dataExport";
+  protected static final String EXTENSION = "extension";
+  protected static final String TOO = "too";
+  protected static final String LARGE = "large";
 
   // Common to subclasses
   protected static final String EMAIL = "email";
