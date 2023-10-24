@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.supercsv.exception.SuperCsvConstraintViolationException;
 
 @Service
 public class DataImportService {
@@ -61,12 +60,6 @@ public class DataImportService {
       } catch (NoSuchBeanDefinitionException e) {
         throw new ValidationMessageException(e, new Message(
                 CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, entry.getKey()));
-      } catch (SuperCsvConstraintViolationException e) {
-        throw new ValidationMessageException("Import error in column: "
-        + e.getCsvContext().getColumnNumber() + ", in row: "
-        + e.getCsvContext().getLineNumber()
-        + ", in file: " + entry.getKey() + ". Reason: "
-        + e.getMessage(), e);
       }
     }
 

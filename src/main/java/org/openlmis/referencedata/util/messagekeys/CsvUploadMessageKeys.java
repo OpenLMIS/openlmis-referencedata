@@ -26,11 +26,17 @@ public class CsvUploadMessageKeys extends MessageKeys {
   public static final String ERROR_UPLOAD_HEADER_MISSING = join(ERROR_PREFIX, HEADER, MISSING);
   public static final String ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS = join(
       ERROR_PREFIX, MANDATORY, COLUMNS, MISSING);
+  public static final String ERROR_UPLOAD_MISSING_MANDATORY_FIELD = join(
+      ERROR_PREFIX, MANDATORY, FIELD, MISSING);
   public static final String ERROR_UPLOAD_HEADER_INVALID = join(ERROR_PREFIX, HEADER, INVALID);
   public static final String ERROR_UPLOAD_FORMATTING_FAILED = join(
       ERROR_PREFIX, RECORD, FORMATTING, FAILED);
   public static final String ERROR_UPLOAD_PARSING_FAILED = join(
       ERROR_PREFIX, RECORD, PARSING, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_NUMBER_FAILED = join(
+      ERROR_PREFIX, RECORD, PARSING, NUMBER, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_BOOLEAN_FAILED = join(
+      ERROR_PREFIX, RECORD, PARSING, BOOLEAN, FAILED);
   public static final String ERROR_UPLOAD_POSITIVE_OR_ZERO = join(
       ERROR_PREFIX, RECORD, MUST_BE_POSITIVE_OR_ZERO);
   public static final String ERROR_FILE_EXTENSION = join(ERROR_PREFIX, FILE, EXTENSION, INVALID);

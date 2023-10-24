@@ -443,13 +443,13 @@ public class Orderable implements Versionable {
       return false;
     }
 
-    return dto.getProductCode().equals(orderable.getProductCode().toString())
-        && dto.getFullProductName().equals(orderable.getFullProductName())
-        && dto.getDescription().equals(orderable.getDescription())
-        && dto.getPackRoundingThreshold().equals(orderable.getPackRoundingThreshold())
-        && dto.getNetContent().equals(orderable.getNetContent())
-        && dto.getRoundToZero().equals(orderable.isRoundToZero())
-        && Dispensable.createNew(dto.getDispensable()).equals(orderable.getDispensable());
+    return Objects.equals(dto.getProductCode(), orderable.getProductCode().toString())
+        && Objects.equals(dto.getFullProductName(), orderable.getFullProductName())
+        && Objects.equals(dto.getDescription(), orderable.getDescription())
+        && Objects.equals(dto.getPackRoundingThreshold(), orderable.getPackRoundingThreshold())
+        && Objects.equals(dto.getNetContent(), orderable.getNetContent())
+        && Objects.equals(dto.getRoundToZero(), orderable.isRoundToZero())
+        && Objects.equals(Dispensable.createNew(dto.getDispensable()), orderable.getDispensable());
   }
 
   /**
