@@ -16,7 +16,7 @@
 package org.openlmis.referencedata.web.csv.processor;
 
 import static org.junit.Assert.assertEquals;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_NUMBER_FAILED;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
 
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class ParsePositiveIntegerTest {
     String value = "abc";
 
     expectedEx.expect(ValidationMessageException.class);
-    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_FAILED);
+    expectedEx.expectMessage(ERROR_UPLOAD_PARSING_NUMBER_FAILED);
 
     parseAmount.execute(value, context);
   }

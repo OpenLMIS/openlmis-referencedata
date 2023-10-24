@@ -22,7 +22,6 @@ import java.util.Map;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
-import org.supercsv.cellprocessor.ParseBool;
 import org.supercsv.cellprocessor.Trim;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
@@ -65,7 +64,7 @@ public class CsvCellProcessors {
     typeParseMappings.put(POSITIVE_INT, new ParsePositiveInteger());
     typeParseMappings.put(CODE_TYPE, new ParseCode());
     typeParseMappings.put(POSITIVE_LONG, new ParsePositiveLong());
-    typeParseMappings.put(BOOLEAN_TYPE, new ParseBool());
+    typeParseMappings.put(BOOLEAN_TYPE, new ParseBoolean());
     typeParseMappings.put(DISPENSABLE_TYPE, new ParseDispensable());
   }
 

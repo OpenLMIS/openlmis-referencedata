@@ -15,8 +15,7 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_NUMBER_FAILED;
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_BOOLEAN_FAILED;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
@@ -24,41 +23,26 @@ import org.supercsv.cellprocessor.CellProcessorAdaptor;
 import org.supercsv.cellprocessor.ift.StringCellProcessor;
 import org.supercsv.util.CsvContext;
 
-public class ParsePositiveLong extends CellProcessorAdaptor implements StringCellProcessor {
+public class ParseBoolean extends CellProcessorAdaptor implements StringCellProcessor {
 
   @Override
   public <T> T execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    Long result;
-    if (value instanceof String) {
-      String textValue = String.valueOf(value);
-
-      try {
-        result = Long.valueOf(textValue);
-      } catch (NumberFormatException ex) {
-        throw getParseException(context, ex);
-      }
-
-      if (result < 0) {
-        throw getNegativeValueException(context);
-      }
+    Boolean result;
+    if (value instanceof Boolean) {
+      String stringValue = String.valueOf(value);
+      result = Boolean.parseBoolean(stringValue);
     } else {
-      throw getParseException(context, null);
+      throw getParseException(context);
     }
-
     return next.execute(result, context);
   }
 
-  private ValidationMessageException getNegativeValueException(CsvContext context) {
-    return new ValidationMessageException(new Message(ERROR_UPLOAD_POSITIVE_OR_ZERO,
-        context.getColumnNumber(), context.getRowNumber()));
-  }
-
-  private ValidationMessageException getParseException(CsvContext context,
-                                                       Exception ex) {
-    return new ValidationMessageException(ex, new Message(ERROR_UPLOAD_PARSING_NUMBER_FAILED,
-        context.getColumnNumber(), context.getRowNumber()));
+  private ValidationMessageException getParseException(CsvContext context) {
+    return new ValidationMessageException(
+        new Message(ERROR_UPLOAD_PARSING_BOOLEAN_FAILED,
+            context.getColumnNumber(), context.getRowNumber()));
   }
 
 }

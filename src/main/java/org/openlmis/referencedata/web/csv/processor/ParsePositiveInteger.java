@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.web.csv.processor;
 
-import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_FAILED;
+import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_NUMBER_FAILED;
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_POSITIVE_OR_ZERO;
 
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -41,30 +41,28 @@ public class ParsePositiveInteger extends CellProcessorAdaptor implements String
       try {
         result = Integer.valueOf(textValue);
       } catch (NumberFormatException ex) {
-        throw getParseException(textValue, context, ex);
+        throw getParseException(context, ex);
       }
 
       if (result < 0) {
-        throw getNegativeValueException(value, context);
+        throw getNegativeValueException(context);
       }
     } else {
-      throw getParseException(value, context, null);
+      throw getParseException(context, null);
     }
 
     return next.execute(result, context);
   }
 
-  private ValidationMessageException getNegativeValueException(Object value,
-                                                               CsvContext context) {
+  private ValidationMessageException getNegativeValueException(CsvContext context) {
     return new ValidationMessageException(new Message(ERROR_UPLOAD_POSITIVE_OR_ZERO,
-        value, context.getColumnNumber(), context.getRowNumber()));
+        context.getColumnNumber(), context.getRowNumber()));
   }
 
-  private ValidationMessageException getParseException(Object value,
-                                                       CsvContext context,
+  private ValidationMessageException getParseException(CsvContext context,
                                                        Exception ex) {
-    return new ValidationMessageException(ex, new Message(ERROR_UPLOAD_PARSING_FAILED,
-        value, "integer value", context.getColumnNumber(), context.getRowNumber()));
+    return new ValidationMessageException(ex, new Message(ERROR_UPLOAD_PARSING_NUMBER_FAILED,
+        context.getColumnNumber(), context.getRowNumber()));
   }
 
 }
