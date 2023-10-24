@@ -30,7 +30,7 @@ public class ParseBoolean extends CellProcessorAdaptor implements StringCellProc
     validateInputNotNull(value, context);
 
     Boolean result;
-    if (value instanceof Boolean) {
+    if (value instanceof String) {
       String stringValue = String.valueOf(value);
       result = Boolean.parseBoolean(stringValue);
     } else {
