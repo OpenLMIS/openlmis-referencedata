@@ -23,7 +23,6 @@ import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.Trim;
-import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 /**
@@ -109,6 +108,6 @@ public class CsvCellProcessors {
       mappedProcessor = new Trim();
     }
 
-    return field.isMandatory() ? new NotNull(mappedProcessor) : new Optional(mappedProcessor);
+    return field.isMandatory() ? new CsvNotNull(mappedProcessor) : new Optional(mappedProcessor);
   }
 }
