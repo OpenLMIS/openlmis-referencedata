@@ -17,6 +17,8 @@ package org.openlmis.referencedata.web.csv.processor;
 
 import static org.openlmis.referencedata.util.messagekeys.CsvUploadMessageKeys.ERROR_UPLOAD_PARSING_BOOLEAN_FAILED;
 
+import java.util.Arrays;
+import java.util.List;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.supercsv.cellprocessor.CellProcessorAdaptor;
@@ -25,17 +27,23 @@ import org.supercsv.util.CsvContext;
 
 public class ParseBoolean extends CellProcessorAdaptor implements StringCellProcessor {
 
+  private static final List<String> possibleStates = Arrays.asList("true", "false", "0", "1");
+
   @Override
   public <T> T execute(Object value, CsvContext context) {
     validateInputNotNull(value, context);
 
-    Boolean result;
-    if (value instanceof String) {
-      String stringValue = String.valueOf(value);
-      result = Boolean.parseBoolean(stringValue);
-    } else {
+    if (!(value instanceof String)) {
       throw getParseException(context);
     }
+
+    String stringValue = String.valueOf(value);
+
+    if (!possibleStates.contains(stringValue.toLowerCase())) {
+      throw getParseException(context);
+    }
+
+    Boolean result = Boolean.parseBoolean(stringValue);
     return next.execute(result, context);
   }
 
