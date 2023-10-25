@@ -51,7 +51,7 @@ public class ProgramOrderableCsvModel {
   @ImportField(name = "fullSupply", type = BOOLEAN_TYPE, mandatory = true)
   private boolean fullSupply;
 
-  @ImportField(name = "displayOrder", type = POSITIVE_INT, mandatory = true)
+  @ImportField(name = "displayOrder", type = POSITIVE_INT)
   private Integer displayOrder;
 
   @ImportField(name = "pricePerPack")

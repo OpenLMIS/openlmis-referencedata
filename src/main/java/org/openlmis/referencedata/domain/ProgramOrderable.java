@@ -98,7 +98,7 @@ public class ProgramOrderable extends BaseEntity {
   private boolean fullSupply;
 
   @Getter
-  @ImportField(name = DISPLAY_ORDER, type = POSITIVE_INT, mandatory = true)
+  @ImportField(name = DISPLAY_ORDER, type = POSITIVE_INT)
   private int displayOrder;
 
   @Getter
