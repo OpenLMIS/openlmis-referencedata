@@ -84,12 +84,13 @@ public class ProgramOrderableImportPersister implements DataImportPersister<Prog
           program.getId(),
           orderableDisplayCategory.getId(),
           orderableDisplayCategory.getOrderedDisplayValue().getDisplayName(),
-          dto.getDisplayOrder(),
+          orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder(),
           dto.isActive(),
           dto.isFullSupply(),
           dto.getDisplayOrder(),
           dto.getDosesPerPatient(),
-          Money.of(currency, Double.parseDouble(dto.getPricePerPack()))
+          dto.getPricePerPack() != null ? Money.of(currency,
+              Double.parseDouble(dto.getPricePerPack())) : null
       );
 
       ProgramOrderable programOrderable = programOrderableRepository
