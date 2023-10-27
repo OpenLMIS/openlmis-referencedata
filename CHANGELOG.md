@@ -4,6 +4,12 @@
 New functionality added in a backwards-compatible manner:
 * [OLMIS-7670](https://openlmis.atlassian.net/browse/OLMIS-7670): Add `POST api/importData` endpoint
 * [OLMIS-7671](https://openlmis.atlassian.net/browse/OLMIS-7671): Add functionality for reading uploaded zip archive
+* [OLMIS-7672](https://openlmis.atlassian.net/browse/OLMIS-7672): Add functionality to import orderable.csv
+* [OLMIS-7757](https://openlmis.atlassian.net/browse/OLMIS-7757): Add functionality to import programOrderable.csv
+* [OLMIS-7759](https://openlmis.atlassian.net/browse/OLMIS-7759): Add functionality to import tradeItem.csv
+* [OLMIS-7753](https://openlmis.atlassian.net/browse/OLMIS-7753): Add validation for csv content
+* [OLMIS-7751](https://openlmis.atlassian.net/browse/OLMIS-7751): Add validation for uploaded files
+* [OLMIS-7720](https://openlmis.atlassian.net/browse/OLMIS-7720): Add data import right
 
 15.2.5 / 2023-04-05
 ==================
