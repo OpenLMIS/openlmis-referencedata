@@ -150,11 +150,6 @@ pipeline {
             }
         }
         stage('Parallel: Sonar analysis and contract tests') {
-            when {
-                expression {
-                    return VERSION.endsWith("SNAPSHOT")
-                }
-            }
             parallel {
                 stage('Sonar analysis') {
                     agent any
@@ -162,10 +157,11 @@ pipeline {
                         PATH = "/usr/local/bin/:$PATH"
                     }
                     steps {
-                        withSonarQubeEnv('Sonar OpenLMIS') {
-                            withCredentials([string(credentialsId: 'SONAR_LOGIN', variable: 'SONAR_LOGIN'), string(credentialsId: 'SONAR_PASSWORD', variable: 'SONAR_PASSWORD')]) {
+                        withSonarQubeEnv('SonarCloud OpenLMIS') {
+                            withCredentials([string(credentialsId: 'SONAR_CLOUD_TOKEN', variable: 'SONAR_CLOUD_TOKEN')]) {
                                 script {
-                                    sh(script: "./ci-sonarAnalysis.sh")
+                                    // sh(script: "./ci-sonarAnalysis.sh")
+                                    sh './gradlew sonar'
 
                                     // workaround: Sonar plugin retrieves the path directly from the output
                                     sh 'echo "Working dir: ${WORKSPACE}/build/sonar"'
