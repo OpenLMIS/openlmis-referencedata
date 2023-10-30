@@ -296,38 +296,6 @@ checkstyle {
     toolVersion = "8.12"
 }
 
-// //Usage: gradle sonarqube
-// sonarqube {
-//     properties {
-//         def branch = System.getenv("SONAR_BRANCH")
-//         if (branch && branch != 'master') {
-//             property "sonar.branch", branch
-//         }
-//         property "sonar.projectName", "OpenLMIS Reference Data Service"
-//         property "sonar.projectKey", "org.sonarqube:openlmis-referencedata"
-//         property "sonar.projectVersion", version
-//         property "sonar.host.url", "http://sonar.openlmis.org"
-//         property "sonar.login", System.getenv("SONAR_LOGIN")
-//         property "sonar.password", System.getenv("SONAR_PASSWORD")
-//         property "sonar.java.coveragePlugin", "jacoco"
-//         //Tells SonarQube where the unit tests execution reports are
-//         property "sonar.junit.reportsPath", "build/test-results/test"
-//         //Tells SonarQube where the code coverage reports are
-//         property "sonar.jacoco.reportPaths", "build/jacoco/test.exec,build/jacoco/integrationTest.exec"
-//         properties["sonar.tests"] += sourceSets.integrationTest.java
-//     }
-// }
-// project.tasks['sonarqube'].dependsOn integrationTest 
-
-sonar {
-  properties {
-    property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
-    property "sonar.organization", "openlmis"
-    property "sonar.host.url", "https://sonarcloud.io"
-    property "sonar.login", System.getenv("SONAR_CLOUD_TOKEN")
-  }
-}
-
 pmd {
     toolVersion = '5.4.0'
     consoleOutput= true

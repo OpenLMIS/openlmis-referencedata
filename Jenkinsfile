@@ -149,54 +149,6 @@ pipeline {
                 }
             }
         }
-        stage('Parallel: Sonar analysis and contract tests') {
-            parallel {
-                stage('Sonar analysis') {
-                    agent any
-                    environment {
-                        PATH = "/usr/local/bin/:$PATH"
-                    }
-                    steps {
-                        withSonarQubeEnv('SonarCloud OpenLMIS') {
-                            withCredentials([string(credentialsId: 'SONAR_CLOUD_TOKEN', variable: 'SONAR_CLOUD_TOKEN')]) {
-                                script {
-                                    sh './gradlew sonar'
-
-                                    // workaround: Sonar plugin retrieves the path directly from the output
-                                    sh 'echo "Working dir: ${WORKSPACE}/build/sonar"'
-                                }
-                            }
-                        }
-                        timeout(time: 1, unit: 'HOURS') {
-                            script {
-                                def gate = waitForQualityGate()
-                                if (gate.status != 'OK') {
-                                    echo 'Quality Gate FAILED'
-                                    currentBuild.result = 'UNSTABLE'
-                                }
-                            }
-                        }
-                    }
-                    post {
-                        unstable {
-                            script {
-                                notifyAfterFailure()
-                            }
-                        }
-                        failure {
-                            script {
-                                notifyAfterFailure()
-                            }
-                        }
-                        cleanup {
-                            script {
-                                sh "sudo rm -rf ${WORKSPACE}/{*,.*} || true"
-                            }
-                        }
-                    }
-                }
-            }
-        }
         stage('ERD generation') {
             agent {
                 node {
