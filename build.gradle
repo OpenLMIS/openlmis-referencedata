@@ -296,6 +296,14 @@ checkstyle {
     toolVersion = "8.12"
 }
 
+sonar {
+  properties {
+    property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
+    property "sonar.organization", "openlmis"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
 pmd {
     toolVersion = '5.4.0'
     consoleOutput= true
