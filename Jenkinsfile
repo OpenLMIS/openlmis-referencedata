@@ -160,7 +160,6 @@ pipeline {
                         withSonarQubeEnv('SonarCloud OpenLMIS') {
                             withCredentials([string(credentialsId: 'SONAR_CLOUD_TOKEN', variable: 'SONAR_CLOUD_TOKEN')]) {
                                 script {
-                                    // sh(script: "./ci-sonarAnalysis.sh")
                                     sh './gradlew sonar'
 
                                     // workaround: Sonar plugin retrieves the path directly from the output
