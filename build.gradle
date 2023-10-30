@@ -7,7 +7,7 @@ buildscript {
 plugins {
     id 'org.springframework.boot' version '2.2.2.RELEASE'
     id "org.flywaydb.flyway" version "6.0.8"
-    id "org.sonarqube" version "2.6.2"
+    id "org.sonarqube" version "3.3"
     id "com.moowork.node" version "1.2.0"
     id 'com.avast.gradle.docker-compose' version '0.8.10'
     id "com.github.ben-manes.versions" version "0.20.0"
@@ -84,7 +84,7 @@ dependencies {
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation 'org.togglz:togglz-spring-boot-starter:2.6.1.Final'
     compile 'org.togglz:togglz-console:2.6.1.Final'
@@ -109,7 +109,7 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock:2.22.0"
     testCompile "com.github.stefanbirkner:system-rules:1.19.0"
 
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.10'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     runtime fileTree(dir: '/extensions/', include: '*.jar')
 }
@@ -296,28 +296,14 @@ checkstyle {
     toolVersion = "8.12"
 }
 
-//Usage: gradle sonarqube
+//NOTE: This plugin requires that this task be named 'sonarqube'. In fact, it is performing SonarCloud analysis.
 sonarqube {
-    properties {
-        def branch = System.getenv("SONAR_BRANCH")
-        if (branch && branch != 'master') {
-            property "sonar.branch", branch
-        }
-        property "sonar.projectName", "OpenLMIS Reference Data Service"
-        property "sonar.projectKey", "org.sonarqube:openlmis-referencedata"
-        property "sonar.projectVersion", version
-        property "sonar.host.url", "http://sonar.openlmis.org"
-        property "sonar.login", System.getenv("SONAR_LOGIN")
-        property "sonar.password", System.getenv("SONAR_PASSWORD")
-        property "sonar.java.coveragePlugin", "jacoco"
-        //Tells SonarQube where the unit tests execution reports are
-        property "sonar.junit.reportsPath", "build/test-results/test"
-        //Tells SonarQube where the code coverage reports are
-        property "sonar.jacoco.reportPaths", "build/jacoco/test.exec,build/jacoco/integrationTest.exec"
-        properties["sonar.tests"] += sourceSets.integrationTest.java
-    }
+  properties {
+    property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
+    property "sonar.organization", "openlmis"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
-project.tasks['sonarqube'].dependsOn integrationTest 
 
 pmd {
     toolVersion = '5.4.0'
