@@ -295,7 +295,7 @@ checkstyle {
     toolVersion = "8.12"
 }
 
-//NOTE: It has to be named 'sonarqube'. Plugin requires this.
+//NOTE: This plugin requires that this task be named 'sonarqube'. In fact, it is performing SonarCloud analysis.
 sonarqube {
   properties {
     property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
