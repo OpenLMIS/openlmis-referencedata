@@ -295,7 +295,7 @@ checkstyle {
     toolVersion = "8.12"
 }
 
-sonarqube {
+sonar {
   properties {
     property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
     property "sonar.organization", "openlmis"
