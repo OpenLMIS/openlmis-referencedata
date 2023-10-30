@@ -83,7 +83,7 @@ dependencies {
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
 
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     implementation 'org.togglz:togglz-spring-boot-starter:2.6.1.Final'
     compile 'org.togglz:togglz-console:2.6.1.Final'
@@ -108,7 +108,7 @@ dependencies {
     testCompile "com.github.tomakehurst:wiremock:2.22.0"
     testCompile "com.github.stefanbirkner:system-rules:1.19.0"
 
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.22'
 
     runtime fileTree(dir: '/extensions/', include: '*.jar')
 }
