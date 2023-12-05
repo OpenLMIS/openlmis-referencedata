@@ -36,7 +36,6 @@ import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.time.ZoneId;
@@ -74,6 +73,7 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.PriceChangeDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
@@ -344,7 +344,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .createNew(Code.code("orderableDisplayCategoryCode"));
     orderableDisplayCategory.setId(UUID.randomUUID());
     ProgramOrderable programOrderable = new ProgramOrderable(program, orderable, 1, true,
-        orderableDisplayCategory, true, 1, Money.of(CurrencyUnit.USD, 10.0));
+        orderableDisplayCategory, true, 1, Money.of(CurrencyUnit.USD, 10.0),
+        Collections.emptyList());
     orderable.setProgramOrderables(Collections.singletonList(programOrderable));
     orderable.export(orderableDto);
 
@@ -929,7 +930,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private ProgramOrderableDto generateProgramOrderable() {
     return new ProgramOrderableDto(UUID.randomUUID(), UUID.randomUUID(),
-        null, null, true, true, 0, 1, Money.of(CurrencyUnit.USD, 10.0));
+        null, null, true, true, 0, 1, Money.of(CurrencyUnit.USD, 10.0),
+        Collections.singletonList(new PriceChangeDto()));
   }
 
   private void checkIfEquals(PageDto response, List<OrderableDto> expected) {
