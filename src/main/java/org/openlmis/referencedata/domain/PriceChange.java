@@ -39,7 +39,7 @@ import org.joda.money.Money;
 @EqualsAndHashCode(callSuper = false)
 public class PriceChange extends BaseEntity {
 
-  @ManyToOne(cascade = {CascadeType.ALL})
+  @ManyToOne(cascade = {CascadeType.REFRESH})
   @JoinColumn(name = "programOrderableId")
   private ProgramOrderable programOrderable;
 
