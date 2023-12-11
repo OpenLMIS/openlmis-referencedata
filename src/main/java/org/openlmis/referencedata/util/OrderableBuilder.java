@@ -17,17 +17,26 @@ package org.openlmis.referencedata.util;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableChild;
+import org.openlmis.referencedata.domain.PriceChange;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.service.AuthenticationHelper;
+import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +48,12 @@ public class OrderableBuilder {
 
   @Autowired
   private OrderableRepository orderableRepository;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  @Autowired
+  private AuthenticationHelper authenticationHelper;
 
   /**
    * Creates new instance based on data from {@link Orderable.Importer}.
@@ -67,6 +82,7 @@ public class OrderableBuilder {
             programOrderable.setProgram(program);
             programOrderable.setProduct(orderable);
 
+            setPriceChanges(persistedOrderable, item, programOrderable, program);
             return programOrderable;
           })
           .collect(Collectors.toList());
@@ -75,26 +91,75 @@ public class OrderableBuilder {
     }
 
     if (!isEmpty(importer.getChildren())) {
-      List<UUID> uuids = importer.getChildren()
-          .stream()
-          .map(item -> item.getOrderable().getId())
-          .collect(Collectors.toList());
-
-      Map<UUID, Orderable> childrenOrderables = orderableRepository
-          .findAllLatestByIds(uuids, null)
-          .getContent()
-          .stream()
-          .collect(Collectors.toMap(Orderable::getId, o -> o));
-
-      Set<OrderableChild> children = importer.getChildren().stream().map(
-          item -> {
-            Orderable child = childrenOrderables.get(item.getOrderable().getId());
-            return OrderableChild.newInstance(orderable, child, item.getQuantity());
-          }).collect(Collectors.toSet());
-      orderable.setChildren(children);
+      setChildren(importer, orderable);
     }
 
     return orderable;
+  }
+
+  private void setPriceChanges(Orderable persistedOrderable, ProgramOrderableDto item,
+      ProgramOrderable programOrderable, Program program) {
+    List<PriceChange> priceChanges = getPreviousPriceChanges(item, programOrderable);
+
+    if (persistedOrderable != null) {
+      boolean priceHasChanged = true;
+      Money newPrice = programOrderable.getPricePerPack();
+      if (persistedOrderable.getProgramOrderable(program) != null) {
+        Money currentPrice = persistedOrderable.getProgramOrderable(program)
+            .getPricePerPack();
+        priceHasChanged = !currentPrice.equals(newPrice);
+      }
+
+      if (priceHasChanged) {
+        addPriceChange(programOrderable, newPrice, priceChanges);
+      }
+    }
+
+    programOrderable.setPriceChanges(priceChanges);
+  }
+
+  private List<PriceChange> getPreviousPriceChanges(ProgramOrderableDto item,
+      ProgramOrderable programOrderable) {
+    return item.getPriceChanges().stream()
+        .map(priceChange -> {
+          User author = userRepository.findById(priceChange.getAuthor().getId())
+              .orElseThrow(() -> new NotFoundException(UserMessageKeys.ERROR_NOT_FOUND));
+          PriceChange priceChangeItem = PriceChange.newInstance(priceChange, author);
+          priceChangeItem.setProgramOrderable(programOrderable);
+          return priceChangeItem;
+        })
+        .collect(Collectors.toList());
+  }
+
+  private void addPriceChange(ProgramOrderable programOrderable, Money newPrice,
+      List<PriceChange> priceChanges) {
+    PriceChange priceChange = new PriceChange();
+    priceChange.setAuthor(authenticationHelper.getCurrentUser());
+    priceChange.setPrice(newPrice);
+    priceChange.setOccurredDate(ZonedDateTime.now());
+    priceChange.setProgramOrderable(programOrderable);
+
+    priceChanges.add(priceChange);
+  }
+
+  private void setChildren(Orderable.Importer importer, Orderable orderable) {
+    List<UUID> uuids = importer.getChildren()
+        .stream()
+        .map(item -> item.getOrderable().getId())
+        .collect(Collectors.toList());
+
+    Map<UUID, Orderable> childrenOrderables = orderableRepository
+        .findAllLatestByIds(uuids, null)
+        .getContent()
+        .stream()
+        .collect(Collectors.toMap(Orderable::getId, o -> o));
+
+    Set<OrderableChild> children = importer.getChildren().stream().map(
+        item -> {
+          Orderable child = childrenOrderables.get(item.getOrderable().getId());
+          return OrderableChild.newInstance(orderable, child, item.getQuantity());
+        }).collect(Collectors.toSet());
+    orderable.setChildren(children);
   }
 
 }

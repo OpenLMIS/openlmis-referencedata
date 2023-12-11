@@ -18,7 +18,12 @@ package org.openlmis.referencedata.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import com.google.common.collect.Lists;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -60,6 +65,8 @@ public class ProgramOrderableDto extends BaseDto
   @JsonDeserialize(using = MoneyDeserializer.class)
   private Money pricePerPack;
 
+  private List<PriceChangeDto> priceChanges;
+
   /**
    * Create new list of ProgramOrderableDto based on given list of {@link ProgramOrderable}.
    *
@@ -89,4 +96,10 @@ public class ProgramOrderableDto extends BaseDto
 
     return programDto;
   }
+
+  public List<PriceChangeDto> getPriceChanges() {
+    return Lists.newArrayList(Optional.ofNullable(priceChanges)
+        .orElse(Collections.emptyList()));
+  }
+
 }
