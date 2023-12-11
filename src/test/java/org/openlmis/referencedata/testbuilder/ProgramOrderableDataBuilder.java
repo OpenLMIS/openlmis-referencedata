@@ -15,11 +15,14 @@
 
 package org.openlmis.referencedata.testbuilder;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
+import org.openlmis.referencedata.domain.PriceChange;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 
@@ -35,6 +38,7 @@ public class ProgramOrderableDataBuilder {
   private Orderable product;
   private CurrencyUnit currencyUnit;
   private Money pricePerPack;
+  private List<PriceChange> priceChanges;
 
   /**
    * Returns instance of {@link ProgramOrderableDataBuilder} with sample data.
@@ -50,6 +54,7 @@ public class ProgramOrderableDataBuilder {
     product = new OrderableDataBuilder().build();
     currencyUnit = CurrencyUnit.of("USD");
     pricePerPack = Money.of(currencyUnit, 0);
+    priceChanges = Collections.emptyList();
   }
 
   /**
@@ -66,8 +71,11 @@ public class ProgramOrderableDataBuilder {
    * Builds instance of {@link ProgramOrderable} without id field.
    */
   public ProgramOrderable buildAsNew() {
-    return ProgramOrderable.createNew(program, orderableDisplayCategory, product, dosesPerPatient,
+    ProgramOrderable programOrderable = ProgramOrderable.createNew(
+        program, orderableDisplayCategory, product, dosesPerPatient,
         active, fullSupply, displayOrder, pricePerPack, currencyUnit);
+    programOrderable.setPriceChanges(priceChanges);
+    return programOrderable;
   }
 
   public ProgramOrderableDataBuilder withProgram(Program program) {

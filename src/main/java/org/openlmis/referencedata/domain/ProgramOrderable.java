@@ -22,13 +22,17 @@ import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.POS
 import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.PROGRAM_TYPE;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -39,6 +43,7 @@ import org.hibernate.annotations.Type;
 import org.javers.core.metamodel.annotation.TypeName;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.openlmis.referencedata.dto.PriceChangeDto;
 import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @Entity
@@ -107,9 +112,17 @@ public class ProgramOrderable extends BaseEntity {
   @ImportField(name = PRICE_PER_PACK, type = MONEY_TYPE)
   private Money pricePerPack;
 
+  @OneToMany(
+      mappedBy = "programOrderable",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true)
+  @Getter
+  @Setter
+  private List<PriceChange> priceChanges = new ArrayList<>();
+
   private ProgramOrderable(Program program,
-                           Orderable product,
-                           OrderableDisplayCategory orderableDisplayCategory) {
+      Orderable product,
+      OrderableDisplayCategory orderableDisplayCategory) {
     this.program = program;
     this.product = product;
     this.orderableDisplayCategory = orderableDisplayCategory;
@@ -159,9 +172,9 @@ public class ProgramOrderable extends BaseEntity {
    * @return see other
    */
   public static final ProgramOrderable createNew(Program program,
-                                                 OrderableDisplayCategory category,
-                                                 Orderable product,
-                                                 CurrencyUnit currencyUnit) {
+      OrderableDisplayCategory category,
+      Orderable product,
+      CurrencyUnit currencyUnit) {
     ProgramOrderable programOrderable = new ProgramOrderable(program, product, category);
     programOrderable.pricePerPack = Money.of(currencyUnit, BigDecimal.ZERO);
     return programOrderable;
@@ -179,14 +192,14 @@ public class ProgramOrderable extends BaseEntity {
    * @return a new ProgramOrderable.
    */
   public static final ProgramOrderable createNew(Program program,
-                                                 OrderableDisplayCategory category,
-                                                 Orderable product,
-                                                 Integer dosesPerPatient,
-                                                 boolean active,
-                                                 boolean fullSupply,
-                                                 int displayOrder,
-                                                 Money pricePerPack,
-                                                 CurrencyUnit currencyUnit) {
+      OrderableDisplayCategory category,
+      Orderable product,
+      Integer dosesPerPatient,
+      boolean active,
+      boolean fullSupply,
+      int displayOrder,
+      Money pricePerPack,
+      CurrencyUnit currencyUnit) {
     ProgramOrderable programOrderable = createNew(program, category, product, currencyUnit);
     programOrderable.dosesPerPatient = dosesPerPatient;
     programOrderable.active = active;
@@ -262,7 +275,7 @@ public class ProgramOrderable extends BaseEntity {
     if (pricePerPack != null) {
       exporter.setPricePerPack(pricePerPack);
     }
-
+    exporter.setPriceChanges(PriceChangeDto.newInstance(priceChanges));
   }
 
   public interface Exporter {
@@ -283,6 +296,8 @@ public class ProgramOrderable extends BaseEntity {
     void setDosesPerPatient(Integer dosesPerPatient);
 
     void setPricePerPack(Money pricePerPack);
+
+    void setPriceChanges(List<PriceChangeDto> priceChanges);
   }
 
   public interface Importer {

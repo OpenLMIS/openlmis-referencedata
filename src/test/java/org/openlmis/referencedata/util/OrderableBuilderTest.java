@@ -18,6 +18,7 @@ package org.openlmis.referencedata.util;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
@@ -28,6 +29,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,6 +47,8 @@ import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.service.AuthenticationHelper;
+import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -56,6 +61,9 @@ public class OrderableBuilderTest {
 
   @Mock
   private OrderableRepository orderableRepository;
+
+  @Mock
+  private AuthenticationHelper authenticationHelper;
 
   @InjectMocks
   private OrderableBuilder orderableBuilder;
@@ -121,6 +129,19 @@ public class OrderableBuilderTest {
 
     Orderable updatedOrderable = Orderable.updateFrom(orderable, orderableDto);
     assertThat(updatedOrderable.getVersionNumber(), is(2L));
+  }
+
+  @Test
+  public void shouldAddNewPriceChange() {
+    Program program = createProgram("test_program");
+    Orderable orderable = createOrderable(program.getId());
+    orderable.getProgramOrderable(program).setPricePerPack(Money.of(CurrencyUnit.of("USD"), 10));
+    OrderableDto orderableDto = createOrderableDto(program.getId());
+    when(authenticationHelper.getCurrentUser()).thenReturn(new UserDataBuilder().build());
+
+    Orderable updatedOrderable = orderableBuilder.newOrderable(orderableDto, orderable);
+
+    assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges(), hasSize(1));
   }
 
   private Program createProgram(String code) {

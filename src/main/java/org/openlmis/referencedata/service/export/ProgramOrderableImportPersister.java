@@ -90,7 +90,8 @@ public class ProgramOrderableImportPersister implements DataImportPersister<Prog
           dto.getDisplayOrder(),
           dto.getDosesPerPatient(),
           dto.getPricePerPack() != null ? Money.of(currency,
-              Double.parseDouble(dto.getPricePerPack())) : null
+              Double.parseDouble(dto.getPricePerPack())) : null,
+          null
       );
 
       ProgramOrderable programOrderable = programOrderableRepository
