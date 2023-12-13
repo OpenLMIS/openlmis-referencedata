@@ -69,7 +69,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, DataImportService.class})
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "test-run"})
 @Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class DataImportServiceIntegrationTest {
