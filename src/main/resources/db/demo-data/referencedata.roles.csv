@@ -1,13 +1,1 @@
 id,name,description
-185db8f7-ee35-44d0-8b40-6de12489ae77,Storeroom Manager,"Can create, view and delete requisitions and manage proofs of delivery."
-b6134c01-cb37-4303-85f0-8c8eab9d3cec,Store Manager,"Can view, authorize and delete requisitions."
-2c3e59f2-6630-4e6d-b98a-4ed427ed778d,District Storeroom Manager,Can view and approve requisitions.
-d30a2fbb-51d9-49ad-90fe-fb405470a439,Program Supervisor,Can view and approve requisitions.
-e16d802b-8eb1-43f7-adf8-ef123227cb88,Warehouse Clerk,Can view and edit orders and shipments.
-2fef03c4-8854-4dc8-b126-007f5e2afcc1,Reporting Personnel,Can view reports and edit report templates.
-d8ff49b1-96e7-4710-9511-289f490f7577,Stock Manager,"Can view stock cards, edit stock inventories and adjust stock."
-3322e1e5-7f6d-4bac-bdb2-0919e54c58d0,Delivery Approver,Can manage proof of delivery.
-201a4f3a-a299-4f5e-8c11-b21a3dbc2ceb,Requisition Viewer,Can view requisitions.
-5c316c50-96ad-4f04-8a3a-4f5aa8afa67e,Stock Viewer,Can view stock cards.
-d835bb5b-2309-4c3e-b6d1-6315442b9f7b,CCE Inventory Manager,Can view and manage cold chain equipment.
-3aa8dfc1-ef16-4345-9924-d39cc264cd1c,CCE Inventory Viewer,Can view cold chain equipment.
