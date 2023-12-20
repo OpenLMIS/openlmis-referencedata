@@ -1,5 +1,7 @@
-id,code,name,active,displayorder
-ac1d268b-ce10-455f-bf87-9c667da8f060,health_center,Health Center,true,3
-663b1d34-cc17-4d60-9619-e553e45aa441,dist_hosp,District Hospital,true,4
-5fc213c6-1bd7-46f0-9883-57c05250ca90,dist_store,District Store,true,5
-caecea08-6b2f-4ba9-98b2-b87702ba57ba,prov_store,Provincial Store,true,6
+﻿id,code,name,active,displayorder
+ac1d268b-ce10-455f-bf87-9c667da8f060,health_center,Health Center,1,3
+663b1d34-cc17-4d60-9619-e553e45aa441,dist_hosp,District Hospital,1,4
+5fc213c6-1bd7-46f0-9883-57c05250ca90,dist_store,District Store,1,5
+caecea08-6b2f-4ba9-98b2-b87702ba57ba,prov_store,Provincial Store,1,6
+93C53B7C-3FB6-4DE4-80FA-15A8FAA885E5,nat_store,National Store,1,7
+7135DFB8-7D56-4DA2-BE24-601A42610F1A,facility,Facility,1,2
