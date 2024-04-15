@@ -89,6 +89,7 @@ import org.openlmis.referencedata.repository.SupplyPartnerRepository;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.repository.WardRepository;
 import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
 import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
@@ -331,6 +332,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected DataImportService dataImportService;
+
+  @MockBean
+  protected WardRepository wardRepository;
 
   /**
    * Constructor for test.

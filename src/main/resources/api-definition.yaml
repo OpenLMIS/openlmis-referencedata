@@ -116,6 +116,10 @@ schemas:
 
   - tradeItemPage: !include schemas/tradeItemPage.json
 
+  - ward:  !include schemas/ward.json
+
+  - wardPage: !include schemas/wardPage.json
+
   - orderable: !include schemas/orderable.json
 
   - orderableChildDto: !include schemas/orderableChildDto.json
@@ -932,6 +936,140 @@ resourceTypes:
                     application/json:
       /{id}/auditLog:
           type: instanceAuditLog
+
+  /wards:
+      displayName: wards
+      get:
+          is: [ secured, paginated, sorted ]
+          description: Get all wards that match the given parameters.
+          responses:
+              200:
+                  headers:
+                    Keep-Alive:
+                  body:
+                    application/json:
+                      schema: wardPage
+              401:
+                  headers:
+                    Keep-Alive:
+                  body:
+                    application/json:
+              403:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+      post:
+          is: [ secured ]
+          description: Creates given ward if possible.
+          body:
+            application/json:
+              schema: ward
+          responses:
+              201:
+                  headers:
+                    Keep-Alive:
+                  body:
+                    application/json:
+                      schema: ward
+              400:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+              401:
+                  headers:
+                    Keep-Alive:
+                  body:
+                    application/json:
+              403:
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
+      /{id}:
+          uriParameters:
+              id:
+                  displayName: id
+                  type: string
+                  required: true
+                  repeat: false
+          get:
+              is: [ secured ]
+              description: Get chosen ward.
+              responses:
+                  200:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: ward
+                  404:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+          put:
+              is: [ secured ]
+              description: Update existing ward.
+              body:
+                application/json:
+                  schema: ward
+              responses:
+                  200:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: ward
+                  400:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  404:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+          delete:
+              is: [ secured ]
+              description: "Completely removes ward. This action is not recoverable."
+              responses:
+                  204:
+                      headers:
+                        Keep-Alive:
+                  400:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                  404:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+      /{id}/auditLog:
+        type: instanceAuditLog
 
   /commodityTypes:
       displayName: Commodity Type
