@@ -120,6 +120,12 @@ schemas:
 
   - wardPage: !include schemas/wardPage.json
 
+  - wardArray: |
+      {
+          "type": "array",
+          "items": { "type": "object", "$ref": "schemas/ward.json" }
+      }
+
   - orderable: !include schemas/orderable.json
 
   - orderableChildDto: !include schemas/orderableChildDto.json
@@ -942,6 +948,17 @@ resourceTypes:
       get:
           is: [ secured, paginated, sorted ]
           description: Get all wards that match the given parameters.
+          queryParameters:
+              facilityId:
+                      displayName: facilityId
+                      type: string
+                      required: false
+                      repeat: false
+              disabled:
+                      displayName: disabled
+                      type: boolean
+                      required: false
+                      repeat: false
           responses:
               200:
                   headers:
@@ -984,6 +1001,37 @@ resourceTypes:
                   body:
                     application/json:
                       schema: localizedErrorResponse
+      /saveAll:
+          put:
+              is: [ secured ]
+              description: Update the list of wards.
+              body:
+                application/json:
+                  schema: wardArray
+              responses:
+                  200:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: wardArray
+                  400:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                  403:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  404:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
       /{id}:
           uriParameters:
               id:

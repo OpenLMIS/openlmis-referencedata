@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -47,6 +48,7 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = WardController.RESOURCE_PATH;
   private static final String ID_URL = RESOURCE_URL + "/{id}";
+  private static final String SAVE_ALL_URL = RESOURCE_URL + "/saveAll";
 
   private static final String NAME = "name";
 
@@ -75,8 +77,8 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(HttpStatus.SC_OK)
         .body("content", Matchers.hasSize(1))
-        .body("content[0].id", Matchers.is(ward.getId().toString()))
-        .body("content[0].name", Matchers.is(ward.getName()));
+        .body("content[0].id", is(ward.getId().toString()))
+        .body("content[0].name", is(ward.getName()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -106,8 +108,8 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .post(RESOURCE_URL)
         .then()
         .statusCode(HttpStatus.SC_CREATED)
-        .body(ID, Matchers.is(Matchers.notNullValue()))
-        .body(NAME, Matchers.is(wardDto.getName()));
+        .body(ID, is(Matchers.notNullValue()))
+        .body(NAME, is(wardDto.getName()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -139,8 +141,8 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .body(ID, Matchers.is(wardDto.getId().toString()))
-        .body(NAME, Matchers.is(wardDto.getName()));
+        .body(ID, is(wardDto.getId().toString()))
+        .body(NAME, is(wardDto.getName()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -157,7 +159,7 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .get(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_NOT_FOUND)
-        .body(MESSAGE_KEY, Matchers.is(WardMessageKeys.ERROR_WARD_NOT_FOUND));
+        .body(MESSAGE_KEY, is(WardMessageKeys.ERROR_WARD_NOT_FOUND));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -193,8 +195,31 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_OK)
-        .body(ID, Matchers.is(wardDto.getId().toString()))
-        .body(NAME, Matchers.is(wardDto.getName()));
+        .body(ID, is(wardDto.getId().toString()))
+        .body(NAME, is(wardDto.getName()));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldUpdateListOfWards() {
+    mockUserHasRight(WARDS_MANAGE);
+    given(wardRepository.findById(wardDto.getId()))
+        .willReturn(Optional.of(ward));
+    given(facilityRepository.findById(facility.getId()))
+        .willReturn(Optional.of(facility));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .body(Collections.singletonList(wardDto))
+        .when()
+        .put(SAVE_ALL_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .assertThat()
+        .body("size()", is(1));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -213,7 +238,7 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_BAD_REQUEST)
-        .body(MESSAGE_KEY, Matchers.is(WardMessageKeys.ERROR_WARD_ID_MISMATCH));
+        .body(MESSAGE_KEY, is(WardMessageKeys.ERROR_WARD_ID_MISMATCH));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -263,7 +288,7 @@ public class WardControllerIntegrationTest extends BaseWebIntegrationTest {
         .delete(ID_URL)
         .then()
         .statusCode(HttpStatus.SC_NOT_FOUND)
-        .body(MESSAGE_KEY, Matchers.is(WardMessageKeys.ERROR_WARD_NOT_FOUND));
+        .body(MESSAGE_KEY, is(WardMessageKeys.ERROR_WARD_NOT_FOUND));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

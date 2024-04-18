@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.openlmis.referencedata.domain.RightName.WARDS_MANAGE;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -76,17 +77,28 @@ public class WardController extends BaseController {
   @ResponseBody
   public WardDto createWard(@RequestBody WardDto ward) {
     rightService.checkAdminRight(WARDS_MANAGE);
-    LOGGER.debug("Creating new ward");
-    Ward newWard = Ward.newWard(ward);
+    return createOne(ward);
+  }
 
-    LOGGER.debug("Find facility");
-    Facility facility = findFacility(ward.getFacility().getId());
-    newWard.setFacility(facility);
+  /**
+   * Updates the list of wards.
+   */
+  @PutMapping(value = "/saveAll")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public List<WardDto> saveWards(@RequestBody List<WardDto> wards) {
+    rightService.checkAdminRight(WARDS_MANAGE);
 
-    newWard.setId(null);
-    newWard = wardRepository.saveAndFlush(newWard);
+    List<WardDto> savedWards = new ArrayList<>();
+    for (WardDto ward : wards) {
+      if (ward.getId() != null) {
+        savedWards.add(saveOne(ward.getId(), ward));
+      } else {
+        savedWards.add(createOne(ward));
+      }
+    }
 
-    return WardDto.newInstance(newWard);
+    return savedWards;
   }
 
   /**
@@ -102,24 +114,7 @@ public class WardController extends BaseController {
       throw new ValidationMessageException(WardMessageKeys.ERROR_WARD_ID_MISMATCH);
     }
 
-    LOGGER.debug("Updating ward");
-    Ward db;
-    Optional<Ward> wardOptional = wardRepository.findById(id);
-    if (wardOptional.isPresent()) {
-      db = wardOptional.get();
-      db.updateFrom(ward);
-    } else {
-      db = Ward.newWard(ward);
-      db.setId(id);
-    }
-
-    LOGGER.debug("Find facility");
-    Facility facility = findFacility(ward.getFacility().getId());
-    db.setFacility(facility);
-
-    wardRepository.saveAndFlush(db);
-
-    return WardDto.newInstance(db);
+    return saveOne(id, ward);
   }
 
   /**
@@ -201,6 +196,41 @@ public class WardController extends BaseController {
 
     return getAuditLogResponse(Ward.class, id, author, changedPropertyName, page,
         returnJson);
+  }
+
+  private WardDto saveOne(UUID id, WardDto ward) {
+    LOGGER.debug("Updating ward");
+    Ward db;
+    Optional<Ward> wardOptional = wardRepository.findById(id);
+    if (wardOptional.isPresent()) {
+      db = wardOptional.get();
+      db.updateFrom(ward);
+    } else {
+      db = Ward.newWard(ward);
+      db.setId(id);
+    }
+
+    LOGGER.debug("Find facility");
+    Facility facility = findFacility(ward.getFacility().getId());
+    db.setFacility(facility);
+
+    wardRepository.saveAndFlush(db);
+
+    return WardDto.newInstance(db);
+  }
+
+  private WardDto createOne(WardDto ward) {
+    LOGGER.debug("Creating new ward");
+    Ward newWard = Ward.newWard(ward);
+
+    LOGGER.debug("Find facility");
+    Facility facility = findFacility(ward.getFacility().getId());
+    newWard.setFacility(facility);
+
+    newWard.setId(null);
+    newWard = wardRepository.saveAndFlush(newWard);
+
+    return WardDto.newInstance(newWard);
   }
 
   private Facility findFacility(UUID facilityId) {
