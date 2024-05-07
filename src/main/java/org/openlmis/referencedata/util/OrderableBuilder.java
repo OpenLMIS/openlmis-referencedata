@@ -20,6 +20,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,11 +30,14 @@ import org.openlmis.referencedata.domain.OrderableChild;
 import org.openlmis.referencedata.domain.PriceChange;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.UnitOfOrderableRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
@@ -48,6 +52,9 @@ public class OrderableBuilder {
 
   @Autowired
   private OrderableRepository orderableRepository;
+
+  @Autowired
+  private UnitOfOrderableRepository unitOfOrderableRepository;
 
   @Autowired
   private UserRepository userRepository;
@@ -92,6 +99,10 @@ public class OrderableBuilder {
 
     if (!isEmpty(importer.getChildren())) {
       setChildren(importer, orderable);
+    }
+
+    if (!isEmpty(importer.getUnits())) {
+      setUnits(importer, orderable);
     }
 
     return orderable;
@@ -162,4 +173,21 @@ public class OrderableBuilder {
     orderable.setChildren(children);
   }
 
+  private void setUnits(Orderable.Importer importer, Orderable orderable) {
+    orderable.setUnits(
+        importer.getUnits().stream().map(this::mapToSavedUnit).collect(Collectors.toList()));
+  }
+
+  private UnitOfOrderable mapToSavedUnit(UnitOfOrderableDto unitDto) {
+    if (unitDto.getId() != null) {
+      final Optional<UnitOfOrderable> existing =
+          unitOfOrderableRepository.findById(unitDto.getId());
+
+      if (existing.isPresent()) {
+        return existing.get();
+      }
+    }
+
+    return unitOfOrderableRepository.save(UnitOfOrderable.newInstance(unitDto));
+  }
 }

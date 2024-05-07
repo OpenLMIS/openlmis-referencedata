@@ -25,6 +25,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.domain.measurement.TemperatureMeasurement;
 import org.openlmis.referencedata.domain.measurement.VolumeMeasurement;
 
@@ -43,6 +44,7 @@ public class OrderableDataBuilder {
   private boolean roundToZero;
   private List<ProgramOrderable> programOrderables;
   private Map<String, String> identifiers;
+  private List<UnitOfOrderable> units;
   private Map<String, Object> extraData;
   private Long versionNumber;
   private ZonedDateTime lastUpdated;
@@ -66,6 +68,7 @@ public class OrderableDataBuilder {
     roundToZero = false;
     programOrderables = new ArrayList<>();
     identifiers = new HashMap<>();
+    units = new ArrayList<>();
     extraData = new HashMap<>();
     versionNumber = 1L;
     lastUpdated = ZonedDateTime.now();
@@ -173,6 +176,7 @@ public class OrderableDataBuilder {
     orderable.setDescription(description);
     orderable.setProgramOrderables(programOrderables);
     orderable.setIdentifiers(identifiers);
+    orderable.setUnits(units);
     orderable.setExtraData(extraData);
     orderable.setLastUpdated(lastUpdated);
     orderable.setMinimumTemperature(minimumTemperature);
