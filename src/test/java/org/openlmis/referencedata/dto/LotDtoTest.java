@@ -42,12 +42,14 @@ public class LotDtoTest {
     assertEquals(lotOne.getLotCode(), result.get(0).getLotCode());
     assertEquals(lotOne.getManufactureDate(), result.get(0).getManufactureDate());
     assertEquals(lotOne.getTradeItem().getId(), result.get(0).getTradeItemId());
+    assertEquals(lotOne.isQuarantined(), result.get(0).isQuarantined());
 
     assertEquals(lotTwo.getId(), result.get(1).getId());
     assertEquals(lotTwo.getExpirationDate(), result.get(1).getExpirationDate());
     assertEquals(lotTwo.getLotCode(), result.get(1).getLotCode());
     assertEquals(lotTwo.getManufactureDate(), result.get(1).getManufactureDate());
     assertEquals(lotTwo.getTradeItem().getId(), result.get(1).getTradeItemId());
+    assertEquals(lotTwo.isQuarantined(), result.get(0).isQuarantined());
   }
 
   @Test
@@ -61,6 +63,7 @@ public class LotDtoTest {
     assertEquals(lot.getLotCode(), result.getLotCode());
     assertEquals(lot.getManufactureDate(), result.getManufactureDate());
     assertEquals(lot.getTradeItem().getId(), result.getTradeItemId());
+    assertEquals(lot.isQuarantined(), result.isQuarantined());
   }
 
   @Test

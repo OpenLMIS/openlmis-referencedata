@@ -27,6 +27,10 @@
     "active": {
       "type": "boolean",
       "title": "active"
+    },
+    "quarantined": {
+      "type": "boolean",
+      "title": "quarantined"
     }
   },
   "required": [
