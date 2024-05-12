@@ -85,6 +85,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     lot.setExpirationDate(LocalDate.now());
     lot.setManufactureDate(LocalDate.now());
     lot.setActive(true);
+    lot.setQuarantined(false);
 
     lotDto = new LotDto();
     lot.export(lotDto);
@@ -113,6 +114,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(lotDto.getLotCode(), response.getLotCode());
     assertEquals(lotDto.isActive(), response.isActive());
     assertEquals(lotDto.getTradeItemId(), response.getTradeItemId());
+    assertEquals(lotDto.isQuarantined(), response.isQuarantined());
     assertTrue(lotDto.getExpirationDate().isEqual(response.getExpirationDate()));
     assertTrue(lotDto.getManufactureDate().isEqual(response.getManufactureDate()));
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());

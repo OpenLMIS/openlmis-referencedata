@@ -53,6 +53,9 @@ public class Lot extends BaseEntity {
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   private boolean active;
 
+  @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
+  private boolean quarantined;
+
   /**
    * Creates new lot object based on data from {@link Importer} and tradeItem argument.
    *
@@ -72,6 +75,7 @@ public class Lot extends BaseEntity {
       lot.setManufactureDate(importer.getManufactureDate());
     }
     lot.setTradeItem(tradeItem);
+    lot.setQuarantined(importer.isQuarantined());
     return lot;
   }
 
@@ -91,6 +95,7 @@ public class Lot extends BaseEntity {
     if (manufactureDate != null) {
       exporter.setManufactureDate(manufactureDate);
     }
+    exporter.setQuarantined(quarantined);
   }
 
   @Override
@@ -122,6 +127,8 @@ public class Lot extends BaseEntity {
     void setExpirationDate(LocalDate expirationDate);
 
     void setManufactureDate(LocalDate manufactureDate);
+
+    void setQuarantined(boolean quarantined);
   }
 
   public interface Importer {
@@ -136,5 +143,7 @@ public class Lot extends BaseEntity {
     LocalDate getExpirationDate();
 
     LocalDate getManufactureDate();
+
+    boolean isQuarantined();
   }
 }

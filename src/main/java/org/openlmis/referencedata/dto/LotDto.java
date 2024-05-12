@@ -38,6 +38,7 @@ public class LotDto extends BaseDto implements Lot.Exporter, Lot.Importer {
   private UUID tradeItemId;
   private LocalDate expirationDate;
   private LocalDate manufactureDate;
+  private boolean quarantined;
 
   /**
    * Create new set of LotDto based on given iterable of {@link Lot}.
