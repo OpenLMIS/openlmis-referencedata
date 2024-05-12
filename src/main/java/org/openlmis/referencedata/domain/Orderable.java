@@ -254,6 +254,10 @@ public class Orderable implements Versionable {
   })
   private VolumeMeasurement inBoxCubeDimension;
 
+  @Getter
+  @Setter
+  private boolean quarantined;
+
   /**
    * Default constructor.
    *
@@ -328,6 +332,7 @@ public class Orderable implements Versionable {
               .newVolumeMeasurement(importer.getInBoxCubeDimension());
     }
 
+    orderable.quarantined = importer.isQuarantined();
     return orderable;
   }
 
@@ -484,6 +489,8 @@ public class Orderable implements Versionable {
     if (inBoxCubeDimension != null) {
       exporter.setInBoxCubeDimension(inBoxCubeDimension);
     }
+
+    exporter.setQuarantined(quarantined);
   }
 
   public void setExtraData(Map<String, Object> extraData) {
@@ -520,6 +527,8 @@ public class Orderable implements Versionable {
     void setMaximumTemperature(TemperatureMeasurement maximumTemperature);
 
     void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
+
+    void setQuarantined(boolean quarantined);
   }
 
   public interface Importer extends BaseImporter, ExtraDataImporter, VersionImporter {
@@ -549,6 +558,8 @@ public class Orderable implements Versionable {
     TemperatureMeasurement.Importer getMaximumTemperature();
 
     VolumeMeasurement.Importer getInBoxCubeDimension();
+
+    boolean isQuarantined();
   }
 }
 
