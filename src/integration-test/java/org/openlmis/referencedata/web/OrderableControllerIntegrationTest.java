@@ -1008,6 +1008,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(orderableDto.getExtraData(), response.getExtraData());
     assertEquals(orderableDto.getOrderableRepository(), response.getOrderableRepository());
     assertEquals(orderableDto.getVersionNumber(), response.getVersionNumber());
+    assertEquals(orderableDto.isQuarantined(), response.isQuarantined());
   }
 
 }

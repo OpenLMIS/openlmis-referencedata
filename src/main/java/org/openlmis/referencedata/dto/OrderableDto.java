@@ -86,6 +86,8 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private VolumeMeasurementDto inBoxCubeDimension;
 
+  private boolean quarantined;
+
   @JsonIgnore
   private OrderableRepository orderableRepository;
 
