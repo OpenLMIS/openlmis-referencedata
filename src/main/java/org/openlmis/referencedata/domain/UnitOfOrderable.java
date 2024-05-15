@@ -87,6 +87,18 @@ public class UnitOfOrderable extends BaseEntity {
   }
 
   /**
+   * Updates this instance from the given one.
+   *
+   * @param unitOfOrderable the instance of {@link UnitOfOrderable}
+   */
+  public void updateFrom(UnitOfOrderable unitOfOrderable) {
+    this.setName(unitOfOrderable.getName());
+    this.setDescription(unitOfOrderable.getDescription());
+    this.setDisplayOrder(unitOfOrderable.getDisplayOrder());
+    this.setFactor(unitOfOrderable.getFactor());
+  }
+
+  /**
    * Export this object to the specified exporter (DTO).
    *
    * @param exporter exporter to export to
