@@ -41,7 +41,8 @@ public class UnitOfOrderableController extends BaseController {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(UnitOfOrderableController.class);
 
-  @Autowired private UnitOfOrderableRepository unitOfOrderableRepository;
+  @Autowired
+  private UnitOfOrderableRepository unitOfOrderableRepository;
 
   /**
    * REST endpoint to get paginated UnitOfOrderable.
@@ -68,7 +69,8 @@ public class UnitOfOrderableController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public UnitOfOrderableDto createUnitOfOrderable(@RequestBody UnitOfOrderableDto unitOfOrderableDto) {
+  public UnitOfOrderableDto createUnitOfOrderable(
+      @RequestBody UnitOfOrderableDto unitOfOrderableDto) {
     rightService.checkAdminRight(UNIT_OF_ORDERABLES_MANAGE);
     XLOGGER.debug("Creating new unitOfOrderable");
 
@@ -83,16 +85,19 @@ public class UnitOfOrderableController extends BaseController {
    * Updating or creating (if not found) UnitOfOrderables.
    *
    * @param unitOfOrderableDto A unitOfOrderableDto bound to the request body.
-   * @param id            UUID of unitOfOrderable which we want to update.
+   * @param id                 UUID of unitOfOrderable which we want to update.
    * @return the updated unitOfOrderable.
    */
   @PutMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
-  public UnitOfOrderableDto updateUnitOfOrderable(@RequestBody UnitOfOrderableDto unitOfOrderableDto,
-                                        @PathVariable UUID id) {
+  public UnitOfOrderableDto updateUnitOfOrderable(
+      @RequestBody UnitOfOrderableDto unitOfOrderableDto,
+      @PathVariable UUID id) {
     rightService.checkAdminRight(UNIT_OF_ORDERABLES_MANAGE);
 
-    UnitOfOrderable unitOfOrderableToUpdate = unitOfOrderableRepository.findById(id).orElse(null);
+    UnitOfOrderable unitOfOrderableToUpdate = unitOfOrderableRepository
+        .findById(id)
+        .orElse(null);
     if (unitOfOrderableToUpdate == null) {
       unitOfOrderableToUpdate = new UnitOfOrderable();
       XLOGGER.debug("Creating new unitOfOrderable");
@@ -109,24 +114,25 @@ public class UnitOfOrderableController extends BaseController {
 
   /**
    * Get the audit information related to units of orderable.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
+   *
+   * @param author              The author of the changes which should be returned.
+   *                            If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
+   *                            If null or empty, changes associated with any and all properties are returned.
+   * @param page                A Pageable object that allows client to optionally add "page" (page number)
+   *                            and "size" (page size) query parameters to the request.
    */
   @GetMapping("{id}/auditLog")
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<String> getUnitOfOrderableAuditLog(
-          @PathVariable UUID id,
-          @RequestParam(name = "author", required = false, defaultValue = "") String author,
-          @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
-          //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
-          @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
-          Pageable page) {
+      @PathVariable UUID id,
+      @RequestParam(name = "author", required = false, defaultValue = "") String author,
+      @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
+      String changedPropertyName,
+      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
+      boolean returnJson,
+      Pageable page) {
     rightService.checkAdminRight(UNIT_OF_ORDERABLES_MANAGE);
 
     //Return a 404 if the specified instance can't be found
@@ -136,7 +142,7 @@ public class UnitOfOrderableController extends BaseController {
     }
 
     return getAuditLogResponse(UnitOfOrderable.class, id, author, changedPropertyName, page,
-            returnJson);
+        returnJson);
   }
 
   /**

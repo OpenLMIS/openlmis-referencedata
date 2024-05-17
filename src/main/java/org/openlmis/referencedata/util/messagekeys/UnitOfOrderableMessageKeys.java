@@ -16,7 +16,7 @@
 package org.openlmis.referencedata.util.messagekeys;
 
 public class UnitOfOrderableMessageKeys extends MessageKeys {
-    private static final String ERROR = join(SERVICE_ERROR, UNIT_OF_ORDERABLE);
+  private static final String ERROR = join(SERVICE_ERROR, UNIT_OF_ORDERABLE);
 
-    public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
+  public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
 }
