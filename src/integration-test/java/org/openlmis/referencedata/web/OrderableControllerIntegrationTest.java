@@ -749,7 +749,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         orderable.getProductCode().toString(),
         Lists.newArrayList(new VersionIdentityDto(
             orderableDto.getId(), orderableDto.getVersionNumber())),
-        0, 10);
+        false, 0, 10);
 
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))
@@ -785,7 +785,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         orderable.getProductCode().toString(),
         Lists.newArrayList(new VersionIdentityDto(
             orderableDto.getId(), orderableDto.getVersionNumber())),
-        0, 10);
+        false, 0, 10);
 
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))
@@ -821,7 +821,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         orderable.getProductCode().toString(),
         Lists.newArrayList(new VersionIdentityDto(
             orderableDto.getId(), orderableDto.getVersionNumber())),
-        0, 10);
+        false, 0, 10);
 
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))
@@ -853,7 +853,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         orderable.getProductCode().toString(),
         Lists.newArrayList(new VersionIdentityDto(
             orderableDto.getId(), orderableDto.getVersionNumber())),
-        0, 10);
+        false, 0, 10);
 
     given(orderableRepository
         .search(eq(searchParams), any(Pageable.class)))
