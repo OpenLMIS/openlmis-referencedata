@@ -115,9 +115,12 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
 
   @Override
   public boolean getIncludeQuarantined() {
-    return BooleanUtils.toBooleanDefaultIfNull(
-        Boolean.valueOf(queryParams.getFirst(INCLUDE_QUARANTINED)),
-        false);
+    if (!queryParams.containsKey(INCLUDE_QUARANTINED)) {
+      return false;
+    } else {
+      return BooleanUtils.toBooleanDefaultIfNull(
+          queryParams.getBoolean(INCLUDE_QUARANTINED), false);
+    }
   }
 
   /**
