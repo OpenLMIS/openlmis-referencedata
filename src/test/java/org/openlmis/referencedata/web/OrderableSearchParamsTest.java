@@ -61,6 +61,7 @@ public class OrderableSearchParamsTest {
         Lists.newArrayList(
             new VersionIdentityDto(UUID.randomUUID(), 1L),
             new VersionIdentityDto(UUID.randomUUID(), 2L)),
+        false,
         null, null
     );
 
@@ -82,6 +83,7 @@ public class OrderableSearchParamsTest {
     OrderableSearchParams searchParams = new OrderableSearchParams(
         null, null, null,
         Lists.newArrayList(new VersionIdentityDto(null, 1L)),
+        false,
         null, null);
 
     // when
@@ -97,6 +99,7 @@ public class OrderableSearchParamsTest {
     OrderableSearchParams searchParams = new OrderableSearchParams(
         null, null, null,
         Lists.newArrayList(new VersionIdentityDto(UUID.randomUUID(), null)),
+        false,
         null, null
     );
 

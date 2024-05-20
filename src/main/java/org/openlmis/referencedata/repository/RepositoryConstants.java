@@ -32,6 +32,8 @@ class RepositoryConstants {
   static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated DESC LIMIT 1";
   static final String WHERE_VERSIONNUMBER_AND_CODE_IGNORE_CASE =
       " WHERE LOWER(o.productCode) = LOWER(:code) AND o.identity.versionNumber = :versionNumber";
+  static final String AND = " AND";
+  static final String QUARANTINED_EQUALS_FALSE = " o.quarantined = FALSE";
 
   private RepositoryConstants() {}
 }

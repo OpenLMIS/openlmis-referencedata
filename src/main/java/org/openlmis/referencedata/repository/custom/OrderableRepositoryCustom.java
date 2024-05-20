@@ -41,5 +41,6 @@ public interface OrderableRepositoryCustom {
 
     Set<UUID> getTradeItemId();
 
+    boolean getIncludeQuarantined();
   }
 }

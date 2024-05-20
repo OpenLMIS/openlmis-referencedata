@@ -327,7 +327,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams("something", "something", null, null), pageable);
+        .search(new TestSearchParams("something", "something", null, null, false), pageable);
 
     // then
     assertEquals(0, foundOrderables.getTotalElements());
@@ -344,7 +344,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, programCode, null),
+        new TestSearchParams(null, null, programCode, null, false),
         pageable);
 
     // then
@@ -403,7 +403,7 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> foundOrderables = repository.search(
         new TestSearchParams(
             validOrderable.getProductCode().toString(), NAME,
-            validProgram.getCode().toString(), null),
+            validProgram.getCode().toString(), null, false),
         pageable);
 
     // then
@@ -507,6 +507,21 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
+  public void findAllLatestShouldFindOnlyNonQuarantinedOrderables() {
+    // given
+    Orderable orderable = saveAndGetOrderable();
+    saveAndGetQuarantinedOrderable();
+
+    // when
+    Page<Orderable> actual = repository.findAllLatest(pageable);
+
+    // then
+    assertEquals(1, actual.getContent().size());
+    Orderable resultOrderable = actual.getContent().get(0);
+    assertEquals(orderable.getFullProductName(), resultOrderable.getFullProductName());
+  }
+
+  @Test
   public void findAllLatestByIdsShouldReturnEmptyPageEmptyContentWithNothingInTheRepository() {
     // given and when
     Page<Orderable> actual = repository.findAllLatestByIds(newHashSet(UUID.randomUUID()), pageable);
@@ -553,7 +568,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> actual = repository
-        .search(new TestSearchParams(SOME_CODE, null, null, null), pageable);
+        .search(new TestSearchParams(SOME_CODE, null, null, null, false), pageable);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
@@ -569,7 +584,7 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> actual = repository.search(
         new TestSearchParams(null, null, null,
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
-                Pair.of(orderable2.getId(), orderable2.getVersionNumber()))),
+                Pair.of(orderable2.getId(), orderable2.getVersionNumber())), false),
         pageable);
 
     assertThat(actual.getNumberOfElements(), is(2));
@@ -593,7 +608,7 @@ public class OrderableRepositoryIntegrationTest {
     // current version
     Page<Orderable> actual = repository.search(
         new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber()))),
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber())), false),
         pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
@@ -602,7 +617,7 @@ public class OrderableRepositoryIntegrationTest {
     // previous version
     actual = repository.search(
         new TestSearchParams(null, null, null,
-            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber() - 1))),
+            Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber() - 1)), false),
         pageable);
 
     assertThat(actual.getNumberOfElements(), is(1));
@@ -758,7 +773,7 @@ public class OrderableRepositoryIntegrationTest {
             orderable3.getFullProductName(), null,
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
               Pair.of(orderable2.getId(), orderable2.getVersionNumber()),
-              Pair.of(orderable3.getId(), orderable3.getVersionNumber()))));
+              Pair.of(orderable3.getId(), orderable3.getVersionNumber())), false));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated().withZoneSameLocal(ZoneId.of("GMT")));
@@ -783,7 +798,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, programCode, null),
+        new TestSearchParams(null, null, programCode, null, false),
         pageable);
 
     // then
@@ -798,11 +813,32 @@ public class OrderableRepositoryIntegrationTest {
         foundOrderable.getProgramOrderable(secondProgram).getId());
   }
 
+  @Test
+  public void shouldReturnOnlyNonQuarantinedOrderables() {
+    // given
+    saveAndGetQuarantinedOrderable();
+    saveAndGetQuarantinedOrderable();
+    Orderable validOrderable1 = saveAndGetOrderable();
+    Orderable validOrderable2 = saveAndGetOrderable();
+
+    // when
+    Page<Orderable> foundOrderables = repository.search(
+        new TestSearchParams(null, null, null, null, false),
+        pageable);
+
+    // then
+    assertEquals(2, foundOrderables.getContent().size());
+    Orderable resultOrderable1 = foundOrderables.getContent().get(0);
+    assertEquals(validOrderable1.getFullProductName(), resultOrderable1.getFullProductName());
+    Orderable resultOrderable2 = foundOrderables.getContent().get(1);
+    assertEquals(validOrderable2.getFullProductName(), resultOrderable2.getFullProductName());
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
       Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams(code, name, programCode, null), pageable);
+        .search(new TestSearchParams(code, name, programCode, null, false), pageable);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
@@ -881,6 +917,19 @@ public class OrderableRepositoryIntegrationTest {
     return repository.save(orderableNewVersion);
   }
 
+  private Orderable saveAndGetQuarantinedOrderable() {
+    Long versionNumber = ThreadLocalRandom.current().nextLong(0, 1000);
+    OrderableDataBuilder builder = new OrderableDataBuilder()
+        .withProductCode(Code.code(CODE + versionNumber))
+        .withIdentifier("cSys", "cSysId")
+        .withDispensable(Dispensable.createNew(EACH))
+        .asQuarantined(true)
+        .withFullProductName(NAME);
+
+    Orderable orderable = builder.withVersionNumber(versionNumber).buildAsNew();
+    return repository.save(orderable);
+  }
+
   private void checkSingleResultOrderableVersion(List<Orderable> result, Long versionNumber) {
     assertNotNull(result);
     assertEquals(1, result.size());
@@ -897,10 +946,16 @@ public class OrderableRepositoryIntegrationTest {
     private String name;
     private String programCode;
     private Set<Pair<UUID, Long>> identityPairs;
+    private boolean includeQuarantined;
 
     @Override
     public Set<UUID> getTradeItemId() {
       return Collections.emptySet();
+    }
+
+    @Override
+    public boolean getIncludeQuarantined() {
+      return includeQuarantined;
     }
   }
 }

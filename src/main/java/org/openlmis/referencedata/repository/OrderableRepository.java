@@ -15,11 +15,13 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.openlmis.referencedata.repository.RepositoryConstants.AND;
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_REFERENCEDATA_ORDERABLES_CLAUSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.QUARANTINED_EQUALS_FALSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_DISTINCT_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_LAST_UPDATED;
 import static org.openlmis.referencedata.repository.RepositoryConstants.SELECT_ORDERABLE;
@@ -125,6 +127,8 @@ public interface OrderableRepository extends
   @Query(value = SELECT_ORDERABLE
           + FROM_ORDERABLES_CLAUSE
           + WHERE_LATEST_ORDERABLE
+          + AND
+          + QUARANTINED_EQUALS_FALSE
           + ORDER_BY_PAGEABLE
   )
   Page<Orderable> findAllLatest(Pageable pageable);
