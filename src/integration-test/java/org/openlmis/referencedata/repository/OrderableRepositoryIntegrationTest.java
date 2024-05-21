@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.domain.Orderable.COMMODITY_TYPE;
 import static org.openlmis.referencedata.domain.Orderable.TRADE_ITEM;
 
-import com.google.common.collect.Sets;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -48,6 +47,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
+import com.google.common.collect.Sets;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -112,7 +112,6 @@ public class OrderableRepositoryIntegrationTest {
 
   @Autowired
   private OrderableBuilder orderableBuilder;
-
   @Autowired
   private EntityManager entityManager;
 

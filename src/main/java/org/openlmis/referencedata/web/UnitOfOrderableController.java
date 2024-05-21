@@ -15,10 +15,9 @@
 
 package org.openlmis.referencedata.web;
 
-import java.util.UUID;
-
 import static org.openlmis.referencedata.domain.RightName.UNIT_OF_ORDERABLES_MANAGE;
 
+import java.util.UUID;
 import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
