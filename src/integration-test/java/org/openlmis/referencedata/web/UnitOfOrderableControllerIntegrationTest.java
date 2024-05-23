@@ -53,8 +53,6 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
   private static final String RESOURCE_URL = UnitOfOrderableController.RESOURCE_PATH;
   private static final String ID_URL = RESOURCE_URL + "/{id}";
 
-  private static final String UNIT = "unit";
-  private static final String CODE = "code";
   private static final String ID = "id";
   private static final String NAME = "testUnit";
   private static final int FACTOR = 10;
