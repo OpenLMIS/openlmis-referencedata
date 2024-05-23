@@ -88,6 +88,7 @@ import org.openlmis.referencedata.repository.SupplyLineRepository;
 import org.openlmis.referencedata.repository.SupplyPartnerRepository;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.repository.UnitOfOrderableRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.repository.custom.impl.ProgramRedisRepository;
 import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
@@ -208,6 +209,9 @@ public abstract class BaseWebIntegrationTest {
 
   @MockBean
   protected OrderableRepository orderableRepository;
+
+  @MockBean
+  protected UnitOfOrderableRepository unitOfOrderableRepository;
 
   @MockBean
   protected FacilityRepository facilityRepository;

@@ -71,6 +71,7 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.RightName;
+import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.PriceChangeDto;
@@ -79,6 +80,7 @@ import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.UnitOfOrderableBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
@@ -104,6 +106,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ID = "id";
   private static final String VERSION_NAME = "versionNumber";
   private static final String GMT = "GMT";
+  private static final String UNIT_OF_ORDERABLE_NAME = "testUnit";
+  private static final int UNIT_OF_ORDERABLE_FACTOR = 10;
 
   @Captor
   public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
@@ -120,11 +124,20 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void setUp() {
     super.setUp();
 
+    UnitOfOrderable unitOfOrderable = new UnitOfOrderableBuilder()
+        .withName(UNIT_OF_ORDERABLE_NAME)
+        .withFactor(UNIT_OF_ORDERABLE_FACTOR)
+        .build();
+
+    List<UnitOfOrderable> units = new ArrayList<>();
+    units.add(unitOfOrderable);
+
     orderable = new OrderableDataBuilder()
         .withProductCode(Code.code(CODE))
         .withDispensable(Dispensable.createNew(UNIT))
         .withProgramOrderables(Collections.emptyList())
         .withVersionNumber(orderableVersionNumber)
+        .withUnits(units)
         .build();
     orderable.setId(orderableId);
     orderable.setLastUpdated(modifiedDate);
@@ -153,6 +166,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableDto orderableDtoResponse = response.as(OrderableDto.class);
     assertOrderablesDtoParams(orderableDto, orderableDtoResponse);
     assertEquals(orderableDto.getPrograms(), orderableDtoResponse.getPrograms());
+    assertEquals(orderableDto.getUnits(), orderableDtoResponse.getUnits());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
     assertThat(response.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
@@ -949,6 +963,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
           retrieved.get("packRoundingThreshold"));
       assertEquals(expected.get(i).getRoundToZero(),
           retrieved.get("roundToZero"));
+      assertEquals(expected.get(i).getUnits(),
+          retrieved.get("units"));
     }
   }
 
