@@ -11,3 +11,8 @@ d8ff49b1-96e7-4710-9511-289f490f7577,Stock Manager,"Can view stock cards, edit s
 5c316c50-96ad-4f04-8a3a-4f5aa8afa67e,Stock Viewer,Can view stock cards.
 d835bb5b-2309-4c3e-b6d1-6315442b9f7b,CCE Inventory Manager,Can view and manage cold chain equipment.
 3aa8dfc1-ef16-4345-9924-d39cc264cd1c,CCE Inventory Viewer,Can view cold chain equipment.
+a4370b58-ebb3-47dd-a5ca-c20566d21aaf,Prepare BUQ,Can prepare the BUQ forms.
+d7fb2ea2-ec3c-4ca6-9a02-0dc48a55a50c,Create/Authorize Forecasting,Can submit and authorize the BUQ forms.
+1ba471b3-9b2e-4aa7-835f-5af695af9567,Approve BUQ,Can approve the BUQ forms on district and regional level.
+d4bd00db-f1e1-4ab2-bf1a-0a966d3bc4f6,MOH/PORALG Approvals,Can approve the BUQ forms on MOH/PORALG levels.
+5f49c7af-61b5-4e94-aed7-89f0e3938488,Manage BUQ,Can manage the BUQ administrative panel.
