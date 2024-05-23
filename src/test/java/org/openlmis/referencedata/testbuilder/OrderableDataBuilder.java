@@ -157,6 +157,14 @@ public class OrderableDataBuilder {
   }
 
   /**
+   * Sets the value of units for new {@link Orderable}.
+   */
+  public OrderableDataBuilder withUnits(List<UnitOfOrderable> units) {
+    this.units = units;
+    return this;
+  }
+
+  /**
    * Builds instance of {@link Orderable}.
    */
   public Orderable build() {
