@@ -51,6 +51,7 @@ public class OrderableDataBuilder {
   private TemperatureMeasurement minimumTemperature;
   private TemperatureMeasurement maximumTemperature;
   private VolumeMeasurement inBoxCubeDimension;
+  private boolean quarantined;
 
   /**
    * Returns instance of {@link OrderableDataBuilder} with sample data.
@@ -75,6 +76,7 @@ public class OrderableDataBuilder {
     minimumTemperature = null;
     maximumTemperature = null;
     inBoxCubeDimension = null;
+    quarantined = false;
   }
 
   public OrderableDataBuilder withId(UUID id) {
@@ -104,6 +106,11 @@ public class OrderableDataBuilder {
 
   public OrderableDataBuilder withVersionNumber(Long versionNumber) {
     this.versionNumber = versionNumber;
+    return this;
+  }
+
+  public OrderableDataBuilder asQuarantined(boolean quarantined) {
+    this.quarantined = quarantined;
     return this;
   }
 
@@ -190,6 +197,7 @@ public class OrderableDataBuilder {
     orderable.setMinimumTemperature(minimumTemperature);
     orderable.setMaximumTemperature(maximumTemperature);
     orderable.setInBoxCubeDimension(inBoxCubeDimension);
+    orderable.setQuarantined(quarantined);
     return orderable;
   }
 }

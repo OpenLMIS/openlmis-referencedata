@@ -16,7 +16,9 @@
 package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.springframework.util.LinkedMultiValueMap;
@@ -101,6 +103,23 @@ public class QueryOrderableSearchParamsTest {
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals("", searchParams.getProgramCode());
+  }
+
+  @Test
+  public void getIncludeQuarantinedShouldReturnFalseIfMapNotContainKeyIncludeQuarantined() {
+    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
+
+    assertFalse(searchParams.getIncludeQuarantined());
+  }
+
+  @Test
+  public void getIncludeQuarantinedShouldReturnValueForKeyIncludeQuarantined() {
+    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    queryMap.add("includeQuarantined", true);
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
+
+    assertTrue(searchParams.getIncludeQuarantined());
   }
 
 }

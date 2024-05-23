@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.ToString;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -41,9 +42,10 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   private static final String PROGRAM_CODE = "program";
   private static final String TRADE_ITEM_ID = "tradeItemId";
   private static final String ID = "id";
+  private static final String INCLUDE_QUARANTINED = "includeQuarantined";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID));
+      ID, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID, INCLUDE_QUARANTINED));
 
   private final SearchParams queryParams;
 
@@ -109,6 +111,16 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   @Override
   public Set<UUID> getTradeItemId() {
     return queryParams.getUuids(TRADE_ITEM_ID);
+  }
+
+  @Override
+  public boolean getIncludeQuarantined() {
+    if (!queryParams.containsKey(INCLUDE_QUARANTINED)) {
+      return false;
+    } else {
+      return BooleanUtils.toBooleanDefaultIfNull(
+          queryParams.getBoolean(INCLUDE_QUARANTINED), false);
+    }
   }
 
   /**

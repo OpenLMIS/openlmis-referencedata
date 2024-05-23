@@ -45,16 +45,19 @@ public final class OrderableSearchParams
   private String code;
   private String name;
   private String programCode;
+  private boolean includeQuarantined;
 
   /**
    * Default constructor to set all available parameters.
    */
   public OrderableSearchParams(String code, String name, String programCode,
-      List<VersionIdentityDto> identities, Integer page, Integer size) {
+      List<VersionIdentityDto> identities, boolean includeQuarantined,
+      Integer page, Integer size) {
     super(identities, page, size);
     this.code = code;
     this.name = name;
     this.programCode = programCode;
+    this.includeQuarantined = includeQuarantined;
   }
 
   @Override
@@ -66,5 +69,10 @@ public final class OrderableSearchParams
   @Override
   public Set<UUID> getTradeItemId() {
     return Collections.emptySet();
+  }
+
+  @Override
+  public boolean getIncludeQuarantined() {
+    return includeQuarantined;
   }
 }

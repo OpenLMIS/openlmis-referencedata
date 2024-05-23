@@ -88,6 +88,8 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private List<UnitOfOrderableDto> units;
 
+  private boolean quarantined;
+
   @JsonIgnore
   private OrderableRepository orderableRepository;
 

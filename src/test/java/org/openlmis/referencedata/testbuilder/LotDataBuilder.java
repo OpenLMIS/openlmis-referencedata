@@ -29,6 +29,7 @@ public class LotDataBuilder {
   private LocalDate manufacturedDate;
   private TradeItem tradeItem = new TradeItemDataBuilder().build();
   private boolean active = true;
+  private boolean quarantined;
 
   public LotDataBuilder withTradeItem(TradeItem tradeItem) {
     this.tradeItem = tradeItem;
@@ -42,6 +43,11 @@ public class LotDataBuilder {
 
   public LotDataBuilder withLotCode(String lotCode) {
     this.lotCode = lotCode;
+    return this;
+  }
+
+  public LotDataBuilder asQuarantined(boolean quarantined) {
+    this.quarantined = quarantined;
     return this;
   }
 
@@ -67,7 +73,8 @@ public class LotDataBuilder {
         expirationDate,
         manufacturedDate,
         tradeItem,
-        active
+        active,
+        quarantined
     );
   }
 }
