@@ -36,7 +36,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 public class UnitOfOrderable extends BaseEntity {
   public static final String TEXT = "text";
 
-  @Column(columnDefinition = TEXT)
+  @Column(columnDefinition = TEXT, nullable = false)
   @Getter
   @Setter
   private String name;
