@@ -16,9 +16,33 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.UUID;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.UnitOfOrderable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UnitOfOrderableRepository extends JpaRepository<UnitOfOrderable, UUID> {}
+public interface UnitOfOrderableRepository extends JpaRepository<UnitOfOrderable, UUID> {
+
+  @Query(value = "SELECT\n"
+      + "    o.*\n"
+      + "FROM\n"
+      + "    referencedata.unit_of_orderables o\n"
+      + "WHERE\n"
+      + "    id NOT IN (\n"
+      + "        SELECT\n"
+      + "            id\n"
+      + "        FROM\n"
+      + "            referencedata.unit_of_orderables o\n"
+      + "            INNER JOIN referencedata.jv_global_id g "
+      + "ON CAST(o.id AS varchar) = SUBSTRING(g.local_id, 2, 36)\n"
+      + "            INNER JOIN referencedata.jv_snapshot s  "
+      + "ON g.global_id_pk = s.global_id_fk\n"
+      + "    )\n"
+      + " ",
+      nativeQuery = true)
+  Page<Orderable> findAllWithoutSnapshots(Pageable pageable);
+}
