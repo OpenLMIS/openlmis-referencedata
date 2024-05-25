@@ -3969,7 +3969,7 @@ resourceTypes:
                       body:
                           application/json:
                               schema: localizedErrorResponse
-  derableFulfills:
+  /orderableFulfills:
       displayName: Orderable Fulfills
       get:
           is: [ secured ]
