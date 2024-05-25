@@ -199,7 +199,7 @@ public abstract class BaseWebIntegrationTest {
   protected RightService rightService;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  protected ObjectMapper objectMapper;
 
   @MockBean
   protected CommodityTypeRepository commodityTypeRepository;
