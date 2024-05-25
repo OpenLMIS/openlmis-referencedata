@@ -170,6 +170,8 @@ schemas:
           "items": { "type": "object", "$ref": "schemas/processingSchedule.json" }
       }
 
+  - unitOfOrderable: !include schemas/unitOfOrderable.json
+
   - uploadResult: !include schemas/uploadResult.json
 
   - user: !include schemas/user.json
@@ -880,6 +882,102 @@ resourceTypes:
                       Keep-Alive:
                     body:
                         application/json:
+
+  /unitOfOrderables:
+    displayName: Unit of Orderable
+    post:
+      is: [ secured ]
+      description: Create an Unit of Orderable.
+      body:
+        application/json:
+          schema: unitOfOrderable
+      responses:
+        "200":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: unitOfOrderable
+        "400":
+          body:
+            application/json:
+              schema: localizedErrorResponse
+        "403":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
+    get:
+      is: [ secured, paginated ]
+      description: Get all Unit of Orderables.
+      responses:
+        "200":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: unitOfOrderablePage
+        "304":
+          description: Returned with no response body if no resource was modified since date provided in the If-Modified-Since request header.
+          headers:
+            Keep-Alive:
+        "400":
+          body:
+            application/json:
+              schema: localizedErrorResponse
+    /{id}:
+      uriParameters:
+        id:
+          displayName: id
+          type: string
+          required: true
+          repeat: false
+      get:
+        is: [ secured ]
+        description: Get chosen unitOfOrderable.
+        responses:
+          "200":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: unitOfOrderable
+          "304":
+            description: Returned with no response body if resource was not modified since date provided in the If-Modified-Since request header.
+            headers:
+              Keep-Alive:
+          "401":
+            body:
+              application/json:
+      put:
+        is: [ secured ]
+        description: Update unitOfOrderable.
+        body:
+          application/json:
+            schema: unitOfOrderable
+        responses:
+          "200":
+            body:
+              application/json:
+                schema: unitOfOrderable
+          "400":
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "403":
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "404":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+
+    /{id}/auditLog:
+      type: instanceAuditLog
 
   /tradeItems:
       displayName: Trade Item
@@ -3871,7 +3969,7 @@ resourceTypes:
                       body:
                           application/json:
                               schema: localizedErrorResponse
-  /orderableFulfills:
+  derableFulfills:
       displayName: Orderable Fulfills
       get:
           is: [ secured ]
