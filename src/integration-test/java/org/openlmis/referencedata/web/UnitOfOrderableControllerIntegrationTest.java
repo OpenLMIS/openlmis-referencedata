@@ -65,7 +65,6 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
 
   private UUID unitOfOrderableId = UUID.randomUUID();
 
-
   @Before
   @Override
   public void setUp() {
