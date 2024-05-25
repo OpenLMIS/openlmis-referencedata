@@ -116,6 +116,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private Orderable orderable;
   private OrderableDto orderableDto = new OrderableDto();
 
+  private UUID unitOfOrderableId = UUID.randomUUID();
   private UUID orderableId = UUID.randomUUID();
   private Long orderableVersionNumber = 1L;
   private ZonedDateTime modifiedDate = ZonedDateTime.now(ZoneId.of(GMT)).withNano(0);
@@ -126,6 +127,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     super.setUp();
 
     UnitOfOrderable unitOfOrderable = new UnitOfOrderableBuilder()
+        .withId(unitOfOrderableId)
         .withName(UNIT_OF_ORDERABLE_NAME)
         .withFactor(UNIT_OF_ORDERABLE_FACTOR)
         .build();
@@ -147,6 +149,11 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     when(orderableRepository.save(any(Orderable.class))).thenReturn(orderable);
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
         orderable.getId())).willReturn(orderable);
+
+    when(unitOfOrderableRepository.findById(unitOfOrderableId))
+        .thenReturn(Optional.of(unitOfOrderable));
+    when(unitOfOrderableRepository.save(any(UnitOfOrderable.class)))
+        .thenReturn(unitOfOrderable);
   }
 
   @Test
