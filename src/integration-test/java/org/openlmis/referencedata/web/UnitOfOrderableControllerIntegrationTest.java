@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.UNIT_OF_ORDERABLES_MANAGE;
@@ -116,7 +115,7 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(unitOfOrderableDto)
         .when()
-        .put(RESOURCE_URL)
+        .post(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().response();
@@ -188,7 +187,8 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.UNIT_OF_ORDERABLES_MANAGE);
-    given(unitOfOrderableRepository.existsById(any(UUID.class))).willReturn(true);
+    when(unitOfOrderableRepository.findById(unitOfOrderableId))
+        .thenReturn(Optional.of(unitOfOrderable));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);
 

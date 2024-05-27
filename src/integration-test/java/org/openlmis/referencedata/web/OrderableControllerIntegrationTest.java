@@ -108,7 +108,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String VERSION_NAME = "versionNumber";
   private static final String GMT = "GMT";
   private static final String UNIT_OF_ORDERABLE_NAME = "testUnit";
+  private static final String UNIT_OF_ORDERABLE_SAMPLE_DESCRIPTION = "sample description";
   private static final int UNIT_OF_ORDERABLE_FACTOR = 10;
+  private static final int UNIT_OF_ORDERABLE_DISPLAY_ORDER = 1;
 
   @Captor
   public ArgumentCaptor<QueryOrderableSearchParams> searchParamsArgumentCaptor;
@@ -129,7 +131,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     UnitOfOrderable unitOfOrderable = new UnitOfOrderableBuilder()
         .withId(unitOfOrderableId)
         .withName(UNIT_OF_ORDERABLE_NAME)
+        .withDescription(UNIT_OF_ORDERABLE_SAMPLE_DESCRIPTION)
         .withFactor(UNIT_OF_ORDERABLE_FACTOR)
+        .withDisplayOrder(UNIT_OF_ORDERABLE_DISPLAY_ORDER)
         .build();
 
     List<UnitOfOrderable> units = new ArrayList<>();
