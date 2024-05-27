@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -35,6 +36,7 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.Response;
@@ -59,6 +61,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
+import org.hamcrest.MatcherAssert;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -979,8 +982,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
       assertEquals(expectedOrderableDto.getRoundToZero(),
           retrieved.get("roundToZero"));
 
-      String expectedUnitsAsJson = objectMapper.writeValueAsString(expectedOrderableDto.getUnits());
-      assertEquals(expectedUnitsAsJson, retrieved.get("units"));
+      List<OrderableDto> retrievedOrderableDtos =
+          objectMapper.readValue(
+              retrieved.get("units"),
+              new TypeReference<List<OrderableDto>>() {
+              });
+      MatcherAssert.assertThat(
+          retrievedOrderableDtos,
+          containsInAnyOrder(expectedOrderableDto.getUnits()));
     }
   }
 
