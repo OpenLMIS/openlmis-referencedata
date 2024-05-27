@@ -894,7 +894,7 @@ resourceTypes:
         application/json:
           schema: unitOfOrderable
       responses:
-        "200":
+        "201":
           headers:
             Keep-Alive:
           body:
@@ -960,14 +960,20 @@ resourceTypes:
             schema: unitOfOrderable
         responses:
           "200":
+            headers:
+              Keep-Alive:
             body:
               application/json:
                 schema: unitOfOrderable
           "400":
+            headers:
+              Keep-Alive:
             body:
               application/json:
                 schema: localizedErrorResponse
           "403":
+            headers:
+              Keep-Alive:
             body:
               application/json:
                 schema: localizedErrorResponse

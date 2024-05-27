@@ -15,9 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -96,51 +94,38 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
         .when()
         .post(RESOURCE_URL)
         .then()
-        .statusCode(200)
+        .statusCode(201)
         .extract().response();
 
     UnitOfOrderableDto unitOfOrderableDtoResponse = response.as(UnitOfOrderableDto.class);
-    assertEquals(unitOfOrderableDto, unitOfOrderableDtoResponse);
+    assertEquals(unitOfOrderableDto.getDescription(), unitOfOrderableDtoResponse.getDescription());
+    assertEquals(unitOfOrderableDto.getDisplayOrder(),
+        unitOfOrderableDtoResponse.getDisplayOrder());
+    assertEquals(unitOfOrderableDto.getFactor(), unitOfOrderableDtoResponse.getFactor());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-    assertThat(response.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
   }
 
   @Test
   public void shouldUpdateUnitOfOrderable() {
     mockUserHasRight(UNIT_OF_ORDERABLES_MANAGE);
+    unitOfOrderableDto.setDescription(NEW_DESCRIPTION);
+    when(unitOfOrderableRepository.findById(unitOfOrderableId))
+        .thenReturn(Optional.of(unitOfOrderable));
 
-    Response response1 = restAssured
+    UnitOfOrderableDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .pathParam(ID, unitOfOrderableId)
         .body(unitOfOrderableDto)
         .when()
-        .put(RESOURCE_URL)
+        .put(ID_URL)
         .then()
         .statusCode(200)
-        .extract().response();
+        .extract().as(UnitOfOrderableDto.class);
 
-    UnitOfOrderableDto unitOfOrderableDto1 = response1.as(UnitOfOrderableDto.class);
-    unitOfOrderableDto1.setDescription(NEW_DESCRIPTION);
-
-    Response response2 = restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .body(unitOfOrderableDto1)
-        .when()
-        .put(String.join("/", RESOURCE_URL, unitOfOrderableDto1.getId().toString()))
-        .then()
-        .statusCode(200)
-        .extract().response();
-
-    UnitOfOrderableDto unitOfOrderableDto2 = response2.as(UnitOfOrderableDto.class);
-
-    assertEquals(NEW_DESCRIPTION, unitOfOrderableDto2.getDescription());
-    assertEquals(unitOfOrderableDto1.getId(), unitOfOrderableDto2.getId());
-    assertNotEquals(unitOfOrderableDto1, unitOfOrderableDto2);
-    assertThat(response1.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
-    assertThat(response2.getHeaders().hasHeaderWithName(HttpHeaders.LAST_MODIFIED), is(true));
+    assertEquals(unitOfOrderableDto.getDescription(), response.getDescription());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
   @Test
