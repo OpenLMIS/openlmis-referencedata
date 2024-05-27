@@ -102,6 +102,7 @@ public class LotService {
         requestParams.getId(),
         requestParams.getExpirationDateFrom(),
         requestParams.getExpirationDateTo(),
+        requestParams.isIncludeQuarantined(),
         pageable
     );
   }

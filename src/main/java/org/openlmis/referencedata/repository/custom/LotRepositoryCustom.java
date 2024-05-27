@@ -33,6 +33,7 @@ public interface LotRepositoryCustom {
           List<UUID> ids,
           LocalDate expirationDateFrom,
           LocalDate expirationDateTo,
+          boolean includeQuarantined,
           Pageable pageable
   );
 }

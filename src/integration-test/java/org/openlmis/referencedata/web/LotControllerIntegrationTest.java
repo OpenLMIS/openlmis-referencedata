@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -96,7 +97,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewLot() {
     mockUserHasRight(LOTS_MANAGE);
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, false, null))
         .willReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -163,7 +164,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(LOTS_MANAGE);
     when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
+    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, false, null))
         .willReturn(Pagination.getPage(Collections.singletonList(lot), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -229,7 +230,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldFindLots() {
     given(lotRepository.search(anyList(), any(LocalDate.class), anyString(),
-        nullable(List.class), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
+        nullable(List.class), any(LocalDate.class), any(LocalDate.class), anyBoolean(),
+        any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(lot), pageable));
     when(tradeItemRepository.findAllById(anyList()))
         .thenReturn(Collections.singletonList(new TradeItem()));
@@ -391,6 +393,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
         eq(null),
         eq(null),
+        eq(false),
         any(Pageable.class)
     )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 10)));
 
@@ -423,6 +426,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         eq(null),
         eq(null),
         eq(null),
+        eq(false),
         eq(PageRequest.of(0, 2))
     )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 2)));
 

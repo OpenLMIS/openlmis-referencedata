@@ -3564,6 +3564,13 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: true
+              includeQuarantined:
+                  displayName: includeQuarantined
+                  description: When true, quarantined Lots are included. Default value is false
+                  type: boolean
+                  default: false
+                  required: false
+                  repeat: false
 
           responses:
               "200":

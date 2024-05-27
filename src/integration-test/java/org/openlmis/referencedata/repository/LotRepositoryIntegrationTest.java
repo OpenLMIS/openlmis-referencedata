@@ -90,6 +90,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -111,6 +112,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -125,7 +127,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     expected.setExpirationDate(now);
     expected = lotRepository.save(expected);
 
-    Page<Lot> lotPage = lotRepository.search(null, now, null, null, null, null, pageRequest);
+    Page<Lot> lotPage = lotRepository.search(null, now, null, null, null, null, false,
+        pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -142,6 +145,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -161,6 +165,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -178,6 +183,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -195,6 +201,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         Collections.singletonList(expected.getId()),
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -217,6 +224,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         Arrays.asList(instanceOne.getId(), instanceTwo.getId()),
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -226,7 +234,8 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldReturnAllIfNoParamIsGiven() {
-    Page<Lot> lotPage = lotRepository.search(null, null, null, null, null, null, pageRequest);
+    Page<Lot> lotPage = lotRepository.search(null, null, null, null, null, null, false,
+        pageRequest);
 
     assertEquals(5, lotPage.getNumberOfElements());
   }
@@ -273,6 +282,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageRequest
     );
 
@@ -291,6 +301,7 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
         null,
         null,
         null,
+        false,
         pageable
     );
 
