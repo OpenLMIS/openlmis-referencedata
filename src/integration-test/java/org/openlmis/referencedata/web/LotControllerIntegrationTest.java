@@ -245,6 +245,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         .queryParam("expirationDate", expirationDate)
         .queryParam("expirationDateFrom", expirationDate)
         .queryParam("expirationDateTo", expirationDate)
+        .queryParam("includeQuarantined", Boolean.TRUE.toString())
         .when()
         .get(RESOURCE_URL)
         .then()

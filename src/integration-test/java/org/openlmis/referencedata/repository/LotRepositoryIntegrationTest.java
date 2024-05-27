@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.ImmutableList;
@@ -309,4 +312,56 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     assertEquals(lotOne, lotPage.getContent().get(0));
     assertEquals(lotTwo, lotPage.getContent().get(1));
   }
+
+  @Test
+  public void shouldFindOnlyNonQuarantinedLots() {
+    Lot quarantinedLot = generateQuarantinedLot();
+    repository.save(quarantinedLot);
+
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        false,
+        pageRequest
+    );
+
+    assertEquals(5, lotPage.getNumberOfElements());
+    assertThat(lotPage.getContent(), not(hasItem(quarantinedLot)));
+  }
+
+  @Test
+  public void shouldFindNonQuarantinedAndQuarantinedLots() {
+    Lot quarantinedLot1 = generateQuarantinedLot();
+    Lot quarantinedLot2 = generateQuarantinedLot();
+    repository.save(quarantinedLot1);
+    repository.save(quarantinedLot2);
+
+    Page<Lot> lotPage = lotRepository.search(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        true,
+        pageRequest
+    );
+
+    assertEquals(7, lotPage.getNumberOfElements());
+    assertThat(lotPage.getContent(), hasItem(quarantinedLot1));
+    assertThat(lotPage.getContent(), hasItem(quarantinedLot2));
+    assertThat(lotPage.getContent(), hasItem(lotOne));
+    assertThat(lotPage.getContent(), hasItem(lotTwo));
+  }
+
+  private Lot generateQuarantinedLot() {
+    Lot lot = generateInstance();
+    lot.setQuarantined(true);
+    return lot;
+  }
+
 }

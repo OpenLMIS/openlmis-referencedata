@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -178,7 +178,7 @@ public class LotServiceTest {
             null,
             null,
             null,
-            false,
+            true,
             pageable
     )).thenReturn(expected);
 
@@ -191,7 +191,7 @@ public class LotServiceTest {
             null,
             null,
             true,
-            false
+            true
     );
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
