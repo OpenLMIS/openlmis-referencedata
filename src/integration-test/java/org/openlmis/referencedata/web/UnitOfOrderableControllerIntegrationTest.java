@@ -197,6 +197,7 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
 
   @Test
   public void shouldDeleteUnitOfOrderable() {
+    mockUserHasRight(UNIT_OF_ORDERABLES_MANAGE);
 
     restAssured
         .given()

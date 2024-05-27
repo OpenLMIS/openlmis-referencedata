@@ -172,6 +172,8 @@ schemas:
 
   - unitOfOrderable: !include schemas/unitOfOrderable.json
 
+  - unitOfOrderablePage: !include schemas/unitOfOrderablePage.json
+
   - uploadResult: !include schemas/uploadResult.json
 
   - user: !include schemas/user.json
@@ -975,7 +977,26 @@ resourceTypes:
             body:
               application/json:
                 schema: localizedErrorResponse
-
+      delete:
+        is: [ secured ]
+        description: "Completely removes single unit of orderable. This action is not recoverable."
+        responses:
+          "204":
+            headers:
+              Keep-Alive:
+          "404":
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "409":
+            body:
+              application/json:
+          "403":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
     /{id}/auditLog:
       type: instanceAuditLog
 
