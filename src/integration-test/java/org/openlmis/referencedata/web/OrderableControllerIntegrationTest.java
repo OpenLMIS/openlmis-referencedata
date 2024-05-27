@@ -518,7 +518,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void shouldReturnEmptyPageIfNoOrderableWithLastUpdatedDateWasFound() throws JsonProcessingException {
+  public void shouldReturnEmptyPageIfNoOrderableWithLastUpdatedDateWasFound()
+      throws JsonProcessingException {
     when(orderableService
         .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
         .thenReturn(null);
@@ -868,7 +869,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
-  public void postSearchShouldReturnEmptyPageWhenNoOrderablesFound() throws JsonProcessingException {
+  public void postSearchShouldReturnEmptyPageWhenNoOrderablesFound()
+      throws JsonProcessingException {
     OrderableSearchParams searchParams = new OrderableSearchParams(
         orderableDto.getProductCode(), orderableDto.getFullProductName(),
         orderable.getProductCode().toString(),
@@ -955,7 +957,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         Collections.singletonList(new PriceChangeDto()));
   }
 
-  private void checkIfEquals(PageDto response, List<OrderableDto> expected) throws JsonProcessingException {
+  private void checkIfEquals(PageDto response, List<OrderableDto> expected)
+      throws JsonProcessingException {
     List pageContent = response.getContent();
     assertEquals(expected.size(), pageContent.size());
     for (int i = 0; i < pageContent.size(); i++) {
