@@ -41,7 +41,10 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedAttributeNode;
@@ -50,13 +53,13 @@ import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.SqlResultSetMapping;
 import javax.persistence.SqlResultSetMappings;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -77,6 +80,7 @@ import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.OrderableIdentifierCsvModel;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.web.csv.model.ImportField;
 
 /**
@@ -254,6 +258,24 @@ public class Orderable implements Versionable {
   })
   private VolumeMeasurement inBoxCubeDimension;
 
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "orderable_units_assignment",
+      joinColumns = {
+        @JoinColumn(name = "orderableId", referencedColumnName = "id", nullable = false),
+        @JoinColumn(
+            name = "orderableVersionNumber",
+            referencedColumnName = "versionNumber",
+            nullable = false),
+      },
+      inverseJoinColumns =
+          @JoinColumn(name = "unitoforderableid", referencedColumnName = "id", nullable = false))
+  @OrderBy("displayOrder ASC")
+  @Getter
+  @Setter
+  @DiffIgnore
+  private List<UnitOfOrderable> units;
+
   @Getter
   @Setter
   private boolean quarantined;
@@ -311,8 +333,8 @@ public class Orderable implements Versionable {
     orderable.roundToZero = importer.getRoundToZero();
     orderable.programOrderables = new ArrayList<>();
     orderable.children = new HashSet<>();
-
     orderable.identifiers = importer.getIdentifiers();
+    orderable.units = UnitOfOrderable.newInstances(importer.getUnits());
 
     orderable.extraData = ExtraDataEntity.defaultEntity(orderable.extraData);
     orderable.extraData.updateFrom(importer.getExtraData());
@@ -474,6 +496,7 @@ public class Orderable implements Versionable {
     exporter.setPrograms(ProgramOrderableDto.newInstance(programOrderables));
     exporter.setChildren(OrderableChildDto.newInstance(children));
     exporter.setIdentifiers(identifiers);
+    exporter.setUnits(UnitOfOrderableDto.newInstances(units));
 
     extraData = ExtraDataEntity.defaultEntity(extraData);
     extraData.export(exporter);
@@ -528,6 +551,8 @@ public class Orderable implements Versionable {
 
     void setInBoxCubeDimension(VolumeMeasurement inBoxCubeDimension);
 
+    void setUnits(List<UnitOfOrderableDto> units);
+
     void setQuarantined(boolean quarantined);
   }
 
@@ -558,6 +583,8 @@ public class Orderable implements Versionable {
     TemperatureMeasurement.Importer getMaximumTemperature();
 
     VolumeMeasurement.Importer getInBoxCubeDimension();
+
+    List<UnitOfOrderableDto> getUnits();
 
     boolean isQuarantined();
   }

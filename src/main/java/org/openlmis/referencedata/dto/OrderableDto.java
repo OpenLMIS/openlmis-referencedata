@@ -86,13 +86,15 @@ public final class OrderableDto extends BaseDto implements Orderable.Importer,
 
   private VolumeMeasurementDto inBoxCubeDimension;
 
+  private List<UnitOfOrderableDto> units;
+
   private boolean quarantined;
 
   @JsonIgnore
   private OrderableRepository orderableRepository;
 
   /**
-   * Create new set of OrderableDto based on given iterable of {@link Orderable}.
+   * Create new list of OrderableDto based on given iterable of {@link Orderable}.
    *
    * @param orderables list of {@link Orderable}
    * @return new list of OrderableDto.

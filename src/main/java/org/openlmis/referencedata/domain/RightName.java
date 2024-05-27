@@ -25,6 +25,7 @@ public class RightName {
   public static final String SUPERVISORY_NODES_MANAGE = "SUPERVISORY_NODES_MANAGE";
   public static final String REQUISITION_GROUPS_MANAGE = "REQUISITION_GROUPS_MANAGE";
   public static final String ORDERABLES_MANAGE = "ORDERABLES_MANAGE";
+  public static final String UNIT_OF_ORDERABLES_MANAGE = "UNIT_OF_ORDERABLES_MANAGE";
   public static final String SUPPLY_LINES_MANAGE = "SUPPLY_LINES_MANAGE";
   public static final String STOCK_ADJUSTMENT_REASONS_MANAGE = "STOCK_ADJUSTMENT_REASONS_MANAGE";
   public static final String FACILITY_APPROVED_ORDERABLES_MANAGE =

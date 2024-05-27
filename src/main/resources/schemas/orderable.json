@@ -62,6 +62,14 @@
       "$ref": "metadata.json",
       "description": "The orderable metadata"
     },
+    "units": {
+      "type": "array",
+      "title": "units",
+      "items": {
+        "type": "object",
+        "$ref": "unitOfOrderable.json"
+      }
+    },
     "quarantined": {
       "type": "boolean",
       "title": "quarantined"

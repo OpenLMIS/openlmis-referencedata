@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -61,13 +62,18 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.domain.VersionIdentity;
 import org.openlmis.referencedata.domain.Versionable;
+import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.repository.custom.OrderableRepositoryCustom.SearchParams;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramOrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.UnitOfOrderableBuilder;
+import org.openlmis.referencedata.util.OrderableBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -102,11 +108,16 @@ public class OrderableRepositoryIntegrationTest {
   private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
 
   @Autowired
+  private UnitOfOrderableRepository unitOfOrderableRepository;
+
+  @Autowired
+  private OrderableBuilder orderableBuilder;
+  @Autowired
   private EntityManager entityManager;
 
-  private AtomicInteger instanceNumber = new AtomicInteger(0);
+  private final AtomicInteger instanceNumber = new AtomicInteger(0);
 
-  private PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.ASC,
+  private final PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.ASC,
       "fullProductName");
 
   private int getNextInstanceNumber() {
@@ -173,6 +184,64 @@ public class OrderableRepositoryIntegrationTest {
 
     // then
     assertEquals(programOrderable, savedOrderable.getProgramOrderable(program));
+  }
+
+  @Test
+  public void shouldCreateOrderableWithNewUnitOfOrderable() {
+    Orderable newOrderable = new OrderableDataBuilder().buildAsNew();
+    newOrderable = repository.saveAndFlush(newOrderable);
+
+    OrderableDto updatedOrderableDto = OrderableDto.newInstance(newOrderable);
+    updatedOrderableDto
+        .getUnits()
+        .add(
+            UnitOfOrderableDto.newInstance(
+                new UnitOfOrderableBuilder().withName("NewUnitOfOrderable").buildAsNew()));
+
+    repository.saveAndFlush(orderableBuilder.newOrderable(updatedOrderableDto, newOrderable));
+
+    List<UnitOfOrderable> allUnits =
+        unitOfOrderableRepository.findAll(Pageable.unpaged()).getContent();
+
+    assertEquals(1, allUnits.size());
+    assertEquals("NewUnitOfOrderable", allUnits.get(0).getName());
+  }
+
+  @Test
+  public void shouldCreateOrderableWithExistingUnitOfOrderable() {
+    UnitOfOrderable unit =
+        new UnitOfOrderableBuilder().withName("ExistingUnitOfOrderable").buildAsNew();
+    unit = unitOfOrderableRepository.saveAndFlush(unit);
+
+    Orderable newOrderable = new OrderableDataBuilder().buildAsNew();
+    newOrderable = repository.saveAndFlush(newOrderable);
+    newOrderable.getUnits().add(unit);
+    repository.saveAndFlush(newOrderable);
+
+    List<UnitOfOrderable> allUnits =
+        unitOfOrderableRepository.findAll(Pageable.unpaged()).getContent();
+
+    assertEquals(1, allUnits.size());
+    assertEquals("ExistingUnitOfOrderable", allUnits.get(0).getName());
+  }
+
+  @Test
+  public void shouldRemoveUnitOfOrderableFromOrderable() {
+    UnitOfOrderable unit = new UnitOfOrderableBuilder().buildAsNew();
+    unit = unitOfOrderableRepository.saveAndFlush(unit);
+
+    Orderable newOrderable = new OrderableDataBuilder().buildAsNew();
+    newOrderable.getUnits().add(unit);
+    repository.saveAndFlush(newOrderable);
+
+    newOrderable.setUnits(Collections.emptyList());
+    repository.saveAndFlush(newOrderable);
+
+    Optional<Orderable> reloadedOrderable = repository.findById(newOrderable.getVersionIdentity());
+
+    assertTrue(reloadedOrderable.isPresent());
+    assertEquals(0, reloadedOrderable.get().getUnits().size());
+    assertEquals(1L, unitOfOrderableRepository.count());
   }
 
   @Test
@@ -431,8 +500,8 @@ public class OrderableRepositoryIntegrationTest {
     String lowercaseCode = uppercaseCode.toLowerCase();
 
     Orderable orderable = new OrderableDataBuilder()
-            .withProductCode(Code.code(uppercaseCode))
-            .buildAsNew();
+        .withProductCode(Code.code(uppercaseCode))
+        .buildAsNew();
 
     assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(lowercaseCode, 1L));
     assertNull(repository.findFirstByVersionNumberAndProductCodeIgnoreCase(uppercaseCode, 1L));
@@ -471,11 +540,11 @@ public class OrderableRepositoryIntegrationTest {
     String productCode = "abcdef";
 
     Orderable orderable1 = new OrderableDataBuilder()
-            .withProductCode(Code.code(productCode))
-            .buildAsNew();
+        .withProductCode(Code.code(productCode))
+        .buildAsNew();
     Orderable orderable2 = new OrderableDataBuilder()
-            .withProductCode(Code.code(productCode.toLowerCase()))
-            .buildAsNew();
+        .withProductCode(Code.code(productCode.toLowerCase()))
+        .buildAsNew();
 
     repository.save(orderable1);
     repository.save(orderable2);
@@ -726,7 +795,7 @@ public class OrderableRepositoryIntegrationTest {
 
     Timestamp timestamp = repository.findLatestModifiedDateByIds(ids);
     ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(ZoneId.systemDefault().toString()));
+        ZoneId.of(ZoneId.systemDefault().toString()));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated());
@@ -748,7 +817,7 @@ public class OrderableRepositoryIntegrationTest {
     //when
     Timestamp timestamp = repository.findLatestModifiedDateOfAll();
     ZonedDateTime lastUpdated = ZonedDateTime.of(timestamp.toLocalDateTime(),
-            ZoneId.of(ZoneId.systemDefault().toString()));
+        ZoneId.of(ZoneId.systemDefault().toString()));
 
     //then
     assertEquals(lastUpdated, orderable3.getLastUpdated());
@@ -835,7 +904,7 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
-      Orderable orderable, int expectedSize) {
+                                               Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
         .search(new TestSearchParams(code, name, programCode, null, false), pageable);
