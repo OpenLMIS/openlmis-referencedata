@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -36,7 +35,6 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.jayway.restassured.response.Response;
@@ -61,7 +59,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import org.apache.http.HttpStatus;
-import org.hamcrest.MatcherAssert;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Before;
@@ -80,6 +77,7 @@ import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.PriceChangeDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.dto.VersionIdentityDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.PageDto;
@@ -969,7 +967,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     List pageContent = response.getContent();
     assertEquals(expected.size(), pageContent.size());
     for (int i = 0; i < pageContent.size(); i++) {
-      Map<String, String> retrieved = (LinkedHashMap) pageContent.get(i);
+      Map<String, ?> retrieved = (LinkedHashMap) pageContent.get(i);
       OrderableDto expectedOrderableDto = expected.get(i);
       assertEquals(expectedOrderableDto.getFullProductName(),
           retrieved.get("fullProductName"));
@@ -981,15 +979,21 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
           retrieved.get("packRoundingThreshold"));
       assertEquals(expectedOrderableDto.getRoundToZero(),
           retrieved.get("roundToZero"));
+      List<UnitOfOrderableDto> expectedUnitDtos = expectedOrderableDto.getUnits();
 
-      List<OrderableDto> retrievedOrderableDtos =
-          objectMapper.readValue(
-              retrieved.get("units"),
-              new TypeReference<List<OrderableDto>>() {
-              });
-      MatcherAssert.assertThat(
-          retrievedOrderableDtos,
-          containsInAnyOrder(expectedOrderableDto.getUnits()));
+      List<Map> units = (List) retrieved.get("units");
+      for (int j = 0; j < units.size(); j++) {
+        Map<String, String> retrievedUnitMap = (LinkedHashMap) units.get(j);
+        UnitOfOrderableDto expectedUnitOfOrderableDto = expectedUnitDtos.get(j);
+        assertEquals(expectedUnitOfOrderableDto.getId(), retrievedUnitMap.get("id"));
+        assertEquals(expectedUnitOfOrderableDto.getName(), retrievedUnitMap.get("name"));
+        assertEquals(expectedUnitOfOrderableDto.getDescription(),
+            retrievedUnitMap.get("description"));
+        assertEquals(expectedUnitOfOrderableDto.getDisplayOrder(),
+            retrievedUnitMap.get("displayOrder"));
+        assertEquals(expectedUnitOfOrderableDto.getFactor(),
+            retrievedUnitMap.get("factor"));
+      }
     }
   }
 
