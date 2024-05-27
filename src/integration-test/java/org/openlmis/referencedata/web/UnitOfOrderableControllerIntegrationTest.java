@@ -94,7 +94,7 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(unitOfOrderableDto)
         .when()
-        .put(RESOURCE_URL)
+        .post(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().response();
@@ -115,7 +115,7 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .body(unitOfOrderableDto)
         .when()
-        .post(RESOURCE_URL)
+        .put(RESOURCE_URL)
         .then()
         .statusCode(200)
         .extract().response();
@@ -187,7 +187,7 @@ public class UnitOfOrderableControllerIntegrationTest extends BaseWebIntegration
     doNothing()
         .when(rightService)
         .checkAdminRight(RightName.UNIT_OF_ORDERABLES_MANAGE);
-    when(unitOfOrderableRepository.findById(unitOfOrderableId))
+    when(unitOfOrderableRepository.findById(any(UUID.class)))
         .thenReturn(Optional.of(unitOfOrderable));
 
     AuditLogHelper.ok(restAssured, getTokenHeader(), RESOURCE_URL);

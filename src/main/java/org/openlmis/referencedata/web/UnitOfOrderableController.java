@@ -108,11 +108,10 @@ public class UnitOfOrderableController extends BaseController {
         .findById(id)
         .orElse(null);
     if (unitOfOrderableToUpdate == null) {
-      unitOfOrderableToUpdate = new UnitOfOrderable();
-      XLOGGER.debug("Creating new unitOfOrderable");
-    } else {
-      XLOGGER.debug("Updating unitOfOrderable with id: " + id);
+      throw new NotFoundException(UnitOfOrderableMessageKeys.ERROR_NOT_FOUND);
     }
+
+    XLOGGER.debug("Updating unitOfOrderable with id: " + id);
 
     unitOfOrderableToUpdate.updateFrom(UnitOfOrderable.newInstance(unitOfOrderableDto));
     unitOfOrderableRepository.save(unitOfOrderableToUpdate);
