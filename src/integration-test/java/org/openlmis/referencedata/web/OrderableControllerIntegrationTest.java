@@ -985,7 +985,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
       for (int j = 0; j < units.size(); j++) {
         Map<String, String> retrievedUnitMap = (LinkedHashMap) units.get(j);
         UnitOfOrderableDto expectedUnitOfOrderableDto = expectedUnitDtos.get(j);
-        assertEquals(expectedUnitOfOrderableDto.getId(), retrievedUnitMap.get("id"));
+        assertEquals(expectedUnitOfOrderableDto.getId().toString(), retrievedUnitMap.get("id"));
         assertEquals(expectedUnitOfOrderableDto.getName(), retrievedUnitMap.get("name"));
         assertEquals(expectedUnitOfOrderableDto.getDescription(),
             retrievedUnitMap.get("description"));
