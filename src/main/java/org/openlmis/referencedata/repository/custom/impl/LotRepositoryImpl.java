@@ -56,7 +56,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * @param expirationDateTo End date for filtering Lots by expiration date.
    * @param includeQuarantined When true, quarantined Lots are included. Default value is false.
    * @param pageable Pagination information.
-   * @return List of Lots matching the parameters.
+   * @return Page of Lots matching the parameters.
    */
   public Page<Lot> search(
           Collection<TradeItem> tradeItems,
