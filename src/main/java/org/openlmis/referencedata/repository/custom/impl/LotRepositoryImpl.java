@@ -41,6 +41,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
   private EntityManager entityManager;
 
   private static final String EXPIRATION_DATE_FIELD = "expirationDate";
+  private static final String QUARANTINED = "quarantined";
 
   /**
    * This method is supposed to retrieve all lots with matched parameters.
@@ -48,9 +49,14 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * To find all wanted lots by code and expiration date we use criteria query and like operator.
    *
    * @param tradeItems list of TradeItems associated with Lot.
-   * @param expirationDate date of lot expiration.
+   * @param expirationDate Date of lot expiration.
    * @param lotCode Part of wanted code.
-   * @return List of Facilities matching the parameters.
+   * @param ids ids List of UUIDs to filter Lots.
+   * @param expirationDateFrom Start date for filtering Lots by expiration date.
+   * @param expirationDateTo End date for filtering Lots by expiration date.
+   * @param includeQuarantined When true, quarantined Lots are included. Default value is false.
+   * @param pageable Pagination information.
+   * @return Page of Lots matching the parameters.
    */
   public Page<Lot> search(
           Collection<TradeItem> tradeItems,
@@ -59,6 +65,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
           List<UUID> ids,
           LocalDate expirationDateFrom,
           LocalDate expirationDateTo,
+          boolean includeQuarantined,
           Pageable pageable
   ) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -72,6 +79,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
             ids,
             expirationDateFrom,
             expirationDateTo,
+            includeQuarantined,
             false
     );
 
@@ -84,6 +92,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
             ids,
             expirationDateFrom,
             expirationDateTo,
+            includeQuarantined,
             true
     );
 
@@ -105,6 +114,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
           List<UUID> ids,
           LocalDate expirationDateFrom,
           LocalDate expirationDateTo,
+          boolean includeQuarantined,
           boolean count
   ) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -153,6 +163,10 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
                       root.get(EXPIRATION_DATE_FIELD), expirationDateTo
               )
       );
+    }
+
+    if (!includeQuarantined) {
+      predicate = builder.and(predicate, builder.equal(root.get(QUARANTINED), false));
     }
 
     query.where(predicate);

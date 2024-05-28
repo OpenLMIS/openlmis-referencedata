@@ -45,4 +45,6 @@ public class LotSearchParams {
 
   private List<UUID> orderableId;
   private boolean isTradeItemIdIgnored = false;
+
+  private boolean includeQuarantined = false;
 }

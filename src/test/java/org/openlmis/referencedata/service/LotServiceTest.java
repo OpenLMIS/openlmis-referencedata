@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -90,7 +90,8 @@ public class LotServiceTest {
         null,
         null,
         Collections.emptyList(),
-            false
+            false,
+        false
     );
 
     List<TradeItem> tradeItems = singletonList(tradeItem);
@@ -104,6 +105,7 @@ public class LotServiceTest {
         lotSearchParams.getId(),
         null,
         null,
+        false,
         pageable
     )).thenReturn(expected);
 
@@ -122,7 +124,8 @@ public class LotServiceTest {
         null,
         null,
         Collections.emptyList(),
-            false
+            false,
+        false
     );
 
     when(lotRepository.search(
@@ -132,6 +135,7 @@ public class LotServiceTest {
         eq(null),
         eq(null),
         eq(null),
+        eq(false),
         eq(pageable)
     )).thenReturn(expected);
 
@@ -152,7 +156,8 @@ public class LotServiceTest {
             null,
             null,
             null,
-            false
+            false,
+        false
     );
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
@@ -173,6 +178,7 @@ public class LotServiceTest {
             null,
             null,
             null,
+            true,
             pageable
     )).thenReturn(expected);
 
@@ -184,6 +190,7 @@ public class LotServiceTest {
             null,
             null,
             null,
+            true,
             true
     );
 
@@ -201,6 +208,7 @@ public class LotServiceTest {
             null,
             null,
             singletonList(UUID.randomUUID()),
+            false,
             false
     );
 
