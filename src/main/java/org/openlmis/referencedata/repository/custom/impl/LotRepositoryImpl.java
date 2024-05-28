@@ -51,6 +51,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * @param tradeItems list of TradeItems associated with Lot.
    * @param expirationDate date of lot expiration.
    * @param lotCode Part of wanted code.
+   * @param includeQuarantined When true, quarantined Lots are included. Default value is false
    * @return List of Facilities matching the parameters.
    */
   public Page<Lot> search(
