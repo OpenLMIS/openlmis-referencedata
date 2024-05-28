@@ -49,10 +49,14 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
    * To find all wanted lots by code and expiration date we use criteria query and like operator.
    *
    * @param tradeItems list of TradeItems associated with Lot.
-   * @param expirationDate date of lot expiration.
+   * @param expirationDate Date of lot expiration.
    * @param lotCode Part of wanted code.
-   * @param includeQuarantined When true, quarantined Lots are included. Default value is false
-   * @return List of Facilities matching the parameters.
+   * @param ids ids List of UUIDs to filter Lots.
+   * @param expirationDateFrom Start date for filtering Lots by expiration date.
+   * @param expirationDateTo End date for filtering Lots by expiration date.
+   * @param includeQuarantined When true, quarantined Lots are included. Default value is false.
+   * @param pageable Pagination information.
+   * @return List of Lots matching the parameters.
    */
   public Page<Lot> search(
           Collection<TradeItem> tradeItems,
