@@ -17,15 +17,20 @@ package org.openlmis.referencedata.validate;
 
 import java.util.Set;
 import java.util.UUID;
+
+import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,6 +64,9 @@ public class UserValidator implements BaseValidator {
   @Autowired
   private RoleAssignmentRepository roleAssignmentRepository;
 
+  @Autowired
+  private FacilityRepository facilityRepository;
+
   /**
    * Checks if the given class definition is supported.
    *
@@ -91,6 +99,7 @@ public class UserValidator implements BaseValidator {
       }
 
       verifyUsername(dto.getId(), dto.getUsername(), errors);
+      verifyHomeFacility(dto.getHomeFacilityId(), errors);
     }
   }
 
@@ -111,6 +120,18 @@ public class UserValidator implements BaseValidator {
 
     if (null != db && (null == id || !id.equals(db.getId()))) {
       rejectValue(errors, USERNAME, UserMessageKeys.ERROR_USERNAME_DUPLICATED);
+    }
+  }
+
+  private void verifyHomeFacility(UUID homeFacilityId, Errors errors) {
+    // home facility cannot be type ward/service
+    if (homeFacilityId != null) {
+      Facility facility = facilityRepository.findById(homeFacilityId)
+          .orElseThrow(() -> new ValidationMessageException(new Message(
+          FacilityMessageKeys.ERROR_NOT_FOUND_WITH_ID, homeFacilityId)));
+      if (facility.getType().getCode().equals("WS")) {
+        rejectValue(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_HOME_FACILITY_INVALID_TYPE);
+      }
     }
   }
 

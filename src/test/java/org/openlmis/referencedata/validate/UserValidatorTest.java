@@ -16,8 +16,11 @@
 package org.openlmis.referencedata.validate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.UserValidator.ACTIVE;
 import static org.openlmis.referencedata.validate.UserValidator.EXTRA_DATA;
@@ -41,13 +44,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.RightService;
+import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
+import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -67,12 +76,16 @@ public class UserValidatorTest {
   @Mock
   private RoleAssignmentRepository roleAssignmentRepository;
 
+  @Mock
+  private FacilityRepository facilityRepository;
+
   @InjectMocks
   private Validator validator = new UserValidator();
 
   private User user;
   private UserDto userDto;
   private Errors errors;
+  private Facility facility;
 
   @Before
   public void setUp() throws Exception {
@@ -80,6 +93,8 @@ public class UserValidatorTest {
 
     user = new UserDataBuilder().build();
     user.export(userDto);
+
+    facility = new FacilityDataBuilder().build();
 
     errors = new BeanPropertyBindingResult(userDto, "userDto");
 
@@ -243,6 +258,8 @@ public class UserValidatorTest {
     userDto.setActive(!userDto.isActive());
     userDto.setExtraData(ImmutableMap.of("a", "b"));
     userDto.setRoleAssignments(Sets.newHashSet(new RoleAssignmentDto()));
+    when(facilityRepository.findById(userDto.getHomeFacilityId()))
+        .thenReturn(Optional.ofNullable(facility));
     validator.validate(userDto, errors);
 
     assertThat(errors.getErrorCount()).isGreaterThanOrEqualTo(7);
@@ -253,6 +270,28 @@ public class UserValidatorTest {
     assertErrorMessage(errors, ACTIVE, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, EXTRA_DATA, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
     assertErrorMessage(errors, ROLE_ASSIGNMENTS, UserMessageKeys.ERROR_FIELD_IS_INVARIANT);
+  }
+
+  @Test
+  public void shouldRejectIfHomeFacilityHasWardOrServiceType() {
+    FacilityType wardType = new FacilityTypeDataBuilder().withCode("WS").build();
+    facility.setType(wardType);
+    userDto.setHomeFacilityId(facility.getId());
+    when(facilityRepository.findById(userDto.getHomeFacilityId()))
+        .thenReturn(Optional.ofNullable(facility));
+    validator.validate(userDto, errors);
+
+    assertErrorMessage(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_HOME_FACILITY_INVALID_TYPE);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfFacilityNotFound() {
+    userDto.setHomeFacilityId(UUID.randomUUID());
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.empty());
+    validator.validate(userDto, errors);
+
+    verify(facilityRepository, times(1)).findById(any(UUID.class));
   }
 
   private void prepareForValidateInvariants() {

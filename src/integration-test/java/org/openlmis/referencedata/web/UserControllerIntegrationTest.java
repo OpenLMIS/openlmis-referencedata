@@ -371,6 +371,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenAnswer(invocation -> invocation.getArguments()[0]);
     when(userRepository.saveAndFlush(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.ofNullable(homeFacility));
 
     UserDto userDto = new UserDto();
 
@@ -404,6 +406,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
     User user = new User();
     user.setId(UUID.randomUUID());
     given(userRepository.findOneByUsernameIgnoreCase(user1.getUsername())).willReturn(user);
+    given(facilityRepository.findById(any(UUID.class)))
+        .willReturn(Optional.ofNullable(homeFacility));
 
     String messageKey = putUser(null)
         .then()
@@ -433,6 +437,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRejectPutUserIfUsernameIsInvalid() {
     mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.ofNullable(homeFacility));
 
     user1.setUsername("bad:name");
     String messageKey = putUser(null)
@@ -823,6 +829,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenAnswer(invocation -> invocation.getArguments()[0]);
     when(userRepository.saveAndFlush(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.ofNullable(homeFacility));
 
     User user = generateUser();
     UserDto userDto = new UserDto();
@@ -857,6 +865,8 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .thenAnswer(invocation -> invocation.getArguments()[0]);
     when(userRepository.saveAndFlush(any(User.class)))
         .thenAnswer(invocation -> invocation.getArguments()[0]);
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.ofNullable(homeFacility));
 
     User newUser = generateUser();
     UserDto newUserDto = new UserDto();
