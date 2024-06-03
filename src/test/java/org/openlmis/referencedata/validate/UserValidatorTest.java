@@ -16,8 +16,11 @@
 package org.openlmis.referencedata.validate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.UserValidator.ACTIVE;
 import static org.openlmis.referencedata.validate.UserValidator.EXTRA_DATA;
@@ -47,6 +50,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.UserRepository;
@@ -278,6 +282,16 @@ public class UserValidatorTest {
     validator.validate(userDto, errors);
 
     assertErrorMessage(errors, HOME_FACILITY_ID, UserMessageKeys.ERROR_HOME_FACILITY_INVALID_TYPE);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionIfFacilityNotFound() {
+    userDto.setHomeFacilityId(UUID.randomUUID());
+    when(facilityRepository.findById(any(UUID.class)))
+        .thenReturn(Optional.empty());
+    validator.validate(userDto, errors);
+
+    verify(facilityRepository, times(1)).findById(any(UUID.class));
   }
 
   private void prepareForValidateInvariants() {
