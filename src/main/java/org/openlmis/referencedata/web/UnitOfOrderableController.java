@@ -123,6 +123,7 @@ public class UnitOfOrderableController extends BaseController {
   /**
    * Get the audit information related to units of orderable.
    *
+   * @param id                  UUID of unitOfOrderable which we want to update.
    * @param author              The author of the changes which should be returned.
    *                            If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.
