@@ -37,10 +37,17 @@ public class GeographicLevelRepositoryIntegrationTest
     return new GeographicLevelDataBuilder().buildAsNew();
   }
 
+  private GeographicLevel generateInstance(int levelNumber) {
+    return new GeographicLevelDataBuilder()
+        .withLevelNumber(levelNumber)
+        .buildAsNew();
+  }
+
   @Test
   public void shouldByLevelNumber() {
     // given
-    GeographicLevel level = repository.save(generateInstance());
+    int levelCounter = (int) repository.count();
+    GeographicLevel level = repository.save(generateInstance(levelCounter + 1));
 
     // when
     GeographicLevel result = repository.findByLevelNumber(level.getLevelNumber());
@@ -49,4 +56,5 @@ public class GeographicLevelRepositoryIntegrationTest
     assertNotNull(result);
     assertEquals(level.getId(), result.getId());
   }
+
 }
