@@ -26,10 +26,12 @@ import static org.openlmis.referencedata.util.messagekeys.UnitOfOrderableMessage
 import static org.openlmis.referencedata.util.messagekeys.UnitOfOrderableMessageKeys.NAME;
 
 import org.openlmis.referencedata.dto.UnitOfOrderableDto;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+@Component
 public class UnitOfOrderableValidator implements BaseValidator {
 
   /**
