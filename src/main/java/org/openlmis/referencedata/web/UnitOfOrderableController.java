@@ -24,6 +24,7 @@ import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.UnitOfOrderableRepository;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.UnitOfOrderableMessageKeys;
+import org.openlmis.referencedata.validate.UnitOfOrderableValidator;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,6 +55,9 @@ public class UnitOfOrderableController extends BaseController {
   @Autowired
   private UnitOfOrderableRepository unitOfOrderableRepository;
 
+  @Autowired
+  private UnitOfOrderableValidator validator;
+
   /**
    * REST endpoint to get paginated UnitOfOrderable.
    *
@@ -74,14 +79,19 @@ public class UnitOfOrderableController extends BaseController {
    * Adding new UnitOfOrderable. If the id is specified, it will be ignored.
    *
    * @param unitOfOrderableDto A unitOfOrderable bound to the request body.
+   * @param bindingResult      The result of validation.
    * @return the created unitOfOrderable.
    */
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public UnitOfOrderableDto createUnitOfOrderable(
-      @RequestBody UnitOfOrderableDto unitOfOrderableDto) {
+      @RequestBody UnitOfOrderableDto unitOfOrderableDto,
+      BindingResult bindingResult) {
     rightService.checkAdminRight(UNIT_OF_ORDERABLES_MANAGE);
     XLOGGER.debug("Creating new unitOfOrderable");
+
+    validator.validate(unitOfOrderableDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     unitOfOrderableDto.setId(null);
     UnitOfOrderable unitOfOrderable = UnitOfOrderable.newInstance(unitOfOrderableDto);
@@ -95,14 +105,19 @@ public class UnitOfOrderableController extends BaseController {
    *
    * @param unitOfOrderableDto A unitOfOrderableDto bound to the request body.
    * @param id                 UUID of unitOfOrderable which we want to update.
+   * @param bindingResult      The result of validation.
    * @return the updated unitOfOrderable.
    */
   @PutMapping("{id}")
   @ResponseStatus(HttpStatus.OK)
   public UnitOfOrderableDto updateUnitOfOrderable(
       @RequestBody UnitOfOrderableDto unitOfOrderableDto,
-      @PathVariable UUID id) {
+      @PathVariable UUID id,
+      BindingResult bindingResult) {
     rightService.checkAdminRight(UNIT_OF_ORDERABLES_MANAGE);
+
+    validator.validate(unitOfOrderableDto, bindingResult);
+    throwValidationMessageExceptionIfErrors(bindingResult);
 
     UnitOfOrderable unitOfOrderableToUpdate = unitOfOrderableRepository
         .findById(id)
@@ -123,6 +138,7 @@ public class UnitOfOrderableController extends BaseController {
   /**
    * Get the audit information related to units of orderable.
    *
+   * @param id                  UUID of unitOfOrderable which we want to update.
    * @param author              The author of the changes which should be returned.
    *                            If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.

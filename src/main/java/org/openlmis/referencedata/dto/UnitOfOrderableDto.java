@@ -65,8 +65,4 @@ public class UnitOfOrderableDto extends BaseDto
         ? units.stream().map(UnitOfOrderableDto::newInstance).collect(Collectors.toList())
         : Collections.emptyList();
   }
-
-  public static UnitOfOrderable newUnitOfOrderable(UnitOfOrderableDto unitOfOrderableDto) {
-    return null;
-  }
 }
