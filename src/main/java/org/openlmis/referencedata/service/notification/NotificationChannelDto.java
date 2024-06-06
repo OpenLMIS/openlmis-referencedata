@@ -13,25 +13,8 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.i18n;
+package org.openlmis.referencedata.service.notification;
 
-import org.openlmis.referencedata.util.LocalizedMessage;
-import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Service;
-
-@Service
-public class MessageService {
-
-  @Autowired
-  private ExposedMessageSource messageSource;
-
-  public LocalizedMessage localize(Message message) {
-    return message.localMessage(messageSource, LocaleContextHolder.getLocale());
-  }
-
-  public String localizeString(String messageKey, Object... messageParameter) {
-    return localize(new Message(messageKey, messageParameter)).asMessage();
-  }
+public enum NotificationChannelDto {
+  EMAIL
 }

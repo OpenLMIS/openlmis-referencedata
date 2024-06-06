@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.service;
 
-import static org.openlmis.referencedata.service.RequestHelper.createUri;
+import static org.openlmis.referencedata.util.RequestHelper.createUri;
 
 import java.util.Map;
 import org.apache.commons.codec.binary.Base64;

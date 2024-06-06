@@ -31,6 +31,7 @@ import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.service.LotSearchParams;
 import org.openlmis.referencedata.service.LotService;
+import org.openlmis.referencedata.service.notifier.QuarantinedNotifier;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
@@ -59,26 +60,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class LotController extends BaseController {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(LotController.class);
-
-  @Autowired
-  private LotRepository lotRepository;
-
-  @Autowired
-  private TradeItemRepository tradeItemRepository;
-
   private final LotValidator validator;
-
-  @Autowired
-  private LotService lotService;
+  @Autowired private LotRepository lotRepository;
+  @Autowired private TradeItemRepository tradeItemRepository;
+  @Autowired private LotService lotService;
+  @Autowired private QuarantinedNotifier quarantinedNotifier;
 
   /**
    * LotController constructor.
+   *
    * @param extensionManager ExtensionManager
    */
   public LotController(ExtensionManager extensionManager) {
-    this.validator = extensionManager.getExtension(
-            ExtensionPointId.LOT_VALIDATOR_POINT_ID, LotValidator.class
-    );
+    this.validator =
+        extensionManager.getExtension(ExtensionPointId.LOT_VALIDATOR_POINT_ID, LotValidator.class);
   }
 
   /**
@@ -106,21 +101,23 @@ public class LotController extends BaseController {
   /**
    * Allows updating Lots.
    *
-   * @param lotDto   a LotDto bound to the request body.
+   * @param lotDto a LotDto bound to the request body.
    * @param lotId the UUID of Lot which we want to update.
    * @return the updated LotDto.
    */
   @RequestMapping(value = "/lots/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public LotDto updateLot(@RequestBody LotDto lotDto, @PathVariable("id") UUID lotId,
-                       BindingResult bindingResult) {
+  public LotDto updateLot(
+      @RequestBody LotDto lotDto, @PathVariable("id") UUID lotId, BindingResult bindingResult) {
     rightService.checkAdminRight(LOTS_MANAGE);
 
     Lot existingLot = lotRepository.findById(lotId).orElse(null);
     if (existingLot == null) {
       throw new NotFoundException(new Message(LotMessageKeys.ERROR_NOT_FOUND_WITH_ID, lotId));
     }
+    final LotDto previousState = LotDto.newInstance(existingLot);
+
     lotDto.setId(lotId);
 
     validator.validate(lotDto, bindingResult);
@@ -130,6 +127,11 @@ public class LotController extends BaseController {
 
     XLOGGER.debug("Updating Lot");
     lotToSave = lotRepository.save(lotToSave);
+
+    if (lotToSave.isQuarantined() && !previousState.isQuarantined()) {
+      quarantinedNotifier.notifyLotQuarantine(lotToSave);
+    }
+
     return exportToDto(lotToSave);
   }
 
@@ -152,12 +154,11 @@ public class LotController extends BaseController {
   }
 
   /**
-   * Retrieves all Lots matching given parameters.
-   * For lotCode: finds any values that have entered string value
-   * in any position of searched field. Not case sensitive.
-   * Other fields: entered string value must equal to searched value.
+   * Retrieves all Lots matching given parameters. For lotCode: finds any values that have entered
+   * string value in any position of searched field. Not case sensitive. Other fields: entered
+   * string value must equal to searched value.
    *
-   * @param requestParams  the request parameters
+   * @param requestParams the request parameters
    * @param pageable Pageable object that allows client to optionally add "page" (page number).
    * @return List of matched Lots.
    */
@@ -174,10 +175,9 @@ public class LotController extends BaseController {
 
     profiler.start("LOT_TO_DTO");
     assert lotsPage != null;
-    Page<LotDto> page = Pagination.getPage(LotDto.newInstance(
-        lotsPage.getContent()),
-        pageable,
-        lotsPage.getTotalElements());
+    Page<LotDto> page =
+        Pagination.getPage(
+            LotDto.newInstance(lotsPage.getContent()), pageable, lotsPage.getTotalElements());
 
     profiler.stop().log();
     XLOGGER.exit(page);
@@ -186,12 +186,13 @@ public class LotController extends BaseController {
 
   /**
    * Get the audit information related to lot.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
-   * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
+   *
+   * @param author The author of the changes which should be returned. If null or empty, changes are
+   *     returned regardless of author.
+   * @param changedPropertyName The name of the property about which changes should be returned. If
+   *     null or empty, changes associated with any and all properties are returned.
+   * @param page A Pageable object that allows client to optionally add "page" (page number) and
+   *     "size" (page size) query parameters to the request.
    */
   @RequestMapping(value = "/lots/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
@@ -201,14 +202,14 @@ public class LotController extends BaseController {
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
           String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
+      // Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
       @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
           boolean returnJson,
       Pageable page) {
 
     rightService.checkAdminRight(LOTS_MANAGE);
 
-    //Return a 404 if the specified instance can't be found
+    // Return a 404 if the specified instance can't be found
     Lot instance = lotRepository.findById(id).orElse(null);
     if (instance == null) {
       throw new NotFoundException(LotMessageKeys.ERROR_NOT_FOUND);
