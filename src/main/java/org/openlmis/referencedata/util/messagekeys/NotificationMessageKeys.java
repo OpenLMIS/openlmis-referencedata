@@ -17,22 +17,22 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class NotificationMessageKeys {
   public static final String LOT_QUARANTINED_EMAIL_TITLE_TEMPLATE =
-      "referencedata.email.quarantinedLot.subject.template";
+      "referencedata-angola.email.quarantinedLot.subject.template";
   public static final String LOT_QUARANTINED_EMAIL_CONTENT_TEMPLATE =
-      "referencedata.email.quarantinedLot.content.template";
+      "referencedata-angola.email.quarantinedLot.content.template";
   public static final String ORDERABLE_QUARANTINED_EMAIL_TITLE_TEMPLATE =
-      "referencedata.email.quarantinedOrderable.subject.template";
+      "referencedata-angola.email.quarantinedOrderable.subject.template";
   public static final String ORDERABLE_QUARANTINED_EMAIL_CONTENT_TEMPLATE =
-      "referencedata.email.quarantinedOrderable.content.template";
+      "referencedata-angola.email.quarantinedOrderable.content.template";
 
   public static final String LOT_QUARANTINED_SYSTEM_NOTIFICATION_TITLE_TEMPLATE =
-      "referencedata.systemNotification.quarantinedLot.subject.template";
+      "referencedata-angola.systemNotification.quarantinedLot.subject.template";
   public static final String LOT_QUARANTINED_SYSTEM_NOTIFICATION_CONTENT_TEMPLATE =
-      "referencedata.systemNotification.quarantinedLot.content.template";
+      "referencedata-angola.systemNotification.quarantinedLot.content.template";
   public static final String ORDERABLE_QUARANTINED_SYSTEM_NOTIFICATION_TITLE_TEMPLATE =
-      "referencedata.systemNotification.quarantinedOrderable.subject.template";
+      "referencedata-angola.systemNotification.quarantinedOrderable.subject.template";
   public static final String ORDERABLE_QUARANTINED_SYSTEM_NOTIFICATION_CONTENT_TEMPLATE =
-      "referencedata.systemNotification.quarantinedOrderable.content.template";
+      "referencedata-angola.systemNotification.quarantinedOrderable.content.template";
 
   protected NotificationMessageKeys() {
     throw new UnsupportedOperationException();

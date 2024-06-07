@@ -36,12 +36,13 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class NotificationService {
+  private static final String NOTIFICATIONS_API_PATH = "/api/notifications";
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Autowired private AuthService authService;
 
   @Value("${notification.url}")
-  private String notificationUrl;
+  private String notificationBaseUrl;
 
   private RestOperations restTemplate = new RestTemplate();
 
@@ -57,7 +58,7 @@ public class NotificationService {
   public Future<Boolean> notifyAsyncEmail(User user, String subject, String content) {
     CompletableFuture<Boolean> resultFuture = new CompletableFuture<>();
     NotificationDto request = buildNotification(user, subject, content);
-    String url = notificationUrl + "/api/notifications";
+    String url = notificationBaseUrl + NOTIFICATIONS_API_PATH;
 
     try {
       restTemplate.postForObject(

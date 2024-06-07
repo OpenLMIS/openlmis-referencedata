@@ -64,7 +64,7 @@ public class NotificationServiceTest {
     when(authService.obtainAccessToken()).thenReturn(ACCESS_TOKEN);
 
     ReflectionTestUtils.setField(notificationService, "restTemplate", restTemplate);
-    ReflectionTestUtils.setField(notificationService, "notificationUrl", BASE_URL);
+    ReflectionTestUtils.setField(notificationService, "notificationBaseUrl", BASE_URL);
   }
 
   @Test
