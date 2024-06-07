@@ -13,25 +13,37 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.i18n;
+package org.openlmis.referencedata.service.notification;
 
-import org.openlmis.referencedata.util.LocalizedMessage;
-import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Service;
+import java.util.Map;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Service
-public class MessageService {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public final class NotificationDto {
+  private UUID userId;
+  private Map<String, MessageDto> messages;
+  private Boolean important;
 
-  @Autowired
-  private ExposedMessageSource messageSource;
-
-  public LocalizedMessage localize(Message message) {
-    return message.localMessage(messageSource, LocaleContextHolder.getLocale());
-  }
-
-  public String localizeString(String messageKey, Object... messageParameter) {
-    return localize(new Message(messageKey, messageParameter)).asMessage();
+  /**
+   * Standard constructor with important set to false.
+   *
+   * @param userId user id
+   * @param messages messages map
+   */
+  public NotificationDto(UUID userId, Map<String, MessageDto> messages) {
+    this.userId = userId;
+    this.messages = messages;
+    this.important = false;
   }
 }

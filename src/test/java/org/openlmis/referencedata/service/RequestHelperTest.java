@@ -22,6 +22,7 @@ import static org.junit.Assert.assertThat;
 
 import java.net.URI;
 import org.junit.Test;
+import org.openlmis.referencedata.util.RequestHelper;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 

@@ -13,25 +13,24 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.i18n;
+package org.openlmis.referencedata.util;
 
-import org.openlmis.referencedata.util.LocalizedMessage;
-import org.openlmis.referencedata.util.Message;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Service;
+import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.i18n.MessageService;
+import org.openlmis.referencedata.util.messagekeys.NotificationMessageKeys;
 
-@Service
-public class MessageService {
-
-  @Autowired
-  private ExposedMessageSource messageSource;
-
-  public LocalizedMessage localize(Message message) {
-    return message.localMessage(messageSource, LocaleContextHolder.getLocale());
-  }
-
-  public String localizeString(String messageKey, Object... messageParameter) {
-    return localize(new Message(messageKey, messageParameter)).asMessage();
+public class QuarantinedOrderableEmailBuilder extends QuarantinedObjectEmailBuilder {
+  /**
+   * Creates new instance of the Builder.
+   *
+   * @param messageService the translation provider, not null
+   * @param orderable the orderable, not null
+   */
+  public QuarantinedOrderableEmailBuilder(MessageService messageService, Orderable orderable) {
+    super(
+        messageService,
+        NotificationMessageKeys.ORDERABLE_QUARANTINED_EMAIL_TITLE_TEMPLATE,
+        NotificationMessageKeys.ORDERABLE_QUARANTINED_EMAIL_CONTENT_TEMPLATE,
+        orderable::getFullProductName);
   }
 }

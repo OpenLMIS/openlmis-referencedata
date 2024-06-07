@@ -13,13 +13,14 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.util;
 
 import static java.lang.String.valueOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.util.UriUtils.encodeQueryParam;
 
 import java.net.URI;
+import org.openlmis.referencedata.service.RequestParameters;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,14 +34,14 @@ public final class RequestHelper {
   /**
    * Creates a {@link URI} from the given string representation without any parameters.
    */
-  static URI createUri(String url) {
+  public static URI createUri(String url) {
     return createUri(url, null);
   }
 
   /**
    * Creates a {@link URI} from the given string representation and with the given parameters.
    */
-  static URI createUri(String url, RequestParameters parameters) {
+  public static URI createUri(String url, RequestParameters parameters) {
     UriComponentsBuilder builder = UriComponentsBuilder.newInstance().uri(URI.create(url));
 
     if (parameters != null) {
@@ -57,8 +58,24 @@ public final class RequestHelper {
    * @param token the token to put into the authorization header
    * @return the {@link HttpEntity} to use
    */
-  static HttpEntity createEntity(String token) {
-    return new HttpEntity(createHeadersWithAuth(token));
+  public static <E> HttpEntity<E> createEntity(String token) {
+    return new HttpEntity<>(createHeadersWithAuth(token));
+  }
+
+  /**
+   * Creates an {@link HttpEntity} with the given payload as a body and adds an authorization
+   * header with the provided token.
+   * @param token the token to put into the authorization header
+   * @param payload the body of the request, pass null if no body
+   * @param <E> the type of the body for the request
+   * @return the {@link HttpEntity} to use
+   */
+  public static <E> HttpEntity<E> createEntity(E payload, String token) {
+    if (payload == null) {
+      return createEntity(token);
+    } else {
+      return new HttpEntity<>(payload, createHeadersWithAuth(token));
+    }
   }
 
   private static HttpHeaders createHeadersWithAuth(String token) {

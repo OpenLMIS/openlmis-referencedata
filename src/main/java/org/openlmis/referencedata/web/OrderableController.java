@@ -34,6 +34,7 @@ import org.openlmis.referencedata.extension.point.OrderableCreatePostProcessor;
 import org.openlmis.referencedata.extension.point.OrderableUpdatePostProcessor;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.OrderableService;
+import org.openlmis.referencedata.service.notifier.QuarantinedNotifier;
 import org.openlmis.referencedata.util.OrderableBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.UuidUtil;
@@ -86,6 +87,9 @@ public class OrderableController extends BaseController {
 
   @Autowired
   private ExtensionManager extensionManager;
+
+  @Autowired
+  private QuarantinedNotifier quarantinedNotifier;
 
   /**
    * Create an orderable.
@@ -147,14 +151,19 @@ public class OrderableController extends BaseController {
 
     validator.validate(orderableDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
-    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(id);
 
+    Orderable foundOrderable = repository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(id);
     if (null == foundOrderable) {
       throw new NotFoundException(OrderableMessageKeys.ERROR_NOT_FOUND);
     }
+    final OrderableDto previousState = OrderableDto.newInstance(foundOrderable);
 
     Orderable savedOrderable = repository
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
+
+    if (savedOrderable.isQuarantined() && !previousState.isQuarantined()) {
+      quarantinedNotifier.notifyOrderableQuarantine(savedOrderable);
+    }
 
     OrderableUpdatePostProcessor orderableUpdatePostProcessor = extensionManager.getExtension(
             ExtensionPointId.ORDERABLE_UPDATE_POST_POINT_ID, OrderableUpdatePostProcessor.class);
