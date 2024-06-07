@@ -71,7 +71,7 @@ public class NotificationServiceTest {
   public void shouldNotifyUser() throws Exception {
     User user = mock(User.class);
 
-    notificationService.notifyAsyncEmail(user, MAIL_SUBJECT, MAIL_CONTENT);
+    notificationService.notifyAsyncEmail(user.getId(), MAIL_SUBJECT, MAIL_CONTENT);
 
     ArgumentCaptor<HttpEntity> captor = ArgumentCaptor.forClass(HttpEntity.class);
 

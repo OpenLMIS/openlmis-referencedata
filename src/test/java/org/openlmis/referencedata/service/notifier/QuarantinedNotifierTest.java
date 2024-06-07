@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,9 @@ public class QuarantinedNotifierTest {
   @Before
   public void setupTests() {
     for (int i = 0; i < TEST_USER_COUNT; ++i) {
-      testUsers.add(mock(User.class));
+      final User user = mock(User.class);
+      when(user.getId()).thenReturn(UUID.randomUUID());
+      testUsers.add(user);
     }
 
     when(authenticationHelper.getCurrentUser()).thenReturn(mock(User.class));
@@ -93,7 +96,7 @@ public class QuarantinedNotifierTest {
 
     for (User testUser : testUsers) {
       verify(notificationService, times(1))
-          .notifyAsyncEmail(eq(testUser), anyString(), anyString());
+          .notifyAsyncEmail(eq(testUser.getId()), anyString(), anyString());
     }
     verify(systemNotificationRepository, times(1)).save(any());
   }

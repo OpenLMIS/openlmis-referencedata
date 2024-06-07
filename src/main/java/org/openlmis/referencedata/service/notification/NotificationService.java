@@ -19,9 +19,8 @@ import static org.openlmis.referencedata.service.notification.NotificationChanne
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.UUID;
 import java.util.concurrent.Future;
-import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.service.AuthService;
 import org.openlmis.referencedata.util.RequestHelper;
 import org.slf4j.Logger;
@@ -29,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestOperations;
@@ -49,15 +49,14 @@ public class NotificationService {
   /**
    * Send an email notification.
    *
-   * @param user receiver of the notification
+   * @param recipientId receiver's ID
    * @param subject subject of the email
    * @param content content of the email
    * @return true if success, false if failed.
    */
-  @Async
-  public Future<Boolean> notifyAsyncEmail(User user, String subject, String content) {
-    CompletableFuture<Boolean> resultFuture = new CompletableFuture<>();
-    NotificationDto request = buildNotification(user, subject, content);
+  @Async("singleThreadExecutor")
+  public Future<Boolean> notifyAsyncEmail(UUID recipientId, String subject, String content) {
+    NotificationDto request = buildNotification(recipientId, subject, content);
     String url = notificationBaseUrl + NOTIFICATIONS_API_PATH;
 
     try {
@@ -65,21 +64,20 @@ public class NotificationService {
           RequestHelper.createUri(url),
           RequestHelper.createEntity(request, authService.obtainAccessToken()),
           Object.class);
-      resultFuture.complete(true);
+      return new AsyncResult<>(true);
     } catch (HttpStatusCodeException ex) {
       logger.error(
           "Unable to send notification. Error code: {}, response message: {}",
           ex.getStatusCode(),
           ex.getResponseBodyAsString());
-      resultFuture.complete(false);
+      return new AsyncResult<>(false);
     }
-    return resultFuture;
   }
 
-  private NotificationDto buildNotification(User user, String subject, String content) {
+  private NotificationDto buildNotification(UUID recipientId, String subject, String content) {
     Map<String, MessageDto> messages = new HashMap<>();
     messages.put(EMAIL.toString(), new MessageDto(subject, content));
 
-    return new NotificationDto(user.getId(), messages);
+    return new NotificationDto(recipientId, messages);
   }
 }

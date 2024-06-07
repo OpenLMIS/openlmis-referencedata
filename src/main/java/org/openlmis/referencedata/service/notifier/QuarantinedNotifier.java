@@ -74,7 +74,8 @@ public class QuarantinedNotifier {
 
       for (User recipient : usersPage.getContent()) {
         final QuarantinedObjectEmailBuilder.Email email = emailBuilder.buildEmail(recipient);
-        notificationService.notifyAsyncEmail(recipient, email.getTitle(), email.getContent());
+        notificationService.notifyAsyncEmail(
+            recipient.getId(), email.getTitle(), email.getContent());
       }
 
       pageRequest = usersPage.nextPageable();

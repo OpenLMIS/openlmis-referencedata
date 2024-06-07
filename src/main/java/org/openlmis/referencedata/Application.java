@@ -20,6 +20,7 @@ import com.google.gson.internal.bind.TypeAdapters;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Locale;
+import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.callback.Callback;
@@ -64,6 +65,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
@@ -278,6 +280,11 @@ public class Application {
         .keyPrefix("togglz:")
         .jedisPool(new JedisPool(properties.getHost(), properties.getPort()))
         .build();
+  }
+
+  @Bean(name = "singleThreadExecutor")
+  Executor threadPoolTaskExecutor() {
+    return new ThreadPoolTaskExecutor();
   }
 
   /**
