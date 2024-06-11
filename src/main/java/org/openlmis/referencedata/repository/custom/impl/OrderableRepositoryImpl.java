@@ -247,8 +247,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
             builder.in(builder.concat(
                 root.get(IDENTITY).get(ID).as(String.class),
                 root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class)
-            ).value(latestOrderablesQuery),
-            builder.equal(root.get(QUARANTINED), searchParams.getIncludeQuarantined()));
+            ).value(latestOrderablesQuery));
+
+        if (!searchParams.getIncludeQuarantined()) {
+          where = builder.and(where, builder.equal(root.get(QUARANTINED), false));
+        }
       } else {
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
