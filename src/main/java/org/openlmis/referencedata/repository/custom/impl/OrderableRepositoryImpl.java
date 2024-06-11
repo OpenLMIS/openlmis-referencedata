@@ -233,8 +233,6 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Predicate where = builder.conjunction();
 
-    boolean includeQuarantined = false;
-
     if (null != searchParams) {
       if (null != searchParams.getProgramCode()) {
         Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
@@ -245,10 +243,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
       if (isEmpty(identities)) {
         Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
-        where = builder.and(where, builder.in(builder.concat(
-            root.get(IDENTITY).get(ID).as(String.class),
-            root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
-            .value(latestOrderablesQuery));
+        where = builder.and(where,
+            builder.in(builder.concat(
+                root.get(IDENTITY).get(ID).as(String.class),
+                root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class)
+            ).value(latestOrderablesQuery),
+            builder.equal(root.get(QUARANTINED), searchParams.getIncludeQuarantined()));
       } else {
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
@@ -262,19 +262,14 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         where = builder.and(where, builder.like(builder.lower(root.get(FULL_PRODUCT_NAME)),
             "%" + searchParams.getName().toLowerCase() + "%"));
       }
-
-      includeQuarantined = searchParams.getIncludeQuarantined();
-
     } else {
       Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
-      where = builder.and(where, builder.in(builder.concat(
-          root.get(IDENTITY).get(ID).as(String.class),
-          root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
-          .value(latestOrderablesQuery));
-    }
-
-    if (!includeQuarantined) {
-      where = builder.and(where, builder.equal(root.get(QUARANTINED), includeQuarantined));
+      where = builder.and(where,
+          builder.in(builder.concat(
+              root.get(IDENTITY).get(ID).as(String.class),
+              root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class)
+          ).value(latestOrderablesQuery),
+          builder.equal(root.get(QUARANTINED), false));
     }
 
     return where;
