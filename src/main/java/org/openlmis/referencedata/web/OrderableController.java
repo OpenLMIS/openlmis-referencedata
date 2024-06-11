@@ -161,7 +161,7 @@ public class OrderableController extends BaseController {
     Orderable savedOrderable = repository
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
 
-    if (savedOrderable.isQuarantined() && !previousState.isQuarantined()) {
+    if (savedOrderable.isQuarantined() != previousState.isQuarantined()) {
       quarantinedNotifier.notifyOrderableQuarantine(savedOrderable);
     }
 

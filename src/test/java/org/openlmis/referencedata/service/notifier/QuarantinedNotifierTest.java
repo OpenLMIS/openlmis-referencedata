@@ -33,13 +33,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.i18n.MessageService;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.SystemNotificationRepository;
 import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.service.notification.NotificationService;
+import org.openlmis.referencedata.util.QuarantinedNotificationBuilderFactory;
+import org.openlmis.referencedata.web.locale.LocaleDto;
+import org.openlmis.referencedata.web.locale.LocaleDtoBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,13 +54,16 @@ public class QuarantinedNotifierTest {
   private static final int TEST_USER_COUNT =
       (int) Math.ceil(QuarantinedNotifier.USER_BATCH_SIZE * 2.5);
 
-  @Mock private AuthenticationHelper authenticationHelper;
+  @Mock private LocaleDtoBuilder localeDtoBuilder;
   @Mock private MessageService messageService;
+  @Mock private OrderableRepository orderableRepository;
+  @Mock private AuthenticationHelper authenticationHelper;
   @Mock private UserService userService;
   @Mock private NotificationService notificationService;
   @Mock private SystemNotificationRepository systemNotificationRepository;
+  @InjectMocks private QuarantinedNotificationBuilderFactory quarantinedNotificationBuilderFactory;
 
-  @InjectMocks private QuarantinedNotifier quarantinedNotifier;
+  private QuarantinedNotifier quarantinedNotifier;
 
   private List<User> testUsers = new ArrayList<>();
 
@@ -67,11 +75,23 @@ public class QuarantinedNotifierTest {
       testUsers.add(user);
     }
 
+    final LocaleDto localeDto = new LocaleDto();
+    localeDto.setDateFormat("dd/MM/yyyy");
+    when(localeDtoBuilder.build()).thenReturn(localeDto);
+
     when(authenticationHelper.getCurrentUser()).thenReturn(mock(User.class));
     when(messageService.localizeString(anyString(), any()))
         .thenAnswer(invocation -> invocation.getArgument(0));
     when(userService.searchUsers(any(UserSearchParams.class), any(Pageable.class)))
         .thenAnswer(invocation -> createTestUsersPage(invocation.getArgument(1)));
+
+    quarantinedNotifier =
+        new QuarantinedNotifier(
+            quarantinedNotificationBuilderFactory,
+            orderableRepository,
+            userService,
+            notificationService,
+            systemNotificationRepository);
   }
 
   private Page<User> createTestUsersPage(Pageable pageRequest) {
@@ -90,7 +110,14 @@ public class QuarantinedNotifierTest {
 
   @Test
   public void notifyLotQuarantine_shouldSendEmailAndSystemNotification() {
+    final UUID testLotId = UUID.fromString("f500555c-6e47-4055-87f8-4b4cc7c59e99");
+    final Orderable testOrderable = mock(Orderable.class);
     final Lot testLot = mock(Lot.class);
+
+    when(testOrderable.getFullProductName()).thenReturn("testOrderable");
+    when(testLot.getId()).thenReturn(testLotId);
+    when(testLot.getLotCode()).thenReturn("testLot");
+    when(orderableRepository.findLatestVersionByLotId(testLotId)).thenReturn(testOrderable);
 
     quarantinedNotifier.notifyLotQuarantine(testLot);
 

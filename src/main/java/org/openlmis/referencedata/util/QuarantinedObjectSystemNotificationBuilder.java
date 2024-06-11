@@ -23,6 +23,7 @@ import org.apache.commons.text.StringSubstitutor;
 import org.openlmis.referencedata.domain.SystemNotification;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.i18n.MessageService;
+import org.openlmis.referencedata.web.locale.LocaleDto;
 
 public class QuarantinedObjectSystemNotificationBuilder {
   private static final String DATE_CTX_KEY = "date";
@@ -37,11 +38,15 @@ public class QuarantinedObjectSystemNotificationBuilder {
    * Creates new instance of the Builder.
    *
    * @param messageService the translation provider, not null
+   * @param localeDto the locale dto, not null
    * @param author the notification's author, not null
+   * @param titleTemplateKey the translation key to use when creating title, not null
+   * @param contentTemplateKey the translation ket to use when creating content, not null
    * @param valuesProvider the replacement value provider, not null
    */
   QuarantinedObjectSystemNotificationBuilder(
       MessageService messageService,
+      LocaleDto localeDto,
       User author,
       String titleTemplateKey,
       String contentTemplateKey,
@@ -49,12 +54,15 @@ public class QuarantinedObjectSystemNotificationBuilder {
     this.author = author;
     this.titleTemplate = messageService.localizeString(titleTemplateKey);
     this.contentTemplate = messageService.localizeString(contentTemplateKey);
-    this.templateSubstitutor = new StringSubstitutor(newContext(valuesProvider));
+    this.templateSubstitutor = new StringSubstitutor(newContext(localeDto, valuesProvider));
   }
 
-  private static Map<String, String> newContext(ValuesProvider valuesProvider) {
+  private static Map<String, String> newContext(
+      LocaleDto localeDto, ValuesProvider valuesProvider) {
     final Map<String, String> context = new HashMap<>();
-    context.put(DATE_CTX_KEY, ZonedDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE));
+    context.put(
+        DATE_CTX_KEY,
+        ZonedDateTime.now().format(DateTimeFormatter.ofPattern(localeDto.getDateFormat())));
     context.put(OBJECT_NAME_CTX_KEY, valuesProvider.getObjectIdentifier());
     return context;
   }
