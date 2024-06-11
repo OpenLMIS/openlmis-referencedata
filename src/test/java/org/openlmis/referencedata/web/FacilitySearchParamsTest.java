@@ -46,6 +46,7 @@ public class FacilitySearchParamsTest {
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
+  private static final String EXCLUDE_WARDS_SERVICES = "excludeWardsServices";
 
   private LinkedMultiValueMap<String, Object> queryMap;
 
@@ -136,6 +137,26 @@ public class FacilitySearchParamsTest {
   }
 
   @Test
+  public void shouldGetExcludeWardsServicesValueFromParameters() {
+    queryMap.add(EXCLUDE_WARDS_SERVICES, true);
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertTrue(params.getExcludeWardsServices());
+
+    queryMap.set(EXCLUDE_WARDS_SERVICES, false);
+    params = new FacilitySearchParams(queryMap);
+
+    assertFalse(params.getExcludeWardsServices());
+  }
+
+  @Test
+  public void shouldGetNullIfMapHasNoExcludeWardsServicesProperty() {
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertFalse(params.getExcludeWardsServices());
+  }
+
+  @Test
   public void shouldGetExtraDataValueFromParameters() {
     Map<String, String> map = ImmutableMap.of("key", "value");
     queryMap.add(EXTRA_DATA, map);
@@ -175,6 +196,6 @@ public class FacilitySearchParamsTest {
 
     ToStringTestUtils.verify(FacilitySearchParams.class, params,
         "CODE", "NAME", "FACILITY_TYPE_CODE", "ZONE_ID", "RECURSE", "EXTRA_DATA",
-        "ALL_PARAMETERS", "ID");
+        "ALL_PARAMETERS", "ID", "EXCLUDE_WARDS_SERVICES");
   }
 }

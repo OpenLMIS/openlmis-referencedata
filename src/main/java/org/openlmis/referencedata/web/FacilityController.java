@@ -156,6 +156,7 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<MinimalFacilityDto> getMinimalFacilities(
       @RequestParam(required = false) Boolean active,
+      @RequestParam(required = false) Boolean excludeWardsServices,
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
     profiler.setLogger(XLOGGER);

@@ -35,5 +35,7 @@ public interface FacilityRepositoryCustom {
     String getFacilityTypeCode();
 
     Set<UUID> getIds();
+
+    Boolean getExcludeWardsServices();
   }
 }

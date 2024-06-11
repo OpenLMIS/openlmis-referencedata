@@ -41,9 +41,11 @@ public final class FacilitySearchParams implements FacilityRepositoryCustom.Sear
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
+  private static final String EXCLUDE_WARDS_SERVICES = "excludeWardsServices";
 
   private static final List<String> ALL_PARAMETERS =
-      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA, ID);
+      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA, ID,
+          EXCLUDE_WARDS_SERVICES);
 
   private SearchParams queryParams;
 
@@ -140,6 +142,19 @@ public final class FacilitySearchParams implements FacilityRepositoryCustom.Sear
       return Collections.emptySet();
     }
     return queryParams.getUuids(ID);
+  }
+
+  /**
+   * Gets value for excludeWardsServices parameter.
+   * If param value has incorrect format {@link ValidationMessageException} will be thrown.
+   *
+   * @return Boolean value of excludeWardsServices flag or false if params doesn't contain the key.
+   */
+  public Boolean getExcludeWardsServices() {
+    if (!queryParams.containsKey(EXCLUDE_WARDS_SERVICES)) {
+      return false;
+    }
+    return queryParams.getBoolean(EXCLUDE_WARDS_SERVICES);
   }
 
   /**
