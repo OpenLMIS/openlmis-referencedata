@@ -67,6 +67,7 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
   private static final String WITH_TYPE = "t.code = :typeCode";
   private static final String WITH_EXTRA_DATA = "f.extradata @> (:extraData)\\:\\:jsonb";
   private static final String WITHOUT_WARDS_SERVICES = "t.code != 'WS'";
+  private static final String WITH_ACTIVE = "f.active = :active";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -188,7 +189,12 @@ public class FacilityRepositoryImpl implements FacilityRepositoryCustom {
       params.put("ids", searchParams.getIds());
     }
 
-    if (searchParams.getExcludeWardsServices()) {
+    if (searchParams.isActive() != null) {
+      where.add(WITH_ACTIVE);
+      params.put("active", searchParams.isActive());
+    }
+
+    if (Boolean.TRUE.equals(searchParams.getExcludeWardsServices())) {
       where.add(WITHOUT_WARDS_SERVICES);
     }
 

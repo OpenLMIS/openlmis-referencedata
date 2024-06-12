@@ -37,5 +37,7 @@ public interface FacilityRepositoryCustom {
     Set<UUID> getIds();
 
     Boolean getExcludeWardsServices();
+
+    Boolean isActive();
   }
 }
