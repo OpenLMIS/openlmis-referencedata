@@ -186,4 +186,17 @@ public interface OrderableRepository extends
   @Query(nativeQuery = true)
   List<OrderableIdentifierCsvModel> findAllOrderableIdentifierCsvModels();
 
+  @Query(
+      value =
+          "SELECT o.* "
+              + "FROM referencedata.lots l "
+              + "JOIN referencedata.trade_items ti ON ti.id = l.tradeitemid "
+              + "JOIN referencedata.orderable_identifiers oi ON oi.key = 'tradeItem' "
+              + "AND oi.value = CAST(ti.id as VARCHAR) "
+              + "JOIN referencedata.orderables o ON o.id = oi.orderableid "
+              + "AND o.versionnumber = oi.orderableversionnumber "
+              + "WHERE l.id = :lotId AND (o.id, o.versionnumber) IN "
+              + "(SELECT id, MAX(versionnumber) FROM referencedata.orderables GROUP BY id)",
+      nativeQuery = true)
+  Orderable findLatestVersionByLotId(@Param("lotId") UUID lotId);
 }

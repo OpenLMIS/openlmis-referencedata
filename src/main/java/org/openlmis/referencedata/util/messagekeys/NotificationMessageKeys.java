@@ -34,6 +34,24 @@ public abstract class NotificationMessageKeys {
   public static final String ORDERABLE_QUARANTINED_SYSTEM_NOTIFICATION_CONTENT_TEMPLATE =
       "referencedata-angola.systemNotification.quarantinedOrderable.content.template";
 
+  public static final String LOT_FREE_EMAIL_TITLE_TEMPLATE =
+      "referencedata-angola.email.freeLot.subject.template";
+  public static final String LOT_FREE_EMAIL_CONTENT_TEMPLATE =
+      "referencedata-angola.email.freeLot.content.template";
+  public static final String ORDERABLE_FREE_EMAIL_TITLE_TEMPLATE =
+      "referencedata-angola.email.freeOrderable.subject.template";
+  public static final String ORDERABLE_FREE_EMAIL_CONTENT_TEMPLATE =
+      "referencedata-angola.email.freeOrderable.content.template";
+
+  public static final String LOT_FREE_SYSTEM_NOTIFICATION_TITLE_TEMPLATE =
+      "referencedata-angola.systemNotification.freeLot.subject.template";
+  public static final String LOT_FREE_SYSTEM_NOTIFICATION_CONTENT_TEMPLATE =
+      "referencedata-angola.systemNotification.freeLot.content.template";
+  public static final String ORDERABLE_FREE_SYSTEM_NOTIFICATION_TITLE_TEMPLATE =
+      "referencedata-angola.systemNotification.freeOrderable.subject.template";
+  public static final String ORDERABLE_FREE_SYSTEM_NOTIFICATION_CONTENT_TEMPLATE =
+      "referencedata-angola.systemNotification.freeOrderable.content.template";
+
   protected NotificationMessageKeys() {
     throw new UnsupportedOperationException();
   }

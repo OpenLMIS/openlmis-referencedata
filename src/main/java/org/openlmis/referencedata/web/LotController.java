@@ -128,7 +128,7 @@ public class LotController extends BaseController {
     XLOGGER.debug("Updating Lot");
     lotToSave = lotRepository.save(lotToSave);
 
-    if (lotToSave.isQuarantined() && !previousState.isQuarantined()) {
+    if (lotToSave.isQuarantined() != previousState.isQuarantined()) {
       quarantinedNotifier.notifyLotQuarantine(lotToSave);
     }
 
