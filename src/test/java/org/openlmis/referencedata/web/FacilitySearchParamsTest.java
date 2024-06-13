@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys.ERROR_INVALID_PARAMS;
@@ -46,6 +47,8 @@ public class FacilitySearchParamsTest {
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
+  private static final String EXCLUDE_WARDS_SERVICES = "excludeWardsServices";
+  private static final String ACTIVE = "active";
 
   private LinkedMultiValueMap<String, Object> queryMap;
 
@@ -136,6 +139,46 @@ public class FacilitySearchParamsTest {
   }
 
   @Test
+  public void shouldGetExcludeWardsServicesValueFromParameters() {
+    queryMap.add(EXCLUDE_WARDS_SERVICES, true);
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertTrue(params.getExcludeWardsServices());
+
+    queryMap.set(EXCLUDE_WARDS_SERVICES, false);
+    params = new FacilitySearchParams(queryMap);
+
+    assertFalse(params.getExcludeWardsServices());
+  }
+
+  @Test
+  public void shouldGetFalseIfMapHasNoExcludeWardsServicesProperty() {
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertFalse(params.getExcludeWardsServices());
+  }
+
+  @Test
+  public void shouldGetActiveValueFromParameters() {
+    queryMap.add(ACTIVE, true);
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertEquals(Boolean.TRUE, params.isActive());
+
+    queryMap.set(ACTIVE, false);
+    params = new FacilitySearchParams(queryMap);
+
+    assertNotEquals(Boolean.TRUE, params.isActive());
+  }
+
+  @Test
+  public void shouldGetNullIfMapHasNoActiveProperty() {
+    FacilitySearchParams params = new FacilitySearchParams(queryMap);
+
+    assertNull(params.isActive());
+  }
+
+  @Test
   public void shouldGetExtraDataValueFromParameters() {
     Map<String, String> map = ImmutableMap.of("key", "value");
     queryMap.add(EXTRA_DATA, map);
@@ -175,6 +218,6 @@ public class FacilitySearchParamsTest {
 
     ToStringTestUtils.verify(FacilitySearchParams.class, params,
         "CODE", "NAME", "FACILITY_TYPE_CODE", "ZONE_ID", "RECURSE", "EXTRA_DATA",
-        "ALL_PARAMETERS", "ID");
+        "ALL_PARAMETERS", "ID", "EXCLUDE_WARDS_SERVICES", "ACTIVE");
   }
 }

@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -72,6 +73,7 @@ import org.springframework.data.domain.Sort;
 public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Facility> {
 
   public static final String FACILITY_SEARCH_KEY = "Facility";
+  public static final String WARD_SERVICE_TYPE_CODE = "WS";
   @Autowired
   private FacilityRepository repository;
 
@@ -167,7 +169,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Test
   public void shouldNotFindAnyFacilityForIncorrectCodeAndName() {
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams("Ogorek", "Pomidor", null, Sets.newHashSet());
+        new TestSearchParams("Ogorek", "Pomidor", null, Sets.newHashSet(), false, null);
 
     List<Facility> foundFacilties = repository
         .search(searchParams, Sets.newHashSet(), null, pageable)
@@ -184,7 +186,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet());
+        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet(), false, null);
 
     List<Facility> searchedAndSortedFacility = repository
         .search(searchParams, Sets.newHashSet(), null, pageableWithNullSort)
@@ -196,6 +198,61 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   }
 
   @Test
+  public void shouldFindFacilitiesWithTypeOtherThanWardService() {
+    facilityTypeRepository.deleteByCode(WARD_SERVICE_TYPE_CODE);
+    FacilityType wardServiceType = new FacilityTypeDataBuilder().withCode(WARD_SERVICE_TYPE_CODE)
+        .build();
+    facilityTypeRepository.save(wardServiceType);
+    facility1.setType(wardServiceType);
+    repository.save(facility1);
+
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, null, Sets.newHashSet(), true, null);
+
+    List<Facility> searchedFacilities = repository
+        .search(searchParams, Sets.newHashSet(), null, pageableWithNullSort)
+        .getContent();
+
+    assertEquals(searchedFacilities.size(), 1);
+    assertEquals(searchedFacilities.get(0).getName(), facility.getName());
+    assertThat(searchedFacilities, not(hasItem(facility1)));
+  }
+
+  @Test
+  public void shouldFindOnlyActiveFacilities() {
+    facility.setActive(false);
+    repository.save(facility);
+
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, null, Sets.newHashSet(), false, true);
+
+    List<Facility> searchedFacilities = repository
+        .search(searchParams, Sets.newHashSet(), null, pageableWithNullSort)
+        .getContent();
+
+    assertEquals(searchedFacilities.size(), 1);
+    assertEquals(searchedFacilities.get(0).getName(), facility1.getName());
+    assertThat(searchedFacilities, not(hasItem(facility)));
+  }
+
+  @Test
+  public void shouldFindOnlyNonActiveFacilities() {
+    facility.setActive(false);
+    repository.save(facility);
+
+    FacilityRepositoryCustom.SearchParams searchParams =
+        new TestSearchParams(null, null, null, Sets.newHashSet(), false, true);
+
+    List<Facility> searchedFacilities = repository
+        .search(searchParams, Sets.newHashSet(), null, pageableWithNullSort)
+        .getContent();
+
+    assertEquals(searchedFacilities.size(), 1);
+    assertEquals(searchedFacilities.get(0).getName(), facility1.getName());
+    assertThat(searchedFacilities, not(hasItem(facility)));
+  }
+
+  @Test
   public void shouldFindAndSortFacilityByFacilityName() {
     facility1.setName("Facility - z");
     facility.setName("Facility - A");
@@ -204,7 +261,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet());
+        new TestSearchParams(null, FACILITY_SEARCH_KEY, null, Sets.newHashSet(), false, null);
 
     List<Facility> searchedAndSortedFacility = repository
         .search(searchParams, Sets.newHashSet(), null, pageable)
@@ -226,7 +283,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility1);
 
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(null, null, facilityType.getCode(), Sets.newHashSet());
+        new TestSearchParams(null, null, facilityType.getCode(), Sets.newHashSet(), false, null);
 
     // when
     List<Facility> foundFacilities = repository
@@ -244,7 +301,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility2);
 
     FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(null, null, null,
-        Sets.newHashSet(facility1.getId(), facility2.getId()));
+        Sets.newHashSet(facility1.getId(), facility2.getId()), false, null);
 
     List<Facility> foundFacilties = repository
         .search(searchParams, null, null, pageable)
@@ -272,7 +329,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(newFacility);
 
     FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(
-        null, newFacility.getName(), null, Sets.newHashSet());
+        null, newFacility.getName(), null, Sets.newHashSet(), false, null);
 
     // when
     List<Facility> foundFacilities = repository
@@ -296,7 +353,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility1);
 
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(null, null, null, Sets.newHashSet());
+        new TestSearchParams(null, null, null, Sets.newHashSet(), false, null);
 
     // when
     List<Facility> foundFacilties = repository
@@ -319,7 +376,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility1);
 
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(null, null, null, Sets.newHashSet());
+        new TestSearchParams(null, null, null, Sets.newHashSet(), false, null);
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataRural);
@@ -339,7 +396,8 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     repository.save(facility);
 
     FacilityRepositoryCustom.SearchParams searchParams = new TestSearchParams(
-        facility.getCode(), facility.getName(), facilityType.getCode(), Sets.newHashSet());
+        facility.getCode(), facility.getName(), facilityType.getCode(), Sets.newHashSet(), false,
+        null);
 
     // when
     String extraDataJson = mapper.writeValueAsString(extraDataUrban);
@@ -474,7 +532,7 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   private void searchFacilityAndCheckResults(String code, String name, Facility facility,
                                              int expectedSize) {
     FacilityRepositoryCustom.SearchParams searchParams =
-        new TestSearchParams(code, name, null, Sets.newHashSet());
+        new TestSearchParams(code, name, null, Sets.newHashSet(), false, null);
     List<Facility> foundFacilities = repository
         .search(searchParams, null, null, pageable)
         .getContent();
@@ -498,18 +556,28 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
     private String name;
     private String facilityTypeCode;
     private Set<UUID> ids;
+    private Boolean excludeWardsServices;
+    private Boolean active;
 
     TestSearchParams() {
-      this(null, null, null, Collections.emptySet());
+      this(null, null, null, Collections.emptySet(), false, false);
     }
 
-    TestSearchParams(String code, String name, String facilityTypeCode, Set<UUID> ids) {
+    TestSearchParams(String code, String name, String facilityTypeCode, Set<UUID> ids,
+                     Boolean excludeWardsServices, Boolean active) {
       this.code = code;
       this.name = name;
       this.facilityTypeCode = facilityTypeCode;
       this.ids = Optional
           .ofNullable(ids)
           .orElse(Collections.emptySet());
+      this.excludeWardsServices = excludeWardsServices;
+      this.active = active;
     }
+
+    public Boolean isActive() {
+      return active;
+    }
+
   }
 }

@@ -149,6 +149,8 @@ public class FacilityController extends BaseController {
    * @param pageable A Pageable object that allows client to optionally add "page" (page number) and
    *                 "size" (page size) query parameters to the request.
    * @param active True if only active facilities should be returned.
+   * @param excludeWardsServices True if only facilities with type other than Ward/Service should
+   *                             be returned.
    * @return Facilities.
    */
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
@@ -156,13 +158,24 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<MinimalFacilityDto> getMinimalFacilities(
       @RequestParam(required = false) Boolean active,
+      @RequestParam(required = false) Boolean excludeWardsServices,
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_MINIMAL_FACILITIES");
     profiler.setLogger(XLOGGER);
 
     Page<Facility> facilities;
 
-    if (active != null) {
+    if (excludeWardsServices != null) {
+      profiler.start("FIND_BY_EXCLUDE_WARDS_SERVICES");
+      MultiValueMap<String, Object> requestParams = new LinkedMultiValueMap<>();
+      requestParams.add("excludeWardsServices", excludeWardsServices);
+      if (active != null) {
+        requestParams.add("active", active);
+      }
+
+      FacilitySearchParams params = new FacilitySearchParams(requestParams);
+      facilities = facilityService.searchFacilities(params, pageable);
+    } else if (active != null) {
       profiler.start("FIND_BY_ACTIVE");
       facilities = facilityRepository.findByActive(active, pageable);
     } else {

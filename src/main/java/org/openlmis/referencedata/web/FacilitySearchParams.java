@@ -41,9 +41,12 @@ public final class FacilitySearchParams implements FacilityRepositoryCustom.Sear
   private static final String ZONE_ID = "zoneId";
   private static final String RECURSE = "recurse";
   private static final String EXTRA_DATA = "extraData";
+  private static final String EXCLUDE_WARDS_SERVICES = "excludeWardsServices";
+  private static final String ACTIVE = "active";
 
   private static final List<String> ALL_PARAMETERS =
-      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA, ID);
+      asList(CODE, NAME, FACILITY_TYPE_CODE, ZONE_ID, RECURSE, EXTRA_DATA, ID,
+          EXCLUDE_WARDS_SERVICES, ACTIVE);
 
   private SearchParams queryParams;
 
@@ -133,13 +136,39 @@ public final class FacilitySearchParams implements FacilityRepositoryCustom.Sear
   /**
    * Gets {@link Set} of {@link UUID} for "id" key from params.
    *
-   * @return List of ids from params, empty if there is no "id" param
+   * @return Set of ids from params, empty if there is no "id" param
    */
   public Set<UUID> getIds() {
     if (!queryParams.containsKey(ID)) {
       return Collections.emptySet();
     }
     return queryParams.getUuids(ID);
+  }
+
+  /**
+   * Gets value for excludeWardsServices parameter.
+   * If param value has incorrect format {@link ValidationMessageException} will be thrown.
+   *
+   * @return Boolean value of excludeWardsServices flag or false if params doesn't contain the key.
+   */
+  public Boolean getExcludeWardsServices() {
+    if (!queryParams.containsKey(EXCLUDE_WARDS_SERVICES)) {
+      return false;
+    }
+    return queryParams.getBoolean(EXCLUDE_WARDS_SERVICES);
+  }
+
+  /**
+   * Gets value for active parameter.
+   * If param value has incorrect format {@link ValidationMessageException} will be thrown.
+   *
+   * @return Boolean value of active flag or null if params doesn't contain "active" key.
+   */
+  public Boolean isActive() {
+    if (!queryParams.containsKey(ACTIVE)) {
+      return null;
+    }
+    return queryParams.getBoolean(ACTIVE);
   }
 
   /**

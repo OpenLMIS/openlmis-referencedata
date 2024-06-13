@@ -40,6 +40,8 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityType, UUID
 
   boolean existsByCode(@Param("code") String code);
 
+  void deleteByCode(String code);
+
   @Query(value = "SELECT\n"
       + "    ft.*\n"
       + "FROM\n"
