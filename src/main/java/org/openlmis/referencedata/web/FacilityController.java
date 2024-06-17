@@ -142,9 +142,18 @@ public class FacilityController extends BaseController {
     if (newFacility.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
       XLOGGER.debug("Adding ward/service configuration");
       facilityService.addWardServiceConfiguration(newFacility);
+      // add main facility's type as valid source/destination for new ward/service facility
       validSourceDestinationService.addValidAssignments(
           facilityService.findMainFacilityForWardService(newFacility),
           newFacility.getId());
+      // add Ward/Service type as valid source/destination for new ward/service facility
+      validSourceDestinationService.addValidAssignments(
+          newFacility,
+          newFacility.getId());
+      // add Ward/Service type as valid source/destination for main facility
+      validSourceDestinationService.addValidAssignments(
+          newFacility,
+          facilityService.findMainFacilityForWardService(newFacility).getId());
     }
 
     profiler.start("SYNC_FHIR_RESOURCE");
