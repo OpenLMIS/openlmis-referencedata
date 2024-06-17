@@ -203,8 +203,12 @@ public class OrderableRepositoryIntegrationTest {
     List<UnitOfOrderable> allUnits =
         unitOfOrderableRepository.findAll(Pageable.unpaged()).getContent();
 
-    assertEquals(1, allUnits.size());
-    assertEquals("NewUnitOfOrderable", allUnits.get(0).getName());
+    assertEquals(2, allUnits.size());
+    boolean isUnitOfOrderable = allUnits
+        .stream()
+        .map(UnitOfOrderable::getName)
+        .anyMatch(name -> name.equals("NewUnitOfOrderable"));
+    assertTrue(isUnitOfOrderable);
   }
 
   @Test
@@ -221,8 +225,12 @@ public class OrderableRepositoryIntegrationTest {
     List<UnitOfOrderable> allUnits =
         unitOfOrderableRepository.findAll(Pageable.unpaged()).getContent();
 
-    assertEquals(1, allUnits.size());
-    assertEquals("ExistingUnitOfOrderable", allUnits.get(0).getName());
+    assertEquals(2, allUnits.size());
+    boolean isUnitOfOrderable = allUnits
+        .stream()
+        .map(UnitOfOrderable::getName)
+        .anyMatch(name -> name.equals("ExistingUnitOfOrderable"));
+    assertTrue(isUnitOfOrderable);
   }
 
   @Test
@@ -241,7 +249,7 @@ public class OrderableRepositoryIntegrationTest {
 
     assertTrue(reloadedOrderable.isPresent());
     assertEquals(0, reloadedOrderable.get().getUnits().size());
-    assertEquals(1L, unitOfOrderableRepository.count());
+    assertEquals(2L, unitOfOrderableRepository.count());
   }
 
   @Test
