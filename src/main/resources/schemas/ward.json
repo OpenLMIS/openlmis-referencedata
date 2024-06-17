@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "Ward",
+  "description": "A single ward",
+  "properties": {
+    "id": {
+      "type": "string",
+      "title": "id"
+    },
+    "code": {
+      "type": "string",
+      "title": "code"
+    },
+    "name": {
+      "type": "string",
+      "title": "name"
+    },
+    "description": {
+      "type": "string",
+      "title": "description"
+    },
+    "disabled": {
+      "type": "boolean",
+      "title": "disabled"
+    },
+    "facility": {
+      "type": "object",
+      "$ref": "facility.json"
+    }
+  },
+  "required": [
+    "code"
+  ]
+}
