@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.openlmis.referencedata.service.FacilityTypeService.WARD_SERVICE_TYPE_CODE;
+
 import com.vividsolutions.jts.geom.Polygon;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.stockmanagement.ValidSourceDestinationService;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.validate.FacilityValidator;
 import org.slf4j.ext.XLogger;
@@ -73,7 +76,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @NoArgsConstructor
 @Controller
-@Transactional
 @SuppressWarnings({"PMD.TooManyMethods"})
 public class FacilityController extends BaseController {
 
@@ -105,6 +107,9 @@ public class FacilityController extends BaseController {
   @Autowired
   private FacilityBuilder facilityBuilder;
 
+  @Autowired
+  private ValidSourceDestinationService validSourceDestinationService;
+
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
    *
@@ -134,6 +139,14 @@ public class FacilityController extends BaseController {
     newFacility = facilityRepository.save(newFacility);
     XLOGGER.debug("Created new facility with id: ", facilityDto.getId());
 
+    if (newFacility.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+      XLOGGER.debug("Adding ward/service configuration");
+      facilityService.addWardServiceConfiguration(newFacility);
+      validSourceDestinationService.addValidAssignments(
+          facilityService.findMainFacilityForWardService(newFacility),
+          newFacility.getId());
+    }
+
     profiler.start("SYNC_FHIR_RESOURCE");
     fhirClient.synchronizeFacility(newFacility);
 
@@ -156,6 +169,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/minimal", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<MinimalFacilityDto> getMinimalFacilities(
       @RequestParam(required = false) Boolean active,
       @RequestParam(required = false) Boolean excludeWardsServices,
@@ -199,6 +213,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/full", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<FacilityDto> getFullRepresentationFacilities(
           @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
     Profiler profiler = new Profiler("GET_FACILITIES");
@@ -229,6 +244,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public ResponseEntity<String> getFacilitiesAuditLog(
           @PathVariable("id") UUID id,
           @RequestParam(name = "author", required = false, defaultValue = "") String author,
@@ -266,6 +282,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public FacilityDto saveFacility(
       @RequestBody FacilityDto facilityDto,
       @PathVariable("id") UUID facilityId,
@@ -312,6 +329,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public FacilityDto getFacility(@PathVariable("id") UUID facilityId) {
     Profiler profiler = new Profiler("GET_FACILITY");
     profiler.setLogger(XLOGGER);
@@ -335,6 +353,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}/approvedProducts")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<ApprovedProductDto> getApprovedProducts(
       @PathVariable("id") UUID facilityId,
       @RequestParam(required = false, value = "programId") UUID programId,
@@ -370,6 +389,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/byBoundary", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<FacilityDto> findFacilitiesByBoundary(@RequestBody Polygon boundary, 
       Pageable pageable) {
     Profiler profiler = new Profiler("GET_FACILITIES_BY_BOUNDARY");
@@ -394,6 +414,7 @@ public class FacilityController extends BaseController {
    */
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Transactional
   public void deleteFacility(@PathVariable("id") UUID facilityId) {
     Profiler profiler = new Profiler("DELETE_FACILITY");
     profiler.setLogger(XLOGGER);
@@ -416,6 +437,7 @@ public class FacilityController extends BaseController {
   @GetMapping(value = RESOURCE_PATH)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<BasicFacilityDto> getFacilities(
       @RequestParam MultiValueMap<String, Object> requestParams, Pageable pageable) {
     Profiler profiler = new Profiler("GET_FACILITIES");
@@ -445,6 +467,7 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/search", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
+  @Transactional
   public Page<BasicFacilityDto> searchFacilities(@RequestBody Map<String, Object> queryParams,
                                                  Pageable pageable) {
     XLOGGER.entry(queryParams);

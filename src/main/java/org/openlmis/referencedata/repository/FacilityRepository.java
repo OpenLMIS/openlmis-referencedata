@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.NamedResource;
 import org.openlmis.referencedata.repository.custom.FacilityRepositoryCustom;
 import org.springframework.data.domain.Page;
@@ -51,6 +52,8 @@ public interface FacilityRepository
   boolean existsByCode(String code);
 
   Page<Facility> findByActive(Boolean active, Pageable pageable);
+
+  List<Facility> findByGeographicZone(GeographicZone geographicZone);
 
   @Query(value = "SELECT\n"
       + "    f.*\n"

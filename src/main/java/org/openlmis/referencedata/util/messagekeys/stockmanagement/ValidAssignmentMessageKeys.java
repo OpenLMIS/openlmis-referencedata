@@ -13,36 +13,15 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.domain;
+package org.openlmis.referencedata.util.messagekeys.stockmanagement;
 
-import java.io.Serializable;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import org.openlmis.referencedata.util.messagekeys.MessageKeys;
 
-@Embeddable
-@AllArgsConstructor
-@EqualsAndHashCode
-public class SupportedProgramPrimaryKey implements Serializable {
+public class ValidAssignmentMessageKeys extends MessageKeys {
 
-  @ManyToOne
-  @JoinColumn(name = "facilityId", nullable = false)
-  @Getter
-  @Setter
-  private Facility facility;
+  private static final String ERROR = join(SERVICE_ERROR, VALID_ASSIGNMENT);
 
-  @ManyToOne
-  @JoinColumn(name = "programId", nullable = false)
-  @Getter
-  private final Program program;
+  public static final String ERROR_COULD_NOT_CREATE_ASSIGNMENT =
+      join(ERROR, "couldNotCreateAssignment");
 
-  // Default constructor needed by hibernate
-  private SupportedProgramPrimaryKey() {
-    facility = null;
-    program = null;
-  }
 }

@@ -32,4 +32,7 @@ public abstract class FacilityMessageKeys extends MessageKeys {
       join(ERROR, EXTRA_DATA, UNALLOWED_KEY);
   public static final String ERROR_EXTRA_DATA_MODIFIED_KEY = join(ERROR, EXTRA_DATA, MODIFIED_KEY);
   public static final String ERROR_FIELD_IS_INVARIANT = join(ERROR, FIELD_IS_INVARIANT);
+  public static final String ERROR_SHOULD_BE_ONE_NON_WARD_SERVICE_FACILITY =
+      join(ERROR, "shouldBeOneNonWardServiceFacility");
+
 }

@@ -31,6 +31,7 @@ import org.springframework.util.MultiValueMap;
 @Service
 public class FacilityTypeService {
 
+  public static final String WARD_SERVICE_TYPE_CODE = "WS";
   protected static final String ACTIVE = "active";
 
   @Autowired
