@@ -21,10 +21,12 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
@@ -37,6 +39,7 @@ public final class SupportedProgram {
 
   @EmbeddedId
   @Getter
+  @Setter
   private SupportedProgramPrimaryKey facilityProgram;
 
   @Column(nullable = false)
@@ -47,6 +50,7 @@ public final class SupportedProgram {
   @Getter
   private Boolean locallyFulfilled;
 
+  @Getter
   @SuppressWarnings("squid:S3437")
   // https://github.com/jhipster/generator-jhipster/issues/4553
   private LocalDate startDate;

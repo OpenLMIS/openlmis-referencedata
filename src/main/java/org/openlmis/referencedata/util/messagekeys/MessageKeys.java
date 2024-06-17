@@ -128,6 +128,7 @@ public abstract class MessageKeys {
   protected static final String EXTENSION = "extension";
   protected static final String TOO = "too";
   protected static final String LARGE = "large";
+  protected static final String VALID_ASSIGNMENT = "validAssignment";
 
   // Common to subclasses
   protected static final String EMAIL = "email";

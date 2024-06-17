@@ -13,36 +13,18 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.domain;
+package org.openlmis.referencedata.service.stockmanagement;
 
-import java.io.Serializable;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
-@Embeddable
-@AllArgsConstructor
-@EqualsAndHashCode
-public class SupportedProgramPrimaryKey implements Serializable {
+@Getter
+@Setter
+public class Node {
 
-  @ManyToOne
-  @JoinColumn(name = "facilityId", nullable = false)
-  @Getter
-  @Setter
-  private Facility facility;
+  private UUID id;
+  private UUID referenceId;
+  private boolean isRefDataFacility;
 
-  @ManyToOne
-  @JoinColumn(name = "programId", nullable = false)
-  @Getter
-  private final Program program;
-
-  // Default constructor needed by hibernate
-  private SupportedProgramPrimaryKey() {
-    facility = null;
-    program = null;
-  }
 }
