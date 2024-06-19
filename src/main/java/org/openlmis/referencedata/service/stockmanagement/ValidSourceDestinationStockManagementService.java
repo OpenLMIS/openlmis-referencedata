@@ -59,7 +59,10 @@ public class ValidSourceDestinationStockManagementService {
       );
     } catch (HttpStatusCodeException ex) {
       throw new ValidationMessageException(
-          ValidAssignmentMessageKeys.ERROR_COULD_NOT_CREATE_ASSIGNMENT, ex);
+          ValidAssignmentMessageKeys.ERROR_COULD_NOT_CREATE_ASSIGNMENT,
+          assignmentDto.getProgramId(),
+          assignmentDto.getFacilityTypeId(),
+          assignmentDto.getNode().getReferenceId(), ex);
     }
   }
 
