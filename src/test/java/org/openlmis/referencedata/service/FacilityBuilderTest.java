@@ -34,6 +34,7 @@ import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
@@ -45,11 +46,13 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
+import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.messagekeys.FacilityOperatorMessageKeys;
@@ -80,6 +83,9 @@ public class FacilityBuilderTest {
   @Mock
   private FacilityRepository facilityRepository;
 
+  @Mock
+  private GeographicLevelRepository geographicLevelRepository;
+
   @InjectMocks
   private FacilityBuilder builder;
 
@@ -93,6 +99,7 @@ public class FacilityBuilderTest {
       .withOperator(facilityOperator)
       .withSupportedProgram(program)
       .build();
+  private GeographicLevel geographicLevel = new GeographicLevelDataBuilder().build();
 
   private FacilityDto importer = new FacilityDto();
 
@@ -111,6 +118,8 @@ public class FacilityBuilderTest {
         .thenReturn(program);
     when(programRepository.findById(program.getId()))
         .thenReturn(Optional.of(program));
+    when(geographicLevelRepository.findFirstByOrderByLevelNumberDesc())
+        .thenReturn(geographicLevel);
   }
 
   @Test
@@ -120,7 +129,7 @@ public class FacilityBuilderTest {
     assertThat(built)
         .isEqualToIgnoringGivenFields(importer,
             "geographicZone", "type", "operator", "supportedPrograms")
-        .hasFieldOrPropertyWithValue("geographicZone", geographicZone)
+        .hasFieldOrPropertyWithValue("geographicZone.level", geographicLevel)
         .hasFieldOrPropertyWithValue("type", facilityType)
         .hasFieldOrPropertyWithValue("operator", facilityOperator);
 

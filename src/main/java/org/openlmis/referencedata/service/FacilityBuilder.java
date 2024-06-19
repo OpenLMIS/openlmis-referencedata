@@ -17,10 +17,12 @@ package org.openlmis.referencedata.service;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
@@ -31,6 +33,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.util.messagekeys.FacilityOperatorMessageKeys;
@@ -58,11 +61,14 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
   @Autowired
   private FacilityRepository facilityRepository;
 
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
+
   /**
    * Creates new {@link Facility} based on data from importer.
    */
   public Facility build(FacilityDto importer) {
-    final GeographicZone geographicZone = findResource(
+    GeographicZone geographicZone = findResource(
         geographicZoneRepository::findById, importer.getGeographicZone(),
         GeographicZoneMessageKeys.ERROR_NOT_FOUND);
     final FacilityType facilityType = findResource(
@@ -77,6 +83,18 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
 
     if (null == importer.getId()) {
       facility = new Facility();
+
+      GeographicZone localZone = new GeographicZone();
+      localZone.setParent(geographicZone);
+      localZone.setName(importer.getName());
+      localZone.setCode("gz-" + importer.getCode());
+
+      GeographicLevel geographicLevel =
+          geographicLevelRepository.findFirstByOrderByLevelNumberDesc();
+      localZone.setLevel(geographicLevel);
+      geographicZoneRepository.save(localZone);
+
+      geographicZone = localZone;
     } else {
       facility = facilityRepository.findById(importer.getId()).orElse(null);
 

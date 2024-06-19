@@ -26,6 +26,8 @@ public interface GeographicLevelRepository
 
   GeographicLevel findByLevelNumber(Integer levelNumber);
 
+  GeographicLevel findFirstByOrderByLevelNumberDesc();
+
   @Query(value = "SELECT\n"
       + "    gl.*\n"
       + "FROM\n"
