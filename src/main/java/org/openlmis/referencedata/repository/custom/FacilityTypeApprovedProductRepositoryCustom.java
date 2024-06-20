@@ -27,7 +27,7 @@ public interface FacilityTypeApprovedProductRepositoryCustom {
 
   Page<FacilityTypeApprovedProduct> searchProducts(
       UUID facilityId,
-      UUID program,
+      Set<UUID> program,
       Boolean fullSupply,
       List<UUID> orderableIds,
       Boolean active,

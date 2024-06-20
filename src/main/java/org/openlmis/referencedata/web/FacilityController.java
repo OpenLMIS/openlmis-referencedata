@@ -15,10 +15,10 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.service.FacilityTypeService.WARD_SERVICE_TYPE_CODE;
 
 import com.vividsolutions.jts.geom.Polygon;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -377,10 +376,16 @@ public class FacilityController extends BaseController {
     profiler.setLogger(XLOGGER);
 
     profiler.start("FIND_APPROVED_PRODUCTS");
-    Page<FacilityTypeApprovedProduct> products = facilityTypeApprovedProductRepository
-        .searchProducts(facilityId, programId, fullSupply, orderablesId, active, orderableCode,
-            orderableName, pageable
-        );
+    Page<FacilityTypeApprovedProduct> products =
+        facilityTypeApprovedProductRepository.searchProducts(
+            facilityId,
+            singleton(programId),
+            fullSupply,
+            orderablesId,
+            active,
+            orderableCode,
+            orderableName,
+            pageable);
 
     Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
 
