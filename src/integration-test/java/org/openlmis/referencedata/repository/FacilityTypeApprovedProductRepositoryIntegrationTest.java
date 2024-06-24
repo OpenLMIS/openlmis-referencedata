@@ -47,7 +47,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -250,7 +249,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(10.00, ftap.getMaxPeriodsOfStock(), MAX_PERIODS_OF_STOCK_DELTA);
   }
 
-  @Ignore
   @Test
   public void shouldGetFullAndNonFullSupply() {
     saveAndGetProduct(facilityType1, true);
@@ -274,7 +272,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertThat(page.getContent(), hasSize(2));
   }
 
-  @Ignore
   @Test
   public void shouldGetFullAndNonFullSupplyFilteredByOrderableIds() {
     saveAndGetProduct(facilityType1, true);
@@ -301,7 +298,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertEquals(page.getContent().get(1).getOrderableId(), orderableNonFullSupply.getId());
   }
 
-  @Ignore
   @Test
   public void shouldPaginate() {
     saveAndGetProduct(facilityType1, true);
@@ -327,7 +323,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
         hasSize(1));
   }
 
-  @Ignore
   @Test
   public void shouldGetFullSupply() {
     saveAndGetProduct(facilityType1, true);
@@ -364,7 +359,6 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     assertTrue(programOrderable.isActive());
   }
 
-  @Ignore
   @Test
   public void shouldGetNonFullSupply() {
     // Create a full supply product

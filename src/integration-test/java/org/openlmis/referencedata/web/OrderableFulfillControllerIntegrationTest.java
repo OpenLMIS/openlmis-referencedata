@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
 import org.openlmis.referencedata.domain.Orderable;
@@ -53,6 +52,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   private Orderable orderable = new OrderableDataBuilder().build();
   private UUID facilityId = UUID.randomUUID();
   private UUID programId = UUID.randomUUID();
+
 
   private UUID tradeItemOrderableId = UUID.randomUUID();
   private UUID commodityTypeOrderableId = UUID.randomUUID();
@@ -121,7 +121,6 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     verify(orderableRepository, times(0)).findAllLatest(any());
   }
 
-  @Ignore
   @Test
   public void shouldCreateResourceBasingOnFacilityIdAndProgramIdParams() {
     orderable.setId(commodityTypeOrderableId);

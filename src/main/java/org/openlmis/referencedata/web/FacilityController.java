@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.service.FacilityTypeService.WARD_SERVICE_TYPE_CODE;
 
 import com.vividsolutions.jts.geom.Polygon;
@@ -353,7 +352,7 @@ public class FacilityController extends BaseController {
    * Returns full or non-full supply approved products for the given facility.
    *
    * @param facilityId ID of the facility
-   * @param programId  ID of the program
+   * @param programsIds  Set of IDs of the programs
    * @param fullSupply true to retrieve full-supply products, false to retrieve non-full supply
    *                   products
    * @return collection of approved products
@@ -364,7 +363,7 @@ public class FacilityController extends BaseController {
   @Transactional
   public Page<ApprovedProductDto> getApprovedProducts(
       @PathVariable("id") UUID facilityId,
-      @RequestParam(required = false, value = "programId") UUID programId,
+      @RequestParam(required = false, value = "programId") Set<UUID> programsIds,
       @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
       @RequestParam(required = false, value = "orderableId") List<UUID> orderablesId,
       @RequestParam(required = false, value = "active") Boolean active,
@@ -379,7 +378,7 @@ public class FacilityController extends BaseController {
     Page<FacilityTypeApprovedProduct> products =
         facilityTypeApprovedProductRepository.searchProducts(
             facilityId,
-            singleton(programId),
+            programsIds,
             fullSupply,
             orderablesId,
             active,

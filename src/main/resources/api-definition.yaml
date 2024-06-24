@@ -2057,7 +2057,7 @@ resourceTypes:
                       displayName: Program ID
                       type: string
                       required: false
-                      repeat: false
+                      repeat: true
                   fullSupply:
                       displayName: Full-supply orderable
                       type: boolean
