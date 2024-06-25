@@ -15,17 +15,22 @@
 
 package org.openlmis.referencedata.web;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
+import java.util.Set;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.springframework.util.LinkedMultiValueMap;
 
 public class QueryOrderableSearchParamsTest {
 
   private static final String VALUE = "test";
+  private static final String ANOTHER_VALUE = "anotherTest";
 
   @Test
   public void getCodeShouldReturnValueForKeyCode() {
@@ -71,7 +76,7 @@ public class QueryOrderableSearchParamsTest {
   }
 
   @Test
-  public void getNameShouldReturnEmptyStringIfValueForRequestParamIsNull() {
+  public void getNameShouldReturnEmptyStringIfValueForRequestParameterIsNull() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     queryMap.add("name", null);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
@@ -81,16 +86,19 @@ public class QueryOrderableSearchParamsTest {
 
 
   @Test
-  public void getProgramCodeShouldReturnValueForKeyProgram() {
+  public void getProgramCodesShouldReturnValueForKeyProgramCodes() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("program", VALUE);
+    Set<String> programCodes = new HashSet<>();
+    programCodes.add(VALUE);
+    programCodes.add(ANOTHER_VALUE);
+    queryMap.add("programCodes", programCodes);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
-    assertEquals(VALUE, searchParams.getProgramCodes());
+    assertEquals(programCodes, searchParams.getProgramCodes());
   }
 
   @Test
-  public void getProgramShouldReturnNullIfMapDoesNotContainKeyProgram() {
+  public void getProgramCodesShouldReturnNullIfMapDoesNotContainKeyProgramCodes() {
     QueryOrderableSearchParams searchParams =
         new QueryOrderableSearchParams(new LinkedMultiValueMap<>());
 
@@ -98,12 +106,20 @@ public class QueryOrderableSearchParamsTest {
   }
 
   @Test
-  public void getProgramShouldReturnEmptyStringIfValueForRequestParamIsNull() {
+  public void getProgramCodesShouldReturnEmptyStringForEachBlankProgramCodeRequestParameter() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("program", null);
+    Set<String> programCodes = new HashSet<>();
+    programCodes.add(null);
+    programCodes.add("");
+    programCodes.add(" ");
+    programCodes.add(VALUE);
+    programCodes.add(ANOTHER_VALUE);
+    queryMap.add("programCodes", programCodes);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
-    assertEquals("", searchParams.getProgramCodes());
+    MatcherAssert.assertThat(
+        searchParams.getProgramCodes(), hasItems("", "", "", VALUE, ANOTHER_VALUE)
+    );
   }
 
   @Test

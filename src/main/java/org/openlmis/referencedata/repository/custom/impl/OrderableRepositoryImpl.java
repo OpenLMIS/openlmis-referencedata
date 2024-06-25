@@ -195,7 +195,8 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   @Override
   <E> TypedQuery<E> prepareQuery(SearchParams searchParams, CriteriaQuery<E> query,
-                                 boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
+                                 boolean count, Collection<VersionIdentity> identities,
+                                 Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
@@ -231,7 +232,8 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   }
 
   private <E> Predicate prepareParams(Root<Orderable> root, CriteriaQuery<E> query,
-                                      SearchParams searchParams, Collection<VersionIdentity> identities) {
+                                      SearchParams searchParams,
+                                      Collection<VersionIdentity> identities) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Predicate where = builder.conjunction();
 
@@ -349,9 +351,9 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     StringJoiner joiner = new StringJoiner(", ");
     for (String programCode : programCodesLowerCase) {
       StringBuilder builder = new StringBuilder();
-      builder.append("'");
+      builder.append('\'');
       builder.append(programCode);
-      builder.append("'");
+      builder.append('\'');
       joiner.add(builder.toString());
     }
     return joiner.toString();

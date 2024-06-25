@@ -21,7 +21,6 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -93,13 +92,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   /**
    * Gets program codes.
    *
-   * @return {@link Code} value of program codes or null if params doesn't contain "programCodes"
-   * param. Empty Code for request param that has no value.
+   * @return {@link Code} values of program codes or null if params doesn't contain
+   *         "programCodes" param. Empty code for each program code request param that has no value.
    */
   @Override
   public Set<String> getProgramCodes() {
     if (!queryParams.containsKey(PROGRAM_CODES)) {
-      return new HashSet<>();
+      return null;
     }
 
     return queryParams.getStrings(PROGRAM_CODES).stream()
