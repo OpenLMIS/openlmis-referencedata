@@ -16,12 +16,10 @@
 package org.openlmis.referencedata.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -74,5 +72,10 @@ public final class OrderableSearchParams
   @Override
   public boolean getIncludeQuarantined() {
     return includeQuarantined;
+  }
+
+  @Override
+  public Set<String> getProgramCodes() {
+    return Collections.singleton(programCode);
   }
 }

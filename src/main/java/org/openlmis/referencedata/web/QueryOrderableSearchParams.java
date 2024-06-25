@@ -21,9 +21,11 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.ToString;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,13 +41,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
 
   private static final String CODE = "code";
   private static final String NAME = "name";
-  private static final String PROGRAM_CODE = "program";
+  private static final String PROGRAM_CODES = "programCodes";
   private static final String TRADE_ITEM_ID = "tradeItemId";
   private static final String ID = "id";
   private static final String INCLUDE_QUARANTINED = "includeQuarantined";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID, INCLUDE_QUARANTINED));
+      ID, CODE, NAME, PROGRAM_CODES, TRADE_ITEM_ID, INCLUDE_QUARANTINED));
 
   private final SearchParams queryParams;
 
@@ -89,18 +91,20 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   }
 
   /**
-   * Gets program code.
+   * Gets program codes.
    *
-   * @return {@link Code} value of program code or null if params doesn't contain "programCode"
-   *                      param. Empty Code for request param that has no value.
+   * @return {@link Code} value of program codes or null if params doesn't contain "programCodes"
+   * param. Empty Code for request param that has no value.
    */
   @Override
-  public String getProgramCode() {
-    if (!queryParams.containsKey(PROGRAM_CODE)) {
-      return null;
+  public Set<String> getProgramCodes() {
+    if (!queryParams.containsKey(PROGRAM_CODES)) {
+      return new HashSet<>();
     }
 
-    return defaultIfBlank(queryParams.getFirst(PROGRAM_CODE), EMPTY);
+    return queryParams.getStrings(PROGRAM_CODES).stream()
+        .map(programCode -> defaultIfBlank(programCode, EMPTY))
+        .collect(Collectors.toSet());
   }
 
   @Override

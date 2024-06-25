@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
@@ -379,7 +378,7 @@ public class OrderableController extends BaseController {
     }
     queryMap.add("name", searchParams.getName());
     queryMap.add("code", searchParams.getCode());
-    queryMap.add("program", searchParams.getProgramCode());
+    queryMap.add("programCodes", searchParams.getProgramCodes());
 
     return new QueryOrderableSearchParams(queryMap);
   }

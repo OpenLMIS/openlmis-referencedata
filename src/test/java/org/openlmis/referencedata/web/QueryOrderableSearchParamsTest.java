@@ -79,13 +79,14 @@ public class QueryOrderableSearchParamsTest {
     assertEquals("", searchParams.getName());
   }
 
+
   @Test
   public void getProgramCodeShouldReturnValueForKeyProgram() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
     queryMap.add("program", VALUE);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
-    assertEquals(VALUE, searchParams.getProgramCode());
+    assertEquals(VALUE, searchParams.getProgramCodes());
   }
 
   @Test
@@ -93,7 +94,7 @@ public class QueryOrderableSearchParamsTest {
     QueryOrderableSearchParams searchParams =
         new QueryOrderableSearchParams(new LinkedMultiValueMap<>());
 
-    assertNull(searchParams.getProgramCode());
+    assertNull(searchParams.getProgramCodes());
   }
 
   @Test
@@ -102,7 +103,7 @@ public class QueryOrderableSearchParamsTest {
     queryMap.add("program", null);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
-    assertEquals("", searchParams.getProgramCode());
+    assertEquals("", searchParams.getProgramCodes());
   }
 
   @Test

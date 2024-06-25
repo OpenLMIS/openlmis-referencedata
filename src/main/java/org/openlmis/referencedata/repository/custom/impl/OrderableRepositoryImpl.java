@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
@@ -46,6 +47,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
@@ -148,7 +150,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
     if (total < 1) {
       profiler.stop().log();
-      return Pagination.getPage(Collections.emptyList(), pageable,0);
+      return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
     profiler.start("GET_VERSION_IDENTITY");
@@ -193,7 +195,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   @Override
   <E> TypedQuery<E> prepareQuery(SearchParams searchParams, CriteriaQuery<E> query,
-      boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
+                                 boolean count, Collection<VersionIdentity> identities, Pageable pageable) {
 
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Orderable> root = query.from(Orderable.class);
@@ -229,16 +231,21 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   }
 
   private <E> Predicate prepareParams(Root<Orderable> root, CriteriaQuery<E> query,
-      SearchParams searchParams, Collection<VersionIdentity> identities) {
+                                      SearchParams searchParams, Collection<VersionIdentity> identities) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Predicate where = builder.conjunction();
 
     if (null != searchParams) {
-      if (null != searchParams.getProgramCode()) {
+      Set<String> programCodes = searchParams.getProgramCodes();
+      Set<Code> programCodesLowerCase = getProgramCodesLowerCase(searchParams)
+          .stream()
+          .map(Code::code)
+          .collect(Collectors.toSet());
+      if (null != programCodes) {
         Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
         Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
-        where = builder.and(where, builder.equal(builder.lower(programJoin.get(CODE).get(CODE)),
-            searchParams.getProgramCode().toLowerCase()));
+        where = builder.and(where, builder.lower(programJoin.get(CODE).get(CODE))
+            .in(programCodesLowerCase));
       }
 
       if (isEmpty(identities)) {
@@ -253,6 +260,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
           where = builder.and(where, builder.equal(root.get(QUARANTINED), false));
         }
       } else {
+
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
 
@@ -278,6 +286,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     return where;
   }
 
+  private Set<String> getProgramCodesLowerCase(SearchParams searchParams) {
+    return searchParams.getProgramCodes().stream()
+        .map(String::toLowerCase)
+        .collect(Collectors.toSet());
+  }
+
   private Subquery<String> createSubQuery(CriteriaQuery query, CriteriaBuilder builder) {
     Subquery<String> latestOrderablesQuery = query.subquery(String.class);
     Root<Orderable> latestOrderablesRoot = latestOrderablesQuery.from(Orderable.class);
@@ -299,10 +313,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     String queryCondition;
 
     if (null != searchParams) {
-      if (null != searchParams.getProgramCode()) {
+      if (null != searchParams.getProgramCodes()) {
         builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN + NATIVE_PROGRAM_INNER_JOIN);
-        queryCondition = "LOWER (p.code) LIKE '%"
-            + searchParams.getProgramCode().toLowerCase() + "%'";
+        Set<String> programCodesLowerCase = getProgramCodesLowerCase(searchParams);
+        queryCondition = "LOWER (p.code) IN ("
+            + generateProgramCodesText(programCodesLowerCase) + ")";
         wheres.add(queryCondition);
       }
 
@@ -330,6 +345,18 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     return entityManager.createNativeQuery(builder.toString());
   }
 
+  private String generateProgramCodesText(Set<String> programCodesLowerCase) {
+    StringJoiner joiner = new StringJoiner(", ");
+    for (String programCode : programCodesLowerCase) {
+      StringBuilder builder = new StringBuilder();
+      builder.append("'");
+      builder.append(programCode);
+      builder.append("'");
+      joiner.add(builder.toString());
+    }
+    return joiner.toString();
+  }
+
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
     CriteriaQuery<Orderable> criteriaQuery =
@@ -355,6 +382,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   /**
    * Returns identity pairs which correspond to supplied trade item ids.
+   *
    * @param tradeItemId Ids of trade items
    * @return Identity pairs matching supplied trade item ids
    */
