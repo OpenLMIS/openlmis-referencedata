@@ -351,9 +351,10 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     StringJoiner joiner = new StringJoiner(", ");
     for (String programCode : programCodesLowerCase) {
       StringBuilder builder = new StringBuilder();
-      builder.append('\'');
-      builder.append(programCode);
-      builder.append('\'');
+      builder
+          .append('\'')
+          .append(programCode)
+          .append('\'');
       joiner.add(builder.toString());
     }
     return joiner.toString();

@@ -774,7 +774,7 @@ resourceTypes:
                   displayName: program code
                   type: string
                   required: false
-                  repeat: false
+                  repeat: true
           responses:
               "200":
                   headers:

@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.ToString;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,13 +39,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
 
   private static final String CODE = "code";
   private static final String NAME = "name";
-  private static final String PROGRAM_CODES = "programCodes";
+  private static final String PROGRAM_CODE = "program";
   private static final String TRADE_ITEM_ID = "tradeItemId";
   private static final String ID = "id";
   private static final String INCLUDE_QUARANTINED = "includeQuarantined";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, CODE, NAME, PROGRAM_CODES, TRADE_ITEM_ID, INCLUDE_QUARANTINED));
+      ID, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID, INCLUDE_QUARANTINED));
 
   private final SearchParams queryParams;
 
@@ -92,18 +91,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   /**
    * Gets program codes.
    *
-   * @return {@link Code} values of program codes or null if params doesn't contain
-   *         "programCodes" param. Empty code for each program code request param that has no value.
+   * @return {@link Code} values of program codes or empty collection if params doesn't contain
+   *         "programCodes" param. No program code is included if a program code
+   *         in request param is blank.
    */
   @Override
   public Set<String> getProgramCodes() {
-    if (!queryParams.containsKey(PROGRAM_CODES)) {
-      return null;
-    }
-
-    return queryParams.getStrings(PROGRAM_CODES).stream()
-        .map(programCode -> defaultIfBlank(programCode, EMPTY))
-        .collect(Collectors.toSet());
+    return queryParams.getStrings(PROGRAM_CODE);
   }
 
   @Override

@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -29,13 +30,17 @@ import org.springframework.util.LinkedMultiValueMap;
 
 public class QueryOrderableSearchParamsTest {
 
+  private static final String CODE = "code";
+  private static final String NAME = "name";
+  private static final String PROGRAM = "program";
+
   private static final String VALUE = "test";
   private static final String ANOTHER_VALUE = "anotherTest";
 
   @Test
   public void getCodeShouldReturnValueForKeyCode() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("code", VALUE);
+    queryMap.add(CODE, VALUE);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals(VALUE, searchParams.getCode());
@@ -52,7 +57,7 @@ public class QueryOrderableSearchParamsTest {
   @Test
   public void getCodeShouldReturnEmptyStringIfValueForRequestParamIsNull() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("code", null);
+    queryMap.add(CODE, null);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals("", searchParams.getCode());
@@ -61,7 +66,7 @@ public class QueryOrderableSearchParamsTest {
   @Test
   public void getNameShouldReturnValueForKeyName() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("name", VALUE);
+    queryMap.add(NAME, VALUE);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals(VALUE, searchParams.getName());
@@ -78,7 +83,7 @@ public class QueryOrderableSearchParamsTest {
   @Test
   public void getNameShouldReturnEmptyStringIfValueForRequestParameterIsNull() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    queryMap.add("name", null);
+    queryMap.add(NAME, null);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals("", searchParams.getName());
@@ -86,40 +91,38 @@ public class QueryOrderableSearchParamsTest {
 
 
   @Test
-  public void getProgramCodesShouldReturnValueForKeyProgramCodes() {
+  public void getProgramCodesShouldReturnValueForKeyProgram() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    queryMap.add(PROGRAM, VALUE);
+    queryMap.add(PROGRAM, ANOTHER_VALUE);
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
+
     Set<String> programCodes = new HashSet<>();
     programCodes.add(VALUE);
     programCodes.add(ANOTHER_VALUE);
-    queryMap.add("programCodes", programCodes);
-    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals(programCodes, searchParams.getProgramCodes());
   }
 
   @Test
-  public void getProgramCodesShouldReturnNullIfMapDoesNotContainKeyProgramCodes() {
+  public void getProgramCodesShouldReturnEmptyCollectionIfMapDoesNotContainKeyProgram() {
     QueryOrderableSearchParams searchParams =
         new QueryOrderableSearchParams(new LinkedMultiValueMap<>());
 
-    assertNull(searchParams.getProgramCodes());
+    MatcherAssert.assertThat(searchParams.getProgramCodes(), hasSize(0));
   }
 
   @Test
-  public void getProgramCodesShouldReturnEmptyStringForEachBlankProgramCodeRequestParameter() {
+  public void getProgramCodesShouldReturnOnlyNotBlankProgramCodeRequestParameters() {
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
-    Set<String> programCodes = new HashSet<>();
-    programCodes.add(null);
-    programCodes.add("");
-    programCodes.add(" ");
-    programCodes.add(VALUE);
-    programCodes.add(ANOTHER_VALUE);
-    queryMap.add("programCodes", programCodes);
+    queryMap.add(PROGRAM, null);
+    queryMap.add(PROGRAM, "");
+    queryMap.add(PROGRAM, " ");
+    queryMap.add(PROGRAM, VALUE);
+    queryMap.add(PROGRAM, ANOTHER_VALUE);
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
-    MatcherAssert.assertThat(
-        searchParams.getProgramCodes(), hasItems("", "", "", VALUE, ANOTHER_VALUE)
-    );
+    MatcherAssert.assertThat(searchParams.getProgramCodes(), hasItems(VALUE, ANOTHER_VALUE));
   }
 
   @Test
