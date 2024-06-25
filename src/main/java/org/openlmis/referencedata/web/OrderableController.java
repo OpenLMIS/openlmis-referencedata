@@ -71,6 +71,9 @@ public class OrderableController extends BaseController {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
   public static final String RESOURCE_PATH = "/orderables";
+  private static final String NAME = "name";
+  private static final String CODE = "code";
+  private static final String PROGRAM_CODE = "program";
 
   @Autowired
   private OrderableRepository repository;
@@ -376,9 +379,12 @@ public class OrderableController extends BaseController {
         queryMap.add("id", id.toString());
       }
     }
-    queryMap.add("name", searchParams.getName());
-    queryMap.add("code", searchParams.getCode());
-    queryMap.add("programCodes", searchParams.getProgramCodes());
+    queryMap.add(NAME, searchParams.getName());
+    queryMap.add(CODE, searchParams.getCode());
+    Set<String> programCodes = searchParams.getProgramCodes();
+    for (String programCode : programCodes) {
+      queryMap.add(PROGRAM_CODE, programCode);
+    }
 
     return new QueryOrderableSearchParams(queryMap);
   }

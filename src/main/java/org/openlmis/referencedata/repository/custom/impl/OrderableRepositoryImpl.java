@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -47,7 +48,6 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.jpa.QueryHints;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
@@ -239,15 +239,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
     if (null != searchParams) {
       Set<String> programCodes = searchParams.getProgramCodes();
-      Set<Code> programCodesLowerCase = getProgramCodesLowerCase(searchParams)
-          .stream()
-          .map(Code::code)
-          .collect(Collectors.toSet());
       if (null != programCodes) {
         Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
         Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
         where = builder.and(where, builder.lower(programJoin.get(CODE).get(CODE))
-            .in(programCodesLowerCase));
+            .in(getProgramCodesLowerCase(searchParams)));
       }
 
       if (isEmpty(identities)) {
@@ -290,6 +286,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   private Set<String> getProgramCodesLowerCase(SearchParams searchParams) {
     return searchParams.getProgramCodes().stream()
+        .filter(Objects::nonNull)
         .map(String::toLowerCase)
         .collect(Collectors.toSet());
   }
