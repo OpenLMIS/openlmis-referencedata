@@ -33,7 +33,6 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PRODUCT_CODE_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 import static org.openlmis.referencedata.web.BaseController.RFC_7231_FORMAT;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
@@ -105,7 +104,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String UNIT = "unit";
   private static final String NAME = "name";
   private static final String CODE = "code";
-  private static final String PROGRAM_CODES = "programCodes";
+  private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
   private static final String VERSION_NAME = "versionNumber";
   private static final String GMT = "GMT";
@@ -573,7 +572,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldSearchOrderables() throws JsonProcessingException {
     final String code = "some-code";
     final String name = "some-name";
-    final String programCode = "program-code";
+    final String programCode1 = "program-code1";
+    final String programCode2 = "program-code2";
     final List<Orderable> items = Collections.singletonList(orderable);
 
     UUID orderableId2 = UUID.randomUUID();
@@ -591,7 +591,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .parameter(CODE, code)
         .parameter(NAME, name)
-        .parameter(PROGRAM_CODES, Collections.singleton(programCode))
+        .parameter(PROGRAM_CODE, programCode1)
+        .parameter(PROGRAM_CODE, programCode2)
         .parameter(ID, orderableId)
         .parameter(ID, orderableId2)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -610,8 +611,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     QueryOrderableSearchParams value = searchParamsArgumentCaptor.getValue();
     assertEquals(code, value.getCode());
     assertEquals(name, value.getName());
-    assertTrue("no such programCode: " + programCode,
-        value.getProgramCodes().contains(programCode));
+    Set<String> programCodes = new HashSet<>();
+    programCodes.add(programCode1);
+    programCodes.add(programCode2);
+    assertEquals(programCodes, value.getProgramCodes());
     assertEquals(new HashSet<>(Arrays.asList(orderableId, orderableId2)), value.getIds());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());

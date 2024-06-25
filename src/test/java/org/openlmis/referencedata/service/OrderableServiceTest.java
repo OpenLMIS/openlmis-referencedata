@@ -33,7 +33,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +61,7 @@ public class OrderableServiceTest {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
-  private static final String PROGRAM_CODES = "programCodes";
+  private static final String PROGRAM_CODE = "program";
   private static final String ID = "id";
   private static final String GMT = "GMT";
 
@@ -128,10 +127,8 @@ public class OrderableServiceTest {
   public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
     searchParams.add(CODE, "-1");
     searchParams.add(NAME, "-1");
-    Set<String> programCodes = new HashSet<>();
-    programCodes.add("programCode1");
-    programCodes.add("programCode2");
-    searchParams.add(PROGRAM_CODES, programCodes);
+    searchParams.add(PROGRAM_CODE, "programCode1");
+    searchParams.add(PROGRAM_CODE, "programCode2");
     orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
   }
 
@@ -199,12 +196,8 @@ public class OrderableServiceTest {
 
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
-
-    Set<String> programCodes = new HashSet<>();
-    programCodes.add(programCode);
-    programCodes.add(programCode2);
-
-    searchParams.add(PROGRAM_CODES, programCodes);
+    searchParams.add(PROGRAM_CODE, programCode);
+    searchParams.add(PROGRAM_CODE, programCode2);
 
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
@@ -286,10 +279,8 @@ public class OrderableServiceTest {
 
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
-    Set<String> programCodes = new HashSet<>();
-    programCodes.add(programCode);
-    programCodes.add(programCode2);
-    searchParams.add(PROGRAM_CODES, programCodes);
+    searchParams.add(PROGRAM_CODE, programCode);
+    searchParams.add(PROGRAM_CODE, programCode2);
 
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
