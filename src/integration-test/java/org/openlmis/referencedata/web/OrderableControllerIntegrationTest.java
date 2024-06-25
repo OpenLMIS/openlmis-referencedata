@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -783,14 +784,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class),
-            any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
+
 
     PageDto response = restAssured
         .given()
@@ -819,13 +820,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()
@@ -855,13 +856,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     restAssured
         .given()
@@ -888,13 +889,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()
