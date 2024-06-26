@@ -889,7 +889,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+    doReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)))
         .when(orderableRepository)
         .search(eq(searchParams), any(Pageable.class));
 
