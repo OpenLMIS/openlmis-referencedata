@@ -291,7 +291,6 @@ public class FacilityController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH + "/{id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  @Transactional
   public FacilityDto saveFacility(
       @RequestBody FacilityDto facilityDto,
       @PathVariable("id") UUID facilityId,
