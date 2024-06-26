@@ -134,13 +134,13 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
 
     ProgramOrderable programOrderableDuplicated = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory2)
+        .withOrderableDisplayCategory(orderableDisplayCategory2)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
@@ -165,13 +165,13 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
 
     ProgramOrderable programOrderableDuplicated = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory2)
+        .withOrderableDisplayCategory(orderableDisplayCategory2)
         .withProgram(program)
         .withProduct(orderable)
         .asInactive()
@@ -421,7 +421,8 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, programCode, null, false),
+        new TestSearchParams(null, null, Collections.singleton(programCode),
+            null, false),
         pageable);
 
     // then
@@ -480,7 +481,8 @@ public class OrderableRepositoryIntegrationTest {
     Page<Orderable> foundOrderables = repository.search(
         new TestSearchParams(
             validOrderable.getProductCode().toString(), NAME,
-            validProgram.getCode().toString(), null, false),
+            Collections.singleton(validProgram.getCode().toString()),
+            null, false),
         pageable);
 
     // then
@@ -875,7 +877,8 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, programCode, null, false),
+        new TestSearchParams(null, null, Collections.singleton(programCode),
+            null, false),
         pageable);
 
     // then
@@ -915,7 +918,9 @@ public class OrderableRepositoryIntegrationTest {
                                                Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams(code, name, programCode, null, false), pageable);
+        .search(new TestSearchParams(code, name, Collections.singleton(programCode),
+                null, false),
+            pageable);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
 
@@ -930,7 +935,7 @@ public class OrderableRepositoryIntegrationTest {
         "some-code");
 
     return new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
@@ -1021,7 +1026,7 @@ public class OrderableRepositoryIntegrationTest {
 
     private String code;
     private String name;
-    private String programCode;
+    private Set<String> programCodes;
     private Set<Pair<UUID, Long>> identityPairs;
     private boolean includeQuarantined;
 

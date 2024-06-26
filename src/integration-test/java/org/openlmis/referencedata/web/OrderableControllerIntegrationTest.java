@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -572,7 +573,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldSearchOrderables() throws JsonProcessingException {
     final String code = "some-code";
     final String name = "some-name";
-    final String programCode = "program-code";
+    final String programCode1 = "program-code1";
+    final String programCode2 = "program-code2";
     final List<Orderable> items = Collections.singletonList(orderable);
 
     UUID orderableId2 = UUID.randomUUID();
@@ -590,7 +592,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .parameter(CODE, code)
         .parameter(NAME, name)
-        .parameter(PROGRAM_CODE, programCode)
+        .parameter(PROGRAM_CODE, programCode1)
+        .parameter(PROGRAM_CODE, programCode2)
         .parameter(ID, orderableId)
         .parameter(ID, orderableId2)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -609,7 +612,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     QueryOrderableSearchParams value = searchParamsArgumentCaptor.getValue();
     assertEquals(code, value.getCode());
     assertEquals(name, value.getName());
-    assertEquals(programCode, value.getProgramCode());
+    Set<String> programCodes = new HashSet<>();
+    programCodes.add(programCode1);
+    programCodes.add(programCode2);
+    assertEquals(programCodes, value.getProgramCodes());
     assertEquals(new HashSet<>(Arrays.asList(orderableId, orderableId2)), value.getIds());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -778,14 +784,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class),
-            any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
+
 
     PageDto response = restAssured
         .given()
@@ -814,13 +820,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()
@@ -850,13 +856,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     restAssured
         .given()
@@ -883,13 +889,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         false, 0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-        .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()

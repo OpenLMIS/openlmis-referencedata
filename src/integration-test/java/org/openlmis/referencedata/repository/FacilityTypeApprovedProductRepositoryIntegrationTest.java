@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static org.apache.commons.lang.BooleanUtils.isFalse;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasProperty;
@@ -164,7 +165,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
     ProgramOrderable programOrderableFullSupply = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withoutProduct()
         .buildAsNew();
@@ -177,7 +178,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.saveAndFlush(orderableFullSupply);
 
     ProgramOrderable programOrderable1 = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program2)
         .withoutProduct()
         .buildAsNew();
@@ -190,7 +191,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.save(orderable1);
 
     ProgramOrderable programOrderable2 = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program2)
         .withoutProduct()
         .buildAsNew();
@@ -203,7 +204,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.save(orderable2);
 
     ProgramOrderable programOrderableNonFullSupply = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withoutProduct()
         .asNonFullSupply()
@@ -257,10 +258,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     List<UUID> orderableIds = emptyList();
 
-    Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
-            null, null, pageable
-        );
+    Page<FacilityTypeApprovedProduct> page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            null,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     assertThat(page.getContent(), hasSize(2));
   }
@@ -275,10 +282,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = Lists
         .newArrayList(orderableFullSupply.getId(), orderableNonFullSupply.getId());
 
-    Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
-            null, null, pageable
-        );
+    Page<FacilityTypeApprovedProduct> page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            null,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     assertThat(page.getContent(), hasSize(2));
     assertEquals(page.getContent().get(0).getOrderableId(), orderableFullSupply.getId());
@@ -295,10 +308,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     pageable = PageRequest.of(0, 1);
     List<UUID> orderableIds = emptyList();
 
-    Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), null, orderableIds, null,
-            null, null, pageable
-        );
+    Page<FacilityTypeApprovedProduct> page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            null,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     assertThat(page.getContent(),
         hasSize(1));
@@ -312,10 +331,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     List<UUID> orderableIds = emptyList();
 
-    Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), true, orderableIds, null,
-            null, null, pageable
-        );
+    Page<FacilityTypeApprovedProduct> page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            true,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     assertThat(page.getContent(), hasSize(1));
 
@@ -342,10 +367,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
 
     List<UUID> orderableIds = emptyList();
 
-    Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null,
-            null, null, pageable
-        );
+    Page<FacilityTypeApprovedProduct> page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            false,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     // At this point we have no non-full supply products
     assertEquals(0, page.getContent().size());
@@ -353,10 +384,16 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     // Create a non-full supply product
     saveAndGetProduct(facilityType1, false);
 
-    page = ftapRepository
-        .searchProducts(facility.getId(), program.getId(), false, orderableIds, null,
-            null, null, pageable
-        );
+    page =
+        ftapRepository.searchProducts(
+            facility.getId(),
+            singleton(program.getId()),
+            false,
+            orderableIds,
+            null,
+            null,
+            null,
+            pageable);
 
     // We should be able to find non-full supply product we have created
     assertEquals(1, page.getContent().size());

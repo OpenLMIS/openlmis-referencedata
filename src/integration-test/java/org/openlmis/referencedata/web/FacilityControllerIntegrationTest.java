@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
@@ -317,10 +318,17 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .build();
 
     when(orderableRepository
-        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
+        .findAllLatestByIds(eq(singleton(orderable.getId())), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
-    when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
-        eq(program.getId()), eq(false), eq(null), eq(null), eq(null), eq(null), eq(pageable)))
+    when(facilityTypeApprovedProductRepository.searchProducts(
+            eq(facility.getId()),
+            eq(singleton(program.getId())),
+            eq(false),
+            eq(null),
+            eq(null),
+            eq(null),
+            eq(null),
+            eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
     PageDto productDtos = restAssured.given()
@@ -347,10 +355,10 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .build();
 
     when(orderableRepository
-        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
+        .findAllLatestByIds(eq(singleton(orderable.getId())), any(Pageable.class)))
         .thenReturn(new PageImpl<>(Collections.singletonList(orderable), pageable, 1));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
-        eq(program.getId()), eq(false), eq(orderableIds), eq(null), eq(null),
+        eq(singleton(program.getId())), eq(false), eq(orderableIds), eq(null), eq(null),
         eq(null), eq(pageable)))
         .thenReturn(new PageImpl<>(Collections.singletonList(approvedProduct), pageable, 1));
 
@@ -387,7 +395,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldBadRequestWhenLookingForProductsInNonExistantFacility() {
     when(facilityTypeApprovedProductRepository
-        .searchProducts(any(UUID.class), nullable(UUID.class), nullable(Boolean.class),
+        .searchProducts(any(UUID.class), nullable(Set.class), nullable(Boolean.class),
             nullable(List.class), nullable(Boolean.class), nullable(String.class),
             nullable(String.class), any(Pageable.class)))
         .thenThrow(new ValidationMessageException(FacilityMessageKeys.ERROR_NOT_FOUND));

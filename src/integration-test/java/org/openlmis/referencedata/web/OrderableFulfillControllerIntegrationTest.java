@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.web;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -51,6 +52,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   private Orderable orderable = new OrderableDataBuilder().build();
   private UUID facilityId = UUID.randomUUID();
   private UUID programId = UUID.randomUUID();
+
 
   private UUID tradeItemOrderableId = UUID.randomUUID();
   private UUID commodityTypeOrderableId = UUID.randomUUID();
@@ -126,7 +128,9 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
         .withOrderableId(commodityTypeOrderableId).build();
 
     given(facilityTypeApprovedProductRepository
-        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any(), any(),any()))
+        .searchProducts(eq(facilityId), eq(singleton(programId)), any(), any(), eq(true), any(),
+            any(),
+            any()))
         .willReturn(getPage(ftap));
     given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
     given(factory.createFor(eq(orderable), any(), any()))
@@ -143,7 +147,8 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
 
     verify(orderableRepository, times(0)).findAllLatest(any());
     verify(facilityTypeApprovedProductRepository)
-        .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any(), any(), any());
+        .searchProducts(
+            eq(facilityId), eq(singleton(programId)), any(), any(), eq(true), any(), any(), any());
   }
 
   @SafeVarargs

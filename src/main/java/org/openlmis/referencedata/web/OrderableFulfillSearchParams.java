@@ -66,15 +66,12 @@ public final class OrderableFulfillSearchParams {
   }
 
   /**
-   * Gets ProgramId.
+   * Gets ProgramIds.
    *
    * @return UUID value of programId or null if params doesn't contain "programId" param.
    */
-  public UUID getProgramId() {
-    if (!queryParams.containsKey(PROGRAM_ID)) {
-      return null;
-    }
-    return queryParams.getUuid(PROGRAM_ID);
+  public Set<UUID> getProgramIds() {
+    return queryParams.getUuids(PROGRAM_ID);
   }
 
   /**
@@ -91,7 +88,7 @@ public final class OrderableFulfillSearchParams {
    * Checks if provided params which allows to search by facilityId and programId.
    */
   public boolean isSearchByFacilityIdAndProgramId() {
-    return getFacilityId() != null && getProgramId() != null;
+    return getFacilityId() != null && getProgramIds() != null;
   }
 
   private void validate() {
