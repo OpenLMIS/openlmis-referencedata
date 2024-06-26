@@ -104,9 +104,10 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
       } else {
         GeographicZone localZone = facility.getGeographicZone();
         if (!localZone.getCode().equals(geographicZone.getCode())) {
-          localZone.setParent(geographicZone);
-
-          geographicZoneRepository.save(localZone);
+          if (!localZone.getParent().getCode().equals(geographicZone.getCode())) {
+            localZone.setParent(geographicZone);
+            geographicZoneRepository.save(localZone);
+          }
           geographicZone = localZone;
         }
       }
