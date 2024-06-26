@@ -134,13 +134,13 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
 
     ProgramOrderable programOrderableDuplicated = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory2)
+        .withOrderableDisplayCategory(orderableDisplayCategory2)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
@@ -165,13 +165,13 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable = new OrderableDataBuilder().buildAsNew();
 
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();
 
     ProgramOrderable programOrderableDuplicated = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory2)
+        .withOrderableDisplayCategory(orderableDisplayCategory2)
         .withProgram(program)
         .withProduct(orderable)
         .asInactive()
@@ -935,7 +935,7 @@ public class OrderableRepositoryIntegrationTest {
         "some-code");
 
     return new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withProduct(orderable)
         .buildAsNew();

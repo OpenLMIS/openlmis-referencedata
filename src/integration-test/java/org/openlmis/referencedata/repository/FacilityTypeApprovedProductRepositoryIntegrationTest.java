@@ -165,7 +165,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableDisplayCategoryRepository.save(orderableDisplayCategory);
 
     ProgramOrderable programOrderableFullSupply = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withoutProduct()
         .buildAsNew();
@@ -178,7 +178,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.saveAndFlush(orderableFullSupply);
 
     ProgramOrderable programOrderable1 = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program2)
         .withoutProduct()
         .buildAsNew();
@@ -191,7 +191,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.save(orderable1);
 
     ProgramOrderable programOrderable2 = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program2)
         .withoutProduct()
         .buildAsNew();
@@ -204,7 +204,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     orderableRepository.save(orderable2);
 
     ProgramOrderable programOrderableNonFullSupply = new ProgramOrderableDataBuilder()
-        .withOrderabeDisplayCategory(orderableDisplayCategory)
+        .withOrderableDisplayCategory(orderableDisplayCategory)
         .withProgram(program)
         .withoutProduct()
         .asNonFullSupply()
