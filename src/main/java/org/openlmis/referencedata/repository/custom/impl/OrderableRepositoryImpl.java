@@ -238,8 +238,10 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     Predicate where = builder.conjunction();
 
     if (null != searchParams) {
-      Set<String> programCodes = searchParams.getProgramCodes();
-      if (null != programCodes) {
+      Set<String> programCodes = searchParams.getProgramCodes() != null
+          ? getProgramCodesLowerCase(searchParams)
+          : Collections.emptySet();
+      if (!programCodes.isEmpty()) {
         Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
         Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
         where = builder.and(where, builder.lower(programJoin.get(CODE).get(CODE))
