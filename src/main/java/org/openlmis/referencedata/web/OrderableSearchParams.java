@@ -75,6 +75,7 @@ public final class OrderableSearchParams
   }
 
   @Override
+  @JsonIgnore
   public Set<String> getProgramCodes() {
     return Collections.singleton(programCode);
   }
