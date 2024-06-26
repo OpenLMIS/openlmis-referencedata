@@ -279,7 +279,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private Query prepareNativeQuery(
       UUID facilityTypeId,
-      Set<UUID> programId,
+      Set<UUID> programIds,
       Boolean fullSupply,
       List<UUID> orderableIds,
       Boolean active,
@@ -293,9 +293,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
-    if (null != programId) {
-      builder.append(" AND p.id IN (:programId)");
-      params.put("programId", programId);
+    if (!isEmpty(programIds)) {
+      builder.append(" AND p.id IN (:programIds)");
+      params.put("programIds", programIds);
     }
 
     String orderablesCondition = "1=1";

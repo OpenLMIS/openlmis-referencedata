@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -238,14 +239,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     Predicate where = builder.conjunction();
 
     if (null != searchParams) {
-      Set<String> programCodes = searchParams.getProgramCodes() != null
-          ? getProgramCodesLowerCase(searchParams)
-          : Collections.emptySet();
+      Set<String> programCodes = getProgramCodesLowerCase(searchParams);
       if (!programCodes.isEmpty()) {
         Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
         Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
         where = builder.and(where, builder.lower(programJoin.get(CODE).get(CODE))
-            .in(getProgramCodesLowerCase(searchParams)));
+            .in(programCodes));
       }
 
       if (isEmpty(identities)) {
@@ -287,7 +286,10 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   }
 
   private Set<String> getProgramCodesLowerCase(SearchParams searchParams) {
-    return searchParams.getProgramCodes().stream()
+    return Optional.ofNullable(searchParams)
+        .map(SearchParams::getProgramCodes)
+        .orElse(Collections.emptySet())
+        .stream()
         .filter(Objects::nonNull)
         .map(String::toLowerCase)
         .collect(Collectors.toSet());
@@ -314,11 +316,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     String queryCondition;
 
     if (null != searchParams) {
-      if (null != searchParams.getProgramCodes()) {
+      Set<String> programCodes = getProgramCodesLowerCase(searchParams);
+      if (!isEmpty(programCodes)) {
         builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN + NATIVE_PROGRAM_INNER_JOIN);
-        Set<String> programCodesLowerCase = getProgramCodesLowerCase(searchParams);
         queryCondition = "LOWER (p.code) IN ("
-            + generateProgramCodesText(programCodesLowerCase) + ")";
+            + generateProgramCodesText(programCodes) + ")";
         wheres.add(queryCondition);
       }
 
