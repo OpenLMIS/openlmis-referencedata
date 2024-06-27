@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.openlmis.referencedata.service.FacilityTypeService.WARD_SERVICE_TYPE_CODE;
+
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,17 +86,19 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     if (null == importer.getId()) {
       facility = new Facility();
 
-      GeographicZone localZone = new GeographicZone();
-      localZone.setParent(geographicZone);
-      localZone.setName(importer.getName());
-      localZone.setCode("gz-" + importer.getCode());
+      if (!facilityType.getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+        GeographicZone localZone = new GeographicZone();
+        localZone.setParent(geographicZone);
+        localZone.setName(importer.getName());
+        localZone.setCode("gz-" + importer.getCode());
 
-      GeographicLevel geographicLevel =
-          geographicLevelRepository.findFirstByOrderByLevelNumberDesc();
-      localZone.setLevel(geographicLevel);
-      geographicZoneRepository.save(localZone);
+        GeographicLevel geographicLevel =
+            geographicLevelRepository.findFirstByOrderByLevelNumberDesc();
+        localZone.setLevel(geographicLevel);
+        geographicZoneRepository.save(localZone);
 
-      geographicZone = localZone;
+        geographicZone = localZone;
+      }
     } else {
       facility = facilityRepository.findById(importer.getId()).orElse(null);
 
