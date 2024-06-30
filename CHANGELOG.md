@@ -1,5 +1,22 @@
 15.2.6-angola.1 / Ongoing
 ==================
+Improvements:
+* [OAM-120](https://openlmis.atlassian.net/browse/OAM-120): Added quarantined field to Orderable entity
+* [OAM-121](https://openlmis.atlassian.net/browse/OAM-121): Added quarantined field to Lot entity
+* [OAM-124](https://openlmis.atlassian.net/browse/OAM-124): Added includeQuarantined search param for Orderables
+* [OAM-125](https://openlmis.atlassian.net/browse/OAM-125): Added includeQuarantined param for GET api/lots endpoint
+* [OAM-186](https://openlmis.atlassian.net/browse/OAM-186): Added home facility validation for ward/service type
+* [OAM-195](https://openlmis.atlassian.net/browse/OAM-195): Added excludeWardsServices for facilities searching endpoints
+* [OAM-206](https://openlmis.atlassian.net/browse/OAM-206): Added configuration import for creating Ward/Service
+* [OAM-220](https://openlmis.atlassian.net/browse/OAM-220): Added creating new geo zone for new facility
+* [OAM-235](https://openlmis.atlassian.net/browse/OAM-235):  Adapted facility update endpoint for ward/service configuration
+
+New functionality added in a backwards-compatible manner:
+* [OAM-91](https://openlmis.atlassian.net/browse/OAM-91):  Added unit of orderable
+* [OAM-48](https://openlmis.atlassian.net/browse/OAM-48):  Added ward/service configuration script
+* [OAM-129](https://openlmis.atlassian.net/browse/OAM-129): Added notification on lot quarantined
+* [OAM-128](https://openlmis.atlassian.net/browse/OAM-128): Added notification on product quarantined
+* [OAM-213](https://openlmis.atlassian.net/browse/OAM-213): Added migration scripts for new sample unit of orderable
 
 15.2.6 / 2023-11-07
 ==================
