@@ -35,7 +35,7 @@ public interface OrderableRepositoryCustom {
 
     String getName();
 
-    String getProgramCode();
+    Set<String> getProgramCodes();
 
     Set<Pair<UUID, Long>> getIdentityPairs();
 

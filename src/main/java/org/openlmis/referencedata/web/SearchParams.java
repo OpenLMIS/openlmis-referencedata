@@ -24,6 +24,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.UuidUtil;
@@ -161,7 +163,9 @@ public final class SearchParams {
     return Optional.ofNullable(get(key))
         .orElse(Collections.emptyList())
         .stream()
+        .filter(Objects::nonNull)
         .map(value -> (String) value)
+        .filter(StringUtils::isNotBlank)
         .collect(toSet());
   }
 

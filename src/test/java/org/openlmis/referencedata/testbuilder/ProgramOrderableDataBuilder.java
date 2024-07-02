@@ -98,7 +98,7 @@ public class ProgramOrderableDataBuilder {
     return this;
   }
 
-  public ProgramOrderableDataBuilder withOrderabeDisplayCategory(
+  public ProgramOrderableDataBuilder withOrderableDisplayCategory(
       OrderableDisplayCategory orderabeDisplayCategory) {
     this.orderableDisplayCategory = orderabeDisplayCategory;
     return this;

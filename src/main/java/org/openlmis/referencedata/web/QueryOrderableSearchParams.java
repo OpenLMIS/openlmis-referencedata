@@ -87,18 +87,15 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   }
 
   /**
-   * Gets program code.
+   * Gets program codes.
    *
-   * @return {@link Code} value of program code or null if params doesn't contain "programCode"
-   *                      param. Empty Code for request param that has no value.
+   * @return {@link Code} values of program codes or empty collection if params doesn't contain
+   *         "programCodes" param. No program code is included if a program code
+   *         in request param is blank.
    */
   @Override
-  public String getProgramCode() {
-    if (!queryParams.containsKey(PROGRAM_CODE)) {
-      return null;
-    }
-
-    return defaultIfBlank(queryParams.getFirst(PROGRAM_CODE), EMPTY);
+  public Set<String> getProgramCodes() {
+    return queryParams.getStrings(PROGRAM_CODE);
   }
 
   @Override

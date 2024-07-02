@@ -421,7 +421,7 @@ public class DataImportServiceIntegrationTest {
   private ProgramOrderable createAndPersistProgramOrderable(
       Program program, Orderable orderable, OrderableDisplayCategory orderableDisplayCategory) {
     ProgramOrderable programOrderable = new ProgramOrderableDataBuilder()
-          .withProgram(program).withProduct(orderable).withOrderabeDisplayCategory(
+        .withProgram(program).withProduct(orderable).withOrderableDisplayCategory(
               orderableDisplayCategory).buildAsNew();
     programOrderableRepository.saveAndFlush(programOrderable);
     return programOrderable;

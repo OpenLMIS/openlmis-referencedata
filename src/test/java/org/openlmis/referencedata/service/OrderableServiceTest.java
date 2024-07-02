@@ -127,7 +127,8 @@ public class OrderableServiceTest {
   public void shouldNotThrowValidationExceptionIfQueryMapCanBeParsed() {
     searchParams.add(CODE, "-1");
     searchParams.add(NAME, "-1");
-    searchParams.add(PROGRAM_CODE, "program-code");
+    searchParams.add(PROGRAM_CODE, "programCode1");
+    searchParams.add(PROGRAM_CODE, "programCode2");
     orderableService.searchOrderables(new QueryOrderableSearchParams(searchParams), null);
   }
 
@@ -185,6 +186,7 @@ public class OrderableServiceTest {
     // given
     final String code = "ORD1";
     final String name = "Orderable";
+    final String programCode2 = "programCode2";
 
     given(orderableRepository.search(
             any(SearchParams.class),
@@ -195,6 +197,7 @@ public class OrderableServiceTest {
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
     searchParams.add(PROGRAM_CODE, programCode);
+    searchParams.add(PROGRAM_CODE, programCode2);
 
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
@@ -268,6 +271,7 @@ public class OrderableServiceTest {
     // given
     final String code = "ORD1";
     final String name = "Orderable";
+    final String programCode2 = "programCode2";
 
     given(orderableRepository.findLatestModifiedDateByParams(
             any(QueryOrderableSearchParams.class)))
@@ -276,6 +280,7 @@ public class OrderableServiceTest {
     searchParams.add(CODE, code);
     searchParams.add(NAME, name);
     searchParams.add(PROGRAM_CODE, programCode);
+    searchParams.add(PROGRAM_CODE, programCode2);
 
     QueryOrderableSearchParams queryMap = new QueryOrderableSearchParams(searchParams);
 
