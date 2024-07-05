@@ -59,7 +59,7 @@ public class TradeItemImportPersister implements DataImportPersister<Orderable,
         createOrUpdate(importedDtos)
     );
 
-    return new ArrayList<>(OrderableDto.newInstance(persistedObjects));
+    return new ArrayList<>(OrderableDto.newInstances(persistedObjects));
   }
 
   @Override

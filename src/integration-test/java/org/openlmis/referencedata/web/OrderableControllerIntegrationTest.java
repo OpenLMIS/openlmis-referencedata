@@ -464,7 +464,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -492,7 +492,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -513,7 +513,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(HttpStatus.SC_OK)
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
+    checkIfEquals(response, OrderableDto.newInstances(Collections.emptyList()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -577,7 +577,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     verify(orderableService)
         .searchOrderables(searchParamsArgumentCaptor.capture(), any(Pageable.class));
@@ -881,7 +881,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
+    checkIfEquals(response, OrderableDto.newInstances(Collections.emptyList()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

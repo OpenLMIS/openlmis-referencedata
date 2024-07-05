@@ -40,7 +40,7 @@ public class DataImportControllerIntegrationTest extends BaseWebIntegrationTest 
   private static final MultipartFile file = new MockMultipartFile(
       "orderable.csv", "test-data".getBytes());
   private final Orderable orderable = new OrderableDataBuilder().build();
-  private final OrderableDto orderableDto = OrderableDto.newInstance(orderable);
+  private final OrderableDto orderableDto = OrderableDto.newInstances(orderable);
 
   @Before
   @Override

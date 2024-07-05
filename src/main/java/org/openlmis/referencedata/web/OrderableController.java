@@ -68,8 +68,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OrderableController extends BaseController {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
   public static final String RESOURCE_PATH = "/orderables";
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
   private static final String NAME = "name";
   private static final String CODE = "code";
   private static final String PROGRAM_CODE = "program";
@@ -116,21 +116,21 @@ public class OrderableController extends BaseController {
     repository.save(orderable);
 
     OrderableCreatePostProcessor orderableCreatePostProcessor = extensionManager.getExtension(
-            ExtensionPointId.ORDERABLE_CREATE_POST_POINT_ID, OrderableCreatePostProcessor.class);
+        ExtensionPointId.ORDERABLE_CREATE_POST_POINT_ID, OrderableCreatePostProcessor.class);
     orderableCreatePostProcessor.process(orderable);
 
     profiler.stop().log();
 
     return ResponseEntity.ok()
-            .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
-            .body(OrderableDto.newInstance(orderable));
+        .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+        .body(OrderableDto.newInstances(orderable));
   }
 
   /**
    * Update an Orderable.
    *
-   * @param id the id of the Orderable to update.
-   * @param orderableDto the contents of how the Orderable should be updated.
+   * @param id            the id of the Orderable to update.
+   * @param orderableDto  the contents of how the Orderable should be updated.
    * @param bindingResult the result of validation.
    * @return the orderable that was updated.
    */
@@ -159,15 +159,15 @@ public class OrderableController extends BaseController {
         .save(orderableBuilder.newOrderable(orderableDto, foundOrderable));
 
     OrderableUpdatePostProcessor orderableUpdatePostProcessor = extensionManager.getExtension(
-            ExtensionPointId.ORDERABLE_UPDATE_POST_POINT_ID, OrderableUpdatePostProcessor.class);
+        ExtensionPointId.ORDERABLE_UPDATE_POST_POINT_ID, OrderableUpdatePostProcessor.class);
     orderableUpdatePostProcessor.process(savedOrderable);
 
     XLOGGER.warn("Orderable updated: down stream services may not support versioned orderables: {}",
         id);
 
     return ResponseEntity.ok()
-            .headers(buildLastModifiedHeader(savedOrderable.getLastUpdated()))
-            .body(OrderableDto.newInstance(savedOrderable));
+        .headers(buildLastModifiedHeader(savedOrderable.getLastUpdated()))
+        .body(OrderableDto.newInstances(savedOrderable));
   }
 
   /**
@@ -176,7 +176,7 @@ public class OrderableController extends BaseController {
    * param doesn't have value, it will search for empty value in database.
    *
    * @param queryParams request parameters (code, name, program, ids).
-   * @param pageable object used to encapsulate the pagination related values: page and size.
+   * @param pageable    object used to encapsulate the pagination related values: page and size.
    * @return a page of orderables
    */
   @GetMapping(RESOURCE_PATH)
@@ -194,7 +194,7 @@ public class OrderableController extends BaseController {
     if (lastUpdated == null) {
       Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable, 0);
       return ResponseEntity.ok()
-              .body(emptyPage);
+          .body(emptyPage);
     }
 
     if (ifModifiedDate == null
@@ -207,7 +207,7 @@ public class OrderableController extends BaseController {
 
       profiler.start("ORDERABLE_PAGINATION");
       Page<OrderableDto> page = Pagination.getPage(
-          OrderableDto.newInstance(orderablesPage.getContent()),
+          OrderableDto.newInstances(orderablesPage.getContent()),
           pageable,
           orderablesPage.getTotalElements());
 
@@ -234,7 +234,7 @@ public class OrderableController extends BaseController {
   public ResponseEntity<Page<OrderableDto>> searchOrderables(
       @RequestBody OrderableSearchParams body,
       @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
-          String ifModifiedDate) {
+      String ifModifiedDate) {
     Profiler profiler = new Profiler("ORDERABLES_SEARCH_POST");
     profiler.setLogger(XLOGGER);
 
@@ -242,12 +242,12 @@ public class OrderableController extends BaseController {
 
     profiler.start("GET_LATEST_LAST_UPDATED_DATE");
     ZonedDateTime lastUpdated = orderableService
-            .getLatestLastUpdatedDate(getQueryOrderableSearchParams(body), profiler);
+        .getLatestLastUpdatedDate(getQueryOrderableSearchParams(body), profiler);
 
     if (lastUpdated == null) {
       Page<OrderableDto> emptyPage = Pagination.getPage(Collections.emptyList(), pageable, 0);
       return ResponseEntity.ok()
-              .body(emptyPage);
+          .body(emptyPage);
     }
 
     if (ifModifiedDate == null
@@ -257,7 +257,7 @@ public class OrderableController extends BaseController {
 
       profiler.start("EXPORT_TO_DTO");
       Page<OrderableDto> page = Pagination.getPage(
-          OrderableDto.newInstance(orderablesPage.getContent()),
+          OrderableDto.newInstances(orderablesPage.getContent()),
           pageable,
           orderablesPage.getTotalElements());
 
@@ -285,7 +285,7 @@ public class OrderableController extends BaseController {
       @PathVariable("id") UUID productId,
       @RequestParam(required = false, value = "versionNumber") Long versionNumber,
       @RequestHeader(value = HttpHeaders.IF_MODIFIED_SINCE, required = false)
-          String ifModifiedDate) {
+      String ifModifiedDate) {
     Profiler profiler = new Profiler("GET_ORDERABLE");
     profiler.setLogger(XLOGGER);
 
@@ -305,22 +305,25 @@ public class OrderableController extends BaseController {
       return (ifModifiedDate == null
           || orderable.wasModifiedSince(parseHttpDateToZonedDateTime(ifModifiedDate)))
           ? ResponseEntity.ok()
-              .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
-              .body(OrderableDto.newInstance(orderable))
+          .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+          .body(OrderableDto.newInstances(orderable))
           : ResponseEntity.status(HttpStatus.NOT_MODIFIED)
-              .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
-              .build();
+          .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
+          .build();
     }
   }
 
   /**
    * Get the audit information related to orderable.
-   *  @param author The author of the changes which should be returned.
-   *               If null or empty, changes are returned regardless of author.
+   *
+   * @param author              The author of the changes which should be returned.
+   *                            If null or empty, changes are returned regardless of author.
    * @param changedPropertyName The name of the property about which changes should be returned.
-   *               If null or empty, changes associated with any and all properties are returned.
-   * @param page A Pageable object that allows client to optionally add "page" (page number)
-   *             and "size" (page size) query parameters to the request.
+   *                            If null or empty, changes associated with any and all properties
+   *                            are returned.
+   * @param page                A Pageable object that allows client to optionally add "page"
+   *                            (page number)
+   *                            and "size" (page size) query parameters to the request.
    */
   @RequestMapping(value = RESOURCE_PATH + "/{id}/auditLog", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
@@ -329,10 +332,10 @@ public class OrderableController extends BaseController {
       @PathVariable("id") UUID id,
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
-          String changedPropertyName,
+      String changedPropertyName,
       //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
       @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
-          boolean returnJson,
+      boolean returnJson,
       Pageable page) {
 
     rightService.checkAdminRight(ORDERABLES_MANAGE);
@@ -359,9 +362,9 @@ public class OrderableController extends BaseController {
       OrderableSearchParams searchParams) {
 
     Set<UUID> ids = searchParams.getIdentityPairs()
-            .stream()
-            .map(Pair::getKey)
-            .collect(Collectors.toSet());
+        .stream()
+        .map(Pair::getKey)
+        .collect(Collectors.toSet());
 
     LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
 
@@ -372,10 +375,7 @@ public class OrderableController extends BaseController {
     }
     queryMap.add(NAME, searchParams.getName());
     queryMap.add(CODE, searchParams.getCode());
-    Set<String> programCodes = searchParams.getProgramCodes();
-    for (String programCode : programCodes) {
-      queryMap.add(PROGRAM_CODE, programCode);
-    }
+    queryMap.add(PROGRAM_CODE, searchParams.getProgramCode());
 
     return new QueryOrderableSearchParams(queryMap);
   }
