@@ -90,10 +90,10 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
           + "  FROM referencedata.orderables GROUP BY id) AS latest"
           + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
 
-  private static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
+  static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
       + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
 
-  private static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
+  static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
       + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
 
   private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
@@ -335,8 +335,9 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     if (!count) {
       builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
     }
-    XLOGGER.info("QueryParamString: " + builder.toString());
-    return entityManager.createNativeQuery(builder.toString());
+    String builderText = builder.toString();
+    XLOGGER.info("QueryParamString: " + builderText);
+    return entityManager.createNativeQuery(builderText);
   }
 
   private String generateProgramCodesText(Set<String> programCodesLowerCase) {

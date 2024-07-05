@@ -15,14 +15,20 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -32,20 +38,13 @@ public class OrderableRepositoryImplTest {
 
   @InjectMocks
   private OrderableRepositoryImpl repository;
-  //@Mock
-  //private EntityManager entityManager;
+  @Mock
+  private EntityManager entityManager;
 
   @Test
   public void shouldFindLatestModifiedDateByParams() {
 
     //given
-    Orderable orderable1 = mock(Orderable.class);
-    Orderable orderable2 = mock(Orderable.class);
-    Orderable orderable3 = mock(Orderable.class);
-    ZonedDateTime now = ZonedDateTime.now();
-    orderable1.setLastUpdated(now.minusHours(1));
-    orderable2.setLastUpdated(now.minusHours(2));
-    orderable3.setLastUpdated(now);
 
     MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
     multiValueMap.add("name", "name");
@@ -53,16 +52,24 @@ public class OrderableRepositoryImplTest {
     multiValueMap.add("program", "programCode1");
     multiValueMap.add("program", "programCode2");
 
-    //when(entityManager.createNativeQuery(anyString())).thenReturn();
+    ZonedDateTime now = ZonedDateTime.now();
+    Query countQuery = mock(Query.class);
+    when(countQuery.getSingleResult()).thenReturn(1);
+    Query selectQuery = mock(Query.class);
+    when(selectQuery.getSingleResult()).thenReturn(Timestamp.from(now.toInstant()));
+
+    when(entityManager.createNativeQuery(
+        contains(OrderableRepositoryImpl.NATIVE_COUNT_LAST_UPDATED)))
+        .thenReturn(countQuery);
+    when(entityManager.createNativeQuery(
+        contains(OrderableRepositoryImpl.NATIVE_SELECT_LAST_UPDATED)))
+        .thenReturn(selectQuery);
 
     //when
-    //ZonedDateTime latestModifiedDateByParams =
-    repository.findLatestModifiedDateByParams(new QueryOrderableSearchParams(multiValueMap));
+    ZonedDateTime latestModifiedDateByParams =
+        repository.findLatestModifiedDateByParams(new QueryOrderableSearchParams(multiValueMap));
 
     //then
-
-
+    assertEquals(latestModifiedDateByParams, now);
   }
-
-
 }
