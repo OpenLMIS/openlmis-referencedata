@@ -101,19 +101,20 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   private static final String WHERE = " WHERE ";
   private static final String AND = " AND ";
-  private static final String ID = "id";
-  private static final String IDENTITY = "identity";
   private static final String GMT = "GMT";
-  private static final String VERSION_NUMBER = "versionNumber";
-  private static final String FULL_PRODUCT_NAME = "fullProductName";
-  private static final String PROGRAM = "program";
-  private static final String CODE = "code";
   private static final String ORDERABLE = "orderable";
-  private static final String PROGRAM_ORDERABLES = "programOrderables";
-  private static final String PRODUCT_CODE = "productCode";
   private static final String LATEST_ORDERABLE_ALIAS = "latest";
 
   private static final String TRADE_ITEM = "tradeItem";
+
+  static final String FULL_PRODUCT_NAME = "fullProductName";
+  static final String PRODUCT_CODE = "productCode";
+  static final String VERSION_NUMBER = "versionNumber";
+  static final String ID = "id";
+  static final String PROGRAM_ORDERABLES = "programOrderables";
+  static final String IDENTITY = "identity";
+  static final String PROGRAM = "program";
+  static final String CODE = "code";
 
   @PersistenceContext
   private EntityManager entityManager;
