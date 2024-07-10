@@ -5,6 +5,8 @@ services:
     image: openlmis/referencedata
     env_file: .env
     depends_on: [db, log, redis]
+    ports:
+      - "5005:5005"
 
   db:
     image: openlmis/postgres:12-debezium

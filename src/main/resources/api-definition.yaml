@@ -271,6 +271,9 @@ schemas:
   - systemNotificationDto: !include schemas/systemNotificationDto.json
   - systemNotificationDtoPage: !include schemas/systemNotificationDtoPage.json
 
+  - integrationEmail: !include schemas/integrationEmail.json
+  - integrationEmailPage: !include schemas/integrationEmailPage.json
+
   #FHIR schemas
   - CodeableConcept: !include schemas/fhir/CodeableConcept.schema.json
   - Coding: !include schemas/fhir/Coding.schema.json
@@ -4228,6 +4231,175 @@ resourceTypes:
                               schema: localizedErrorResponse
       /{id}/auditLog:
         type: instanceAuditLog
+  /integrationEmails:
+      displayName: integrationEmails
+      get:
+          is: [ secured, paginated, sorted ]
+          description: Get all integration emails that match the given parameters.
+          responses:
+              200:
+                  headers:
+                    Keep-Alive:
+                  body:
+                    application/json:
+                      schema: integrationEmailPage
+              401:
+                  headers:
+                    Keep-Alive:
+                  body:
+                      application/json:
+      post:
+          is: [ secured ]
+          description: Creates given integration emails if possible.
+          body:
+              application/json:
+                  schema: integrationEmail
+          responses:
+              201:
+                  headers:
+                    Keep-Alive:
+                  body:
+                      application/json:
+                        schema: integrationEmail
+              401:
+                  headers:
+                    Keep-Alive:
+                  body:
+                      application/json:
+      /{id}:
+          uriParameters:
+              id:
+                  displayName: id
+                  type: string
+                  required: true
+                  repeat: false
+          get:
+              is: [ secured ]
+              description: Get chosen integration email.
+              responses:
+                  200:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+                              schema: integrationEmail
+                  404:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+                              schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+          put:
+              is: [ secured ]
+              description: Update existing integration email.
+              body:
+                  application/json:
+                    schema: integrationEmail
+              responses:
+                  200:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+                            schema: integrationEmail
+                  400:
+                      body:
+                          application/json:
+                            schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+          delete:
+              is: [ secured ]
+              description: "Completely removes integration email. This action is not recoverable."
+              responses:
+                  204:
+                      headers:
+                        Keep-Alive:
+                  404:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+                            schema: localizedErrorResponse
+                  401:
+                      headers:
+                        Keep-Alive:
+                      body:
+                          application/json:
+          /auditLog:
+              description: This represents the audit log for all <<resourcePathName|!singularize>> resources.
+              get:
+                  description: Returns all or part of the resource's audit log
+                  # Although /auditLog endpoints support "page" and "number" query parameters for pagination,
+                  # they don’t return the response body and set of pagination-related values expected to be
+                  # returned for core domain resources.
+                  is: [ paginated ]
+                  queryParameters:
+                      author:
+                          displayName: author
+                          description: Name of the author of changes which should be returned. By default, all changes are returned regardless of author.
+                          type: string
+                          required: false
+                          repeat: false
+                      changedPropertyName:
+                          displayName: changedPropertyName
+                          description: The name of the property about which changes should be returned. If null or empty, changes associated with any and all properties are returned.
+                          type: string
+                          required: false
+                          repeat: false
+                      returnJSON:
+                          displayName: returnJSON
+                          description: Indicates whether the return type is in JSON format.
+                          type: boolean
+                          default: true
+                          required: false
+                          repeat: false
+                  responses:
+                      200:
+                          headers:
+                            Keep-Alive:
+                          body:
+                              application/json:
+                                schema: auditLogEntryArray
+                                example: |
+                                  [
+                                    {
+                                      "changeType": "ValueChange",
+                                      "globalId": {
+                                        "entity": "org.openlmis.SomeClass",
+                                        "cdoId": 1
+                                      },
+                                      "commitMetadata": {
+                                        "author": "SomeUserName",
+                                        "properties": [],
+                                        "commitDate": "2016-12-17T19:39:57.621",
+                                        "id": 3
+                                      },
+                                      "property": "PropertyName",
+                                      "left": "OldValue",
+                                      "right": "NewValue"
+                                    }
+                                  ]
+                      404:
+                          description: The specified <<resourcePathName|!singularize>> does not exist.
+                          headers:
+                            Keep-Alive:
+                          body:
+                             application/json:
+                                schema: localizedErrorResponse
+                      401:
+                          headers:
+                            Keep-Alive:
+                          body:
+                             application/json:
 
   /systemNotifications:
       displayName: Administrative Messages
