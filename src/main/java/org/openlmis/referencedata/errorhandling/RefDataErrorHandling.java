@@ -74,7 +74,8 @@ public class RefDataErrorHandling extends BaseHandler {
         SupplyPartnerMessageKeys.ERROR_ASSOCIATION_DUPLICATED);
     CONSTRAINT_MAP.put("unq_role_name", RoleMessageKeys.ERROR_MUST_HAVE_A_UNIQUE_NAME);
     CONSTRAINT_MAP.put("unq_ftap", FacilityTypeApprovedProductMessageKeys.ERROR_DUPLICATED);
-    CONSTRAINT_MAP.put("unq_integration_email", IntegrationEmailMessageKeys.ERROR_DUPLICATED);
+    CONSTRAINT_MAP.put("unq_integration_email",
+        IntegrationEmailMessageKeys.ERROR_INTEGRATION_EMAIL_DUPLICATED);
 
     // https://www.postgresql.org/docs/9.6/static/errcodes-appendix.html
     SQL_STATES.put("23503", OrderableMessageKeys.ERROR_NOT_FOUND);

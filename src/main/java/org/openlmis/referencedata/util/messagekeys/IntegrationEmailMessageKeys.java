@@ -21,6 +21,7 @@ public class IntegrationEmailMessageKeys extends MessageKeys {
 
   public static final String ERROR_INTEGRATION_EMAIL_ID_MISMATCH = join(ERROR, ID_MISMATCH);
   public static final String ERROR_INTEGRATION_EMAIL_NOT_FOUND = join(ERROR, NOT_FOUND);
-  public static final String ERROR_DUPLICATED = join(ERROR, DUPLICATED);
+  public static final String ERROR_INTEGRATION_EMAIL_DUPLICATED = join(ERROR, DUPLICATED);
+  public static final String ERROR_INTEGRATION_INVALID = join(ERROR, EMAIL, INVALID);
 
 }

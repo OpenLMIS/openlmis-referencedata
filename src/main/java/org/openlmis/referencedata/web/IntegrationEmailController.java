@@ -20,6 +20,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.apache.commons.validator.routines.EmailValidator;
 import org.openlmis.referencedata.domain.IntegrationEmail;
 import org.openlmis.referencedata.dto.IntegrationEmailDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -69,6 +71,8 @@ public class IntegrationEmailController extends BaseController {
   @ResponseStatus(HttpStatus.CREATED)
   public IntegrationEmailDto createIntegrationEmail(
       @RequestBody IntegrationEmailDto integrationEmail) {
+    verifyEmail(integrationEmail.getEmail());
+
     LOGGER.debug("Creating new integration email");
     IntegrationEmail newIntegrationEmail = IntegrationEmail.newInstance(integrationEmail);
     newIntegrationEmail.setId(null);
@@ -88,6 +92,7 @@ public class IntegrationEmailController extends BaseController {
       throw new ValidationMessageException(new Message(
           IntegrationEmailMessageKeys.ERROR_INTEGRATION_EMAIL_ID_MISMATCH));
     }
+    verifyEmail(integrationEmail.getEmail());
 
     LOGGER.debug("Updating integration email");
     IntegrationEmail db;
@@ -176,6 +181,13 @@ public class IntegrationEmailController extends BaseController {
 
     return getAuditLogResponse(IntegrationEmail.class, id, author, changedPropertyName, page,
         returnJson);
+  }
+
+  private void verifyEmail(String email) {
+    if (!EmailValidator.getInstance().isValid(email)) {
+      throw new ValidationMessageException(new Message(
+          IntegrationEmailMessageKeys.ERROR_INTEGRATION_INVALID, email));
+    }
   }
 
 }
