@@ -338,7 +338,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
               .append('\'');
           return builder.toString();
         })
-        .collect(Collectors.joining(","));
+        .collect(Collectors.joining(", "));
   }
 
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
