@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
@@ -67,46 +66,6 @@ import org.springframework.data.domain.Pageable;
 public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<SearchParams>
     implements OrderableRepositoryCustom {
 
-  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
-
-  private static final String FROM_ORDERABLES_TABLE = " FROM referencedata.orderables AS o";
-
-  private static final String NATIVE_PROGRAM_ORDERABLE_JOIN =
-      " JOIN referencedata.program_orderables AS po"
-          + "  ON o.id = po.orderableId AND o.versionNumber = po.orderableVersionNumber";
-
-  private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
-      " INNER" + NATIVE_PROGRAM_ORDERABLE_JOIN;
-
-  private static final String NATIVE_PROGRAM_JOIN =
-      " JOIN referencedata.programs AS p"
-          + "  ON p.id = po.programId";
-
-  private static final String NATIVE_PROGRAM_INNER_JOIN =
-      " INNER" + NATIVE_PROGRAM_JOIN;
-
-  private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX (versionNumber) AS versionNumber"
-          + "  FROM referencedata.orderables GROUP BY id) AS latest"
-          + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
-
-  static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
-      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
-
-  static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
-      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
-
-  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
-      + " DESC LIMIT 1";
-
-  private static final String WHERE = " WHERE ";
-  private static final String AND = " AND ";
-  private static final String GMT = "GMT";
-  private static final String ORDERABLE = "orderable";
-  private static final String LATEST_ORDERABLE_ALIAS = "latest";
-
-  private static final String TRADE_ITEM = "tradeItem";
-
   static final String FULL_PRODUCT_NAME = "fullProductName";
   static final String PRODUCT_CODE = "productCode";
   static final String VERSION_NUMBER = "versionNumber";
@@ -115,7 +74,34 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   static final String IDENTITY = "identity";
   static final String PROGRAM = "program";
   static final String CODE = "code";
-
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
+  private static final String FROM_ORDERABLES_TABLE = " FROM referencedata.orderables AS o";
+  private static final String NATIVE_PROGRAM_ORDERABLE_JOIN =
+      " JOIN referencedata.program_orderables AS po"
+          + "  ON o.id = po.orderableId AND o.versionNumber = po.orderableVersionNumber";
+  private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
+      " INNER" + NATIVE_PROGRAM_ORDERABLE_JOIN;
+  private static final String NATIVE_PROGRAM_JOIN =
+      " JOIN referencedata.programs AS p"
+          + "  ON p.id = po.programId";
+  private static final String NATIVE_PROGRAM_INNER_JOIN =
+      " INNER" + NATIVE_PROGRAM_JOIN;
+  private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
+      " INNER JOIN (SELECT id, MAX (versionNumber) AS versionNumber"
+          + "  FROM referencedata.orderables GROUP BY id) AS latest"
+          + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
+  static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
+      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
+  static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
+      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
+  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
+      + " DESC LIMIT 1";
+  private static final String WHERE = " WHERE ";
+  private static final String AND = " AND ";
+  private static final String GMT = "GMT";
+  private static final String ORDERABLE = "orderable";
+  private static final String LATEST_ORDERABLE_ALIAS = "latest";
+  private static final String TRADE_ITEM = "tradeItem";
   @PersistenceContext
   private EntityManager entityManager;
   @Autowired
@@ -250,8 +236,8 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       if (isEmpty(identities)) {
         Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
         where = builder.and(where, builder.in(builder.concat(
-            root.get(IDENTITY).get(ID).as(String.class),
-            root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
+                root.get(IDENTITY).get(ID).as(String.class),
+                root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
             .value(latestOrderablesQuery));
       } else {
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
@@ -269,8 +255,8 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     } else {
       Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
       where = builder.and(where, builder.in(builder.concat(
-          root.get(IDENTITY).get(ID).as(String.class),
-          root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
+              root.get(IDENTITY).get(ID).as(String.class),
+              root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
           .value(latestOrderablesQuery));
     }
 
@@ -342,16 +328,17 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   }
 
   private String generateProgramCodesText(Set<String> programCodesLowerCase) {
-    StringJoiner joiner = new StringJoiner(", ");
-    for (String programCode : programCodesLowerCase) {
-      StringBuilder builder = new StringBuilder();
-      builder
-          .append('\'')
-          .append(programCode)
-          .append('\'');
-      joiner.add(builder.toString());
-    }
-    return joiner.toString();
+
+    return programCodesLowerCase.stream()
+        .map(programCode -> {
+          StringBuilder builder = new StringBuilder();
+          builder
+              .append('\'')
+              .append(programCode)
+              .append('\'');
+          return builder.toString();
+        })
+        .collect(Collectors.joining(","));
   }
 
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
