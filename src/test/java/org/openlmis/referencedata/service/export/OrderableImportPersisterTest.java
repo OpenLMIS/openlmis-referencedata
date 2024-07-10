@@ -57,7 +57,7 @@ public class OrderableImportPersisterTest {
   public void setUp() {
     dataStream = mock(InputStream.class);
     orderable = new OrderableDataBuilder().build();
-    dto = OrderableDto.newInstance(orderable);
+    dto = OrderableDto.newInstances(orderable);
   }
 
   @Test

@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -463,7 +464,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -491,7 +492,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -512,7 +513,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(HttpStatus.SC_OK)
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
+    checkIfEquals(response, OrderableDto.newInstances(Collections.emptyList()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -545,7 +546,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldSearchOrderables() {
     final String code = "some-code";
     final String name = "some-name";
-    final String programCode = "program-code";
+    final String programCode1 = "program-code1";
+    final String programCode2 = "program-code2";
     final List<Orderable> items = Collections.singletonList(orderable);
 
     UUID orderableId2 = UUID.randomUUID();
@@ -563,7 +565,8 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .parameter(CODE, code)
         .parameter(NAME, name)
-        .parameter(PROGRAM_CODE, programCode)
+        .parameter(PROGRAM_CODE, programCode1)
+        .parameter(PROGRAM_CODE, programCode2)
         .parameter(ID, orderableId)
         .parameter(ID, orderableId2)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -574,7 +577,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(items));
+    checkIfEquals(response, OrderableDto.newInstances(items));
 
     verify(orderableService)
         .searchOrderables(searchParamsArgumentCaptor.capture(), any(Pageable.class));
@@ -582,7 +585,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     QueryOrderableSearchParams value = searchParamsArgumentCaptor.getValue();
     assertEquals(code, value.getCode());
     assertEquals(name, value.getName());
-    assertEquals(programCode, value.getProgramCode());
+    Set<String> programCodes = new HashSet<>();
+    programCodes.add(programCode1);
+    programCodes.add(programCode2);
+    assertEquals(programCodes, value.getProgramCodes());
     assertEquals(new HashSet<>(Arrays.asList(orderableId, orderableId2)), value.getIds());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
@@ -751,14 +757,14 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class),
-                    any(Profiler.class)))
-            .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
+
 
     PageDto response = restAssured
         .given()
@@ -787,13 +793,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-            .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()
@@ -823,13 +829,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-            .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     restAssured
         .given()
@@ -855,13 +861,13 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             orderableDto.getId(), orderableDto.getVersionNumber())),
         0, 10);
 
-    given(orderableRepository
-        .search(eq(searchParams), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)));
+    doReturn(Pagination.getPage(Lists.newArrayList(), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
 
-    when(orderableService
-            .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
-            .thenReturn(modifiedDate);
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
 
     PageDto response = restAssured
         .given()
@@ -875,7 +881,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .header(HttpHeaders.LAST_MODIFIED, modifiedDate.format(RFC_7231_FORMAT))
         .extract().as(PageDto.class);
 
-    checkIfEquals(response, OrderableDto.newInstance(Collections.emptyList()));
+    checkIfEquals(response, OrderableDto.newInstances(Collections.emptyList()));
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
@@ -938,16 +944,17 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     List pageContent = response.getContent();
     assertEquals(expected.size(), pageContent.size());
     for (int i = 0; i < pageContent.size(); i++) {
-      Map<String, String> retrieved = (LinkedHashMap) pageContent.get(i);
-      assertEquals(expected.get(i).getFullProductName(),
+      Map<String, ?> retrieved = (LinkedHashMap) pageContent.get(i);
+      OrderableDto expectedOrderableDto = expected.get(i);
+      assertEquals(expectedOrderableDto.getFullProductName(),
           retrieved.get("fullProductName"));
-      assertEquals(expected.get(i).getProductCode(),
+      assertEquals(expectedOrderableDto.getProductCode(),
           retrieved.get("productCode"));
-      assertEquals(expected.get(i).getNetContent().intValue(),
+      assertEquals(expectedOrderableDto.getNetContent().intValue(),
           retrieved.get("netContent"));
-      assertEquals(expected.get(i).getPackRoundingThreshold().intValue(),
+      assertEquals(expectedOrderableDto.getPackRoundingThreshold().intValue(),
           retrieved.get("packRoundingThreshold"));
-      assertEquals(expected.get(i).getRoundToZero(),
+      assertEquals(expectedOrderableDto.getRoundToZero(),
           retrieved.get("roundToZero"));
     }
   }
@@ -987,7 +994,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
       return orderable;
     });
   }
-  
+
   private OrderableChildDto getChildFromOrderableDto(OrderableDto orderableDto) {
     if (orderableDto.getChildren().size() > 0) {
       return orderableDto.getChildren().iterator().next();

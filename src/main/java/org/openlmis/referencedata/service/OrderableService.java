@@ -73,9 +73,10 @@ public class OrderableService implements ExportableDataService<OrderableDto> {
     if (LOGGER.isInfoEnabled()) {
       String code = queryMap.getCode();
       String name = queryMap.getName();
-      String programCode = queryMap.getProgramCode();
+      Set<String> programCodes = queryMap.getProgramCodes();
 
-      LOGGER.info("search by code {}, name {}, and program code {}", code, name, programCode);
+      LOGGER.info("search by code {}, name {}, and program codes: {}", code, name,
+          programCodes.toArray(new String[programCodes.size()]));
     }
 
     return orderableRepository.search(queryMap, pageable);

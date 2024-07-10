@@ -46,7 +46,7 @@ public class OrderableImportPersister
     List<Orderable> persistedObjects = orderableRepository.saveAll(
         createOrUpdate(importedDtos));
 
-    return OrderableDto.newInstance(persistedObjects);
+    return OrderableDto.newInstances(persistedObjects);
   }
 
   @Override
