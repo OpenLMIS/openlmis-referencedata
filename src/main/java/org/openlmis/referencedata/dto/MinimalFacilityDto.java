@@ -43,6 +43,10 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
   @Setter
   private String name;
 
+  @Getter
+  @Setter
+  private Boolean active;
+
   /**
    * Creates new instance of {@link MinimalFacilityDto} based on passed facility.
    */
@@ -70,11 +74,6 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Override
   public void setOperator(FacilityOperator operator) {
-    // unsupported operation
-  }
-
-  @Override
-  public void setActive(Boolean active) {
     // unsupported operation
   }
 

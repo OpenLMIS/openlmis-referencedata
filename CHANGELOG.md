@@ -1,3 +1,8 @@
+15.2.7 / WIP
+==================
+
+* [MW-1367](https://openlmis.atlassian.net/browse/MW-1367): Add active flag to MinimalFacilityDto
+
 15.2.6 / 2023-11-07
 ==================
 
