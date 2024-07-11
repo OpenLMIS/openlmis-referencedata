@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ApprovedProductDto;
@@ -41,6 +42,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.fhir.FhirClient;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
@@ -107,6 +109,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private ValidSourceDestinationService validSourceDestinationService;
+
+  @Autowired
+  private GeographicZoneRepository geographicZoneRepository;
 
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
@@ -434,9 +439,19 @@ public class FacilityController extends BaseController {
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     Facility facility = findFacility(facilityId, profiler);
-
     profiler.start("DELETE_FACILITY");
     facilityRepository.delete(facility);
+
+    if (!facility.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+      GeographicZone geographicZone = facility.getGeographicZone();
+      List<Facility> wardsAndServices = facilityRepository.findByGeographicZone(geographicZone);
+
+      profiler.start("DELETE_WARDS_AND_SERVICES");
+      facilityRepository.deleteAll(wardsAndServices);
+
+      profiler.start("DELETE_GEO_ZONE");
+      geographicZoneRepository.delete(geographicZone);
+    }
   }
 
   /**
