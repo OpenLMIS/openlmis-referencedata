@@ -1,6 +1,6 @@
 CREATE TABLE integration_emails (
     id uuid NOT NULL,
-    email text NOT NULL
+    email text NOT NULL,
     CONSTRAINT integration_emails_pkey PRIMARY KEY (id)
 );
 
