@@ -21,6 +21,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.anyIterable;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -650,6 +651,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .then()
         .statusCode(204);
 
+    verify(facilityRepository).deleteAll(anyIterable());
+    verify(geographicZoneRepository).delete(geographicZone);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
