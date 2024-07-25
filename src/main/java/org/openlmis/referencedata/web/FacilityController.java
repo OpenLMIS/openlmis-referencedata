@@ -44,6 +44,7 @@ import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeApprovedProductRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
 import org.openlmis.referencedata.service.RightAssignmentService;
@@ -112,6 +113,9 @@ public class FacilityController extends BaseController {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
 
   /**
    * Allows creating new facilities. If the id is specified, it will be ignored.
@@ -439,12 +443,21 @@ public class FacilityController extends BaseController {
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
     Facility facility = findFacility(facilityId, profiler);
+
+    profiler.start("DELETE_REQUISITION_GROUP_MEMBERS");
+    requisitionGroupRepository.deleteRequisitionGroupMembersByFacilityId(facility.getId());
+
     profiler.start("DELETE_FACILITY");
     facilityRepository.delete(facility);
 
     if (!facility.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
       GeographicZone geographicZone = facility.getGeographicZone();
       List<Facility> wardsAndServices = facilityRepository.findByGeographicZone(geographicZone);
+
+      profiler.start("DELETE_REQUISITION_GROUP_MEMBERS");
+      for (Facility ward : wardsAndServices) {
+        requisitionGroupRepository.deleteRequisitionGroupMembersByFacilityId(ward.getId());
+      }
 
       profiler.start("DELETE_WARDS_AND_SERVICES");
       facilityRepository.deleteAll(wardsAndServices);
