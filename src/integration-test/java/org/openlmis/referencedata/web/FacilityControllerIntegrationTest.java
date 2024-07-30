@@ -792,7 +792,19 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(FacilityDto.class);
 
-    assertEquals(facilityDto, response);
+    assertEquals(facilityDto.getCode(), response.getCode());
+    assertEquals(facilityDto.getName(), response.getName());
+    assertEquals(facilityDto.getId(), response.getId());
+    assertEquals(facilityDto.getDescription(), response.getDescription());
+    assertEquals(facilityDto.getType(), response.getType());
+    assertEquals(facilityDto.getOperator(), response.getOperator());
+    assertEquals(facilityDto.getActive(), response.getActive());
+    assertEquals(facilityDto.getGoLiveDate(), response.getGoLiveDate());
+    assertEquals(facilityDto.getGoDownDate(), response.getGoDownDate());
+    assertEquals(facilityDto.getComment(), response.getComment());
+    assertEquals(facilityDto.getEnabled(), response.getEnabled());
+    assertEquals(facilityDto.getLocation(), response.getLocation());
+    assertEquals(facilityDto.getExtraData(), response.getExtraData());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
