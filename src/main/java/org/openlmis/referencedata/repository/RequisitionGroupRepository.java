@@ -21,13 +21,21 @@ import org.openlmis.referencedata.repository.custom.RequisitionGroupRepositoryCu
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface RequisitionGroupRepository
     extends JpaRepository<RequisitionGroup, UUID>, RequisitionGroupRepositoryCustom,
     BaseAuditableRepository<RequisitionGroup, UUID> {
 
   <S extends RequisitionGroup> S findByCode(String code);
+
+  @Transactional
+  @Modifying
+  @Query(value = "DELETE FROM referencedata.requisition_group_members "
+      + "WHERE facilityid = :facilityId", nativeQuery = true)
+  void deleteRequisitionGroupMembersByFacilityId(UUID facilityId);
 
   @Query(value = "SELECT\n"
       + "    r.*\n"
