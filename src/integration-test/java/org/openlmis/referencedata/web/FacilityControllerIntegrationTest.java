@@ -104,6 +104,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
   private UUID orderableId;
   private Program program;
   private GeographicZone geographicZone = new GeographicZoneDataBuilder().build();
+  private GeographicZone geographicZone1 = new GeographicZoneDataBuilder().build();
   private FacilityType facilityType = new FacilityTypeDataBuilder().build();
   private Facility facility;
   private Facility facility1;
@@ -136,10 +137,18 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
     facility1 = new FacilityDataBuilder()
         .withSupportedProgram(program)
         .withSupportedProgram(program1)
-        .withGeographicZone(geographicZone)
+        .withGeographicZone(geographicZone1)
         .withType(facilityType)
         .withoutOperator()
         .build();
+
+    // In Angola, facilities are grouped under special local zone
+    // The local zone's name and code relate tightly to the Main facility
+    // See Ward&Services solution for Angola
+    geographicZone.setName(facility.getName());
+    geographicZone.setCode("gz-" + facility.getCode());
+    geographicZone1.setName(facility1.getName());
+    geographicZone1.setCode("gz-" + facility1.getCode());
 
     mockUserHasRight(FACILITIES_MANAGE_RIGHT);
 
@@ -792,19 +801,7 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().as(FacilityDto.class);
 
-    assertEquals(facilityDto.getCode(), response.getCode());
-    assertEquals(facilityDto.getName(), response.getName());
-    assertEquals(facilityDto.getId(), response.getId());
-    assertEquals(facilityDto.getDescription(), response.getDescription());
-    assertEquals(facilityDto.getType(), response.getType());
-    assertEquals(facilityDto.getOperator(), response.getOperator());
-    assertEquals(facilityDto.getActive(), response.getActive());
-    assertEquals(facilityDto.getGoLiveDate(), response.getGoLiveDate());
-    assertEquals(facilityDto.getGoDownDate(), response.getGoDownDate());
-    assertEquals(facilityDto.getComment(), response.getComment());
-    assertEquals(facilityDto.getEnabled(), response.getEnabled());
-    assertEquals(facilityDto.getLocation(), response.getLocation());
-    assertEquals(facilityDto.getExtraData(), response.getExtraData());
+    assertEquals(facilityDto, response);
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
