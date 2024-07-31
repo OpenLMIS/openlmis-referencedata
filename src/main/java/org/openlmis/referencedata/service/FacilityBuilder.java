@@ -116,7 +116,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
           geographicZone = localZone;
         }
       }
-      if (!facility.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+      if (!importer.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
         geographicZone.setName(importer.getName());
         geographicZoneRepository.save(geographicZone);
       }
