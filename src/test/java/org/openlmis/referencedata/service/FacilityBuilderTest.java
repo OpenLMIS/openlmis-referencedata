@@ -289,4 +289,81 @@ public class FacilityBuilderTest {
     Facility built = builder.build(importer);
     assertThat(built.getId()).isEqualTo(facility.getId());
   }
+
+  @Test
+  public void shouldCreateLocalGeozone() {
+    final String facilityName = "shouldCreateLocalGeozone_facility";
+    final String facilityCode = "shouldCreateLocalGeozone_code";
+    final String realGeozoneName = "shouldCreateLocalGeozone_geozone";
+    final String realGeozoneCode = "shouldCreateLocalGeozone_code";
+
+    final GeographicZone realGeozone = new GeographicZone();
+    realGeozone.setId(UUID.fromString("81016457-b20e-440e-a983-26214f3889ab"));
+    realGeozone.setName(realGeozoneName);
+    realGeozone.setCode(realGeozoneCode);
+    realGeozone.setLevel(new GeographicLevelDataBuilder().build());
+
+    when(geographicZoneRepository.findById(realGeozone.getId()))
+        .thenReturn(Optional.of(realGeozone));
+
+    final GeographicZoneSimpleDto realGeozoneDto = new GeographicZoneSimpleDto();
+    realGeozone.export(realGeozoneDto);
+
+    final FacilityDto testImporter = new FacilityDto();
+    testImporter.setName(facilityName);
+    testImporter.setCode(facilityCode);
+    testImporter.setGeographicZone(realGeozoneDto);
+    testImporter.setType(facilityType);
+
+    Facility built = builder.build(testImporter);
+
+    assertThat(built.getGeographicZone().getName()).isEqualTo(facilityName);
+    assertThat(built.getGeographicZone().getCode()).isEqualTo("gz-" + facilityCode);
+    assertThat(built.getGeographicZone().getParent()).isNotNull();
+    assertThat(built.getGeographicZone().getParent().getId()).isEqualTo(realGeozone.getId());
+  }
+
+  @Test
+  public void shouldUpdateLocalGeozone() {
+    final String facilityName = "shouldUpdateLocalGeozone_facility";
+    final String changedFacilityName = "shouldUpdateLocalGeozone_facility_changed";
+    final String facilityCode = "shouldUpdateLocalGeozone_code";
+    final String realGeozoneName = "shouldUpdateLocalGeozone_geozone";
+    final String realGeozoneCode = "shouldUpdateLocalGeozone_code";
+
+    final GeographicZone realGeozone = new GeographicZone();
+    realGeozone.setId(UUID.fromString("81016457-b20e-440e-a983-26214f3889ab"));
+    realGeozone.setName(realGeozoneName);
+    realGeozone.setCode(realGeozoneCode);
+    realGeozone.setLevel(new GeographicLevelDataBuilder().build());
+
+    final GeographicZone localGeozone = new GeographicZone();
+    localGeozone.setId(UUID.fromString("81016457-b20e-440e-a983-26214f3889cd"));
+    localGeozone.setName(facilityName);
+    localGeozone.setCode("gz-" + facilityCode);
+    localGeozone.setParent(realGeozone);
+    localGeozone.setLevel(new GeographicLevelDataBuilder().build());
+
+    when(geographicZoneRepository.findById(localGeozone.getId()))
+        .thenReturn(Optional.of(localGeozone));
+
+    final Facility testFacility = new Facility();
+    testFacility.setId(UUID.fromString("81016457-b20e-440e-a983-26214f3889ef"));
+    testFacility.setName(facilityName);
+    testFacility.setCode(facilityCode);
+    testFacility.setGeographicZone(localGeozone);
+    testFacility.setType(facilityType);
+
+    when(facilityRepository.findById(testFacility.getId())).thenReturn(Optional.of(testFacility));
+
+    final FacilityDto testImporter = FacilityDto.newInstance(testFacility);
+    testImporter.setName(changedFacilityName);
+
+    Facility built = builder.build(testImporter);
+
+    assertThat(built.getGeographicZone().getName()).isEqualTo(changedFacilityName);
+    assertThat(built.getGeographicZone().getCode()).isEqualTo("gz-" + facilityCode);
+    assertThat(built.getGeographicZone().getParent()).isNotNull();
+    assertThat(built.getGeographicZone().getParent().getId()).isEqualTo(realGeozone.getId());
+  }
 }
