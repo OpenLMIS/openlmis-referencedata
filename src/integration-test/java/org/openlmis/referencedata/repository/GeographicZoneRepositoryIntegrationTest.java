@@ -23,6 +23,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -31,6 +33,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -298,6 +301,18 @@ public class GeographicZoneRepositoryIntegrationTest
     assertEquals(0, foundPage.getContent().size());
   }
 
+  @Test
+  public void shouldExcludeByLevelName() {
+    Pageable pageable = mockPageable(0, 10);
+    Page<GeographicZone> foundPage =
+        repository.findByLevelNameNotIn(
+            Collections.singletonList(districtLevel.getName()), pageable);
+    assertNotNull(foundPage);
+    assertEquals(2, foundPage.getTotalElements());
+    assertFalse(foundPage.getContent().stream()
+        .anyMatch(gz -> gz.getLevel().getName().equals(districtLevel.getName())));
+  }
+
   private void searchZonesAndCheckResults(String name, String code, GeographicZone parent,
                                           GeographicLevel geographicLevel,
                                           Pageable pageable, int expectedSize,
@@ -313,7 +328,7 @@ public class GeographicZoneRepositoryIntegrationTest
     Pageable pageable = mock(Pageable.class);
     given(pageable.getPageNumber()).willReturn(pageNumber);
     given(pageable.getPageSize()).willReturn(pageSize);
-    given(pageable.getSort()).willReturn(null);
+    given(pageable.getSort()).willReturn(Sort.unsorted());
     return pageable;
   }
 

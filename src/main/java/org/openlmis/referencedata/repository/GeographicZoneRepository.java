@@ -65,4 +65,11 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
       + " ",
       nativeQuery = true)
   Page<GeographicZone> findAllWithoutSnapshots(Pageable pageable);
+
+  @Query(
+      "select gz from GeographicZone gz "
+          + "where gz.level in (select l from GeographicLevel l "
+          + "where not l.name in (:excludeLevel))")
+  Page<GeographicZone> findByLevelNameNotIn(
+      @Param("excludeLevel") List<String> excludeLevel, Pageable pageable);
 }

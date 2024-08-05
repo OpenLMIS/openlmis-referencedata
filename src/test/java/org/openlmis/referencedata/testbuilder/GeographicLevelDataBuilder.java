@@ -62,8 +62,16 @@ public class GeographicLevelDataBuilder {
     return this;
   }
 
+  /**
+   * Use level number.
+   * It also updates a name of level to create.
+   *
+   * @param levelNumber the level number, not null
+   * @return this builder
+   */
   public GeographicLevelDataBuilder withLevelNumber(Integer levelNumber) {
     this.levelNumber = levelNumber;
+    this.name = "Geographic Level" + levelNumber;
     return this;
   }
 }
