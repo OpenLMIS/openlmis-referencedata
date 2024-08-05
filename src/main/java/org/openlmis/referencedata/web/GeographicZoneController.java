@@ -17,7 +17,6 @@ package org.openlmis.referencedata.web;
 
 import com.vividsolutions.jts.geom.Point;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -129,8 +128,10 @@ public class GeographicZoneController extends BaseController {
 
     profiler.start("FIND_ALL");
     Page<GeographicZone> page =
-        geographicZoneRepository.findByLevelNameNotIn(
-            excludeLevel != null ? Arrays.asList(excludeLevel) : Collections.emptyList(), pageable);
+        (excludeLevel == null || excludeLevel.length == 0)
+            ? geographicZoneRepository.findAll(pageable)
+            : geographicZoneRepository.findByLevelCodeNotIn(Arrays.asList(excludeLevel), pageable);
+
     List<GeographicZoneSimpleDto> dtos = toSimpleDto(page.getContent(), profiler);
     Page<GeographicZoneSimpleDto> response =
         toPage(dtos, pageable, page.getTotalElements(), profiler);

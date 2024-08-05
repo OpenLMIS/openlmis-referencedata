@@ -302,15 +302,15 @@ public class GeographicZoneRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldExcludeByLevelName() {
+  public void shouldExcludeByLevelCode() {
     Pageable pageable = mockPageable(0, 10);
     Page<GeographicZone> foundPage =
-        repository.findByLevelNameNotIn(
-            Collections.singletonList(districtLevel.getName()), pageable);
+        repository.findByLevelCodeNotIn(
+            Collections.singletonList(districtLevel.getCode()), pageable);
     assertNotNull(foundPage);
     assertEquals(2, foundPage.getTotalElements());
     assertFalse(foundPage.getContent().stream()
-        .anyMatch(gz -> gz.getLevel().getName().equals(districtLevel.getName())));
+        .anyMatch(gz -> gz.getLevel().getCode().equals(districtLevel.getCode())));
   }
 
   private void searchZonesAndCheckResults(String name, String code, GeographicZone parent,

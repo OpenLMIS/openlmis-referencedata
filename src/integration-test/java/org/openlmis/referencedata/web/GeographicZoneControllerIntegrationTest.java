@@ -18,7 +18,6 @@ package org.openlmis.referencedata.web;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyMapOf;
@@ -192,7 +191,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones,
         PageRequest.of(0, 10));
 
-    given(geographicZoneRepository.findByLevelNameNotIn(any(), eq(pageable)))
+    given(geographicZoneRepository.findAll(pageable))
         .willReturn(geographicZonesPage);
 
     restAssured

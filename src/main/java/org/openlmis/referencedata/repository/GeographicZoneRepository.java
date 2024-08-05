@@ -69,7 +69,7 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
   @Query(
       "select gz from GeographicZone gz "
           + "where gz.level in (select l from GeographicLevel l "
-          + "where not l.name in (:excludeLevel))")
-  Page<GeographicZone> findByLevelNameNotIn(
+          + "where not l.code in (:excludeLevel))")
+  Page<GeographicZone> findByLevelCodeNotIn(
       @Param("excludeLevel") List<String> excludeLevel, Pageable pageable);
 }
