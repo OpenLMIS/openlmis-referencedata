@@ -37,7 +37,7 @@ public class OrderableChildTest {
         .withPrefabValues(Orderable.class,
             new OrderableDataBuilder().buildAsNew(),
             new OrderableDataBuilder().buildAsNew())
-        .withOnlyTheseFields("parent", "orderable")
+        .withOnlyTheseFields("parent", "orderable", "unit")
         .verify();
   }
 
@@ -45,13 +45,15 @@ public class OrderableChildTest {
   public void shouldCreateNewOrderableChild() {
     Orderable parent = Mockito.mock(Orderable.class);
     Orderable child = Mockito.mock(Orderable.class);
+    UnitOfOrderable unit = Mockito.mock(UnitOfOrderable.class);
     Long quantity = 10L;
 
-    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, quantity);
+    OrderableChild orderableChild = OrderableChild.newInstance(parent, child, quantity, unit);
 
     assertEquals(orderableChild.getQuantity(), quantity);
     assertEquals(orderableChild.getOrderable(), child);
     assertEquals(orderableChild.getParent(), parent);
+    assertEquals(orderableChild.getUnit(), unit);
   }
 
   @Test
@@ -63,6 +65,7 @@ public class OrderableChildTest {
 
     verify(exporter).setQuantity(any());
     verify(exporter).setOrderable(any());
+    verify(exporter).setUnit(any());
   }
 
 }

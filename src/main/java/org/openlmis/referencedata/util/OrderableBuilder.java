@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.util;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.time.ZonedDateTime;
@@ -32,6 +35,8 @@ import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.UnitOfOrderable;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.exception.NotFoundException;
@@ -77,7 +82,7 @@ public class OrderableBuilder {
           .getPrograms()
           .stream()
           .map(item -> programRepository.findById(item.getProgramId()).orElse(null))
-          .collect(Collectors.toMap(Program::getId, program -> program, (id1, id2) -> id1));
+          .collect(toMap(Program::getId, program -> program, (id1, id2) -> id1));
 
       List<ProgramOrderable> programOrderables = importer
           .getPrograms()
@@ -92,7 +97,7 @@ public class OrderableBuilder {
             setPriceChanges(persistedOrderable, item, programOrderable, program);
             return programOrderable;
           })
-          .collect(Collectors.toList());
+          .collect(toList());
 
       orderable.setProgramOrderables(programOrderables);
     }
@@ -139,7 +144,7 @@ public class OrderableBuilder {
           priceChangeItem.setProgramOrderable(programOrderable);
           return priceChangeItem;
         })
-        .collect(Collectors.toList());
+        .collect(toList());
   }
 
   private void addPriceChange(ProgramOrderable programOrderable, Money newPrice,
@@ -154,28 +159,44 @@ public class OrderableBuilder {
   }
 
   private void setChildren(Orderable.Importer importer, Orderable orderable) {
-    List<UUID> uuids = importer.getChildren()
-        .stream()
-        .map(item -> item.getOrderable().getId())
-        .collect(Collectors.toList());
+    final Map<UUID, Orderable> childrenOrderables = loadChildrenOrderables(importer);
+    final Map<UUID, UnitOfOrderable> childrenUnits = loadChildrenUnits(importer);
 
-    Map<UUID, Orderable> childrenOrderables = orderableRepository
-        .findAllLatestByIds(uuids, null)
-        .getContent()
-        .stream()
-        .collect(Collectors.toMap(Orderable::getId, o -> o));
-
-    Set<OrderableChild> children = importer.getChildren().stream().map(
+    final Set<OrderableChild> children = importer.getChildren().stream().map(
         item -> {
-          Orderable child = childrenOrderables.get(item.getOrderable().getId());
-          return OrderableChild.newInstance(orderable, child, item.getQuantity());
+          final Orderable child = childrenOrderables.get(item.getOrderable().getId());
+          final UnitOfOrderable unit = childrenUnits.get(item.getUnit().getId());
+          return OrderableChild.newInstance(orderable, child, item.getQuantity(), unit);
         }).collect(Collectors.toSet());
     orderable.setChildren(children);
   }
 
+  private Map<UUID, Orderable> loadChildrenOrderables(Orderable.Importer importer) {
+    List<UUID> uuids = importer.getChildren()
+        .stream()
+        .map(item -> item.getOrderable().getId())
+        .collect(toList());
+
+    return orderableRepository
+        .findAllLatestByIds(uuids, null)
+        .getContent()
+        .stream()
+        .collect(toMap(Orderable::getId, identity()));
+  }
+
+  private Map<UUID, UnitOfOrderable> loadChildrenUnits(Orderable.Importer importer) {
+    final List<UUID> unitIds = importer.getChildren().stream()
+        .map(OrderableChildDto::getUnit)
+        .map(BaseDto::getId)
+        .collect(toList());
+
+    return unitOfOrderableRepository.findAllById(unitIds).stream()
+        .collect(toMap(UnitOfOrderable::getId, identity()));
+  }
+
   private void setUnits(Orderable.Importer importer, Orderable orderable) {
     orderable.setUnits(
-        importer.getUnits().stream().map(this::mapToSavedUnit).collect(Collectors.toList()));
+        importer.getUnits().stream().map(this::mapToSavedUnit).collect(toList()));
   }
 
   private UnitOfOrderable mapToSavedUnit(UnitOfOrderableDto unitDto) {

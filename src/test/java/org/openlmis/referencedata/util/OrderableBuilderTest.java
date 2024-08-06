@@ -15,7 +15,7 @@
 
 package org.openlmis.referencedata.util;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -45,9 +45,12 @@ import org.openlmis.referencedata.dto.ObjectReferenceDto;
 import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
+import org.openlmis.referencedata.dto.UnitOfOrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.repository.UnitOfOrderableRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
+import org.openlmis.referencedata.testbuilder.UnitOfOrderableBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -61,6 +64,9 @@ public class OrderableBuilderTest {
 
   @Mock
   private OrderableRepository orderableRepository;
+
+  @Mock
+  private UnitOfOrderableRepository unitOfOrderableRepository;
 
   @Mock
   private AuthenticationHelper authenticationHelper;
@@ -88,11 +94,11 @@ public class OrderableBuilderTest {
 
   @Test
   public void shouldCreateOrderableWithChildren() {
-
     Set<OrderableChildDto> childSet = new HashSet<>();
     ObjectReferenceDto objectReferenceDto = new ObjectReferenceDto();
     objectReferenceDto.setId(UUID.randomUUID());
-    OrderableChildDto childDto = new OrderableChildDto(objectReferenceDto, 20L);
+    UnitOfOrderableDto unit = UnitOfOrderableDto.newInstance(new UnitOfOrderableBuilder().build());
+    OrderableChildDto childDto = new OrderableChildDto(objectReferenceDto, 20L, unit);
     childSet.add(childDto);
     OrderableDto orderableDto = new OrderableDto();
 
@@ -104,11 +110,12 @@ public class OrderableBuilderTest {
 
     Orderable child = createOrderable();
 
-    Page<Orderable> orderablePage = new PageImpl<>(asList(child), PageRequest.of(1, 100), 1);
+    Page<Orderable> orderablePage = new PageImpl<>(singletonList(child), PageRequest.of(1, 100), 1);
 
     when(orderableRepository
         .findAllLatestByIds(any(), any()))
         .thenReturn(orderablePage);
+    when(unitOfOrderableRepository.findAllById(any())).thenReturn(child.getUnits());
 
     Orderable orderable = orderableBuilder.newOrderable(orderableDto, null);
     assertThat(orderable.getChildren().size(), is(1));

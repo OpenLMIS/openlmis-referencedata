@@ -17,7 +17,6 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,11 +27,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableChild;
+import org.openlmis.referencedata.domain.UnitOfOrderable;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class OrderableChildDto implements OrderableChild.Exporter, OrderableChild.Importer {
+public class OrderableChildDto extends BaseDto
+    implements OrderableChild.Exporter, OrderableChild.Importer {
 
   @Getter
   private ObjectReferenceDto orderable;
@@ -40,6 +41,9 @@ public class OrderableChildDto implements OrderableChild.Exporter, OrderableChil
   @Getter
   @Setter
   private Long quantity;
+
+  @Getter
+  private UnitOfOrderableDto unit;
 
   /**
    * Create new Set containing OrderableChildDto based on given a set of {@link OrderableChild}.
@@ -66,7 +70,23 @@ public class OrderableChildDto implements OrderableChild.Exporter, OrderableChil
   @JsonIgnore
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   public void setOrderable(Orderable orderable) {
-    this.orderable = new ObjectReferenceDto();
-    this.orderable.setId(orderable.getId());
+    final ObjectReferenceDto referenceDto = new ObjectReferenceDto();
+    referenceDto.setId(orderable.getId());
+    setOrderable(referenceDto);
+  }
+
+  public void setOrderable(ObjectReferenceDto orderable) {
+    this.orderable = orderable;
+  }
+
+  @Override
+  @JsonIgnore
+  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+  public void setUnit(UnitOfOrderable unit) {
+    setUnit(UnitOfOrderableDto.newInstance(unit));
+  }
+
+  public void setUnit(UnitOfOrderableDto unit) {
+    this.unit = unit;
   }
 }
