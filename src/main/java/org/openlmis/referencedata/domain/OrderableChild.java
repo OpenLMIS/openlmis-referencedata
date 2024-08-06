@@ -32,12 +32,14 @@ import org.javers.core.metamodel.annotation.TypeName;
 @Table(name = "orderable_children", schema = "referencedata",
     uniqueConstraints = @UniqueConstraint(
         name = "unq_orderable_parent_id",
-        columnNames = {"orderableid", "orderableVersionNumber", "parentid", "parentVersionNumber"})
+        columnNames = {
+            "orderableid", "orderableVersionNumber", "parentid", "parentVersionNumber", "unitId"
+        })
 )
 @NoArgsConstructor
 @AllArgsConstructor
 @TypeName("OrderableChild")
-@EqualsAndHashCode(callSuper = false, of = {"parent", "orderable"})
+@EqualsAndHashCode(callSuper = false, of = {"parent", "orderable", "unit"})
 public class OrderableChild extends BaseEntity {
 
   @ManyToOne
@@ -64,19 +66,28 @@ public class OrderableChild extends BaseEntity {
   @Setter
   private Long quantity;
 
+  @ManyToOne
+  @JoinColumn(name = "unitId", referencedColumnName = "id", nullable = false)
+  @Getter
+  @Setter
+  private UnitOfOrderable unit;
+
   /**
    * Create a new instance of OrderableChild to represent what is in a kit.
    *
    * @param parent parent orderable.
    * @param child kit constituent.
    * @param quantity quantity of constituent contained in kit.
+   * @param unit unit of the quantity
    * @return OrderableChild.
    */
-  public static OrderableChild newInstance(Orderable parent, Orderable child, Long quantity) {
+  public static OrderableChild newInstance(Orderable parent, Orderable child, Long quantity,
+                                           UnitOfOrderable unit) {
     OrderableChild orderableChild = new OrderableChild();
     orderableChild.setOrderable(child);
     orderableChild.setParent(parent);
     orderableChild.setQuantity(quantity);
+    orderableChild.setUnit(unit);
     return orderableChild;
   }
 
@@ -88,18 +99,23 @@ public class OrderableChild extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setOrderable(orderable);
     exporter.setQuantity(quantity);
+    exporter.setUnit(unit);
   }
 
-  public interface Exporter {
+  public interface Exporter extends BaseExporter {
 
     void setOrderable(Orderable orderable);
 
     void setQuantity(Long quantity);
+
+    void setUnit(UnitOfOrderable unit);
   }
 
-  public interface Importer {
+  public interface Importer extends BaseImporter {
 
     Long getQuantity();
+
+    UnitOfOrderable.Importer getUnit();
   }
 
 }

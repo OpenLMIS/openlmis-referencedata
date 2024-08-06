@@ -38,6 +38,7 @@ public class OrderableChildDtoTest {
         .withRedefinedSuperclass()
         .suppress(Warning.STRICT_INHERITANCE)
         .suppress(Warning.NONFINAL_FIELDS)
+        .withIgnoredFields("id")
         .verify();
   }
 

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -240,6 +241,10 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         .statusCode(200)
         .extract().response();
 
+    UnitOfOrderable testUnit = new UnitOfOrderableBuilder().build();
+    when(unitOfOrderableRepository.findAllById(singletonList(testUnit.getId())))
+        .thenReturn(singletonList(testUnit));
+
     OrderableDto orderableDto1 = response1.as(OrderableDto.class);
     orderableDto1.setNetContent(11L);
     Orderable orderableChild =
@@ -248,6 +253,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
             .withDispensable(Dispensable.createNew(UNIT))
             .withVersionNumber(orderableVersionNumber)
             .withProgramOrderables(Collections.emptyList())
+            .withUnits(singletonList(testUnit))
             .build();
     orderableChild.setLastUpdated(modifiedDate);
 
@@ -259,7 +265,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<Orderable> orderableList = new ArrayList<>();
     orderableList.add(orderableChild);
-    Page<Orderable> orderableMap = new PageImpl<Orderable>(orderableList);
+    Page<Orderable> orderableMap = new PageImpl<>(orderableList);
 
     when(orderableRepository.findAllLatestByIds(orderableIdList, null)).thenReturn(orderableMap);
 
@@ -282,6 +288,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     OrderableChildDto childDto = new OrderableChildDto();
     childDto.setOrderable(orderableChild);
     childDto.setQuantity(1L);
+    childDto.setUnit(testUnit);
     Set<OrderableChildDto> childSet = new HashSet<>();
     childSet.add(childDto);
 
@@ -308,6 +315,9 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
         getChildFromOrderableDto(orderableDto3).getOrderable().getId());
     assertEquals(getChildFromOrderableDto(orderableDto1).getQuantity(),
         getChildFromOrderableDto(orderableDto3).getQuantity());
+    assertEquals(
+        UnitOfOrderableDto.newInstance(testUnit),
+        getChildFromOrderableDto(orderableDto3).getUnit());
   }
 
   @Test
@@ -373,7 +383,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     ProgramOrderable programOrderable = new ProgramOrderable(program, orderable, 1, true,
         orderableDisplayCategory, true, 1, Money.of(CurrencyUnit.USD, 10.0),
         Collections.emptyList());
-    orderable.setProgramOrderables(Collections.singletonList(programOrderable));
+    orderable.setProgramOrderables(singletonList(programOrderable));
     orderable.export(orderableDto);
 
     when(programRepository.findById(programId)).thenReturn(Optional.of(program));
@@ -470,7 +480,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveAllOrderables() throws JsonProcessingException {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
     when(orderableService
         .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(items, PageRequest.of(0, 10)));
@@ -497,7 +507,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldRetrieveAllOrderablesIfAnyResourceWasModified() throws JsonProcessingException {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
     when(orderableService
         .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(items, PageRequest.of(0, 10)));
@@ -547,7 +557,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldReturnNotModifiedAndNoResponseBodyIfNoOrderableWasModified() {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
     when(orderableService
         .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
         .thenReturn(Pagination.getPage(items, PageRequest.of(0, 10)));
@@ -575,7 +585,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     final String name = "some-name";
     final String programCode1 = "program-code1";
     final String programCode2 = "program-code2";
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
 
     UUID orderableId2 = UUID.randomUUID();
 
@@ -623,7 +633,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldPaginateSearchOrderables() {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
 
     Pageable page = PageRequest.of(0, 10);
     when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
@@ -658,7 +668,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void shouldNotAllowPaginationWithZeroSize() {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
 
     Pageable page = PageRequest.of(0, 0);
     when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
@@ -678,7 +688,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void shouldNotAllowPaginationWithoutSize() {
-    final List<Orderable> items = Collections.singletonList(orderable);
+    final List<Orderable> items = singletonList(orderable);
 
     Pageable page = PageRequest.of(0, 0);
     when(orderableService.searchOrderables(any(QueryOrderableSearchParams.class), eq(page)))
@@ -965,7 +975,7 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   private ProgramOrderableDto generateProgramOrderable() {
     return new ProgramOrderableDto(UUID.randomUUID(), UUID.randomUUID(),
         null, null, true, true, 0, 1, Money.of(CurrencyUnit.USD, 10.0),
-        Collections.singletonList(new PriceChangeDto()));
+        singletonList(new PriceChangeDto()));
   }
 
   private void checkIfEquals(PageDto response, List<OrderableDto> expected)
