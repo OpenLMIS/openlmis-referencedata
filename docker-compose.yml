@@ -19,7 +19,7 @@ services:
     depends_on: [log]
 
   log:
-    image: openlmis/rsyslog:1
+    image: openlmis/rsyslog:3
     ports:
       - "514"
       - "12514:514/udp"

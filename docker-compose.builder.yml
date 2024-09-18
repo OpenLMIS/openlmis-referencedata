@@ -2,7 +2,7 @@ version: "2"
 services:
 
   builder:
-    image: openlmis/dev:9
+    image: openlmis/dev:10
     links:
       - db
       - log
@@ -16,7 +16,7 @@ services:
     env_file: .env
 
   sonar:
-    image: openlmis/dev:9
+    image: openlmis/dev:10
     links:
       - db
       - log
@@ -44,6 +44,6 @@ services:
     depends_on: [log]
 
   log:
-    image: openlmis/rsyslog:1
+    image: openlmis/rsyslog:3
     volumes:
       - '../logs/referencedata:/var/log'
