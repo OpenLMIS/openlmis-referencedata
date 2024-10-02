@@ -1,0 +1,1 @@
+INSERT INTO rights (id, description, name, type) VALUES ('5445e435-11f6-4bda-b28b-b18b35f1bd47', NULL, 'WARDS_MANAGE', 'GENERAL_ADMIN');
