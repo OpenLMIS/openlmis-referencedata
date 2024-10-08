@@ -15,12 +15,18 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.BOOLEAN_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.FACILITY_OPERATOR_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.LOCAL_DATE;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +39,7 @@ import lombok.Setter;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,12 +48,24 @@ import org.openlmis.referencedata.domain.SupportedProgram;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public final class FacilityDto extends BasicFacilityDto {
+  @ImportField(name = "description")
   private String description;
+
+  @ImportField(name = "operator", type = FACILITY_OPERATOR_TYPE)
   private FacilityOperatorDto operator;
+
+  @ImportField(name = "goLiveDate", type = LOCAL_DATE)
   private LocalDate goLiveDate;
+
+  @ImportField(name = "goDownDate", type = LOCAL_DATE)
   private LocalDate goDownDate;
+
+  @ImportField(name = "comment")
   private String comment;
+
+  @ImportField(name = "openLmisAccessible", type = BOOLEAN_TYPE)
   private Boolean openLmisAccessible;
+
   private Point location;
   private Map<String, Object> extraData;
 
@@ -65,6 +84,18 @@ public final class FacilityDto extends BasicFacilityDto {
     facility.export(dto);
 
     return dto;
+  }
+
+  /**
+   * Create new set of FacilityDto based on given iterable of {@link Facility}.
+   *
+   * @param facilities list of {@link Facility}
+   * @return new list of FacilityDto.
+   */
+  public static List<FacilityDto> newInstances(Iterable<Facility> facilities) {
+    List<FacilityDto> facilityDtos = new LinkedList<>();
+    facilities.forEach(f -> facilityDtos.add(newInstance(f)));
+    return facilityDtos;
   }
 
   @JsonSetter("operator")

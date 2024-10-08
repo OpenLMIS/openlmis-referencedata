@@ -82,7 +82,7 @@ public class FacilityDataBuilder {
    */
   public Facility buildAsNew() {
 
-    //TODO: add new constructor, AllArgsConstructor fails 1 integration test
+    // TODO: add new constructor, AllArgsConstructor fails 1 integration test
     Facility facility = new Facility(code);
     facility.setName(name);
     facility.setDescription(description);
@@ -97,13 +97,12 @@ public class FacilityDataBuilder {
     facility.setOpenLmisAccessible(openLmisAccessible);
     facility.setLocation(location);
     facility.setExtraData(extraData);
-    facility.setSupportedPrograms(supportedPrograms
-        .stream()
-        .map(p -> new SupportedProgramDataBuilder()
-            .withProgram(p)
-            .withFacility(facility)
-            .build())
-        .collect(Collectors.toSet()));
+    facility.setSupportedPrograms(
+        supportedPrograms.stream()
+            .map(
+                p ->
+                    new SupportedProgramDataBuilder().withProgram(p).withFacility(facility).build())
+            .collect(Collectors.toSet()));
 
     return facility;
   }
@@ -138,6 +137,16 @@ public class FacilityDataBuilder {
 
   public FacilityDataBuilder withName(String name) {
     this.name = name;
+    return this;
+  }
+
+  public FacilityDataBuilder witActive(Boolean active) {
+    this.active = active;
+    return this;
+  }
+
+  public FacilityDataBuilder witEnabled(Boolean enabled) {
+    this.enabled = enabled;
     return this;
   }
 
@@ -180,8 +189,7 @@ public class FacilityDataBuilder {
    */
   public FacilityDataBuilder withGeographicZoneWithParent() {
     GeographicZone parent = new GeographicZoneDataBuilder().build();
-    this.geographicZone = new GeographicZoneDataBuilder()
-        .withParent(parent).build();
+    this.geographicZone = new GeographicZoneDataBuilder().withParent(parent).build();
     return this;
   }
 
@@ -216,5 +224,25 @@ public class FacilityDataBuilder {
 
   public FacilityDataBuilder withIsManagedExternallyFlag() {
     return withExtraData(FhirLocationValidator.IS_MANAGED_EXTERNALLY, Boolean.TRUE.toString());
+  }
+
+  public FacilityDataBuilder withGoLiveDate(LocalDate goLiveDate) {
+    this.goLiveDate = goLiveDate;
+    return this;
+  }
+
+  public FacilityDataBuilder withGoDownDate(LocalDate goDownDate) {
+    this.goDownDate = goDownDate;
+    return this;
+  }
+
+  public FacilityDataBuilder withComment(String comment) {
+    this.comment = comment;
+    return this;
+  }
+
+  public FacilityDataBuilder withOpenLmisAccessible(Boolean openLmisAccessible) {
+    this.openLmisAccessible = openLmisAccessible;
+    return this;
   }
 }

@@ -15,6 +15,10 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.BOOLEAN_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.FACILITY_TYPE_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.GEOGRAPHIC_ZONE_TYPE;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.google.common.collect.Maps;
@@ -30,6 +34,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @Getter
 @Setter
@@ -38,8 +43,14 @@ import org.openlmis.referencedata.domain.GeographicZone;
 @EqualsAndHashCode(callSuper = true)
 public class BasicFacilityDto extends MinimalFacilityDto
     implements Facility.Importer, Facility.Exporter {
+
+  @ImportField(name = "enabled", type = BOOLEAN_TYPE)
   private Boolean enabled;
+
+  @ImportField(name = "type", type = FACILITY_TYPE_TYPE)
   private FacilityTypeDto type;
+
+  @ImportField(name = "geographicZone", type = GEOGRAPHIC_ZONE_TYPE)
   private GeographicZoneSimpleDto geographicZone;
 
   /**

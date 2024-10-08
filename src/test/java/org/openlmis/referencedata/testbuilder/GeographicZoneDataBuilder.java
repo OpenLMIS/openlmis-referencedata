@@ -95,6 +95,11 @@ public class GeographicZoneDataBuilder {
     return this;
   }
 
+  public GeographicZoneDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
+
   public GeographicZoneDataBuilder withLevel(GeographicLevel level) {
     this.level = level;
     return this;

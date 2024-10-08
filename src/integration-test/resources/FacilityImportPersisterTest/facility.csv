@@ -1,0 +1,2 @@
+code,name,active,enabled,type,geographicZone,description,operator,goLiveDate,goDownDate,comment,openLmisAccessible
+TEST1,Test1,true,true,TestType,TestZone,TestDecription,TestOperator,2024-10-07,2034-10-07,TestComment,true

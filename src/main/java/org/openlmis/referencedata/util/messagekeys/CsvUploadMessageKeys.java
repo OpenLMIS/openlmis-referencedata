@@ -17,28 +17,29 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public class CsvUploadMessageKeys extends MessageKeys {
 
+  public static final String ERROR_UPLOAD_PARSING_LOCAL_DATE_FAILED =
+      "referenceData.error.record.parsing.boolean.failed";
   private static final String ERROR_PREFIX = join(SERVICE_ERROR, UPLOAD);
-
   public static final String ERROR_UPLOAD_RECORD_INVALID = join(ERROR_PREFIX, RECORD, INVALID);
   public static final String ERROR_FILE_IS_EMPTY = join(ERROR_PREFIX, FILE, EMPTY);
-  public static final String ERROR_INCORRECT_FILE_FORMAT = join(
-      ERROR_PREFIX, FILE, FORMAT, INCORRECT);
+  public static final String ERROR_INCORRECT_FILE_FORMAT =
+      join(ERROR_PREFIX, FILE, FORMAT, INCORRECT);
   public static final String ERROR_UPLOAD_HEADER_MISSING = join(ERROR_PREFIX, HEADER, MISSING);
-  public static final String ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS = join(
-      ERROR_PREFIX, MANDATORY, COLUMNS, MISSING);
-  public static final String ERROR_UPLOAD_MISSING_MANDATORY_FIELD = join(
-      ERROR_PREFIX, MANDATORY, FIELD, MISSING);
+  public static final String ERROR_UPLOAD_MISSING_MANDATORY_COLUMNS =
+      join(ERROR_PREFIX, MANDATORY, COLUMNS, MISSING);
+  public static final String ERROR_UPLOAD_MISSING_MANDATORY_FIELD =
+      join(ERROR_PREFIX, MANDATORY, FIELD, MISSING);
   public static final String ERROR_UPLOAD_HEADER_INVALID = join(ERROR_PREFIX, HEADER, INVALID);
-  public static final String ERROR_UPLOAD_FORMATTING_FAILED = join(
-      ERROR_PREFIX, RECORD, FORMATTING, FAILED);
-  public static final String ERROR_UPLOAD_PARSING_FAILED = join(
-      ERROR_PREFIX, RECORD, PARSING, FAILED);
-  public static final String ERROR_UPLOAD_PARSING_NUMBER_FAILED = join(
-      ERROR_PREFIX, RECORD, PARSING, NUMBER, FAILED);
-  public static final String ERROR_UPLOAD_PARSING_BOOLEAN_FAILED = join(
-      ERROR_PREFIX, RECORD, PARSING, BOOLEAN, FAILED);
-  public static final String ERROR_UPLOAD_POSITIVE_OR_ZERO = join(
-      ERROR_PREFIX, RECORD, MUST_BE_POSITIVE_OR_ZERO);
+  public static final String ERROR_UPLOAD_FORMATTING_FAILED =
+      join(ERROR_PREFIX, RECORD, FORMATTING, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_FAILED =
+      join(ERROR_PREFIX, RECORD, PARSING, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_NUMBER_FAILED =
+      join(ERROR_PREFIX, RECORD, PARSING, NUMBER, FAILED);
+  public static final String ERROR_UPLOAD_PARSING_BOOLEAN_FAILED =
+      join(ERROR_PREFIX, RECORD, PARSING, BOOLEAN, FAILED);
+  public static final String ERROR_UPLOAD_POSITIVE_OR_ZERO =
+      join(ERROR_PREFIX, RECORD, MUST_BE_POSITIVE_OR_ZERO);
   public static final String ERROR_FILE_EXTENSION = join(ERROR_PREFIX, FILE, EXTENSION, INVALID);
   public static final String ERROR_FILE_TOO_LARGE = join(ERROR_PREFIX, FILE, TOO, LARGE);
   public static final String ERROR_FILE_NAME_INVALID = join(ERROR_PREFIX, FILE, NAME, INVALID);

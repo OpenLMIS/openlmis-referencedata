@@ -44,4 +44,6 @@ public interface FacilityOperatorRepository
       + " ",
       nativeQuery = true)
   Page<FacilityOperator> findAllWithoutSnapshots(Pageable pageable);
+
+  FacilityOperator findByCode(String code);
 }

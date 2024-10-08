@@ -19,6 +19,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.openlmis.referencedata.dto.BasicFacilityDto;
+import org.openlmis.referencedata.dto.FacilityOperatorDto;
+import org.openlmis.referencedata.dto.FacilityTypeDto;
+import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
+import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.model.ModelField;
 import org.supercsv.cellprocessor.Optional;
@@ -26,12 +31,14 @@ import org.supercsv.cellprocessor.Trim;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 
 /**
- * This class has mappings from type to cell processors used for parsing value in a cell
- * to corresponding data type.
+ * This class has mappings from type to cell processors used for parsing value in a cell to
+ * corresponding data type.
  */
 public class CsvCellProcessors {
 
   public static final String FACILITY_TYPE = "Facility";
+  public static final String FACILITY_TYPE_TYPE = "FacilityType";
+  public static final String FACILITY_OPERATOR_TYPE = "FacilityOperator";
   public static final String COMMODITY_TYPE = "CommodityType";
   public static final String PROCESSING_PERIOD_TYPE = "ProcessingPeriod";
   public static final String POSITIVE_INT = "int";
@@ -43,12 +50,20 @@ public class CsvCellProcessors {
   public static final String MONEY_TYPE = "Money";
   public static final String CODE_TYPE = "Code";
   public static final String BOOLEAN_TYPE = "Boolean";
+  public static final String GEOGRAPHIC_ZONE_TYPE = "GeographicZone";
+  public static final String LOCAL_DATE = "LocalDate";
 
   private static final Map<String, CellProcessor> typeParseMappings = new HashMap<>();
   private static final Map<String, CellProcessor> typeExportMappings = new HashMap<>();
 
   static {
-    typeExportMappings.put(FACILITY_TYPE, new FormatFacility());
+    typeExportMappings.put(
+        FACILITY_TYPE, new FormatToCode<>(FACILITY_TYPE, MinimalFacilityDto::getCode));
+    typeExportMappings.put(
+        FACILITY_TYPE_TYPE, new FormatToCode<>(FACILITY_TYPE_TYPE, FacilityTypeDto::getCode));
+    typeExportMappings.put(
+        FACILITY_OPERATOR_TYPE,
+        new FormatToCode<>(FACILITY_OPERATOR_TYPE, FacilityOperatorDto::getCode));
     typeExportMappings.put(COMMODITY_TYPE, new FormatCommodityType());
     typeExportMappings.put(PROCESSING_PERIOD_TYPE, new FormatProcessingPeriod());
     typeExportMappings.put(DISPENSABLE_TYPE, new FormatDispensable());
@@ -56,8 +71,20 @@ public class CsvCellProcessors {
     typeExportMappings.put(ORDERABLE_TYPE, new FormatOrderable());
     typeExportMappings.put(ORDERABLE_DISPLAY_CATEGORY_TYPE, new FormatOrderableDisplayCategory());
     typeExportMappings.put(MONEY_TYPE, new FormatMoney());
+    typeExportMappings.put(
+        GEOGRAPHIC_ZONE_TYPE,
+        new FormatToCode<>(GEOGRAPHIC_ZONE_TYPE, GeographicZoneSimpleDto::getCode));
 
-    typeParseMappings.put(FACILITY_TYPE, new ParseFacility());
+    typeParseMappings.put(
+        FACILITY_TYPE,
+        new ParseCodeOnly<>(FACILITY_TYPE, BasicFacilityDto::new, BasicFacilityDto::setCode));
+    typeParseMappings.put(
+        FACILITY_TYPE_TYPE,
+        new ParseCodeOnly<>(FACILITY_TYPE_TYPE, FacilityTypeDto::new, FacilityTypeDto::setCode));
+    typeParseMappings.put(
+        FACILITY_OPERATOR_TYPE,
+        new ParseCodeOnly<>(
+            FACILITY_OPERATOR_TYPE, FacilityOperatorDto::new, FacilityOperatorDto::setCode));
     typeParseMappings.put(COMMODITY_TYPE, new ParseCommodityType());
     typeParseMappings.put(PROCESSING_PERIOD_TYPE, new ParseProcessingPeriod());
     typeParseMappings.put(POSITIVE_INT, new ParsePositiveInteger());
@@ -65,27 +92,31 @@ public class CsvCellProcessors {
     typeParseMappings.put(POSITIVE_LONG, new ParsePositiveLong());
     typeParseMappings.put(BOOLEAN_TYPE, new ParseBoolean());
     typeParseMappings.put(DISPENSABLE_TYPE, new ParseDispensable());
+    typeParseMappings.put(
+        GEOGRAPHIC_ZONE_TYPE,
+        new ParseCodeOnly<>(
+            GEOGRAPHIC_ZONE_TYPE, GeographicZoneSimpleDto::new, GeographicZoneSimpleDto::setCode));
+    typeParseMappings.put(LOCAL_DATE, new ParseLocalDate());
   }
 
-  /**
-   * Get all parse processors for given headers.
-   */
-  public static List<CellProcessor> getParseProcessors(ModelClass modelClass,
-                                                       List<String> headers) {
+  private CsvCellProcessors() {
+    // do nothing
+  }
+
+  /** Get all parse processors for given headers. */
+  public static List<CellProcessor> getParseProcessors(
+      ModelClass modelClass, List<String> headers) {
     return getProcessors(modelClass, headers, true);
   }
 
-  /**
-   * Get all format processors for given headers.
-   */
-  public static List<CellProcessor> getFormatProcessors(ModelClass modelClass,
-                                                        List<String> headers) {
+  /** Get all format processors for given headers. */
+  public static List<CellProcessor> getFormatProcessors(
+      ModelClass modelClass, List<String> headers) {
     return getProcessors(modelClass, headers, false);
   }
 
-  private static List<CellProcessor> getProcessors(ModelClass modelClass,
-                                                   List<String> headers,
-                                                   boolean forParsing) {
+  private static List<CellProcessor> getProcessors(
+      ModelClass modelClass, List<String> headers, boolean forParsing) {
     List<CellProcessor> processors = new ArrayList<>();
     for (String header : headers) {
       ModelField field = modelClass.findImportFieldWithName(header);
