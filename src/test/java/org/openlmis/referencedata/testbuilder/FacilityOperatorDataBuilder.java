@@ -40,13 +40,24 @@ public class FacilityOperatorDataBuilder {
     displayOrder = 1;
   }
 
+  public FacilityOperatorDataBuilder withCode(String code) {
+    this.code = code;
+    return this;
+  }
+
   /**
-   * Builds instance of {@link FacilityOperator}.
+   * Builds instance of {@link FacilityOperator} with empty id.
+   */
+  public FacilityOperator buildAsNew() {
+    return new FacilityOperator(code, name, description, displayOrder);
+  }
+
+  /**
+   * Builds instance of {@link FacilityOperator} with set id.
    */
   public FacilityOperator build() {
-    FacilityOperator operator = new FacilityOperator(code, name, description, displayOrder);
-    operator.setId(id);
-
-    return operator;
+    FacilityOperator zone = buildAsNew();
+    zone.setId(id);
+    return zone;
   }
 }

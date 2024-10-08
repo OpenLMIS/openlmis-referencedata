@@ -21,8 +21,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.List;
 import lombok.Getter;
+import org.dozer.DozerBeanMapper;
 import org.openlmis.referencedata.validate.CsvHeaderValidator;
 import org.openlmis.referencedata.web.csv.model.ModelClass;
 import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
@@ -80,7 +82,9 @@ public class CsvBeanReader<T> {
         .build();
 
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-    dozerBeanReader = new CsvDozerBeanReader(bufferedReader, csvPreference);
+    DozerBeanMapper beanMapper = new DozerBeanMapper();
+    beanMapper.setMappingFiles(Collections.singletonList("dozerJdk8Converters.xml"));
+    dozerBeanReader = new CsvDozerBeanReader(bufferedReader, csvPreference, beanMapper);
     headers = readHeaders();
     String[] mappings = modelClass.getFieldNameMappings(headers);
     dozerBeanReader.configureBeanMapping(modelClass.getClazz(), mappings);

@@ -15,6 +15,9 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.BOOLEAN_TYPE;
+import static org.openlmis.referencedata.web.csv.processor.CsvCellProcessors.CODE_TYPE;
+
 import com.vividsolutions.jts.geom.Point;
 import java.time.LocalDate;
 import java.util.Map;
@@ -29,6 +32,7 @@ import org.openlmis.referencedata.domain.FacilityOperator;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.SupportedProgram;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,14 +41,17 @@ public class MinimalFacilityDto extends BaseDto implements Facility.Exporter {
 
   @Getter
   @Setter
+  @ImportField(name = "code", type = CODE_TYPE, mandatory = true)
   private String code;
 
   @Getter
   @Setter
+  @ImportField(name = "name")
   private String name;
 
   @Getter
   @Setter
+  @ImportField(name = "active", type = BOOLEAN_TYPE)
   private Boolean active;
 
   /**

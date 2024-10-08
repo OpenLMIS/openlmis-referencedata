@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.web.csv.model;
 
 import com.google.common.collect.Maps;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +36,19 @@ class ModelClassHelper {
   }
 
   private static List<ModelField> fieldsWithImportFieldAnnotation(Class clazz) {
-    return Arrays
-        .stream(clazz.getDeclaredFields())
+    return getDeclaredFieldsFromHierarchy(clazz).stream()
         .filter(field -> field.isAnnotationPresent(ImportField.class))
         .map(field -> new ModelField(field, field.getAnnotation(ImportField.class)))
         .collect(Collectors.toList());
+  }
+
+  private static List<Field> getDeclaredFieldsFromHierarchy(Class<?> type) {
+    final List<Field> fields = new ArrayList<>(Arrays.asList(type.getDeclaredFields()));
+
+    if (type.getSuperclass() != null) {
+      fields.addAll(getDeclaredFieldsFromHierarchy(type.getSuperclass()));
+    }
+
+    return fields;
   }
 }

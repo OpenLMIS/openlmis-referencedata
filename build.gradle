@@ -80,6 +80,7 @@ dependencies {
 
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'net.sf.supercsv:super-csv-dozer:2.4.0'
+    compile 'io.craftsman:dozer-jdk8-support:1.0.6'
 
     compile 'ca.uhn.hapi.fhir:hapi-fhir-client:3.7.0'
     compile 'ca.uhn.hapi.fhir:hapi-fhir-structures-r4:3.7.0'
