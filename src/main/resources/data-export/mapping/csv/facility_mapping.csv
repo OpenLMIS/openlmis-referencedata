@@ -1,0 +1,14 @@
+from,to,type,entityName,defaultValue
+code,code,DIRECT,,
+name,name,DIRECT,,
+description,description,DIRECT,,
+geographicZone,geographicZone,TO_OBJECT_BY_CODE,GeographicZone,
+facilityType,type,TO_OBJECT_BY_CODE,FacilityType,
+facilityOperator,operator,TO_OBJECT_BY_CODE,FacilityOperator,
+active,active,DIRECT,,
+goLiveDate,goLiveDate,DIRECT_DATE,,
+goDownDate,goDownDate,DIRECT_DATE,,
+comment,comment,DIRECT,,
+enabled,enabled,DIRECT,,
+openLMISAccessible,openLmisAccessible,DIRECT,,
+supportedPrograms,supportedPrograms,TO_ARRAY_FROM_FILE_BY_PROGRAM_CODE,SupportedPrograms.csv

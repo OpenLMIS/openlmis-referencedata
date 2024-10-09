@@ -15,18 +15,22 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.MapUtils.isNotEmpty;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
+import org.openlmis.referencedata.service.export.ExportableDataService;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.web.FacilitySearchParams;
@@ -39,7 +43,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FacilityService {
+public class FacilityService implements ExportableDataService<FacilityDto> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FacilityService.class);
 
@@ -115,4 +119,13 @@ public class FacilityService {
     return facilityRepository.search(params, zones, extraDataString, pageable);
   }
 
+  @Override
+  public List<FacilityDto> findAllExportableItems() {
+    return facilityRepository.findAll().stream().map(FacilityDto::newInstance).collect(toList());
+  }
+
+  @Override
+  public Class<FacilityDto> getExportableType() {
+    return FacilityDto.class;
+  }
 }
