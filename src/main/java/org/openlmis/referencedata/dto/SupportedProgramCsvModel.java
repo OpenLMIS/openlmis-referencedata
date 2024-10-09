@@ -47,4 +47,20 @@ public class SupportedProgramCsvModel implements SupportedProgram.Importer {
 
   @ImportField(name = "startDate", type = LOCAL_DATE)
   private LocalDate startDate;
+
+  /**
+   * Create new instance of SupportedProgramCsvModel.
+   *
+   * @param supportedProgram a supportedProgram to create model from, not null
+   * @return new instance of SupportedProgramCsvModel, never null
+   */
+  public static SupportedProgramCsvModel newInstance(SupportedProgram supportedProgram) {
+    final SupportedProgramCsvModel model = new SupportedProgramCsvModel();
+    model.programCode = supportedProgram.getFacilityProgram().getProgram().getCode().toString();
+    model.facilityCode = supportedProgram.getFacilityProgram().getFacility().getCode();
+    model.active = supportedProgram.getActive();
+    model.locallyFulfilled = supportedProgram.getLocallyFulfilled();
+    model.startDate = supportedProgram.getStartDate();
+    return model;
+  }
 }

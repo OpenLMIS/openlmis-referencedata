@@ -1,0 +1,6 @@
+from,to,type,entityName,defaultValue
+programCode,id,TO_ID_BY_CODE,Program,
+active,supportActive,DIRECT,,
+active,supportActive,DIRECT,,
+locallyFulfilled,locallyFulfilled,DIRECT,,
+startDate,startDate,DIRECT_DATE,,
