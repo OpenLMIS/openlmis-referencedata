@@ -44,10 +44,10 @@ public class FacilityImportPersister
     implements DataImportPersister<Facility, FacilityDto, FacilityDto> {
 
   @Autowired private FileHelper fileHelper;
+  @Autowired private FacilityRepository facilityRepository;
   @Autowired private GeographicZoneRepository geographicZoneRepository;
   @Autowired private FacilityTypeRepository facilityTypeRepository;
   @Autowired private FacilityOperatorRepository facilityOperatorRepository;
-  @Autowired private FacilityRepository facilityRepository;
 
   @Override
   public List<FacilityDto> processAndPersist(InputStream dataStream) {
@@ -59,7 +59,7 @@ public class FacilityImportPersister
 
   @Override
   public List<Facility> createOrUpdate(List<FacilityDto> dtoList) {
-    List<Facility> persistList = new LinkedList<>();
+    final List<Facility> persistList = new LinkedList<>();
     for (FacilityDto dto : dtoList) {
       Optional<Facility> latestFacility = facilityRepository.findByCode(dto.getCode());
 

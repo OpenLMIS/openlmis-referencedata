@@ -50,11 +50,18 @@ public class ProgramDataBuilder {
   }
 
   /**
-   * Builds instance of {@link Program}.
+   * Builds instance of {@link Program} without id.
+   */
+  public Program buildAsNew() {
+    return new Program(code, name, description, active, periodSkippable,
+        skipAuthorization, showNonFullSupplyTab, enableDatePhysicalStockCountCompleted);
+  }
+
+  /**
+   * Builds instance of {@link Program} with id.
    */
   public Program build() {
-    Program program = new Program(code, name, description, active, periodSkippable,
-        skipAuthorization, showNonFullSupplyTab, enableDatePhysicalStockCountCompleted);
+    Program program = buildAsNew();
     program.setId(id);
 
     return program;

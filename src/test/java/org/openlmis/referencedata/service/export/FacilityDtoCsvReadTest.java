@@ -94,7 +94,7 @@ public class FacilityDtoCsvReadTest {
                 .buildAsNew());
 
     final InputStream csvStream =
-        new ClassPathResource("/FacilityDtoCSVReadTest/shouldReadFacilityDtoFromCsv.csv")
+        new ClassPathResource("/FacilityDtoCsvReadTest/shouldReadFacilityDtoFromCsv.csv")
             .getInputStream();
     final List<FacilityDto> facilityDtos = fileHelper.readCsv(FacilityDto.class, csvStream);
 

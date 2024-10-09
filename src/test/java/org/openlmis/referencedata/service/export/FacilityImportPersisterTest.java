@@ -33,9 +33,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.FacilityOperator;
+import org.openlmis.referencedata.domain.FacilityType;
+import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
-import org.openlmis.referencedata.service.FacilityBuilder;
+import org.openlmis.referencedata.repository.FacilityTypeRepository;
+import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
 
@@ -46,11 +51,10 @@ public class FacilityImportPersisterTest {
   private FacilityDto dto;
 
   @Mock private FileHelper fileHelper;
-
   @Mock private FacilityRepository facilityRepository;
-
-  @Mock private FacilityBuilder facilityBuilder;
-
+  @Mock private GeographicZoneRepository geographicZoneRepository;
+  @Mock private FacilityTypeRepository facilityTypeRepository;
+  @Mock private FacilityOperatorRepository facilityOperatorRepository;
   @InjectMocks private FacilityImportPersister facilityImportPersister;
 
   @Before
@@ -58,12 +62,30 @@ public class FacilityImportPersisterTest {
     dataStream = mock(InputStream.class);
     facility = new FacilityDataBuilder().build();
     dto = FacilityDto.newInstance(facility);
+
+    when(fileHelper.readCsv(FacilityDto.class, dataStream))
+        .thenReturn(Collections.singletonList(dto));
+    when(facilityRepository.saveAll(any()))
+        .thenAnswer(
+            invocation -> {
+              List<Facility> answer = new ArrayList<>();
+              Iterable<?> facilities = invocation.getArgument(0);
+              for (Object facility : facilities) {
+                answer.add((Facility) facility);
+              }
+              return answer;
+            });
+    when(geographicZoneRepository.findByCode(facility.getGeographicZone().getCode()))
+        .thenReturn(mock(GeographicZone.class));
+    when(facilityTypeRepository.findOneByCode(facility.getType().getCode()))
+        .thenReturn(mock(FacilityType.class));
+    when(facilityOperatorRepository.findByCode(facility.getOperator().getCode()))
+        .thenReturn(mock(FacilityOperator.class));
   }
 
   @Test
   public void shouldCreateFacility() {
     // Given
-    setupCommonMocks();
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.empty());
 
     // When
@@ -78,7 +100,6 @@ public class FacilityImportPersisterTest {
   @Test
   public void shouldUpdateFacility() {
     // Given
-    setupCommonMocks();
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.of(facility));
 
     // When
@@ -88,28 +109,5 @@ public class FacilityImportPersisterTest {
     assertEquals(1, result.size());
     verify(fileHelper).readCsv(FacilityDto.class, dataStream);
     verify(facilityRepository).saveAll(Collections.singletonList(facility));
-  }
-
-  private void setupCommonMocks() {
-    when(fileHelper.readCsv(FacilityDto.class, dataStream))
-        .thenReturn(Collections.singletonList(dto));
-    when(facilityBuilder.build(any(FacilityDto.class)))
-        .thenAnswer(
-            invocation -> {
-              FacilityDto facilityDto = invocation.getArgument(0);
-              Facility facility = new Facility();
-              facility.updateFrom(facilityDto);
-              return facility;
-            });
-    when(facilityRepository.saveAll(any()))
-        .thenAnswer(
-            invocation -> {
-              List<Facility> answer = new ArrayList<>();
-              Iterable<?> facilities = invocation.getArgument(0);
-              for (Object facility : facilities) {
-                answer.add((Facility) facility);
-              }
-              return answer;
-            });
   }
 }

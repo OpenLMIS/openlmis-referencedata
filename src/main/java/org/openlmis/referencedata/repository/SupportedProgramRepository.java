@@ -13,24 +13,11 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service.export;
+package org.openlmis.referencedata.repository;
 
-import java.io.InputStream;
-import java.util.List;
 import org.openlmis.referencedata.domain.SupportedProgram;
-import org.openlmis.referencedata.dto.SupportedProgramDto;
-import org.springframework.stereotype.Service;
+import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Service("supportedProgram.csv")
-public class SupportedProgramDataImportPersister
-    implements DataImportPersister<SupportedProgram, SupportedProgramDto, SupportedProgramDto> {
-  @Override
-  public List<SupportedProgramDto> processAndPersist(InputStream dataStream) {
-    return null;
-  }
-
-  @Override
-  public List<SupportedProgram> createOrUpdate(List<SupportedProgramDto> dtoList) {
-    return null;
-  }
-}
+public interface SupportedProgramRepository
+    extends JpaRepository<SupportedProgram, SupportedProgramPrimaryKey> {}
