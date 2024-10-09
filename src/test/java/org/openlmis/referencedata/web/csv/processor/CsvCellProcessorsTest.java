@@ -104,7 +104,7 @@ public class CsvCellProcessorsTest {
 
     assertTrue(cellProcessors.get(1) instanceof Optional);
     Optional optional = (Optional) cellProcessors.get(1);
-    assertEquals(getNextProcessorInstanceClass(nextProcessorField, optional), ParseFacility.class);
+    assertEquals(ParseCodeOnly.class, getNextProcessorInstanceClass(nextProcessorField, optional));
   }
 
   @Test
@@ -153,7 +153,7 @@ public class CsvCellProcessorsTest {
 
     assertTrue(cellProcessors.get(1) instanceof Optional);
     Optional optional = (Optional) cellProcessors.get(1);
-    assertEquals(getNextProcessorInstanceClass(nextProcessorField, optional), FormatFacility.class);
+    assertEquals(FormatToCode.class, getNextProcessorInstanceClass(nextProcessorField, optional));
   }
 
   private Class<?> getNextProcessorInstanceClass(Field next, CellProcessorAdaptor instance)

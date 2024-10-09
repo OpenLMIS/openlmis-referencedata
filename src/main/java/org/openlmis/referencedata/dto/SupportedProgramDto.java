@@ -16,6 +16,8 @@
 package org.openlmis.referencedata.dto;
 
 import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,14 +38,33 @@ public final class SupportedProgramDto extends BaseDto implements SupportedProgr
   private boolean periodsSkippable;
   private boolean showNonFullSupplyTab;
 
-  @Setter
-  private boolean supportActive;
+  @Setter private boolean supportActive;
 
-  @Setter
-  private boolean supportLocallyFulfilled;
+  @Setter private boolean supportLocallyFulfilled;
 
-  @Setter
-  private LocalDate supportStartDate;
+  @Setter private LocalDate supportStartDate;
+
+  /**
+   * Creates new instance of {@link SupportedProgramDto} based on passed supportedProgram.
+   */
+  public static SupportedProgramDto newInstance(SupportedProgram supportedProgram) {
+    SupportedProgramDto dto = new SupportedProgramDto();
+    supportedProgram.export(dto);
+    return dto;
+  }
+
+  /**
+   * Create new set of SupportedProgramDto based on given iterable of {@link SupportedProgram}.
+   *
+   * @param supportedPrograms list of {@link SupportedProgram}
+   * @return new list of SupportedProgramDto.
+   */
+  public static List<SupportedProgramDto> newInstances(
+      Iterable<SupportedProgram> supportedPrograms) {
+    List<SupportedProgramDto> dtos = new LinkedList<>();
+    supportedPrograms.forEach(sp -> dtos.add(newInstance(sp)));
+    return dtos;
+  }
 
   @Override
   public void setProgram(Program program) {
@@ -55,5 +76,4 @@ public final class SupportedProgramDto extends BaseDto implements SupportedProgr
     periodsSkippable = Optional.ofNullable(program.getPeriodsSkippable()).orElse(false);
     showNonFullSupplyTab = Optional.ofNullable(program.getShowNonFullSupplyTab()).orElse(false);
   }
-
 }

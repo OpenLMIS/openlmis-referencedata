@@ -35,9 +35,7 @@ import org.javers.core.metamodel.annotation.TypeName;
 @EqualsAndHashCode(of = "facilityProgram")
 public final class SupportedProgram {
 
-  @EmbeddedId
-  @Getter
-  private SupportedProgramPrimaryKey facilityProgram;
+  @EmbeddedId @Getter private SupportedProgramPrimaryKey facilityProgram;
 
   @Column(nullable = false)
   @Getter
@@ -47,6 +45,7 @@ public final class SupportedProgram {
   @Getter
   private Boolean locallyFulfilled;
 
+  @Getter
   @SuppressWarnings("squid:S3437")
   // https://github.com/jhipster/generator-jhipster/issues/4553
   private LocalDate startDate;
@@ -71,6 +70,17 @@ public final class SupportedProgram {
     exporter.setSupportLocallyFulfilled(locallyFulfilled);
   }
 
+  /**
+   * Updates an instance of SupportedProgram with an updated version from importer.
+   *
+   * @param importer importer to update from.
+   */
+  public void updateFrom(Importer importer) {
+    active = importer.getActive();
+    locallyFulfilled = importer.getLocallyFulfilled();
+    startDate = importer.getStartDate();
+  }
+
   public interface Exporter {
     void setProgram(Program program);
 
@@ -79,5 +89,13 @@ public final class SupportedProgram {
     void setSupportLocallyFulfilled(boolean supportLocallyFulfilled);
 
     void setSupportStartDate(LocalDate supportStartDate);
+  }
+
+  public interface Importer {
+    Boolean getActive();
+
+    Boolean getLocallyFulfilled();
+
+    LocalDate getStartDate();
   }
 }
