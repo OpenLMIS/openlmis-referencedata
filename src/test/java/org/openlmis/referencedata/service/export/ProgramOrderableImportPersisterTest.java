@@ -15,15 +15,18 @@
 
 package org.openlmis.referencedata.service.export;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,93 +35,91 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
-import org.openlmis.referencedata.domain.OrderedDisplayValue;
 import org.openlmis.referencedata.domain.Program;
-import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.dto.ProgramOrderableCsvModel;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDisplayCategoryDataBuilder;
+import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramOrderableImportPersisterTest {
 
-  private static final String PRICE_PER_PACK = "123";
-
+  @Rule public EnvironmentVariables environmentVariables = new EnvironmentVariables();
   private InputStream dataStream;
-  private ProgramOrderableCsvModel csvModel;
-  private ProgramOrderable programOrderable;
-  private OrderableDisplayCategory orderableDisplayCategory;
 
-  @Rule
-  public EnvironmentVariables environmentVariables = new EnvironmentVariables();
+  @Mock private FileHelper fileHelper;
+  @Mock private ProgramOrderableRepository programOrderableRepository;
+  @Mock private ProgramRepository programRepository;
+  @Mock private OrderableRepository orderableRepository;
+  @Mock private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+  @Mock private TransactionUtils transactionUtils;
 
-  @Mock
-  private FileHelper fileHelper;
-
-  @Mock
-  private ProgramOrderableRepository programOrderableRepository;
-
-  @Mock
-  private ProgramRepository programRepository;
-
-  @Mock
-  private OrderableRepository orderableRepository;
-
-  @Mock
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
-
-  @InjectMocks
-  private ProgramOrderableImportPersister programOrderableImportPersister;
+  @InjectMocks private ProgramOrderableImportPersister programOrderableImportPersister;
 
   @Before
   public void setUp() {
-    // Set environment variables
     environmentVariables.set("CURRENCY_CODE", "USD");
 
-    // Initialize mock objects
-    dataStream = mock(InputStream.class);
-    csvModel = mock(ProgramOrderableCsvModel.class);
-    programOrderable = mock(ProgramOrderable.class);
-    orderableDisplayCategory = mock(OrderableDisplayCategory.class);
+    ReflectionTestUtils.setField(
+        programOrderableImportPersister,
+        "importExecutorService",
+        MoreExecutors.newDirectExecutorService());
 
-    // Set up mock behaviors
-    when(csvModel.getPricePerPack()).thenReturn(PRICE_PER_PACK);
-    when(orderableDisplayCategory.getOrderedDisplayValue()).thenReturn(
-        mock(OrderedDisplayValue.class));
+    final Program program = new ProgramDataBuilder().build();
+    final Orderable orderable = new OrderableDataBuilder().build();
+    final OrderableDisplayCategory orderableDisplayCategory =
+        new OrderableDisplayCategoryDataBuilder().build();
+    final ProgramOrderableCsvModel csvModel =
+        new ProgramOrderableCsvModel(
+            program.getCode().toString(),
+            orderable.getProductCode().toString(),
+            2,
+            true,
+            orderableDisplayCategory.getCode().toString(),
+            true,
+            1,
+            "123");
+
+    dataStream = mock(InputStream.class);
+
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
+    when(fileHelper.readCsv(ProgramOrderableCsvModel.class, dataStream))
+        .thenReturn(singletonList(csvModel));
+    when(programOrderableRepository.saveAll(any()))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+
+    when(programRepository.findAllByCodeIn(any())).thenReturn(singletonList(program));
+    when(orderableRepository.findAllLatestByProductCode(any()))
+        .thenReturn(singletonList(orderable));
+    when(orderableDisplayCategoryRepository.findAllByCodeIn(any()))
+        .thenReturn(singletonList(orderableDisplayCategory));
+    when(programOrderableRepository
+            .findAllByProgramCodeInAndProductCodeInAndOrderableDisplayCategoryCodeIn(
+                any(), any(), any()))
+        .thenReturn(emptyList());
   }
 
   @Test
-  public void shouldSuccessfullyProcessAndPersistData() {
-    // Given
-    setupMocksForSuccess();
-
+  public void shouldSuccessfullyProcessAndPersistData() throws InterruptedException {
     // When
-    List<ProgramOrderableDto> result = programOrderableImportPersister
-        .processAndPersist(dataStream);
+    List<ProgramOrderableDto> result =
+        programOrderableImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());
     verify(fileHelper).readCsv(ProgramOrderableCsvModel.class, dataStream);
     verify(programOrderableRepository).saveAll(any());
   }
-
-  private void setupMocksForSuccess() {
-    when(fileHelper.readCsv(ProgramOrderableCsvModel.class, dataStream))
-        .thenReturn(Collections.singletonList(csvModel));
-    when(programRepository.findByCode(any(Code.class))).thenReturn(mock(Program.class));
-    when(orderableRepository.findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-        any(Code.class))).thenReturn(mock(Orderable.class));
-    when(orderableDisplayCategoryRepository.findByCode(any(Code.class))).thenReturn(
-        orderableDisplayCategory);
-    when(programOrderableRepository.saveAll(any()))
-        .thenReturn(Collections.singletonList(programOrderable));
-  }
-
 }

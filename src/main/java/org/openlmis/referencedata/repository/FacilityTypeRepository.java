@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,8 @@ public interface FacilityTypeRepository extends JpaRepository<FacilityType, UUID
   <S extends FacilityType> S save(S entity);
 
   FacilityType findOneByCode(@Param("code") String code);
+
+  List<FacilityType> findAllByCodeIn(List<String> codes);
 
   Page<FacilityType> findByIdIn(Collection<UUID> id, Pageable pageable);
 

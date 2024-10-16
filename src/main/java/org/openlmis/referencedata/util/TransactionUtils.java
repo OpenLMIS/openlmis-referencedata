@@ -13,21 +13,17 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service.export;
+package org.openlmis.referencedata.util;
 
-import java.io.InputStream;
-import java.util.List;
-import org.slf4j.profiler.Profiler;
+import java.util.function.Supplier;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * This interface handle importing data from files to database.
- *
- * @param <E> The entity type being imported.
- * @param <D> The DTO type containing parsed data.
- * @param <U> The DTO type for data retrieved from files.
- */
-public interface DataImportPersister<E, D, U> {
-
-  List<U> processAndPersist(InputStream dataStream, Profiler profiler) throws InterruptedException;
-
+@Component
+public class TransactionUtils {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public <R> R runInOwnTransaction(Supplier<R> task) {
+    return task.get();
+  }
 }

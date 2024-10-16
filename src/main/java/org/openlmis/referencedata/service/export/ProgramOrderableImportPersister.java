@@ -15,10 +15,19 @@
 
 package org.openlmis.referencedata.service.export;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
+import lombok.EqualsAndHashCode;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Code;
@@ -32,76 +41,93 @@ import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
+import org.openlmis.referencedata.util.EasyBatchUtils;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service("programOrderable.csv")
-public class ProgramOrderableImportPersister implements DataImportPersister<ProgramOrderable,
-    ProgramOrderableCsvModel, ProgramOrderableDto> {
+public class ProgramOrderableImportPersister
+    implements DataImportPersister<
+        ProgramOrderable, ProgramOrderableCsvModel, ProgramOrderableDto> {
+
+  private static final CurrencyUnit CURRENCY_UNIT = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
+
+  @Autowired private FileHelper fileHelper;
+  @Autowired private ProgramOrderableRepository programOrderableRepository;
+  @Autowired private ProgramRepository programRepository;
+  @Autowired private OrderableRepository orderableRepository;
+  @Autowired private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+  @Autowired private TransactionUtils transactionUtils;
 
   @Autowired
-  private FileHelper fileHelper;
-
-  @Autowired
-  private ProgramOrderableRepository programOrderableRepository;
-
-  @Autowired
-  private ProgramRepository programRepository;
-
-  @Autowired
-  private OrderableRepository orderableRepository;
-
-  @Autowired
-  private OrderableDisplayCategoryRepository orderableDisplayCategoryRepository;
+  @Qualifier("importExecutorService")
+  private ExecutorService importExecutorService;
 
   @Override
-  public List<ProgramOrderableDto> processAndPersist(InputStream dataStream) {
+  public List<ProgramOrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
+      throws InterruptedException {
+    profiler.start("READ_CSV");
     List<ProgramOrderableCsvModel> importedDtos =
         fileHelper.readCsv(ProgramOrderableCsvModel.class, dataStream);
-    List<ProgramOrderable> persistedObjects = programOrderableRepository.saveAll(
-        createOrUpdate(importedDtos)
-    );
+
+    profiler.start("CREATE_OR_UPDATE_SAVE_ALL");
+    List<ProgramOrderableDto> result =
+        new EasyBatchUtils(importExecutorService)
+            .processInBatches(
+                importedDtos,
+                batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
+
+    profiler.start("RETURN");
+    return result;
+  }
+
+  private List<ProgramOrderableDto> importBatch(List<ProgramOrderableCsvModel> importedDtosBatch) {
+    final List<ProgramOrderable> toPersistBatch = createOrUpdate(importedDtosBatch);
+    final List<ProgramOrderable> persistedObjects =
+        programOrderableRepository.saveAll(toPersistBatch);
 
     return new ArrayList<>(ProgramOrderableDto.newInstance(persistedObjects));
   }
 
-  @Override
-  public List<ProgramOrderable> createOrUpdate(List<ProgramOrderableCsvModel> dtoList) {
-    List<ProgramOrderable> persistList = new LinkedList<>();
+  private List<ProgramOrderable> createOrUpdate(List<ProgramOrderableCsvModel> dtoList) {
+    final ImportContext context = new ImportContext(dtoList);
+    final List<ProgramOrderable> persistList = new LinkedList<>();
 
-    for (ProgramOrderableCsvModel dto: dtoList) {
-      Program program = programRepository.findByCode(Code.code(dto.getProgramCode()));
-      Orderable orderable = orderableRepository
-          .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-              Code.code(dto.getOrderableCode()));
-      OrderableDisplayCategory orderableDisplayCategory = orderableDisplayCategoryRepository
-          .findByCode(Code.code(dto.getCategoryCode()));
+    for (ProgramOrderableCsvModel dto : dtoList) {
+      Program program = context.programByCode.get(dto.getProgramCode());
+      Orderable orderable = context.orderableByCode.get(dto.getOrderableCode());
+      OrderableDisplayCategory orderableDisplayCategory =
+          context.orderableDisplayCategoryByCode.get(dto.getCategoryCode());
 
-      CurrencyUnit currency = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
+      ProgramOrderableDto programOrderableDto =
+          new ProgramOrderableDto(
+              program.getId(),
+              orderableDisplayCategory.getId(),
+              orderableDisplayCategory.getOrderedDisplayValue().getDisplayName(),
+              orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder(),
+              dto.isActive(),
+              dto.isFullSupply(),
+              dto.getDisplayOrder(),
+              dto.getDosesPerPatient(),
+              dto.getPricePerPack() != null
+                  ? Money.of(CURRENCY_UNIT, Double.parseDouble(dto.getPricePerPack()))
+                  : null,
+              null);
 
-      ProgramOrderableDto programOrderableDto = new ProgramOrderableDto(
-          program.getId(),
-          orderableDisplayCategory.getId(),
-          orderableDisplayCategory.getOrderedDisplayValue().getDisplayName(),
-          orderableDisplayCategory.getOrderedDisplayValue().getDisplayOrder(),
-          dto.isActive(),
-          dto.isFullSupply(),
-          dto.getDisplayOrder(),
-          dto.getDosesPerPatient(),
-          dto.getPricePerPack() != null ? Money.of(currency,
-              Double.parseDouble(dto.getPricePerPack())) : null,
-          null
-      );
-
-      ProgramOrderable programOrderable = programOrderableRepository
-          .findByProgramCodeOrderableCodeCategoryCode(dto.getProgramCode(),
-              dto.getOrderableCode(), dto.getCategoryCode()
-          );
+      ProgramOrderable programOrderable =
+          context.programOrderableIdentityByCodes.get(
+              new ProgramOrderableIdentity(
+                  program.getCode(),
+                  orderable.getProductCode(),
+                  orderableDisplayCategory.getCode()));
 
       if (programOrderable == null) {
-        programOrderable = ProgramOrderable.createNew(program, orderableDisplayCategory,
-            orderable, currency);
+        programOrderable =
+            ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, CURRENCY_UNIT);
       }
 
       programOrderable.updateFrom(programOrderableDto);
@@ -111,4 +137,89 @@ public class ProgramOrderableImportPersister implements DataImportPersister<Prog
     return persistList;
   }
 
+  @EqualsAndHashCode
+  private static class ProgramOrderableIdentity {
+    private final Code programCode;
+    private final Code orderableCode;
+    private final Code orderableDisplayCategoryCode;
+
+    ProgramOrderableIdentity(ProgramOrderable programOrderable) {
+      programCode = programOrderable.getProgram().getCode();
+      orderableCode = programOrderable.getProduct().getProductCode();
+      orderableDisplayCategoryCode = programOrderable.getOrderableDisplayCategory().getCode();
+    }
+
+    ProgramOrderableIdentity(
+        Code programCode, Code orderableCode, Code orderableDisplayCategoryCode) {
+      this.programCode = programCode;
+      this.orderableCode = orderableCode;
+      this.orderableDisplayCategoryCode = orderableDisplayCategoryCode;
+    }
+  }
+
+  private class ImportContext {
+    final Map<String, Program> programByCode;
+    final Map<String, Orderable> orderableByCode;
+    final Map<String, OrderableDisplayCategory> orderableDisplayCategoryByCode;
+    final Map<ProgramOrderableIdentity, ProgramOrderable> programOrderableIdentityByCodes;
+
+    ImportContext(List<ProgramOrderableCsvModel> dtoList) {
+      final List<Code> distinctProgramCodes =
+          dtoList.stream()
+              .map(ProgramOrderableCsvModel::getProgramCode)
+              .filter(Objects::nonNull)
+              .distinct()
+              .map(Code::code)
+              .collect(toList());
+      final List<Code> distinctOrderableCodes =
+          dtoList.stream()
+              .map(ProgramOrderableCsvModel::getOrderableCode)
+              .filter(Objects::nonNull)
+              .distinct()
+              .map(Code::code)
+              .collect(toList());
+      final List<Code> distinctCategoryCodes =
+          dtoList.stream()
+              .map(ProgramOrderableCsvModel::getCategoryCode)
+              .filter(Objects::nonNull)
+              .distinct()
+              .map(Code::code)
+              .collect(toList());
+
+      programByCode =
+          distinctProgramCodes.isEmpty()
+              ? emptyMap()
+              : programRepository.findAllByCodeIn(distinctProgramCodes).stream()
+                  .collect(toMap(p -> p.getCode().toString(), Function.identity()));
+
+      orderableByCode =
+          distinctOrderableCodes.isEmpty()
+              ? emptyMap()
+              : orderableRepository.findAllLatestByProductCode(distinctOrderableCodes).stream()
+                  .collect(toMap(o -> o.getProductCode().toString(), Function.identity()));
+
+      orderableDisplayCategoryByCode =
+          distinctCategoryCodes.isEmpty()
+              ? emptyMap()
+              : orderableDisplayCategoryRepository.findAllByCodeIn(distinctCategoryCodes).stream()
+                  .collect(toMap(c -> c.getCode().toString(), Function.identity()));
+
+      programOrderableIdentityByCodes =
+          programOrderableRepository
+              .findAllByProgramCodeInAndProductCodeInAndOrderableDisplayCategoryCodeIn(
+                  distinctProgramCodes.stream().map(Code::toString).collect(toList()),
+                  distinctOrderableCodes.stream().map(Code::toString).collect(toList()),
+                  distinctCategoryCodes.stream().map(Code::toString).collect(toList()))
+              .stream()
+              .collect(
+                  toMap(
+                      ProgramOrderableIdentity::new,
+                      Function.identity(),
+                      (first, second) ->
+                          first.getProduct().getVersionNumber()
+                                  > second.getProduct().getVersionNumber()
+                              ? first
+                              : second));
+    }
+  }
 }

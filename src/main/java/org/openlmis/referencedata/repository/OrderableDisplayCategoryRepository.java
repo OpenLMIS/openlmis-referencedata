@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
@@ -28,6 +29,8 @@ public interface OrderableDisplayCategoryRepository extends
         BaseAuditableRepository<OrderableDisplayCategory, UUID> {
 
   OrderableDisplayCategory findByCode(Code code);
+
+  List<OrderableDisplayCategory> findAllByCodeIn(Iterable<Code> codes);
 
   @Query(value = "SELECT\n"
       + "    odc.*\n"

@@ -44,6 +44,8 @@ public interface FacilityRepository
 
   Optional<Facility> findByCode(String code);
 
+  List<Facility> findAllByCodeIn(List<String> codes);
+
   @Query(name = "Facility.findSupervisionFacilitiesByUser",
       nativeQuery = true)
   Set<NamedResource> findSupervisionFacilitiesByUser(@Param("userId") UUID userId);

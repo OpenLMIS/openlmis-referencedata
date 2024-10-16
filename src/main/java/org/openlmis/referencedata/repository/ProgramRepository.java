@@ -38,6 +38,8 @@ public interface ProgramRepository
 
   <S extends Program> S findByCode(Code code);
 
+  <S extends Program> List<S> findAllByCodeIn(List<Code> codes);
+
   @Query(value = "SELECT DISTINCT p.*"
       + " FROM referencedata.programs p"
       + "   JOIN referencedata.right_assignments ra ON ra.programid = p.id"

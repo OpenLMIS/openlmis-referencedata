@@ -16,11 +16,18 @@
 package org.openlmis.referencedata.service.export;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
@@ -36,11 +43,14 @@ import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
@@ -53,10 +63,23 @@ public class SupportedProgramImportPersisterIntegrationTest {
   @Autowired private ProgramRepository programRepository;
   @Autowired private FacilityRepository facilityRepository;
   @Autowired private SupportedProgramImportPersister supportedProgramImportPersister;
+  @Mock private TransactionUtils transactionUtils;
+
+  @Before
+  public void setup() {
+    ReflectionTestUtils.setField(
+        supportedProgramImportPersister,
+        "importExecutorService",
+        MoreExecutors.newDirectExecutorService());
+    ReflectionTestUtils.setField(
+        supportedProgramImportPersister, "transactionUtils", transactionUtils);
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
+  }
 
   @Test
   @Transactional
-  public void shouldImportSupportedProgram() throws IOException {
+  public void shouldImportSupportedProgram() throws IOException, InterruptedException {
     final GeographicLevel geographicLevel =
         geographicLevelRepository.save(new GeographicLevelDataBuilder().buildAsNew());
     final GeographicZone geographicZone =
@@ -81,7 +104,8 @@ public class SupportedProgramImportPersisterIntegrationTest {
         supportedProgramImportPersister.processAndPersist(
             new ClassPathResource(
                     "/SupportedProgramImportPersisterIntegrationTest/supportedProgram.csv")
-                .getInputStream());
+                .getInputStream(),
+            mock(Profiler.class));
 
     assertEquals(1, supportedProgramDtos.size());
   }

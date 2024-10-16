@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,4 +39,26 @@ public interface ProgramOrderableRepository extends JpaRepository<ProgramOrderab
       @Param("orderable_code") String orderableCode,
       @Param("category_code") String categoryCode);
 
+  /**
+   * Find all ProgramOrderable by Program Code, Orderable Code and Orderable Display Category Code.
+   * <b>Returns all versions of Orderable!</b>
+   *
+   * @param programCodes the program code
+   * @param productCodes the orderable code
+   * @param orderableDisplayCategoryCodes the category code
+   * @return the list of ProgramOrderables, for all versions of Orderable
+   */
+  @Query(value = "SELECT po.* FROM referencedata.program_orderables po\n"
+      + "JOIN referencedata.orderables o ON o.id = po.orderableid \n"
+      + "JOIN referencedata.orderable_display_categories odc "
+      + "ON odc.id = po.orderabledisplaycategoryid \n"
+      + "JOIN referencedata.programs p ON p.id = po.programid \n"
+      + "WHERE p.code in (:programCodes) "
+      + "AND o.code in (:productCodes) "
+      + "AND odc.code in (:orderableDisplayCategoryCodes)",
+      nativeQuery = true)
+  List<ProgramOrderable> findAllByProgramCodeInAndProductCodeInAndOrderableDisplayCategoryCodeIn(
+      List<String> programCodes,
+      List<String> productCodes,
+      List<String> orderableDisplayCategoryCodes);
 }
