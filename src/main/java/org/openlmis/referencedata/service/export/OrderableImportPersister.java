@@ -15,54 +15,101 @@
 
 package org.openlmis.referencedata.service.export;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
+import org.openlmis.referencedata.util.EasyBatchUtils;
 import org.openlmis.referencedata.util.FileHelper;
-import org.openlmis.referencedata.util.OrderableBuilder;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service("orderable.csv")
 public class OrderableImportPersister
     implements DataImportPersister<Orderable, OrderableDto, OrderableDto> {
 
-  @Autowired
-  private FileHelper fileHelper;
+  @Autowired private FileHelper fileHelper;
+  @Autowired private OrderableRepository orderableRepository;
+  @Autowired private TransactionUtils transactionUtils;
 
   @Autowired
-  private OrderableBuilder orderableBuilder;
-
-  @Autowired
-  private OrderableRepository orderableRepository;
+  @Qualifier("importExecutorService")
+  private ExecutorService importExecutorService;
 
   @Override
-  public List<OrderableDto> processAndPersist(InputStream dataStream) {
+  public List<OrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
+      throws InterruptedException {
+    profiler.start("READ_CSV");
     List<OrderableDto> importedDtos = fileHelper.readCsv(OrderableDto.class, dataStream);
-    List<Orderable> persistedObjects = orderableRepository.saveAll(
-        createOrUpdate(importedDtos));
+
+    profiler.start("CREATE_OR_UPDATE_SAVE_ALL");
+    List<OrderableDto> result =
+        new EasyBatchUtils(importExecutorService)
+            .processInBatches(
+                importedDtos,
+                batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
+
+    profiler.start("RETURN");
+    return result;
+  }
+
+  private List<OrderableDto> importBatch(List<OrderableDto> importedDtosBatch) {
+    final List<Orderable> toPersistBatch = createOrUpdate(importedDtosBatch);
+    final List<Orderable> persistedObjects = orderableRepository.saveAll(toPersistBatch);
 
     return OrderableDto.newInstances(persistedObjects);
   }
 
-  @Override
-  public List<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
-    List<Orderable> persistList = new LinkedList<>();
-    for (OrderableDto dto: dtoList) {
-      Orderable latestOrderable = orderableRepository
-          .findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-              Code.code(dto.getProductCode()));
+  private List<Orderable> createOrUpdate(List<OrderableDto> dtoList) {
+    final ImportContext importContext = new ImportContext(dtoList);
+    final List<Orderable> persistList = new LinkedList<>();
+
+    for (OrderableDto dto : dtoList) {
+      Orderable latestOrderable = importContext.orderableByCode.get(dto.getProductCode());
 
       if (!Orderable.isEqualForCsvFields(dto, latestOrderable)) {
-        persistList.add(orderableBuilder.newOrderable(dto, latestOrderable));
+        final Orderable orderable =
+            (latestOrderable == null)
+                ? Orderable.newInstance(dto)
+                : Orderable.updateFrom(latestOrderable, dto);
+        persistList.add(orderable);
       }
     }
 
     return persistList;
   }
 
+  private class ImportContext {
+    final Map<String, Orderable> orderableByCode;
+
+    ImportContext(List<OrderableDto> dtoList) {
+      final List<Code> distinctOrderableCodes =
+          dtoList.stream()
+              .map(OrderableDto::getProductCode)
+              .filter(Objects::nonNull)
+              .distinct()
+              .map(Code::code)
+              .collect(toList());
+
+      orderableByCode =
+          distinctOrderableCodes.isEmpty()
+              ? emptyMap()
+              : orderableRepository.findAllLatestByProductCode(distinctOrderableCodes).stream()
+                  .collect(toMap(o -> o.getProductCode().toString(), Function.identity()));
+    }
+  }
 }

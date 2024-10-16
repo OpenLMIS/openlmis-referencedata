@@ -15,18 +15,19 @@
 
 package org.openlmis.referencedata.service.export;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,6 +47,9 @@ import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SupportedProgramImportPersisterTest {
@@ -53,6 +57,7 @@ public class SupportedProgramImportPersisterTest {
   @Mock private FacilityRepository facilityRepository;
   @Mock private ProgramRepository programRepository;
   @Mock private SupportedProgramRepository supportedProgramRepository;
+  @Mock private TransactionUtils transactionUtils;
 
   @InjectMocks private SupportedProgramImportPersister supportedProgramPersister;
 
@@ -68,6 +73,11 @@ public class SupportedProgramImportPersisterTest {
     supportedProgram =
         new SupportedProgramDataBuilder().withFacility(facility).withProgram(program).build();
 
+    ReflectionTestUtils.setField(
+        supportedProgramPersister,
+        "importExecutorService",
+        MoreExecutors.newDirectExecutorService());
+
     final SupportedProgramCsvModel csvModel =
         new SupportedProgramCsvModel(
             program.getCode().toString(),
@@ -76,10 +86,14 @@ public class SupportedProgramImportPersisterTest {
             supportedProgram.getLocallyFulfilled(),
             supportedProgram.getStartDate());
 
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
     when(fileHelper.readCsv(SupportedProgramCsvModel.class, dataStream))
         .thenReturn(singletonList(csvModel));
-    when(facilityRepository.findByCode(facility.getCode())).thenReturn(of(facility));
-    when(programRepository.findByCode(program.getCode())).thenReturn(program);
+    when(facilityRepository.findAllByCodeIn(singletonList(facility.getCode())))
+        .thenReturn(singletonList(facility));
+    when(programRepository.findAllByCodeIn(singletonList(program.getCode())))
+        .thenReturn(singletonList(program));
     when(supportedProgramRepository.saveAll(any()))
         .thenAnswer(
             invocation -> {
@@ -93,13 +107,15 @@ public class SupportedProgramImportPersisterTest {
   }
 
   @Test
-  public void shouldCreateSupportedProgram() {
+  public void shouldCreateSupportedProgram() throws InterruptedException {
     // Given
-    when(supportedProgramRepository.findById(new SupportedProgramPrimaryKey(facility, program)))
-        .thenReturn(Optional.empty());
+    when(supportedProgramRepository.findAllById(
+            singletonList(new SupportedProgramPrimaryKey(facility, program))))
+        .thenReturn(emptyList());
 
     // When
-    List<SupportedProgramDto> result = supportedProgramPersister.processAndPersist(dataStream);
+    List<SupportedProgramDto> result =
+        supportedProgramPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());
@@ -108,13 +124,15 @@ public class SupportedProgramImportPersisterTest {
   }
 
   @Test
-  public void shouldUpdateSupportedProgram() {
+  public void shouldUpdateSupportedProgram() throws InterruptedException {
     // Given
-    when(supportedProgramRepository.findById(new SupportedProgramPrimaryKey(facility, program)))
-        .thenReturn(of(supportedProgram));
+    when(supportedProgramRepository.findAllById(
+            singletonList(new SupportedProgramPrimaryKey(facility, program))))
+        .thenReturn(singletonList(supportedProgram));
 
     // When
-    List<SupportedProgramDto> result = supportedProgramPersister.processAndPersist(dataStream);
+    List<SupportedProgramDto> result =
+        supportedProgramPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());

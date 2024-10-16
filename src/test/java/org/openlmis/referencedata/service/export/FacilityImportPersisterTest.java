@@ -15,17 +15,20 @@
 
 package org.openlmis.referencedata.service.export;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
-import org.openlmis.referencedata.domain.FacilityOperator;
-import org.openlmis.referencedata.domain.FacilityType;
-import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -43,6 +43,9 @@ import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FacilityImportPersisterTest {
@@ -55,6 +58,7 @@ public class FacilityImportPersisterTest {
   @Mock private GeographicZoneRepository geographicZoneRepository;
   @Mock private FacilityTypeRepository facilityTypeRepository;
   @Mock private FacilityOperatorRepository facilityOperatorRepository;
+  @Mock private TransactionUtils transactionUtils;
   @InjectMocks private FacilityImportPersister facilityImportPersister;
 
   @Before
@@ -63,8 +67,10 @@ public class FacilityImportPersisterTest {
     facility = new FacilityDataBuilder().build();
     dto = FacilityDto.newInstance(facility);
 
-    when(fileHelper.readCsv(FacilityDto.class, dataStream))
-        .thenReturn(Collections.singletonList(dto));
+    ReflectionTestUtils.setField(
+        facilityImportPersister, "importExecutorService", MoreExecutors.newDirectExecutorService());
+
+    when(fileHelper.readCsv(FacilityDto.class, dataStream)).thenReturn(singletonList(dto));
     when(facilityRepository.saveAll(any()))
         .thenAnswer(
             invocation -> {
@@ -75,39 +81,46 @@ public class FacilityImportPersisterTest {
               }
               return answer;
             });
-    when(geographicZoneRepository.findByCode(facility.getGeographicZone().getCode()))
-        .thenReturn(mock(GeographicZone.class));
-    when(facilityTypeRepository.findOneByCode(facility.getType().getCode()))
-        .thenReturn(mock(FacilityType.class));
-    when(facilityOperatorRepository.findByCode(facility.getOperator().getCode()))
-        .thenReturn(mock(FacilityOperator.class));
+    when(facilityRepository.findAllByCodeIn(any())).thenReturn(emptyList());
+    when(geographicZoneRepository.findAllByCodeIn(
+            singletonList(facility.getGeographicZone().getCode())))
+        .thenReturn(singletonList(facility.getGeographicZone()));
+    when(facilityTypeRepository.findAllByCodeIn(singletonList(facility.getType().getCode())))
+        .thenReturn(singletonList(facility.getType()));
+    when(facilityOperatorRepository.findAllByCodeIn(
+            singletonList(facility.getOperator().getCode())))
+        .thenReturn(singletonList(facility.getOperator()));
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
   }
 
   @Test
-  public void shouldCreateFacility() {
+  public void shouldCreateFacility() throws InterruptedException {
     // Given
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.empty());
 
     // When
-    List<FacilityDto> result = facilityImportPersister.processAndPersist(dataStream);
+    List<FacilityDto> result =
+        facilityImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());
     verify(fileHelper).readCsv(FacilityDto.class, dataStream);
-    verify(facilityRepository).saveAll(Collections.singletonList(facility));
+    verify(facilityRepository).saveAll(singletonList(facility));
   }
 
   @Test
-  public void shouldUpdateFacility() {
+  public void shouldUpdateFacility() throws InterruptedException {
     // Given
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.of(facility));
 
     // When
-    List<FacilityDto> result = facilityImportPersister.processAndPersist(dataStream);
+    List<FacilityDto> result =
+        facilityImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());
     verify(fileHelper).readCsv(FacilityDto.class, dataStream);
-    verify(facilityRepository).saveAll(Collections.singletonList(facility));
+    verify(facilityRepository).saveAll(singletonList(facility));
   }
 }

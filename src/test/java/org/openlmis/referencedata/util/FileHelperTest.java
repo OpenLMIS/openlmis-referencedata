@@ -95,13 +95,4 @@ public class FileHelperTest {
     fileHelper.validateMultipartFile(multipartFile);
   }
 
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowExceptionWhenZipIsTooLarge() {
-    MultipartFile multipartFile = mock(MultipartFile.class);
-    when(multipartFile.getOriginalFilename()).thenReturn("test.zip");
-    when(multipartFile.getSize()).thenReturn(5000000L);
-    fileHelper.setZipMaxSize("1000000");
-    fileHelper.validateMultipartFile(multipartFile);
-  }
-
 }

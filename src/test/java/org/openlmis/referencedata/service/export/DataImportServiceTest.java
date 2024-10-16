@@ -37,64 +37,48 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.dto.BaseDto;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataImportServiceTest {
 
+  @Rule public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
   private Map<String, InputStream> fileMap;
   private DataImportPersister<?, ?, ?> dataImportPersister;
+  @Mock private FileHelper fileHelper;
 
-  @Rule
-  public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+  @Mock private BeanFactory beanFactory;
 
-  @Mock
-  private FileHelper fileHelper;
+  @Mock private Profiler profiler;
 
-  @Mock
-  private BeanFactory beanFactory;
-
-  @InjectMocks
-  private DataImportService dataImportService;
+  @InjectMocks private DataImportService dataImportService;
 
   @Before
   public void setUp() {
     fileMap = new HashMap<>();
-    fileMap.put("test.csv", mock(InputStream.class));
+    fileMap.put("facility.csv", mock(InputStream.class));
     dataImportPersister = mock(DataImportPersister.class);
+
+    when(profiler.startNested(anyString())).thenReturn(profiler);
   }
 
   @Test
-  public void shouldSuccessfullyImportData() {
+  public void shouldSuccessfullyImportData() throws InterruptedException {
     // Given
-    when(fileHelper.convertMultipartFileToZipFileMap(any(MultipartFile.class)))
-        .thenReturn(fileMap);
-    when(beanFactory.getBean(anyString(), eq(DataImportPersister.class))).thenReturn(
-        dataImportPersister);
-    when(dataImportPersister.processAndPersist(any(InputStream.class)))
+    when(fileHelper.convertMultipartFileToZipFileMap(any(MultipartFile.class))).thenReturn(fileMap);
+    when(beanFactory.getBean(anyString(), eq(DataImportPersister.class)))
+        .thenReturn(dataImportPersister);
+    when(dataImportPersister.processAndPersist(any(InputStream.class), any(Profiler.class)))
         .thenReturn((List) Collections.singletonList(mock(BaseDto.class)));
 
     // When
-    List<BaseDto> result = dataImportService.importData(mock(MultipartFile.class));
+    List<BaseDto> result = dataImportService.importData(mock(MultipartFile.class), profiler);
 
     // Then
     assertNotNull(result);
     assertEquals(1, result.size());
   }
-
-  @Test(expected = ValidationMessageException.class)
-  public void shouldThrowErrorIfBeanNotFound() {
-    // given
-    when(fileHelper.convertMultipartFileToZipFileMap(any(MultipartFile.class)))
-        .thenReturn(fileMap);
-    when(beanFactory.getBean(anyString(), eq(DataImportPersister.class)))
-        .thenThrow(ValidationMessageException.class);
-
-    // when
-    dataImportService.importData(mock(MultipartFile.class));
-  }
-
 }

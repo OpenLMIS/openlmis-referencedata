@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.slf4j.profiler.Profiler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,8 +49,12 @@ public class DataImportControllerIntegrationTest extends BaseWebIntegrationTest 
     super.setUp();
     mockUserHasRight(DATA_IMPORT);
 
-    given(dataImportService.importData(any(MultipartFile.class)))
-        .willReturn(Collections.singletonList(orderableDto));
+    try {
+      given(dataImportService.importData(any(MultipartFile.class), any(Profiler.class)))
+          .willReturn(Collections.singletonList(orderableDto));
+    } catch (InterruptedException ie) {
+      // ignore in tests
+    }
   }
 
   @Test

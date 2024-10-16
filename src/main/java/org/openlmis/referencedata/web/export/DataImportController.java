@@ -22,6 +22,9 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.web.BaseController;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +38,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Controller
 @RequestMapping(RESOURCE_PATH)
 public class DataImportController extends BaseController {
-
   public static final String RESOURCE_PATH = BaseController.API_PATH + "/importData";
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(DataImportController.class);
 
-  @Autowired
-  private DataImportService dataImportService;
+  @Autowired private DataImportService dataImportService;
 
   /**
    * Imports the data from a ZIP with CSV files.
@@ -48,10 +50,18 @@ public class DataImportController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile file) {
+  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile file)
+      throws InterruptedException {
+    final Profiler profiler = new Profiler("DATA_IMPORT");
+    profiler.setLogger(XLOGGER);
+
+    profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.DATA_IMPORT);
-    List<BaseDto> importedData = dataImportService.importData(file);
+
+    final List<BaseDto> importedData =
+        dataImportService.importData(file, profiler.startNested("IMPORT_DATA"));
+
+    profiler.stop().log();
     return ResponseEntity.ok().body(importedData);
   }
-
 }

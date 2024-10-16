@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.FacilityOperator;
 import org.springframework.data.domain.Page;
@@ -46,4 +47,6 @@ public interface FacilityOperatorRepository
   Page<FacilityOperator> findAllWithoutSnapshots(Pageable pageable);
 
   FacilityOperator findByCode(String code);
+
+  List<FacilityOperator> findAllByCodeIn(List<String> codes);
 }

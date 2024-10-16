@@ -16,11 +16,18 @@
 package org.openlmis.referencedata.service.export;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.dto.FacilityDto;
@@ -32,11 +39,14 @@ import org.openlmis.referencedata.testbuilder.FacilityOperatorDataBuilder;
 import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @RunWith(SpringRunner.class)
@@ -48,10 +58,21 @@ public class FacilityImportPersisterIntegrationTest {
   @Autowired private GeographicZoneRepository geographicZoneRepository;
   @Autowired private FacilityOperatorRepository facilityOperatorRepository;
   @Autowired private FacilityImportPersister facilityImportPersister;
+  @Mock private TransactionUtils transactionUtils;
+
+  @Before
+  public void setup() {
+    ReflectionTestUtils.setField(
+        facilityImportPersister, "importExecutorService", MoreExecutors.newDirectExecutorService());
+    ReflectionTestUtils.setField(
+        facilityImportPersister, "transactionUtils", transactionUtils);
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
+  }
 
   @Test
   @Transactional
-  public void shouldImportFacility() throws IOException {
+  public void shouldImportFacility() throws IOException, InterruptedException {
     facilityTypeRepository.save(new FacilityTypeDataBuilder().withCode("TestType").buildAsNew());
     final GeographicLevel geographicLevel =
         geographicLevelRepository.save(new GeographicLevelDataBuilder().buildAsNew());
@@ -65,7 +86,8 @@ public class FacilityImportPersisterIntegrationTest {
 
     final List<FacilityDto> facilityDtos =
         facilityImportPersister.processAndPersist(
-            new ClassPathResource("/FacilityImportPersisterTest/facility.csv").getInputStream());
+            new ClassPathResource("/FacilityImportPersisterTest/facility.csv").getInputStream(),
+            mock(Profiler.class));
 
     assertEquals(1, facilityDtos.size());
   }

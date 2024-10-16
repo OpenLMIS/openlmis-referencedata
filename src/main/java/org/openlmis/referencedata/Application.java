@@ -20,6 +20,10 @@ import com.google.gson.internal.bind.TypeAdapters;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.callback.Callback;
@@ -278,6 +282,11 @@ public class Application {
         .keyPrefix("togglz:")
         .jedisPool(new JedisPool(properties.getHost(), properties.getPort()))
         .build();
+  }
+
+  @Bean("importExecutorService")
+  ExecutorService getImportExecutorService() {
+    return new ThreadPoolExecutor(1, 8, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
   }
 
   /**

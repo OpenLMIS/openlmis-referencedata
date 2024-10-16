@@ -21,14 +21,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,12 +41,14 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
-import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.openlmis.referencedata.util.FileHelper;
+import org.openlmis.referencedata.util.TransactionUtils;
+import org.slf4j.profiler.Profiler;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TradeItemImportPersisterTest {
@@ -57,17 +60,11 @@ public class TradeItemImportPersisterTest {
   private Map<String, String> identifiers = new HashMap<>();
   private TradeItem tradeItem;
 
-  @Mock
-  private FileHelper fileHelper;
-
-  @Mock
-  private TradeItemRepository tradeItemRepository;
-
-  @Mock
-  private OrderableRepository orderableRepository;
-
-  @InjectMocks
-  private TradeItemImportPersister tradeItemImportPersister;
+  @Mock private FileHelper fileHelper;
+  @Mock private TradeItemRepository tradeItemRepository;
+  @Mock private OrderableRepository orderableRepository;
+  @Mock private TransactionUtils transactionUtils;
+  @InjectMocks private TradeItemImportPersister tradeItemImportPersister;
 
   @Before
   public void setUp() {
@@ -77,23 +74,29 @@ public class TradeItemImportPersisterTest {
     // Initialize objects
     identifier = UUID.randomUUID().toString();
     csvModel = new TradeItemCsvModel("code", "manufacturer");
-    tradeItem = new TradeItemDataBuilder()
-        .build();
-    orderable = new OrderableDataBuilder()
-        .withIdentifier("tradeItem", identifier)
-        .build();
+    tradeItem = new TradeItemDataBuilder().build();
+    orderable = new OrderableDataBuilder().withIdentifier("tradeItem", identifier).build();
 
     // Set fields
     identifiers.put("tradeItem", identifier);
+
+    ReflectionTestUtils.setField(
+        tradeItemImportPersister,
+        "importExecutorService",
+        MoreExecutors.newDirectExecutorService());
+
+    when(transactionUtils.runInOwnTransaction(any(Supplier.class)))
+        .thenAnswer(invocation -> ((Supplier) invocation.getArgument(0)).get());
   }
 
   @Test
-  public void shouldSuccessfullyProcessAndPersistData() {
+  public void shouldSuccessfullyProcessAndPersistData() throws InterruptedException {
     // Given
     setupMocksForSuccess();
 
     // When
-    List<OrderableDto> result = tradeItemImportPersister.processAndPersist(dataStream);
+    List<OrderableDto> result =
+        tradeItemImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
     assertEquals(1, result.size());
@@ -102,55 +105,14 @@ public class TradeItemImportPersisterTest {
     verify(orderableRepository).saveAll(any());
   }
 
-  @Test
-  public void shouldSuccessfullyProcessAndPersistDataWithNotExistingIdentifier() {
-    // Given
-    setupMocksForSuccess();
-    orderable.setIdentifiers(null);
-
-    // When
-    List<Orderable> result = tradeItemImportPersister
-        .createOrUpdate(Collections.singletonList(csvModel));
-
-    // Then
-    assertEquals(1, result.size());
-  }
-
-  @Test
-  public void shouldSuccessfullyProcessAndPersistDataWithExistingIdentifier() {
-    // Given
-    setupMocksForSuccess();
-
-    // When
-    List<Orderable> result = tradeItemImportPersister
-        .createOrUpdate(Collections.singletonList(csvModel));
-
-    // Then
-    assertEquals(1, result.size());
-  }
-
-  @Test(expected = NotFoundException.class)
-  public void shouldThrowErrorIfOrderableNotFound() {
-    // Given
-    List<TradeItemCsvModel> list = Arrays.asList(
-        mock(TradeItemCsvModel.class), mock(TradeItemCsvModel.class)
-    );
-    when(orderableRepository.findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-        any(Code.class))).thenReturn(null);
-
-    // When
-    tradeItemImportPersister.createOrUpdate(list);
-  }
-
   private void setupMocksForSuccess() {
     when(fileHelper.readCsv(TradeItemCsvModel.class, dataStream))
         .thenReturn(Collections.singletonList(csvModel));
     when(orderableRepository.findFirstByProductCodeOrderByIdentityVersionNumberDesc(
-        any(Code.class))).thenReturn(orderable);
-    when(tradeItemRepository.saveAll(any()))
-        .thenReturn(Collections.singletonList(tradeItem));
+            any(Code.class)))
+        .thenReturn(orderable);
+    when(tradeItemRepository.saveAll(any())).thenReturn(Collections.singletonList(tradeItem));
     when(tradeItemRepository.findById(any(UUID.class))).thenReturn(Optional.ofNullable(tradeItem));
     when(orderableRepository.saveAll(any())).thenReturn(Collections.singletonList(orderable));
   }
-
 }

@@ -95,6 +95,22 @@ public interface OrderableRepository extends
       }, forCounting = false)
   Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
 
+  @Query(
+      value =
+          "SELECT DISTINCT o FROM Orderable o"
+              + " WHERE (o.identity.id, o.identity.versionNumber)"
+              + " IN (SELECT identity.id, MAX(identity.versionNumber)"
+              + " FROM Orderable GROUP BY identity.id)"
+              + " AND o.productCode IN :productCodes",
+      countQuery =
+          "SELECT COUNT(1)"
+              + " FROM Orderable o"
+              + " WHERE (o.identity.id, o.identity.versionNumber)"
+              + " IN (SELECT identity.id, MAX(identity.versionNumber)"
+              + " FROM Orderable GROUP BY identity.id)"
+              + " AND o.productCode IN :productCodes")
+  List<Orderable> findAllLatestByProductCode(@Param("productCodes") Iterable<Code> productCodes);
+
   @Query(value = SELECT_ORDERABLE
           + FROM_ORDERABLES_CLAUSE
           + WHERE_LATEST_ORDERABLE
