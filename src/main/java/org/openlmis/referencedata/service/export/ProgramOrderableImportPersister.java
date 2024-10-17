@@ -47,6 +47,7 @@ import org.openlmis.referencedata.util.TransactionUtils;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service("programOrderable.csv")
@@ -54,7 +55,8 @@ public class ProgramOrderableImportPersister
     implements DataImportPersister<
         ProgramOrderable, ProgramOrderableCsvModel, ProgramOrderableDto> {
 
-  private final CurrencyUnit currencyUnit;
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   @Autowired private FileHelper fileHelper;
   @Autowired private ProgramOrderableRepository programOrderableRepository;
@@ -66,10 +68,6 @@ public class ProgramOrderableImportPersister
   @Autowired
   @Qualifier("importExecutorService")
   private ExecutorService importExecutorService;
-
-  public ProgramOrderableImportPersister() {
-    currencyUnit = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
-  }
 
   @Override
   public List<ProgramOrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
@@ -118,7 +116,8 @@ public class ProgramOrderableImportPersister
               dto.getDisplayOrder(),
               dto.getDosesPerPatient(),
               dto.getPricePerPack() != null
-                  ? Money.of(currencyUnit, Double.parseDouble(dto.getPricePerPack()))
+                  ? Money.of(
+                      CurrencyUnit.of(currencyCode), Double.parseDouble(dto.getPricePerPack()))
                   : null,
               null);
 
@@ -131,7 +130,8 @@ public class ProgramOrderableImportPersister
 
       if (programOrderable == null) {
         programOrderable =
-            ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, currencyUnit);
+            ProgramOrderable.createNew(
+                program, orderableDisplayCategory, orderable, CurrencyUnit.of(currencyCode));
       }
 
       programOrderable.updateFrom(programOrderableDto);
