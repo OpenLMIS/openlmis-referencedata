@@ -28,9 +28,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -55,7 +53,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(MockitoJUnitRunner.class)
 public class ProgramOrderableImportPersisterTest {
 
-  @Rule public EnvironmentVariables environmentVariables = new EnvironmentVariables();
   private InputStream dataStream;
 
   @Mock private FileHelper fileHelper;
@@ -69,7 +66,7 @@ public class ProgramOrderableImportPersisterTest {
 
   @Before
   public void setUp() {
-    environmentVariables.set("CURRENCY_CODE", "USD");
+    ReflectionTestUtils.setField(programOrderableImportPersister, "currencyCode", "USD");
 
     ReflectionTestUtils.setField(
         programOrderableImportPersister,
