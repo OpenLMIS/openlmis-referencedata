@@ -54,7 +54,7 @@ public class ProgramOrderableImportPersister
     implements DataImportPersister<
         ProgramOrderable, ProgramOrderableCsvModel, ProgramOrderableDto> {
 
-  private static final CurrencyUnit CURRENCY_UNIT = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
+  private final CurrencyUnit currencyUnit;
 
   @Autowired private FileHelper fileHelper;
   @Autowired private ProgramOrderableRepository programOrderableRepository;
@@ -66,6 +66,10 @@ public class ProgramOrderableImportPersister
   @Autowired
   @Qualifier("importExecutorService")
   private ExecutorService importExecutorService;
+
+  public ProgramOrderableImportPersister() {
+    currencyUnit = CurrencyUnit.of(System.getenv("CURRENCY_CODE"));
+  }
 
   @Override
   public List<ProgramOrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
@@ -114,7 +118,7 @@ public class ProgramOrderableImportPersister
               dto.getDisplayOrder(),
               dto.getDosesPerPatient(),
               dto.getPricePerPack() != null
-                  ? Money.of(CURRENCY_UNIT, Double.parseDouble(dto.getPricePerPack()))
+                  ? Money.of(currencyUnit, Double.parseDouble(dto.getPricePerPack()))
                   : null,
               null);
 
@@ -127,7 +131,7 @@ public class ProgramOrderableImportPersister
 
       if (programOrderable == null) {
         programOrderable =
-            ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, CURRENCY_UNIT);
+            ProgramOrderable.createNew(program, orderableDisplayCategory, orderable, currencyUnit);
       }
 
       programOrderable.updateFrom(programOrderableDto);
