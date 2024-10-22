@@ -1,7 +1,18 @@
 15.2.7 / WIP
 ==================
 
+Improvements:
+* [OLMIS-7989](https://openlmis.atlassian.net/browse/OLMIS-7989): Extension of import functionality by adding possibility to import 
+facilities and supported programs.
+  * Improved performance. 
+* [OLMIS-7895](https://openlmis.atlassian.net/browse/OLMIS-7895): Add demo data for BUQ and TB Monthly
+* [OLMIS-7988](https://openlmis.atlassian.net/browse/OLMIS-7988): Add DHIS2 integration rights
+* [OLMIS-7953](https://openlmis.atlassian.net/browse/OLMIS-7953): Improve some API calls performance
+* [OIS-14](https://openlmis.atlassian.net/browse/OIS-14): Upgrade Transifex API version
+* [OIS-48](https://openlmis.atlassian.net/browse/OIS-48): Update service base images to versions without known vulnerabilities
 * [MW-1367](https://openlmis.atlassian.net/browse/MW-1367): Add active flag to MinimalFacilityDto
+* [AO-802](https://openlmis.atlassian.net/browse/AO-802): Add endpoint `GET api/orderables/{product_id}` to retrieve
+the history of price changes
 
 15.2.6 / 2023-11-07
 ==================
