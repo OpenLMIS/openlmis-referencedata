@@ -5,6 +5,7 @@ Improvements:
 * [OLMIS-7989](https://openlmis.atlassian.net/browse/OLMIS-7989): Extension of import functionality by adding possibility to import 
 facilities and supported programs.
   * Improved performance. 
+  * Improved csv files validation
 * [OLMIS-7895](https://openlmis.atlassian.net/browse/OLMIS-7895): Add demo data for BUQ and TB Monthly
 * [OLMIS-7988](https://openlmis.atlassian.net/browse/OLMIS-7988): Add DHIS2 integration rights
 * [OLMIS-7953](https://openlmis.atlassian.net/browse/OLMIS-7953): Improve some API calls performance

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
@@ -61,6 +62,11 @@ public class DataImportService {
     profiler.start("CONVERT_TO_ZIP_FILE_MAP");
     final Map<String, InputStream> fileMap = fileHelper.convertMultipartFileToZipFileMap(zipFile);
 
+    profiler.start("VALIDATE_CSV_FILES");
+    for (String fileName : fileMap.keySet()) {
+      fileHelper.validateCsvFile(fileName, IMPORT_ORDER);
+    }
+
     final List<BaseDto> result = new ArrayList<>();
     for (String importFileName : IMPORT_ORDER) {
       final InputStream fileStream = fileMap.get(importFileName);
@@ -71,10 +77,6 @@ public class DataImportService {
 
       try {
         final Profiler entryProfiler = profiler.startNested("IMPORT_ZIP_ENTRY: " + importFileName);
-
-        entryProfiler.start("VALIDATE_CSV_FILE");
-        fileHelper.validateCsvFile(importFileName);
-
         final DataImportPersister<?, ?, ? extends BaseDto> persister =
             beanFactory.getBean(importFileName, DataImportPersister.class);
         result.addAll(persister.processAndPersist(fileStream, entryProfiler));
