@@ -23,6 +23,8 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -37,6 +39,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileHelperTest {
+
+  private static final List<String> IMPORTABLE_FILES =
+          Arrays.asList(
+                  "facility.csv",
+                  "supportedProgram.csv",
+                  "orderable.csv",
+                  "programOrderable.csv",
+                  "tradeItem.csv");
 
   @InjectMocks
   private FileHelper fileHelper;
@@ -84,8 +94,14 @@ public class FileHelperTest {
 
   @Test(expected = ValidationMessageException.class)
   public void shouldThrowExceptionWhenValidateCsvWithWrongExtension() {
-    String fileName = "test.txt";
-    fileHelper.validateCsvFile(fileName);
+    String fileName = "facility.txt";
+    fileHelper.validateCsvFile(fileName, IMPORTABLE_FILES);
+  }
+
+  @Test(expected = ValidationMessageException.class)
+  public void shouldThrowExceptionWhenValidateCsvWithWrongFileName() {
+    String fileName = "invalidName.csv";
+    fileHelper.validateCsvFile(fileName, IMPORTABLE_FILES);
   }
 
   @Test(expected = ValidationMessageException.class)
