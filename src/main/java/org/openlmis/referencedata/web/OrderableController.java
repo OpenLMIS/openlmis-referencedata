@@ -123,7 +123,7 @@ public class OrderableController extends BaseController {
 
     return ResponseEntity.ok()
         .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
-        .body(OrderableDto.newInstances(orderable));
+        .body(OrderableDto.newInstance(orderable));
   }
 
   /**
@@ -167,7 +167,7 @@ public class OrderableController extends BaseController {
 
     return ResponseEntity.ok()
         .headers(buildLastModifiedHeader(savedOrderable.getLastUpdated()))
-        .body(OrderableDto.newInstances(savedOrderable));
+        .body(OrderableDto.newInstance(savedOrderable));
   }
 
   /**
@@ -306,7 +306,7 @@ public class OrderableController extends BaseController {
           || orderable.wasModifiedSince(parseHttpDateToZonedDateTime(ifModifiedDate)))
           ? ResponseEntity.ok()
           .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
-          .body(OrderableDto.newInstances(orderable))
+          .body(OrderableDto.newInstance(orderable))
           : ResponseEntity.status(HttpStatus.NOT_MODIFIED)
           .headers(buildLastModifiedHeader(orderable.getLastUpdated()))
           .build();

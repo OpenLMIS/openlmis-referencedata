@@ -58,7 +58,7 @@ public class OrderableImportPersisterTest {
   public void setUp() {
     dataStream = mock(InputStream.class);
     orderable = new OrderableDataBuilder().build();
-    dto = OrderableDto.newInstances(orderable);
+    dto = OrderableDto.newInstance(orderable);
 
     ReflectionTestUtils.setField(
         orderableImportPersister,
