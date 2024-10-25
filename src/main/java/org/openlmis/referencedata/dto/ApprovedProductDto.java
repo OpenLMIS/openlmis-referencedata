@@ -72,7 +72,7 @@ public final class ApprovedProductDto
 
   @JsonIgnore
   public void setOrderable(Orderable orderable) {
-    this.orderable = OrderableDto.newInstances(orderable);
+    this.orderable = OrderableDto.newInstance(orderable);
   }
 
   @Override
