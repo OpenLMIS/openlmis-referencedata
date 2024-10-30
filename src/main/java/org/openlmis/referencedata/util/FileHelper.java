@@ -134,8 +134,16 @@ public class FileHelper {
    * @param fileName the name of CSV file
    * @throws ValidationMessageException if any of check fails
    */
-  public void validateCsvFile(String fileName) {
+  public void validateCsvFile(String fileName, List<String> expectedFileNames) {
     hasExpectedExtension(fileName, ".csv");
+    hasExpectedName(fileName, expectedFileNames);
+  }
+
+  private void hasExpectedName(String fileName, List<String> expectedFileNames) {
+    if (!expectedFileNames.contains(fileName)) {
+      throw new ValidationMessageException(
+              new Message(CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, fileName));
+    }
   }
 
   private void hasExpectedExtension(String fileName, String expectedExtension) {
