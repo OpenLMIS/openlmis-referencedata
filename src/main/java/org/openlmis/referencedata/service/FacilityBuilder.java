@@ -73,7 +73,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     GeographicZone geographicZone = findResource(
         geographicZoneRepository::findById, importer.getGeographicZone(),
         GeographicZoneMessageKeys.ERROR_NOT_FOUND);
-    final FacilityType facilityType = findResource(
+    final FacilityType importerFacilityType = findResource(
         facilityTypeRepository::findById, importer.getType(),
         FacilityTypeMessageKeys.ERROR_NOT_FOUND);
     final FacilityOperator facilityOperator = null == importer.getOperator()
@@ -86,7 +86,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     if (null == importer.getId()) {
       facility = new Facility();
 
-      if (!facilityType.getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+      if (!importerFacilityType.getCode().equals(WARD_SERVICE_TYPE_CODE)) {
         GeographicZone localZone = new GeographicZone();
         localZone.setParent(geographicZone);
         localZone.setName(importer.getName());
@@ -116,7 +116,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
           geographicZone = localZone;
         }
       }
-      if (!importer.getType().getCode().equals(WARD_SERVICE_TYPE_CODE)) {
+      if (!importerFacilityType.getCode().equals(WARD_SERVICE_TYPE_CODE)) {
         geographicZone.setName(importer.getName());
         geographicZoneRepository.save(geographicZone);
       }
@@ -124,7 +124,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
 
     facility.updateFrom(importer);
     facility.setGeographicZone(geographicZone);
-    facility.setType(facilityType);
+    facility.setType(importerFacilityType);
     facility.setOperator(facilityOperator);
     addSupportedPrograms(importer.getSupportedPrograms(), facility);
 
