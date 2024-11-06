@@ -19,7 +19,6 @@ import static org.openlmis.referencedata.service.FacilityTypeService.WARD_SERVIC
 
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityOperator;
@@ -87,17 +86,7 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
       facility = new Facility();
 
       if (!importerFacilityType.getCode().equals(WARD_SERVICE_TYPE_CODE)) {
-        GeographicZone localZone = new GeographicZone();
-        localZone.setParent(geographicZone);
-        localZone.setName(importer.getName());
-        localZone.setCode("gz-" + importer.getCode());
-
-        GeographicLevel geographicLevel =
-            geographicLevelRepository.findFirstByOrderByLevelNumberDesc();
-        localZone.setLevel(geographicLevel);
-        geographicZoneRepository.save(localZone);
-
-        geographicZone = localZone;
+        geographicZone = getOrCreateLocalZone(importer, geographicZone);
       }
     } else {
       facility = facilityRepository.findById(importer.getId()).orElse(null);
@@ -129,6 +118,27 @@ public class FacilityBuilder implements DomainResourceBuilder<FacilityDto, Facil
     addSupportedPrograms(importer.getSupportedPrograms(), facility);
 
     return facility;
+  }
+
+  private GeographicZone getOrCreateLocalZone(FacilityDto importer, GeographicZone geographicZone) {
+    final String localZoneCode = "gz-" + importer.getCode();
+
+    final GeographicZone existingLocalZone = geographicZoneRepository.findByCode(localZoneCode);
+
+    if (existingLocalZone != null) {
+      return existingLocalZone;
+    }
+
+    GeographicZone newLocalZone = new GeographicZone();
+    newLocalZone.setParent(geographicZone);
+    newLocalZone.setName(importer.getName());
+    newLocalZone.setCode(localZoneCode);
+
+    GeographicLevel geographicLevel = geographicLevelRepository.findFirstByOrderByLevelNumberDesc();
+    newLocalZone.setLevel(geographicLevel);
+    geographicZoneRepository.save(newLocalZone);
+
+    return newLocalZone;
   }
 
   private void addSupportedPrograms(Set<SupportedProgramDto> supportedPrograms,
