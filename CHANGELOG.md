@@ -1,4 +1,4 @@
-15.2.6-angola.1 / Ongoing
+15.2.6-angola.r2 / 2024-11-08
 ==================
 Improvements:
 * [OAM-120](https://openlmis.atlassian.net/browse/OAM-120): Added quarantined field to Orderable entity
