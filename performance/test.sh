@@ -15,7 +15,7 @@ export BASE_URL="${URL}"
 docker run --rm -e BASE_URL -v $(pwd):/bzt-configs \
   -v $(pwd)/../build/performance-artifacts:/tmp/artifacts \
   -v $(pwd)/resources:/tmp/resources \
-  blazemeter/taurus:1.10.3 \
+  blazemeter/taurus:1.16.35 \
   -o modules.jmeter.properties.base-uri="${BASE_URL}" \
   -o reporting.2.dump-xml=/tmp/artifacts/stats.xml \
   config.yml \

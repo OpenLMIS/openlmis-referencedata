@@ -1,24 +1,38 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-supply-line
-#  - concurrency: ${__P(scenario-concurrency,1)}
-#    hold-for: ${__P(scenario-duration,60)}
-#    scenario: get-all-supply-lines
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-all-supply-lines-expand
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+    # - concurrency: ${__P(scenario-concurrency,10)}
+    # iterations: ${__P(scenario-iterations,10)}
+    # ramp-up: ${__P(scenario-ramp-up,1m)}
+    # hold-for: ${__P(scenario-duration,10m)}
+    # scenario: get-all-supply-lines
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-page-of-ten-supply-lines
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-page-of-ten-supply-lines-expand
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-supply-lines-by-supervisory-node-id
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: get-supply-lines-by-program-id-and-supplying-facility-id
 
 scenarios:
@@ -99,10 +113,21 @@ scenarios:
 reporting:
   - module: passfail
     criteria:
-      Get Supply Line too slow: p90 of GetSupplyLine>60000ms
-#      Get All Supply Lines too slow: p90 of GetAll1000SupplyLines>1000ms
-      Get All Supply Lines with expand too slow: p90 of GetAll1000SupplyLinesExpand>2000ms
-      Get Page of Ten Supply Lines too slow: p90 of GetPageOfTenSupplyLines>1000ms
-      Get Page of Ten Supply Lines with expand too slow: p90 of GetPageOfTenSupplyLinesExpand>1000ms
-      Get Supply Lines by Supervisory Node too slow: p90 of GetSupplyLinesBySupervisoryNodeId>1000ms
-      Get Supply Lines by Program and Supplying Facility too slow: p90 of GetSupplyLinesByProgramIdAndSupplyingFacilityId>1000ms
+      - 'GetSupplyLine too high error rate: failures>1%, continue as failed, label=GetSupplyLine, title="GetSupplyLine error rate too high"'
+      - 'GetSupplyLine is too slow: p90>2500ms, stop as failed, label=GetSupplyLine, title="GetSupplyLine response time too high"'
+      - 'GetSupplyLine needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetSupplyLine, title="GetSupplyLine needs improvement"'
+      - 'GetAll1000SupplyLinesExpand too high error rate: failures>1%, continue as failed, label=GetAll1000SupplyLinesExpand, title="GetAll1000SupplyLinesExpand error rate too high"'
+      - 'GetAll1000SupplyLinesExpand is too slow: p90>2500ms, stop as failed, label=GetAll1000SupplyLinesExpand, title="GetAll1000SupplyLinesExpand response time too high"'
+      - 'GetAll1000SupplyLinesExpand needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAll1000SupplyLinesExpand, title="GetAll1000SupplyLinesExpand needs improvement"'
+      - 'GetPageOfTenSupplyLines too high error rate: failures>1%, continue as failed, label=GetPageOfTenSupplyLines, title="GetPageOfTenSupplyLines error rate too high"'
+      - 'GetPageOfTenSupplyLines is too slow: p90>2500ms, stop as failed, label=GetPageOfTenSupplyLines, title="GetPageOfTenSupplyLines response time too high"'
+      - 'GetPageOfTenSupplyLines needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetPageOfTenSupplyLines, title="GetPageOfTenSupplyLines needs improvement"'
+      - 'GetPageOfTenSupplyLinesExpand too high error rate: failures>1%, continue as failed, label=GetPageOfTenSupplyLinesExpand, title="GetPageOfTenSupplyLinesExpand error rate too high"'
+      - 'GetPageOfTenSupplyLinesExpand is too slow: p90>2500ms, stop as failed, label=GetPageOfTenSupplyLinesExpand, title="GetPageOfTenSupplyLinesExpand response time too high"'
+      - 'GetPageOfTenSupplyLinesExpand needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetPageOfTenSupplyLinesExpand, title="GetPageOfTenSupplyLinesExpand needs improvement"'
+      - 'GetSupplyLinesBySupervisoryNodeId too high error rate: failures>1%, continue as failed, label=GetSupplyLinesBySupervisoryNodeId, title="GetSupplyLinesBySupervisoryNodeId error rate too high"'
+      - 'GetSupplyLinesBySupervisoryNodeId is too slow: p90>2500ms, stop as failed, label=GetSupplyLinesBySupervisoryNodeId, title="GetSupplyLinesBySupervisoryNodeId response time too high"'
+      - 'GetSupplyLinesBySupervisoryNodeId needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetSupplyLinesBySupervisoryNodeId, title="GetSupplyLinesBySupervisoryNodeId needs improvement"'
+      - 'GetSupplyLinesByProgramIdAndSupplyingFacilityId too high error rate: failures>1%, continue as failed, label=GetSupplyLinesByProgramIdAndSupplyingFacilityId, title="GetSupplyLinesByProgramIdAndSupplyingFacilityId error rate too high"'
+      - 'GetSupplyLinesByProgramIdAndSupplyingFacilityId is too slow: p90>2500ms, stop as failed, label=GetSupplyLinesByProgramIdAndSupplyingFacilityId, title="GetSupplyLinesByProgramIdAndSupplyingFacilityId response time too high"'
+      - 'GetSupplyLinesByProgramIdAndSupplyingFacilityId needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetSupplyLinesByProgramIdAndSupplyingFacilityId, title="GetSupplyLinesByProgramIdAndSupplyingFacilityId needs improvement"'

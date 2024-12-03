@@ -1,15 +1,23 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: programs-get-one
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: programs-search
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: create-program
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: delete-program
 
 scenarios:
@@ -70,9 +78,17 @@ scenarios:
           Authorization: Bearer ${access_token}
 
 reporting:
-    - module: passfail
-      criteria:
-        Get Program too slow: p90 of GetProgram>500ms
-        Get All Programs too slow: p90 of GetAllPrograms>500ms
-        Create Program too slow: p90 of CreateProgram>500ms
-        Delete Program too slow: p90 of DeleteProgram>500ms
+  - module: passfail
+    criteria:
+      - 'GetProgram too high error rate: failures>1%, continue as failed, label=GetProgram, title="GetProgram error rate too high"'
+      - 'GetProgram is too slow: p90>2500ms, stop as failed, label=GetProgram, title="GetProgram response time too high"'
+      - 'GetProgram needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetProgram, title="GetProgram needs improvement"'
+      - 'GetAllPrograms too high error rate: failures>1%, continue as failed, label=GetAllPrograms, title="GetAllPrograms error rate too high"'
+      - 'GetAllPrograms is too slow: p90>2500ms, stop as failed, label=GetAllPrograms, title="GetAllPrograms response time too high"'
+      - 'GetAllPrograms needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAllPrograms, title="GetAllPrograms needs improvement"'
+      - 'CreateProgram too high error rate: failures>1%, continue as failed, label=CreateProgram, title="CreateProgram error rate too high"'
+      - 'CreateProgram is too slow: p90>3000ms, stop as failed, label=CreateProgram, title="CreateProgram response time too high"'
+      - 'CreateProgram needs improvement: p90>2000ms and p90<=3000ms, continue as passed, label=CreateProgram, title="CreateProgram needs improvement"'
+      - 'DeleteProgram too high error rate: failures>1%, continue as failed, label=DeleteProgram, title="DeleteProgram error rate too high"'
+      - 'DeleteProgram is too slow: p90>2500ms, stop as failed, label=DeleteProgram, title="DeleteProgram response time too high"'
+      - 'DeleteProgram needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=DeleteProgram, title="DeleteProgram needs improvement"'
