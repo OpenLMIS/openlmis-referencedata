@@ -1,4 +1,6 @@
 modules:
+  local:
+    sequential: true
   jmeter:
     properties:
       base-uri: http://localhost
@@ -15,6 +17,9 @@ modules:
   local:
     sequential: true
 reporting:
+  - module: console
+    summary: true
+    details: true
   - module: final-stats
   - module: passfail
     criteria:

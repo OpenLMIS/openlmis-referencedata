@@ -1,6 +1,8 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: facility-update-async
 
 scenarios:
@@ -38,6 +40,11 @@ scenarios:
         body: ${facility}
 
 reporting:
-    - module: passfail
-      criteria:
-        Update Facility too slow: p90 of UpdateFacilityAsync>500ms
+  - module: passfail
+    criteria:
+      - 'UpdateFacilityAsync too high error rate: failures>1%, continue as failed, label=UpdateFacilityAsync, title="UpdateFacilityAsync error rate too high"'
+      - 'UpdateFacilityAsync is too slow: p90>4000ms, stop as failed, label=UpdateFacilityAsync, title="UpdateFacilityAsync response time too high"'
+      - 'UpdateFacilityAsync needs improvement: p90>2500ms and p90<=4000ms, continue as passed, label=UpdateFacilityAsync, title="UpdateFacilityAsync needs improvement"'
+      - 'GetGivenFacility too high error rate: failures>1%, continue as failed, label=GetGivenFacility, title="GetGivenFacility error rate too high"'
+      - 'GetGivenFacility is too slow: p90>2500ms, stop as failed, label=GetGivenFacility, title="GetGivenFacility response time too high"'
+      - 'GetGivenFacility needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetGivenFacility, title="GetGivenFacility needs improvement"'

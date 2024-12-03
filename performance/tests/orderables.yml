@@ -1,18 +1,28 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: orderables-get-first-10
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: orderables-get-10-by-id
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: orderables-get-by-program-code-name
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: orderables-get-10000-by-program
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(long-scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(long-scenario-duration,10m)}
     scenario: orderables-search-10000-by-version-identities
 
 scenarios:
@@ -92,10 +102,20 @@ scenarios:
         body: ${versionIdentities}
 
 reporting:
-    - module: passfail
-      criteria:
-        Get An Orderable Page Of Ten too slow: p90 of GetAnOrderablePageOfTen>500ms
-        Get An Orderable By Id Page Of Ten too slow: p90 of GetAnOrderableByIdPageOfTen>500ms
-        Get An Orderable By Program And Code And Name too slow: p90 of GetAnOrderableByProgramAndCodeAndName>500ms
-        Get 10000 Orderables By Program too slow: p90 of Get10000OrderablesByProgram>15000ms
-        Get 10000 Orderables By Version Identities too slow: p90 of Search10000OrderablesByVersionIdentities>15000ms
+  - module: passfail
+    criteria:
+      - 'GetAnOrderablePageOfTen too high error rate: failures>1%, continue as failed, label=GetAnOrderablePageOfTen, title="GetAnOrderablePageOfTen error rate too high"'
+      - 'GetAnOrderablePageOfTen is too slow: p90>2500ms, stop as failed, label=GetAnOrderablePageOfTen, title="GetAnOrderablePageOfTen response time too high"'
+      - 'GetAnOrderablePageOfTen needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAnOrderablePageOfTen, title="GetAnOrderablePageOfTen needs improvement"'
+      - 'GetAnOrderableByIdPageOfTen too high error rate: failures>1%, continue as failed, label=GetAnOrderableByIdPageOfTen, title="GetAnOrderableByIdPageOfTen error rate too high"'
+      - 'GetAnOrderableByIdPageOfTen is too slow: p90>2500ms, stop as failed, label=GetAnOrderableByIdPageOfTen, title="GetAnOrderableByIdPageOfTen response time too high"'
+      - 'GetAnOrderableByIdPageOfTen needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAnOrderableByIdPageOfTen, title="GetAnOrderableByIdPageOfTen needs improvement"'
+      - 'GetAnOrderableByProgramAndCodeAndName too high error rate: failures>1%, continue as failed, label=GetAnOrderableByProgramAndCodeAndName, title="GetAnOrderableByProgramAndCodeAndName error rate too high"'
+      - 'GetAnOrderableByProgramAndCodeAndName is too slow: p90>2500ms, stop as failed, label=GetAnOrderableByProgramAndCodeAndName, title="GetAnOrderableByProgramAndCodeAndName response time too high"'
+      - 'GetAnOrderableByProgramAndCodeAndName needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAnOrderableByProgramAndCodeAndName, title="GetAnOrderableByProgramAndCodeAndName needs improvement"'
+      - 'Get10000OrderablesByProgram too high error rate: failures>1%, continue as failed, label=Get10000OrderablesByProgram, title="Get10000OrderablesByProgram error rate too high"'
+      - 'Get10000OrderablesByProgram is too slow: p90>15000ms, stop as failed, label=Get10000OrderablesByProgram, title="Get10000OrderablesByProgram response time too high"'
+      - 'Get10000OrderablesByProgram needs improvement: p90>5000ms and p90<=15000ms, continue as passed, label=Get10000OrderablesByProgram, title="Get10000OrderablesByProgram needs improvement"'
+      - 'Search10000OrderablesByVersionIdentities too high error rate: failures>1%, continue as failed, label=Search10000OrderablesByVersionIdentities, title="Search10000OrderablesByVersionIdentities error rate too high"'
+      - 'Search10000OrderablesByVersionIdentities is too slow: p90>15000ms, stop as failed, label=Search10000OrderablesByVersionIdentities, title="Search10000OrderablesByVersionIdentities response time too high"'
+      - 'Search10000OrderablesByVersionIdentities needs improvement: p90>5000ms and p90<=15000ms, continue as passed, label=Search10000OrderablesByVersionIdentities, title="Search10000OrderablesByVersionIdentities needs improvement"'

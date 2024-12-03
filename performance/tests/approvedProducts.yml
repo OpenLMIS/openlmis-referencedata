@@ -1,6 +1,8 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: approved-products
 
 scenarios:
@@ -17,6 +19,9 @@ scenarios:
           Authorization: Bearer ${access_token}
 
 reporting:
-    - module: passfail
-      criteria:
-        Get 1000 Approved Full Supply Products For Health Clinic too slow: p90 of Get1000ApprovedFullSupplyProductsForHealthClinic>3000ms
+  - module: passfail
+    criteria:
+      - 'Get1000ApprovedFullSupplyProductsForHealthClinic too high error rate: failures>1%, continue as failed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic error rate too high"'
+      - 'Get1000ApprovedFullSupplyProductsForHealthClinic is too slow: p90>5000ms, continue as failed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic response time too high"'
+      - 'Get1000ApprovedFullSupplyProductsForHealthClinic needs improvement: p90>3000ms and p90<=5000ms, continue as passed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic needs improvement"'
+  

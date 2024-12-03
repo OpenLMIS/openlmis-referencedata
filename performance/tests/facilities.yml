@@ -1,40 +1,126 @@
 # /api/facilities/${id}/approvedProducts endpoint is tested in another config files
+# execution:
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facility-create
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-minimal-all
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-minimal-one-page
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-audit-log
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facility-update
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-one
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-by-boundary-all
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-by-boundary-one-page
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-delete-one
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-get-all
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-search-all
+#   - concurrency: ${__P(scenario-concurrency,10)}
+#     iterations: ${__P(scenario-iterations,10)}
+#     ramp-up: ${__P(scenario-ramp-up,10s)}
+#     hold-for: ${__P(scenario-duration,10m)}
+#     scenario: facilities-search-one-page
+
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facility-create
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-minimal-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-minimal-one-page
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-audit-log
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facility-update
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-one
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-by-boundary-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-by-boundary-one-page
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-delete-one
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-get-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-search-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: 10
+    iterations: 10
+    ramp-up: 10s
+    hold-for: 10m
     scenario: facilities-search-one-page
 
 scenarios:
@@ -294,17 +380,52 @@ scenarios:
           Content-Type: application/json
 
 reporting:
-    - module: passfail
-      criteria:
-        Create Facility too slow: p90 of CreateFacility>500ms
-        Get All Minimal Facilities too slow: p90 of GetAllMinimalFacilities>1500ms
-        Get First Ten Minimal Facilities too slow: p90 of GetFirstTenMinimalFacilities>500ms
-        Get Facility Audit Log too slow: p90 of GetFacilityAuditLog>500ms
-        Update Facility too slow: p90 of UpdateFacility>500ms
-        Get Facility too slow: p90 of GetFacility>500ms
-        Get All Facilities By Boundary too slow: p90 of GetAllFacilitiesByBoundary>500ms
-        Get First ten Facilities By Boundary too slow: p90 of GetFirstTenFacilitiesByBoundary>500ms
-        Delete Facility too slow: p90 of DeleteFacility>500ms
-        Get All Facilities too slow: p90 of GetAllFacilities>2000ms
-        Find All Health Center Facilities too slow: p90 of FindAllHealthCenterFacilities>2000ms
-        Find First Ten Health Center Facilities too slow: p90 of FindFirstTenHealthCenterFacilities>500ms
+  - module: passfail
+    criteria:
+      - 'p90<=2000ms, continue as passed, label=CreateFacility, title="Create Facility is successful"'
+      - 'p90>2000ms and p90<=3000ms, continue as passed, label=CreateFacility, title="Create Facility needs improvement"'
+      - 'p90>3000ms, continue as failed, label=CreateFacility, title="Create Facility is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=GetAllMinimalFacilities, title="Get All Minimal Facilities is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=GetAllMinimalFacilities, title="Get All Minimal Facilities needs improvement"'
+      - 'p90>2500ms, continue as failed, label=GetAllMinimalFacilities, title="Get All Minimal Facilities is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=GetFirstTenMinimalFacilities, title="Get First Ten Minimal Facilities is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=GetFirstTenMinimalFacilities, title="Get First Ten Minimal Facilities needs improvement"'
+      - 'p90>2500ms, continue as failed, label=GetFirstTenMinimalFacilities, title="Get First Ten Minimal Facilities is too slow"'
+
+      - 'p90<=3000ms, continue as passed, label=GetFacilityAuditLog, title="Get Facility Audit Log is successful"'
+      - 'p90>3000ms and p90<=5000ms, continue as passed, label=GetFacilityAuditLog, title="Get Facility Audit Log needs improvement"'
+      - 'p90>5000ms, continue as failed, label=GetFacilityAuditLog, title="Get Facility Audit Log is too slow"'
+
+      - 'p90<=2500ms, continue as passed, label=UpdateFacility, title="Update Facility is successful"'
+      - 'p90>2500ms and p90<=4000ms, continue as passed, label=UpdateFacility, title="Update Facility needs improvement"'
+      - 'p90>4000ms, continue as failed, label=UpdateFacility, title="Update Facility is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=GetFacility, title="Get Facility is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=GetFacility, title="Get Facility needs improvement"'
+      - 'p90>2500ms, continue as failed, label=GetFacility, title="Get Facility is too slow"'
+
+      - 'p90<=3000ms, continue as passed, label=GetAllFacilitiesByBoundary, title="Get All Facilities By Boundary is successful"'
+      - 'p90>3000ms and p90<=5000ms, continue as passed, label=GetAllFacilitiesByBoundary, title="Get All Facilities By Boundary needs improvement"'
+      - 'p90>5000ms, continue as failed, label=GetAllFacilitiesByBoundary, title="Get All Facilities By Boundary is too slow"'
+
+      - 'p90<=3000ms, continue as passed, label=GetFirstTenFacilitiesByBoundary, title="Get First Ten Facilities By Boundary is successful"'
+      - 'p90>3000ms and p90<=5000ms, continue as passed, label=GetFirstTenFacilitiesByBoundary, title="Get First Ten Facilities By Boundary needs improvement"'
+      - 'p90>5000ms, continue as failed, label=GetFirstTenFacilitiesByBoundary, title="Get First Ten Facilities By Boundary is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=DeleteFacility, title="Delete Facility is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=DeleteFacility, title="Delete Facility needs improvement"'
+      - 'p90>2500ms, continue as failed, label=DeleteFacility, title="Delete Facility is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=GetAllFacilities, title="Get All Facilities is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=GetAllFacilities, title="Get All Facilities needs improvement"'
+      - 'p90>2500ms, continue as failed, label=GetAllFacilities, title="Get All Facilities is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=FindAllHealthCenterFacilities, title="Find All Health Center Facilities is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=FindAllHealthCenterFacilities, title="Find All Health Center Facilities needs improvement"'
+      - 'p90>2500ms, continue as failed, label=FindAllHealthCenterFacilities, title="Find All Health Center Facilities is too slow"'
+
+      - 'p90<=1500ms, continue as passed, label=FindFirstTenHealthCenterFacilities, title="Find First Ten Health Center Facilities is successful"'
+      - 'p90>1500ms and p90<=2500ms, continue as passed, label=FindFirstTenHealthCenterFacilities, title="Find First Ten Health Center Facilities needs improvement"'
+      - 'p90>2500ms, continue as failed, label=FindFirstTenHealthCenterFacilities, title="Find First Ten Health Center Facilities is too slow"'

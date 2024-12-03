@@ -1,42 +1,68 @@
 execution:
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-all
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-search-one-page
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-has-right
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-permission-strings
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-programs
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-facilities
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: create-user
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: delete-user
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-supported-programs
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-fulfillment-facilities
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-get-one-role-assignments
-  - concurrency: ${__P(scenario-concurrency,1)}
-    hold-for: ${__P(scenario-duration,60)}
+  - concurrency: ${__P(scenario-concurrency,10)}
+    iterations: ${__P(scenario-iterations,10)}
+    ramp-up: ${__P(scenario-ramp-up,1m)}
+    hold-for: ${__P(scenario-duration,10m)}
     scenario: users-search-by-right
 
 scenarios:
@@ -95,13 +121,13 @@ scenarios:
         extract-jsonpath:
           user_id: $.id
   delete-user:
-      requests:
-        - include-scenario: create-user
-        - url: ${__P(base-uri)}/api/users/${user_id}
-          method: DELETE
-          label: DeleteUser
-          headers:
-            Authorization: Bearer ${access_token}
+    requests:
+      - include-scenario: create-user
+      - url: ${__P(base-uri)}/api/users/${user_id}
+        method: DELETE
+        label: DeleteUser
+        headers:
+          Authorization: Bearer ${access_token}
   users-has-right:
     variables:
       # administrator
@@ -207,18 +233,29 @@ scenarios:
           Authorization: Bearer ${access_token}
 
 reporting:
-    - module: passfail
-      criteria:
-        Get User too slow: p90 of GetUser>500ms
-        Get All Users too slow: p90 of GetAllUsers>500ms
-        Get a User Page of Ten too slow: p90 of GetAUserPageOfTen>500ms
-        User Has Right too slow: p90 of UserHasRight>500ms
-        Get User Permission Strings too slow: p90 of GetUserPermissionStrings>500ms
-        Get User Programs too slow: p90 of GetUserPrograms>250ms
-        Get User Supported Programs too slow: p90 of GetUserSupportedPrograms>700ms
-        Get User Facilities too slow: p90 of GetUserFacilities>500ms
-        Get User Fulfillment Facilities too slow: p90 of GetUserFulfillmentFacilities>125000ms
-        Get User Role Assignments too slow: p90 of GetUserRoleAssignments>20000ms
-        Create User too slow: p90 of CreateUser>500ms
-        Delete User too slow: p90 of DeleteUser>500ms
-        Get Users By Right too slow: p90 of GetUsersByRight>500ms
+  - module: passfail
+    criteria:
+      - 'GetUser too high error rate: failures>1%, continue as failed, label=GetUser, title="GetUser error rate too high"'
+      - 'GetUser is too slow: p90>2500ms, stop as failed, label=GetUser, title="GetUser response time too high"'
+      - 'GetUser needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetUser, title="GetUser needs improvement"'
+      - 'GetAllUsers too high error rate: failures>1%, continue as failed, label=GetAllUsers, title="GetAllUsers error rate too high"'
+      - 'GetAllUsers is too slow: p90>2500ms, stop as failed, label=GetAllUsers, title="GetAllUsers response time too high"'
+      - 'GetAllUsers needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAllUsers, title="GetAllUsers needs improvement"'
+      - 'GetAUserPageOfTen too high error rate: failures>1%, continue as failed, label=GetAUserPageOfTen, title="GetAUserPageOfTen error rate too high"'
+      - 'GetAUserPageOfTen is too slow: p90>2500ms, stop as failed, label=GetAUserPageOfTen, title="GetAUserPageOfTen response time too high"'
+      - 'GetAUserPageOfTen needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetAUserPageOfTen, title="GetAUserPageOfTen needs improvement"'
+      - 'CreateUser too high error rate: failures>1%, continue as failed, label=CreateUser, title="CreateUser error rate too high"'
+      - 'CreateUser is too slow: p90>2000ms, stop as failed, label=CreateUser, title="CreateUser response time too high"'
+      - 'CreateUser needs improvement: p90>1500ms and p90<=2000ms, continue as passed, label=CreateUser, title="CreateUser needs improvement"'
+      - 'DeleteUser too high error rate: failures>1%, continue as failed, label=DeleteUser, title="DeleteUser error rate too high"'
+      - 'DeleteUser is too slow: p90>2500ms, stop as failed, label=DeleteUser, title="DeleteUser response time too high"'
+      - 'DeleteUser needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=DeleteUser, title="DeleteUser needs improvement"'
+      - 'GetUserPrograms too high error rate: failures>1%, continue as failed, label=GetUserPrograms, title="GetUserPrograms error rate too high"'
+      - 'GetUserPrograms is too slow: p90>1500ms, stop as failed, label=GetUserPrograms, title="GetUserPrograms response time too high"'
+      - 'GetUserPrograms needs improvement: p90>1000ms and p90<=1500ms, continue as passed, label=GetUserPrograms, title="GetUserPrograms needs improvement"'
+      - 'GetUserFacilities too high error rate: failures>1%, continue as failed, label=GetUserFacilities, title="GetUserFacilities error rate too high"'
+      - 'GetUserFacilities is too slow: p90>2500ms, stop as failed, label=GetUserFacilities, title="GetUserFacilities response time too high"'
+      - 'GetUserFacilities needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetUserFacilities, title="GetUserFacilities needs improvement"'
+      - 'GetUserRoleAssignments too high error rate: failures>1%, continue as failed, label=GetUserRoleAssignments, title="GetUserRoleAssignments error rate too high"'
+      - 'GetUserRoleAssignments is too slow: p90>2500ms, stop as failed, label=GetUserRoleAssignments, title="GetUserRoleAssignments response time too high"'
+      - 'GetUserRoleAssignments needs improvement: p90>1500ms and p90<=2500ms, continue as passed, label=GetUserRoleAssignments, title="GetUserRoleAssignments needs improvement"'
