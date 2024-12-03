@@ -24,4 +24,3 @@ reporting:
       - 'Get1000ApprovedFullSupplyProductsForHealthClinic too high error rate: failures>1%, continue as failed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic error rate too high"'
       - 'Get1000ApprovedFullSupplyProductsForHealthClinic is too slow: p90>5000ms, continue as failed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic response time too high"'
       - 'Get1000ApprovedFullSupplyProductsForHealthClinic needs improvement: p90>3000ms and p90<=5000ms, continue as passed, label=Get1000ApprovedFullSupplyProductsForHealthClinic, title="Get1000ApprovedFullSupplyProductsForHealthClinic needs improvement"'
-  
