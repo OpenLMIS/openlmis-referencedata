@@ -1,17 +1,17 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
-    iterations: ${__P(scenario-iterations,10)}
-    ramp-up: ${__P(scenario-ramp-up,1m)}
+    iterations: 10
+    ramp-up: 1m
     hold-for: ${__P(scenario-duration,10m)}
     scenario: download-ideal-stock-amounts-csv
   - concurrency: ${__P(scenario-concurrency,10)}
-    iterations: ${__P(scenario-iterations,10)}
-    ramp-up: ${__P(scenario-ramp-up,1m)}
+    iterations: 10
+    ramp-up: 1m
     hold-for: ${__P(scenario-duration,10m)}
     scenario: get-ideal-stock-amounts
   - concurrency: ${__P(scenario-concurrency,10)}
-    iterations: ${__P(scenario-iterations,10)}
-    ramp-up: ${__P(scenario-ramp-up,1m)}
+    iterations: 10
+    ramp-up: 1m
     hold-for: ${__P(scenario-duration,10m)}
     scenario: upload-ideal-stock-amounts-csv
 
