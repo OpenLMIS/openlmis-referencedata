@@ -1,7 +1,7 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: ftaps-get-first-10
 

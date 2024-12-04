@@ -1,12 +1,12 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-all-supervisory-nodes
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-page-of-ten-supervisory-nodes
 

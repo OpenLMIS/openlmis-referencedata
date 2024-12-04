@@ -1,67 +1,67 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-all
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-search-one-page
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-has-right
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-permission-strings
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-programs
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-facilities
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: create-user
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: delete-user
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-supported-programs
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-fulfillment-facilities
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-get-one-role-assignments
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: users-search-by-right
 

@@ -1,32 +1,32 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-processing-period
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-all-processing-periods
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: processing-periods-search
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-page-of-ten-processing-periods
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-processing-period-duration
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: get-processing-period-audit-log
 

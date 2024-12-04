@@ -2,62 +2,62 @@
 execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facility-create
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-minimal-all
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-minimal-one-page
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-audit-log
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facility-update
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-one
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-by-boundary-all
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-by-boundary-one-page
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-delete-one
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-get-all
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-search-all
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
-    ramp-up: 1m
+    ramp-up: 60
     hold-for: ${__P(scenario-duration,600)}
     scenario: facilities-search-one-page
 
