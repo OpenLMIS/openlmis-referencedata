@@ -2,22 +2,22 @@ execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: programs-get-one
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: programs-search
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: create-program
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: delete-program
 
 scenarios:

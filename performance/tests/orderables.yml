@@ -2,27 +2,27 @@ execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: orderables-get-first-10
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: orderables-get-10-by-id
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: orderables-get-by-program-code-name
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: orderables-get-10000-by-program
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: orderables-search-10000-by-version-identities
 
 scenarios:

@@ -2,7 +2,7 @@ execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: ftaps-get-first-10
 
 scenarios:
@@ -10,7 +10,7 @@ scenarios:
     requests:
       - include-scenario: get-user-token
       - url: ${__P(base-uri)}/api/facilityTypeApprovedProducts?page=1&size=10&facilityType=dist_hosp&program=PRG002
-        method: GET
+        method: GET 
         label: GetAFacilityTypeApprovedProductsPageOfTen
         headers:
           Authorization: Bearer ${access_token}

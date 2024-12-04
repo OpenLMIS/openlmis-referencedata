@@ -2,37 +2,37 @@ execution:
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-supply-line
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-all-supply-lines-expand
     # - concurrency: ${__P(scenario-concurrency,10)}
     # iterations: ${__P(scenario-iterations,10)}
     # ramp-up: ${__P(scenario-ramp-up,1m)}
-    # hold-for: ${__P(scenario-duration,10m)}
+    # hold-for: ${__P(scenario-duration,600)}
     # scenario: get-all-supply-lines
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-page-of-ten-supply-lines
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-page-of-ten-supply-lines-expand
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-supply-lines-by-supervisory-node-id
   - concurrency: ${__P(scenario-concurrency,10)}
     iterations: 10
     ramp-up: 1m
-    hold-for: ${__P(scenario-duration,10m)}
+    hold-for: ${__P(scenario-duration,600)}
     scenario: get-supply-lines-by-program-id-and-supplying-facility-id
 
 scenarios:
