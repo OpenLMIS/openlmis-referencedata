@@ -17,6 +17,9 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.vividsolutions.jts.geom.Polygon;
+
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,6 +27,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.openlmis.referencedata.domain.GeographicZone;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,4 +39,32 @@ import lombok.ToString;
 public final class GeographicZoneDto extends GeographicZoneSimpleDto {
   private Polygon boundary;
   private Map<String, Object> extraData;
+
+  /**
+   * Create new list of GeographicZoneDto based on given iterable of {@link GeographicZone}.
+   *
+   * @param geographicZones list of {@link GeographicZoneDto}
+   * @return new list of GeographicZoneDto.
+   */
+  public static List<GeographicZoneDto> newInstances(Iterable<GeographicZone> geographicZones) {
+    List<GeographicZoneDto> geographicZoneDtos = new LinkedList<>();
+    geographicZones.forEach(gz -> geographicZoneDtos.add(newInstance(gz)));
+    return geographicZoneDtos;
+  }
+
+  /**
+   * Creates new instance of GeographicZoneDto based on given {@link GeographicZone}.
+   *
+   * @param geographicZone instance of GeographicZone.
+   * @return new instance of GeographicZoneDto.
+   */
+  public static GeographicZoneDto newInstance(GeographicZone geographicZone) {
+    if (geographicZone == null) {
+      return null;
+    }
+    GeographicZoneDto geographicZoneDto = new GeographicZoneDto();
+    geographicZone.export(geographicZoneDto);
+
+    return geographicZoneDto;
+  }
 }
