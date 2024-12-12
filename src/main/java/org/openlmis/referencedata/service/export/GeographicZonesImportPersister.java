@@ -17,17 +17,24 @@ package org.openlmis.referencedata.service.export;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.EasyBatchUtils;
 import org.openlmis.referencedata.util.FileHelper;
 import org.openlmis.referencedata.util.TransactionUtils;
+import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,6 +46,7 @@ public class GeographicZonesImportPersister
 
   @Autowired private FileHelper fileHelper;
   @Autowired private GeographicZoneRepository geographicZoneRepository;
+  @Autowired private GeographicLevelRepository geographicLevelRepository;
   @Autowired private TransactionUtils transactionUtils;
 
   @Autowired
@@ -76,11 +84,23 @@ public class GeographicZonesImportPersister
     for (GeographicZoneDto dto : dtoList) {
       GeographicZone zone = geographicZoneRepository.findByCode(dto.getCode());
       if (zone != null) {
+        validateZone(zone);
         zone.setCatchmentPopulation(dto.getCatchmentPopulation());
         persistList.add(zone);
       }
     }
 
     return persistList;
+  }
+
+  private void validateZone(GeographicZone zone) {
+    List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
+        .spliterator(), false).collect(Collectors.toList());
+    int lowestLevelNumber = Collections.min(allLevels,
+        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
+    if (zone.getLevel().getLevelNumber() != lowestLevelNumber) {
+      throw new ValidationMessageException(
+          GeographicZoneMessageKeys.ERROR_TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE);
+    }
   }
 }

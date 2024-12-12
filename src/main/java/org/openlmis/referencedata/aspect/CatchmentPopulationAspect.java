@@ -15,12 +15,22 @@
 
 package org.openlmis.referencedata.aspect;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,31 +41,79 @@ import org.springframework.stereotype.Component;
 public class CatchmentPopulationAspect {
 
   @Autowired
-  private GeographicZoneRepository repository;
+  private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
 
   @Value("${referencedata.catchmentPopulationAutoCalc.enabled}")
   private boolean catchmentPopulationAutoCalc;
 
+  /**
+   * Advice executed after the `save` method of the `GeographicZoneRepository` is called.
+   *
+   * @param joinPoint the join point providing access to the method arguments,
+   *                  specifically the `GeographicZone` object being saved.
+   */
   @AfterReturning(
       "execution(* org.openlmis.referencedata.repository.GeographicZoneRepository.save(*))")
   public void afterGeographicZoneSaveReturningAdvice(JoinPoint joinPoint) {
     final GeographicZone updatedGeoZone = (GeographicZone) joinPoint.getArgs()[0];
-    updateCatchmentPopulation(updatedGeoZone);
+    updateCatchmentPopulation(updatedGeoZone.getParent());
   }
 
-  private void updateCatchmentPopulation(GeographicZone updatedGeoZone) {
-    if (updatedGeoZone.getParent() != null && catchmentPopulationAutoCalc) {
-      List<GeographicZone> geoZonesByParentAndLevel = repository.findByParentAndLevel(
-          updatedGeoZone.getParent(), updatedGeoZone.getLevel());
-      int totalCatchmentPopulation = sumCatchmentPopulation(geoZonesByParentAndLevel);
-      GeographicZone parent = updatedGeoZone.getParent();
-      parent.setCatchmentPopulation(totalCatchmentPopulation);
-      repository.save(parent);
+  /**
+   * Advice executed after the `saveAll` method of the `GeographicZoneRepository` is called.
+   *
+   * @param joinPoint the join point providing access to the method arguments,
+   *                  specifically the list of `GeographicZone` objects being saved.
+   */
+  @AfterReturning(
+      "execution(* org.openlmis.referencedata.repository.GeographicZoneRepository.saveAll(*))")
+  public void afterGeographicZoneSaveAllReturningAdvice(JoinPoint joinPoint) {
+    final Iterable<GeographicZone> updatedGeoZones = (Iterable) joinPoint.getArgs()[0];
+    Set<GeographicZone> uniqueParents = new HashSet<>();
+    updatedGeoZones.forEach(updatedGeoZone -> {
+      if (updatedGeoZone.getParent() != null) {
+        uniqueParents.add(updatedGeoZone.getParent());
+      }
+    });
+    uniqueParents.forEach(this::updateCatchmentPopulation);
+  }
+
+  private void updateCatchmentPopulation(GeographicZone parent) {
+    List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
+        .spliterator(), false).collect(Collectors.toList());
+    if (shouldCatchmentPopulationBePerformed(parent, allLevels)) {
+      Optional<GeographicLevel> childLevel = allLevels.stream()
+          .filter(level ->
+              Objects.equals(level.getLevelNumber(), parent.getLevel().getLevelNumber() + 1))
+          .findFirst();
+      if (childLevel.isPresent()) {
+        List<GeographicZone> children = geographicZoneRepository
+            .findByParentAndLevel(parent, childLevel.get());
+        int totalCatchmentPopulation = sumCatchmentPopulation(children);
+        parent.setCatchmentPopulation(totalCatchmentPopulation);
+        geographicZoneRepository.save(parent);
+      }
     }
   }
 
-  private int sumCatchmentPopulation(List<GeographicZone> elements) {
-    return elements.stream()
+  private boolean shouldCatchmentPopulationBePerformed(GeographicZone parent,
+                                                       List<GeographicLevel> allLevels) {
+    if (parent == null) {
+      return false;
+    }
+
+    int lowestLevelNumber = Collections.min(allLevels,
+        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
+    int childLevel = parent.getLevel().getLevelNumber() + 1;
+
+    return childLevel == lowestLevelNumber && catchmentPopulationAutoCalc;
+  }
+
+  private int sumCatchmentPopulation(List<GeographicZone> geoZones) {
+    return geoZones.stream()
         .map(GeographicZone::getCatchmentPopulation)
         .filter(Objects::nonNull)
         .mapToInt(Integer::intValue)
