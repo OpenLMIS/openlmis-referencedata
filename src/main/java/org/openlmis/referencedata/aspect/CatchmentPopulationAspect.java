@@ -15,8 +15,6 @@
 
 package org.openlmis.referencedata.aspect;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,11 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CatchmentPopulationAspect {
 
-  @Autowired
-  private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
+  @Autowired private GeographicZoneRepository geographicZoneRepository;
+  @Autowired private GeographicLevelRepository geographicLevelRepository;
 
   @Value("${referencedata.catchmentPopulationAutoCalc.enabled}")
   private boolean catchmentPopulationAutoCalc;
@@ -82,13 +77,8 @@ public class CatchmentPopulationAspect {
   }
 
   private void updateCatchmentPopulation(GeographicZone parent) {
-    List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
-        .spliterator(), false).collect(Collectors.toList());
-    if (shouldCatchmentPopulationBePerformed(parent, allLevels)) {
-      Optional<GeographicLevel> childLevel = allLevels.stream()
-          .filter(level ->
-              Objects.equals(level.getLevelNumber(), parent.getLevel().getLevelNumber() + 1))
-          .findFirst();
+    if (catchmentPopulationAutoCalc && parent != null) {
+      Optional<GeographicLevel> childLevel = findChildLevel(parent);
       if (childLevel.isPresent()) {
         List<GeographicZone> children = geographicZoneRepository
             .findByParentAndLevel(parent, childLevel.get());
@@ -99,21 +89,18 @@ public class CatchmentPopulationAspect {
     }
   }
 
-  private boolean shouldCatchmentPopulationBePerformed(GeographicZone parent,
-                                                       List<GeographicLevel> allLevels) {
-    if (parent == null) {
-      return false;
-    }
+  private Optional<GeographicLevel> findChildLevel(GeographicZone parent) {
+    List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
+        .spliterator(), false).collect(Collectors.toList());
 
-    int lowestLevelNumber = Collections.min(allLevels,
-        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
-    int childLevel = parent.getLevel().getLevelNumber() + 1;
-
-    return childLevel == lowestLevelNumber && catchmentPopulationAutoCalc;
+    return allLevels.stream()
+        .filter(level ->
+            Objects.equals(level.getLevelNumber(), parent.getLevel().getLevelNumber() + 1))
+        .findFirst();
   }
 
-  private int sumCatchmentPopulation(List<GeographicZone> geoZones) {
-    return geoZones.stream()
+  private int sumCatchmentPopulation(List<GeographicZone> elements) {
+    return elements.stream()
         .map(GeographicZone::getCatchmentPopulation)
         .filter(Objects::nonNull)
         .mapToInt(Integer::intValue)

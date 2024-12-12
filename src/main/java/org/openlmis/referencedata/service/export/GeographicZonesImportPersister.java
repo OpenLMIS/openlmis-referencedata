@@ -96,7 +96,7 @@ public class GeographicZonesImportPersister
   private void validateZone(GeographicZone zone) {
     List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
         .spliterator(), false).collect(Collectors.toList());
-    int lowestLevelNumber = Collections.min(allLevels,
+    int lowestLevelNumber = Collections.max(allLevels,
         Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
     if (zone.getLevel().getLevelNumber() != lowestLevelNumber) {
       throw new ValidationMessageException(
