@@ -64,23 +64,30 @@ public class GeographicZonesImportPersister
     List<GeographicZoneDto> importedDtos = fileHelper.readCsv(GeographicZoneDto.class, dataStream)
         .stream().filter(dto -> dto.getCode() != null).collect(Collectors.toList());
 
-    List<GeographicLevel> allGeoLevels = StreamSupport.stream(geographicLevelRepository.findAll()
-        .spliterator(), false).collect(Collectors.toList());
+    int lowestLevelNumber = findLowestHierarchyLevelNumber();
 
     profiler.start("CREATE_OR_UPDATE_SAVE_ALL");
     List<GeographicZoneDto> result = new EasyBatchUtils(importExecutorService)
         .processInBatches(
             importedDtos,
             batch -> transactionUtils.runInOwnTransaction(() ->
-                importBatch(batch, allGeoLevels)));
+                importBatch(batch, lowestLevelNumber)));
 
     profiler.start("RETURN");
     return result;
   }
 
+  private int findLowestHierarchyLevelNumber() {
+    List<GeographicLevel> allGeoLevels = StreamSupport.stream(geographicLevelRepository.findAll()
+        .spliterator(), false).collect(Collectors.toList());
+
+    return Collections.max(allGeoLevels,
+        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
+  }
+
   private List<GeographicZoneDto> importBatch(List<GeographicZoneDto> importedDtosBatch,
-                                              List<GeographicLevel> geoLevels) {
-    List<GeographicZone> toPersistBatch = createListToUpdate(importedDtosBatch, geoLevels);
+                                              int lowestLevelNumber) {
+    List<GeographicZone> toPersistBatch = createListToUpdate(importedDtosBatch, lowestLevelNumber);
     List<GeographicZone> persistedObjects = new ArrayList<>();
     geographicZoneRepository.saveAll(toPersistBatch).forEach(persistedObjects::add);
 
@@ -88,13 +95,13 @@ public class GeographicZonesImportPersister
   }
 
   private List<GeographicZone> createListToUpdate(List<GeographicZoneDto> dtoList,
-                                                  List<GeographicLevel> geoLevels) {
+                                                  int lowestLevelNumber) {
     List<GeographicZone> persistList = new LinkedList<>();
 
     for (GeographicZoneDto dto : dtoList) {
       GeographicZone zone = geographicZoneRepository.findByCode(dto.getCode());
       if (zone != null) {
-        validateZone(zone, geoLevels);
+        validateZone(zone, lowestLevelNumber);
         zone.setCatchmentPopulation(dto.getCatchmentPopulation());
         persistList.add(zone);
       }
@@ -103,9 +110,7 @@ public class GeographicZonesImportPersister
     return persistList;
   }
 
-  private void validateZone(GeographicZone zone, List<GeographicLevel> geoLevels) {
-    int lowestLevelNumber = Collections.max(geoLevels,
-        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
+  private void validateZone(GeographicZone zone, int lowestLevelNumber) {
     if (catchmentPopulationAutoCalc && zone.getLevel().getLevelNumber() != lowestLevelNumber) {
       throw new ValidationMessageException(
           GeographicZoneMessageKeys.ERROR_TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE);
