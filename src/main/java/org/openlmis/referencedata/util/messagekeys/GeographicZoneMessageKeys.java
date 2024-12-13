@@ -29,4 +29,8 @@ public abstract class GeographicZoneMessageKeys extends MessageKeys {
       join(ERROR, EXTRA_DATA, UNALLOWED_KEY);
   public static final String ERROR_EXTRA_DATA_MODIFIED_KEY = join(ERROR, EXTRA_DATA, MODIFIED_KEY);
   public static final String ERROR_FIELD_IS_INVARIANT = join(ERROR, FIELD_IS_INVARIANT);
+  public static final String TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE =
+      "youAreTryingToUpdateGeographicZoneThatIsNotTheLowestInTheHierarchy";
+  public static final String ERROR_TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE = join(ERROR,
+      TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE);
 }

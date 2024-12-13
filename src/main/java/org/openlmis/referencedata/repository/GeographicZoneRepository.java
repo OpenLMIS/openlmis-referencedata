@@ -67,4 +67,7 @@ public interface GeographicZoneRepository extends PagingAndSortingRepository<Geo
       + " ",
       nativeQuery = true)
   Page<GeographicZone> findAllWithoutSnapshots(Pageable pageable);
+
+  @Query("SELECT SUM(gz.catchmentPopulation) FROM GeographicZone gz WHERE gz.parent = :parent ")
+  Integer sumCatchmentPopulationByParent(@Param("parent") GeographicZone parent);
 }

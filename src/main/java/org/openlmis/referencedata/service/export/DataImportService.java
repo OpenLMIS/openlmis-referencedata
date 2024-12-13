@@ -42,7 +42,8 @@ public class DataImportService {
           "supportedProgram.csv",
           "orderable.csv",
           "programOrderable.csv",
-          "tradeItem.csv");
+          "tradeItem.csv",
+          "geographicZones.csv");
 
   @Autowired private FileHelper fileHelper;
   @Autowired private BeanFactory beanFactory;
