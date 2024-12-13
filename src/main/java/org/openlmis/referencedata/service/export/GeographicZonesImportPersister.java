@@ -38,6 +38,7 @@ import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service("geographicZones.csv")
@@ -48,6 +49,9 @@ public class GeographicZonesImportPersister
   @Autowired private GeographicZoneRepository geographicZoneRepository;
   @Autowired private GeographicLevelRepository geographicLevelRepository;
   @Autowired private TransactionUtils transactionUtils;
+
+  @Value("${referencedata.catchmentPopulationAutoCalc.enabled}")
+  private boolean catchmentPopulationAutoCalc;
 
   @Autowired
   @Qualifier("importExecutorService")
@@ -60,31 +64,37 @@ public class GeographicZonesImportPersister
     List<GeographicZoneDto> importedDtos = fileHelper.readCsv(GeographicZoneDto.class, dataStream)
         .stream().filter(dto -> dto.getCode() != null).collect(Collectors.toList());
 
+    List<GeographicLevel> allGeoLevels = StreamSupport.stream(geographicLevelRepository.findAll()
+        .spliterator(), false).collect(Collectors.toList());
+
     profiler.start("CREATE_OR_UPDATE_SAVE_ALL");
     List<GeographicZoneDto> result = new EasyBatchUtils(importExecutorService)
         .processInBatches(
             importedDtos,
-            batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
+            batch -> transactionUtils.runInOwnTransaction(() ->
+                importBatch(batch, allGeoLevels)));
 
     profiler.start("RETURN");
     return result;
   }
 
-  private List<GeographicZoneDto> importBatch(List<GeographicZoneDto> importedDtosBatch) {
-    List<GeographicZone> toPersistBatch = createListToUpdate(importedDtosBatch);
+  private List<GeographicZoneDto> importBatch(List<GeographicZoneDto> importedDtosBatch,
+                                              List<GeographicLevel> geoLevels) {
+    List<GeographicZone> toPersistBatch = createListToUpdate(importedDtosBatch, geoLevels);
     List<GeographicZone> persistedObjects = new ArrayList<>();
     geographicZoneRepository.saveAll(toPersistBatch).forEach(persistedObjects::add);
 
     return GeographicZoneDto.newInstances(persistedObjects);
   }
 
-  private List<GeographicZone> createListToUpdate(List<GeographicZoneDto> dtoList) {
+  private List<GeographicZone> createListToUpdate(List<GeographicZoneDto> dtoList,
+                                                  List<GeographicLevel> geoLevels) {
     List<GeographicZone> persistList = new LinkedList<>();
 
     for (GeographicZoneDto dto : dtoList) {
       GeographicZone zone = geographicZoneRepository.findByCode(dto.getCode());
       if (zone != null) {
-        validateZone(zone);
+        validateZone(zone, geoLevels);
         zone.setCatchmentPopulation(dto.getCatchmentPopulation());
         persistList.add(zone);
       }
@@ -93,12 +103,10 @@ public class GeographicZonesImportPersister
     return persistList;
   }
 
-  private void validateZone(GeographicZone zone) {
-    List<GeographicLevel> allLevels = StreamSupport.stream(geographicLevelRepository.findAll()
-        .spliterator(), false).collect(Collectors.toList());
-    int lowestLevelNumber = Collections.max(allLevels,
+  private void validateZone(GeographicZone zone, List<GeographicLevel> geoLevels) {
+    int lowestLevelNumber = Collections.max(geoLevels,
         Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
-    if (zone.getLevel().getLevelNumber() != lowestLevelNumber) {
+    if (catchmentPopulationAutoCalc && zone.getLevel().getLevelNumber() != lowestLevelNumber) {
       throw new ValidationMessageException(
           GeographicZoneMessageKeys.ERROR_TRYING_TO_UPDATE_NON_LOWEST_GEOGRAPHIC_ZONE);
     }
