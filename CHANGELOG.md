@@ -1,7 +1,19 @@
-15.2.8 / wip
+15.2.8 / 2024-12-17
 ==================
 
-15.2.7 / 31.10.2024
+Improvements:
+* [SELV3-781](https://openlmis.atlassian.net/browse/SELV3-781): Extension of catchment population logic.
+  * Feature Flag Implementation:
+    * Implement a feature flag (CATCHMENT_POPULATION_CALC_AUTO) to control the aggregation and editing behavior of catchment population data.
+  * Automatic Aggregation Logic:
+    * If the feature flag is enabled (CATCHMENT_POPULATION_CALC_AUTO=true), automatically aggregate population data from the lowest geographic level to higher levels.
+    * If the feature flag is disabled (CATCHMENT_POPULATION_CALC_AUTO=false), prevent automatic aggregation and allow editing of population data at higher levels.
+  * Import Logic:
+    * Implement logic to support CSV import of population data for geographic zones.
+  * Fix /geographicZone/search endpoint so it’s parameters are optional.
+    * `GET /geographicZone/search?parent=UUID` is now possible.
+
+15.2.7 / 2024-10-31
 ==================
 
 Improvements:
