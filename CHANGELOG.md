@@ -1,6 +1,14 @@
 15.3.0-SNAPSHOT / wip
 ==================
 
+15.2.9 / 2025-01-14
+==================
+
+Changes:
+* [SELV3-752](https://openlmis.atlassian.net/browse/SELV3-752): Add `GENERAL_ADMIN` rights for managing dashboard reports and report categories
+  * `REPORTS_MANAGE`
+  * `REPORT_CATEGORIES_MANAGE`
+
 15.2.8 / 2024-12-17
 ==================
 
