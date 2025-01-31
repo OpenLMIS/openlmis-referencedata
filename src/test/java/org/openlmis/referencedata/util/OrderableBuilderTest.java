@@ -53,6 +53,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
+@SuppressWarnings("PMD.TooManyMethods")
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableBuilderTest {
 
@@ -142,6 +143,19 @@ public class OrderableBuilderTest {
     Orderable updatedOrderable = orderableBuilder.newOrderable(orderableDto, orderable);
 
     assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges(), hasSize(1));
+  }
+
+  @Test
+  public void shouldAddNewDefaultPriceChangeIfNull() {
+    Program program = createProgram("test_program");
+    OrderableDto orderableDto = createOrderableDto(program.getId());
+    when(authenticationHelper.getCurrentUser()).thenReturn(new UserDataBuilder().build());
+
+    Orderable updatedOrderable = orderableBuilder.newOrderable(orderableDto, null);
+
+    assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges(), hasSize(1));
+    assertThat(updatedOrderable.getProgramOrderable(program).getPricePerPack(),
+        is(Money.zero(CurrencyUnit.of("USD"))));
   }
 
   private Program createProgram(String code) {

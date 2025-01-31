@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -105,28 +106,36 @@ public class OrderableBuilder {
   private void setPriceChanges(Orderable persistedOrderable, ProgramOrderableDto item,
       ProgramOrderable programOrderable, Program program) {
     List<PriceChange> priceChanges = getPreviousPriceChanges(item, programOrderable);
+    Money newPrice = getOrInitializePrice(programOrderable);
 
-    if (persistedOrderable != null) {
-      boolean priceHasChanged = true;
-      Money newPrice = programOrderable.getPricePerPack();
-      if (persistedOrderable.getProgramOrderable(program) != null) {
-        Money currentPrice = persistedOrderable.getProgramOrderable(program).getPricePerPack();
-        priceHasChanged = !currentPrice.equals(newPrice);
-      }
+    boolean priceHasChanged = hasPriceChanged(persistedOrderable, program, newPrice);
 
-      if (newPrice == null) {
-        String currencyString = defaultIfBlank(System.getenv("CURRENCY_CODE"), "USD");
-        CurrencyUnit currencyUnit = CurrencyUnit.of(currencyString);
-        newPrice = Money.zero(currencyUnit);
-        programOrderable.setPricePerPack(newPrice);
-      }
-
-      if (priceHasChanged) {
-        addPriceChange(programOrderable, newPrice, priceChanges);
-      }
+    if (priceHasChanged) {
+      addPriceChange(programOrderable, newPrice, priceChanges);
     }
 
     programOrderable.setPriceChanges(priceChanges);
+  }
+
+  private Money getOrInitializePrice(ProgramOrderable programOrderable) {
+    if (programOrderable.getPricePerPack() != null) {
+      return programOrderable.getPricePerPack();
+    }
+
+    String currencyCode = defaultIfBlank(System.getenv("CURRENCY_CODE"), "USD");
+    CurrencyUnit currencyUnit = CurrencyUnit.of(currencyCode);
+    Money defaultPrice = Money.zero(currencyUnit);
+
+    programOrderable.setPricePerPack(defaultPrice);
+    return defaultPrice;
+  }
+
+  private boolean hasPriceChanged(Orderable persistedOrderable, Program program, Money newPrice) {
+    return Optional.ofNullable(persistedOrderable)
+        .map(orderable -> orderable.getProgramOrderable(program))
+        .map(ProgramOrderable::getPricePerPack)
+        .map(currentPrice -> !currentPrice.equals(newPrice))
+        .orElse(true);
   }
 
   private List<PriceChange> getPreviousPriceChanges(ProgramOrderableDto item,
