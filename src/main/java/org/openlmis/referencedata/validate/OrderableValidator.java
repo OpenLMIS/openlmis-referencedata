@@ -22,7 +22,6 @@ import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.E
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_ROUND_TO_ZERO_REQUIRED;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.joda.money.Money;
@@ -87,20 +86,23 @@ public class OrderableValidator implements BaseValidator {
     rejectIfNull(errors, "netContent", ERROR_NET_CONTENT_REQUIRED);
 
     OrderableDto dto = (OrderableDto) target;
-    Set<ProgramOrderableDto> programs = dto.getPrograms();
-    if (programs != null && !programs.isEmpty()) {
-      Iterator iterator = programs.iterator();
-      ProgramOrderableDto programOrderableDto = (ProgramOrderableDto)iterator.next();
-      Money pricePerPack = programOrderableDto.getPricePerPack();
-      BigDecimal amount = pricePerPack.getAmount();
-      if (amount.compareTo(BigDecimal.ZERO) < 0) {
-        throw new ValidationMessageException(OrderableMessageKeys.ERROR_NEGATIVE_PRICE_PER_PACK);
-      }
-    }
+    validatePrograms(dto);
     validateTemperature(dto, errors);
     validateVolumeMeasurement(dto, errors);
     validateProductCode(dto, errors);
+  }
 
+  private void validatePrograms(OrderableDto dto) {
+    Set<ProgramOrderableDto> programs = dto.getPrograms();
+    if (programs != null && !programs.isEmpty()) {
+      for (ProgramOrderableDto programOrderableDto : programs) {
+        Money pricePerPack = programOrderableDto.getPricePerPack();
+        BigDecimal amount = pricePerPack != null ? pricePerPack.getAmount() : BigDecimal.ZERO;
+        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+          throw new ValidationMessageException(OrderableMessageKeys.ERROR_NEGATIVE_PRICE_PER_PACK);
+        }
+      }
+    }
   }
 
   private void validateTemperature(OrderableDto dto, Errors errors) {

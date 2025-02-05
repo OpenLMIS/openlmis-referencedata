@@ -20,9 +20,12 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableChild;
@@ -38,10 +41,14 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderableBuilder {
+
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -100,22 +107,34 @@ public class OrderableBuilder {
   private void setPriceChanges(Orderable persistedOrderable, ProgramOrderableDto item,
       ProgramOrderable programOrderable, Program program) {
     List<PriceChange> priceChanges = getPreviousPriceChanges(item, programOrderable);
+    Money newPrice = getOrInitializePrice(programOrderable);
 
-    if (persistedOrderable != null) {
-      boolean priceHasChanged = true;
-      Money newPrice = programOrderable.getPricePerPack();
-      if (persistedOrderable.getProgramOrderable(program) != null) {
-        Money currentPrice = persistedOrderable.getProgramOrderable(program)
-            .getPricePerPack();
-        priceHasChanged = !currentPrice.equals(newPrice);
-      }
+    boolean priceHasChanged = hasPriceChanged(persistedOrderable, program, newPrice);
 
-      if (priceHasChanged) {
-        addPriceChange(programOrderable, newPrice, priceChanges);
-      }
+    if (priceHasChanged) {
+      addPriceChange(programOrderable, newPrice, priceChanges);
     }
 
     programOrderable.setPriceChanges(priceChanges);
+  }
+
+  private Money getOrInitializePrice(ProgramOrderable programOrderable) {
+    if (programOrderable.getPricePerPack() != null) {
+      return programOrderable.getPricePerPack();
+    }
+
+    Money defaultPrice = Money.zero(CurrencyUnit.of(currencyCode));
+
+    programOrderable.setPricePerPack(defaultPrice);
+    return defaultPrice;
+  }
+
+  private boolean hasPriceChanged(Orderable persistedOrderable, Program program, Money newPrice) {
+    return Optional.ofNullable(persistedOrderable)
+        .map(orderable -> orderable.getProgramOrderable(program))
+        .map(ProgramOrderable::getPricePerPack)
+        .map(currentPrice -> !currentPrice.equals(newPrice))
+        .orElse(true);
   }
 
   private List<PriceChange> getPreviousPriceChanges(ProgramOrderableDto item,
