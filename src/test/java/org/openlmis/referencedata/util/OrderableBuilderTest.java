@@ -25,12 +25,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -52,10 +55,13 @@ import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @SuppressWarnings("PMD.TooManyMethods")
 @RunWith(MockitoJUnitRunner.class)
 public class OrderableBuilderTest {
+
+  private static final String CURRENCY_CODE = "USD";
 
   @Mock
   private ProgramRepository programRepository;
@@ -68,6 +74,11 @@ public class OrderableBuilderTest {
 
   @InjectMocks
   private OrderableBuilder orderableBuilder;
+
+  @Before
+  public void setUp() {
+    ReflectionTestUtils.setField(orderableBuilder, "currencyCode", CURRENCY_CODE);
+  }
 
   @Test
   public void shouldCreateOrderableWithSingleProgram() throws Exception {
@@ -136,13 +147,16 @@ public class OrderableBuilderTest {
   public void shouldAddNewPriceChange() {
     Program program = createProgram("test_program");
     Orderable orderable = createOrderable(program.getId());
-    orderable.getProgramOrderable(program).setPricePerPack(Money.of(CurrencyUnit.of("USD"), 10));
     OrderableDto orderableDto = createOrderableDto(program.getId());
+    orderableDto.getPrograms().forEach(programOrderableDto ->
+        programOrderableDto.setPricePerPack(Money.of(CurrencyUnit.of(CURRENCY_CODE), 15)));
     when(authenticationHelper.getCurrentUser()).thenReturn(new UserDataBuilder().build());
 
     Orderable updatedOrderable = orderableBuilder.newOrderable(orderableDto, orderable);
 
     assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges(), hasSize(1));
+    assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges().get(0).getPrice(),
+        is(Money.of(CurrencyUnit.of(CURRENCY_CODE), 15)));
   }
 
   @Test
@@ -155,7 +169,7 @@ public class OrderableBuilderTest {
 
     assertThat(updatedOrderable.getProgramOrderable(program).getPriceChanges(), hasSize(1));
     assertThat(updatedOrderable.getProgramOrderable(program).getPricePerPack(),
-        is(Money.zero(CurrencyUnit.of("USD"))));
+        is(Money.zero(CurrencyUnit.of(CURRENCY_CODE))));
   }
 
   private Program createProgram(String code) {

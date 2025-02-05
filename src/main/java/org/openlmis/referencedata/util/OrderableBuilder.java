@@ -15,13 +15,11 @@
 
 package org.openlmis.referencedata.util;
 
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -43,10 +41,14 @@ import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.AuthenticationHelper;
 import org.openlmis.referencedata.util.messagekeys.UserMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class OrderableBuilder {
+
+  @Value("${currencyCode}")
+  private String currencyCode;
 
   @Autowired
   private ProgramRepository programRepository;
@@ -75,7 +77,6 @@ public class OrderableBuilder {
           .getPrograms()
           .stream()
           .map(item -> programRepository.findById(item.getProgramId()).orElse(null))
-          .filter(Objects::nonNull)
           .collect(Collectors.toMap(Program::getId, program -> program, (id1, id2) -> id1));
 
       List<ProgramOrderable> programOrderables = importer
@@ -122,9 +123,7 @@ public class OrderableBuilder {
       return programOrderable.getPricePerPack();
     }
 
-    String currencyCode = defaultIfBlank(System.getenv("CURRENCY_CODE"), "USD");
-    CurrencyUnit currencyUnit = CurrencyUnit.of(currencyCode);
-    Money defaultPrice = Money.zero(currencyUnit);
+    Money defaultPrice = Money.zero(CurrencyUnit.of(currencyCode));
 
     programOrderable.setPricePerPack(defaultPrice);
     return defaultPrice;
