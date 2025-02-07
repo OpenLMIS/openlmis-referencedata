@@ -43,7 +43,7 @@ import org.openlmis.referencedata.web.csv.processor.CsvCellProcessors;
 public class GeographicZoneSimpleDto extends BaseDto implements
     GeographicZone.Exporter, GeographicZone.Importer {
 
-  @ImportField(name = "code")
+  @ImportField(name = "code", mandatory = true)
   private String code;
 
   private String name;
@@ -102,5 +102,18 @@ public class GeographicZoneSimpleDto extends BaseDto implements
   public Map<String, Object> getExtraData() {
     // unsupported operation
     return Maps.newHashMap();
+  }
+
+  /**
+   * Create new instance of GeographicZoneSimpleDto.
+   *
+   * @param geographicZone a geographicZone to create model from, not null
+   * @return new instance of GeographicZoneSimpleDto, never null
+   */
+  public static GeographicZoneSimpleDto newInstance(GeographicZone geographicZone) {
+    final GeographicZoneSimpleDto model = new GeographicZoneSimpleDto();
+    model.code = geographicZone.getCode();
+    model.catchmentPopulation = geographicZone.getCatchmentPopulation();
+    return model;
   }
 }

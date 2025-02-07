@@ -15,10 +15,14 @@
 
 package org.openlmis.referencedata.dto;
 
+import static org.junit.Assert.assertEquals;
+
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 import org.openlmis.referencedata.ToStringTestUtils;
+import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 
 public class GeographicZoneSimpleDtoTest {
 
@@ -39,6 +43,15 @@ public class GeographicZoneSimpleDtoTest {
   public void shouldImplementToString() {
     GeographicZoneSimpleDto dto = new GeographicZoneSimpleDto();
     ToStringTestUtils.verify(GeographicZoneSimpleDto.class, dto);
+  }
+
+  @Test
+  public void shouldCreateNewInstance() {
+    GeographicZone geographicZone = new GeographicZoneDataBuilder().buildAsNew();
+    GeographicZoneSimpleDto dto = GeographicZoneSimpleDto.newInstance(geographicZone);
+
+    assertEquals(geographicZone.getCode(), dto.getCode());
+    assertEquals(geographicZone.getCatchmentPopulation(), dto.getCatchmentPopulation());
   }
 
 }

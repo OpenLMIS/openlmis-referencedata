@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
@@ -30,12 +31,15 @@ import static org.openlmis.referencedata.service.GeographicZoneService.PARENT;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hamcrest.core.Every;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,6 +49,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
+import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
@@ -181,5 +186,21 @@ public class GeographicZoneServiceTest {
     Set<UUID> actual = geographicZoneService.getAllZonesInHierarchy(parentId);
     assertThat(actual, hasSize(expected.length));
     assertThat(actual, hasItems(expected));
+  }
+
+  @Test
+  public void shouldReturnAllGeographicZones() {
+    final Integer geographicZoneListSize = geographicZones.size();
+    when(geographicZoneRepository.findAll()).thenReturn(geographicZones);
+    List<GeographicZoneSimpleDto> result = geographicZoneService.findAllExportableItems();
+    assertEquals(Integer.valueOf(result.size()), geographicZoneListSize);
+  }
+
+  @Test
+  public void shouldReturnTypeThatMatchesTypeOfFoundItems() {
+    when(geographicZoneRepository.findAll()).thenReturn(geographicZones);
+    List<GeographicZoneSimpleDto> resultList = geographicZoneService.findAllExportableItems();
+    Class<?> resultType = geographicZoneService.getExportableType();
+    assertThat(resultList, Every.everyItem(instanceOf(resultType)));
   }
 }

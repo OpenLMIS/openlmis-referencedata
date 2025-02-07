@@ -1,0 +1,3 @@
+from,to,type,entityName,defaultValue
+code,code,DIRECT,,
+catchmentpopulation,catchmentPopulation,DIRECT,,

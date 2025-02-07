@@ -3,6 +3,9 @@
 Bux fixes:
 * [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fix NPE on adding programs to products
 
+New functionality:
+* [OLMIS-8072](https://openlmis.atlassian.net/browse/OLMIS-8072): Add functionality to export geographic zone codes with their catchment population.
+
 15.2.9 / 2025-01-14
 ==================
 
