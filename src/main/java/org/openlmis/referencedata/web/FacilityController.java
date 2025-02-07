@@ -324,7 +324,7 @@ public class FacilityController extends BaseController {
   @ResponseBody
   public Page<ApprovedProductDto> getApprovedProducts(
       @PathVariable("id") UUID facilityId,
-      @RequestParam(required = false, value = "programId") UUID programId,
+      @RequestParam(required = false, value = "programId") List<UUID> programId,
       @RequestParam(required = false, value = "fullSupply") Boolean fullSupply,
       @RequestParam(required = false, value = "orderableId") List<UUID> orderablesId,
       @RequestParam(required = false, value = "active") Boolean active,

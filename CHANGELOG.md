@@ -1,5 +1,9 @@
 15.3.0 / wip
 ==================
+Improvements:
+* [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET /facilities/{id}/approvedProducts supports multiple program id
+ query parameters
+
 Bux fixes:
 * [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fix NPE on adding programs to products
 

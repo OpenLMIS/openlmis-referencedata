@@ -122,7 +122,28 @@ public class FacilityTypeApprovedProductRepositoryImpl
   @Override
   public Page<FacilityTypeApprovedProduct> searchProducts(
       UUID facilityId,
-      UUID programId,
+      UUID program,
+      Boolean fullSupply,
+      List<UUID> orderableIds,
+      Boolean active,
+      String orderableCode,
+      String orderableName,
+      Pageable pageable) {
+    return searchProducts(
+        facilityId,
+        Collections.singletonList(program),
+        fullSupply,
+        orderableIds,
+        active,
+        orderableCode,
+        orderableName,
+        pageable);
+  }
+
+  @Override
+  public Page<FacilityTypeApprovedProduct> searchProducts(
+      UUID facilityId,
+      List<UUID> programIds,
       Boolean fullSupply,
       List<UUID> orderableIds,
       Boolean active,
@@ -137,8 +158,17 @@ public class FacilityTypeApprovedProductRepositoryImpl
     UUID facilityTypeId = getFacilityTypeId(facilityId, profiler);
 
     profiler.start("CALCULATE_FULL_LIST_SIZE");
-    Query countNativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
-        active, orderableCode, orderableName, true, pageable);
+    Query countNativeQuery =
+        prepareNativeQuery(
+            facilityTypeId,
+            programIds,
+            fullSupply,
+            orderableIds,
+            active,
+            orderableCode,
+            orderableName,
+            true,
+            pageable);
 
     int total = executeCountQuery(countNativeQuery);
 
@@ -148,7 +178,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
     }
 
     profiler.start("GET_VERSION_IDENTITY");
-    Query nativeQuery = prepareNativeQuery(facilityTypeId, programId, fullSupply, orderableIds,
+    Query nativeQuery = prepareNativeQuery(facilityTypeId, programIds, fullSupply, orderableIds,
         active, orderableCode, orderableName, false, pageable);
     List<VersionIdentity> identities = executeNativeQuery(nativeQuery);
 
@@ -279,7 +309,7 @@ public class FacilityTypeApprovedProductRepositoryImpl
 
   private Query prepareNativeQuery(
       UUID facilityTypeId,
-      UUID programId,
+      List<UUID> programIds,
       Boolean fullSupply,
       List<UUID> orderableIds,
       Boolean active,
@@ -293,9 +323,9 @@ public class FacilityTypeApprovedProductRepositoryImpl
     Map<String, Object> params = Maps.newHashMap();
 
     builder.append(NATIVE_PROGRAM_INNER_JOIN);
-    if (null != programId) {
-      builder.append(" AND p.id = :programId");
-      params.put("programId", programId);
+    if (!isEmpty(programIds)) {
+      builder.append(" AND p.id in (:programIds)");
+      params.put("programIds", programIds);
     }
 
     String orderablesCondition = "1=1";
