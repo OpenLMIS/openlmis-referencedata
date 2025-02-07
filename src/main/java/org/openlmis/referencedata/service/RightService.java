@@ -18,11 +18,20 @@ package org.openlmis.referencedata.service;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
+
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
+import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -45,6 +54,12 @@ public class RightService {
 
   @Autowired
   private RightAssignmentRepository rightAssignmentRepository;
+
+  @Autowired
+  private RightRepository rightRepository;
+
+  @Autowired
+  private RoleRepository roleRepository;
 
   @Autowired
   private AuthenticationHelper authenticationHelper;
@@ -131,6 +146,29 @@ public class RightService {
   }
 
   /**
+   * Deletes right together with unassigning it from roles.
+   */
+  public void deleteRight(UUID rightId) {
+    checkRootAccess();
+
+    Right storedRight = rightRepository.findById(rightId).orElse(null);
+    if (storedRight == null) {
+      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
+    }
+
+    List<Role> roles = roleRepository.findByRightId(storedRight.getId());
+    List<Role> updatedRoles = new LinkedList<>();
+    for (Role role : roles) {
+      role.getRights().remove(storedRight);
+      updatedRoles.add(role);
+    }
+
+    roleRepository.saveAll(updatedRoles);
+    rightAssignmentRepository.deleteAllByRightName(storedRight.getName());
+    rightRepository.delete(storedRight);
+  }
+
+  /**
    * Check the client is a trusted client ("root" access).
    */
   public void checkRootAccess() {
@@ -173,6 +211,4 @@ public class RightService {
 
     return false;
   }
-
-
 }
