@@ -18,7 +18,6 @@ package org.openlmis.referencedata.service;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -146,24 +145,21 @@ public class RightService {
   }
 
   /**
-   * Deletes right together with unassigning it from roles.
+   * Deletes a right, right assignments and unassigns rights from all associated roles.
    */
   public void deleteRight(UUID rightId) {
     checkRootAccess();
 
-    Right storedRight = rightRepository.findById(rightId).orElse(null);
-    if (storedRight == null) {
-      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
+    Right storedRight = rightRepository.findById(rightId)
+        .orElseThrow(() -> new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND));
+
+    List<Role> roles = roleRepository.findAllByRightId(storedRight.getId());
+
+    if (!roles.isEmpty()) {
+      roles.forEach(role -> role.getRights().remove(storedRight));
+      roleRepository.saveAll(roles);
     }
 
-    List<Role> roles = roleRepository.findByRightId(storedRight.getId());
-    List<Role> updatedRoles = new LinkedList<>();
-    for (Role role : roles) {
-      role.getRights().remove(storedRight);
-      updatedRoles.add(role);
-    }
-
-    roleRepository.saveAll(updatedRoles);
     rightAssignmentRepository.deleteAllByRightName(storedRight.getName());
     rightRepository.delete(storedRight);
   }

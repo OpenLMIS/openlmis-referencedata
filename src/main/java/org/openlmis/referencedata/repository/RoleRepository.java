@@ -49,5 +49,5 @@ public interface RoleRepository extends JpaRepository<Role, UUID>, RoleRepositor
   Page<Role> findAllWithoutSnapshots(Pageable pageable);
 
   @Query("SELECT r FROM Role r JOIN r.rights rights WHERE rights.id = :rightId")
-  List<Role> findByRightId(@Param("rightId") UUID rightId);
+  List<Role> findAllByRightId(@Param("rightId") UUID rightId);
 }

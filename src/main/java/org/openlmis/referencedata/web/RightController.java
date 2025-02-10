@@ -180,7 +180,7 @@ public class RightController extends BaseController {
   }
 
   /**
-   * Delete an existing right.
+   * Deletes a right, right assignments and unassigns rights from all associated roles.
    *
    * @param rightId id of the right to delete.
    */
