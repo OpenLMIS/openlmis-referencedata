@@ -123,10 +123,10 @@ idea {
             xmlFile.asNode().component
                     .find { it.@name == 'CompilerConfiguration' }['annotationProcessing'][0]
                     .replaceNode {
-                annotationProcessing {
-                    profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
-                }
-            }
+                        annotationProcessing {
+                            profile(default: true, name: 'Default', useClasspath: 'true', enabled: true)
+                        }
+                    }
         }
     }
     module {
@@ -215,6 +215,10 @@ dockerCompose {
     stopContainers = false
 }
 
+jacoco {
+    toolVersion = '0.8.7'  // Make sure you're using a compatible version of JaCoCo
+}
+
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
@@ -226,13 +230,54 @@ task integrationTest(type: Test) {
     environment 'BASE_URL', "http://localhost"
 
     exclude '**/migration/**'
-    
+
+    // Include JaCoCo for integration test coverage
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/integrationTest.exec")
+    }
+
     if (checkForDocker()) dockerCompose.isRequiredBy(integrationTest)
     doFirst {
-        if(checkForDocker()) {
+        if (checkForDocker()) {
             configureForDockerCompose(integrationTest)
         }
     }
+}
+
+test {
+    testLogging.showStandardStreams = false
+    maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
+    testLogging {
+        events 'started', 'passed'
+        exceptionFormat = 'full'
+    }
+    dependsOn checkstyleMain
+    dependsOn checkstyleTest
+    dependsOn pmdMain
+    dependsOn pmdTest
+
+    // Include JaCoCo for test coverage
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/test.exec")
+    }
+}
+
+jacocoTestReport {
+    dependsOn integrationTest, test
+    group = "reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+
+    reports {
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
+    }
+
+    // Merge the coverage data from both unit tests and integration tests
+    executionData file("$buildDir/jacoco/test.exec"), file("$buildDir/jacoco/integrationTest.exec")
+
+    // Additional source directories for coverage calculation
+    additionalSourceDirs(files(sourceSets.main.allJava.srcDirs))
 }
 
 tasks.withType(Test) {
@@ -268,44 +313,19 @@ configure(checkApiIsRaml) {
     description = 'Verify that the api-specification is valid RAML'
 }
 
-test {
-    testLogging.showStandardStreams = false // set to true for verbose console output
-    maxParallelForks = Runtime.runtime.availableProcessors() - 1 ?: 1
-    testLogging {
-        events 'started', 'passed'
-        exceptionFormat = 'full'
-    }
-    dependsOn checkstyleMain
-    dependsOn checkstyleTest
-    dependsOn pmdMain
-    dependsOn pmdTest
-}
-
-jacocoTestReport {
-    group = "reporting"
-    description = "Generate Jacoco coverage reports after running tests."
-    reports {
-        xml.enabled true
-        html.enabled true
-        csv.enabled false
-    }
-
-    additionalSourceDirs(files(sourceSets.main.allJava.srcDirs))
-}
-
 checkstyle {
     toolVersion = "8.12"
 }
 
 //NOTE: This plugin requires that this task be named 'sonarqube'. In fact, it is performing SonarCloud analysis.
 sonarqube {
-  properties {
-    property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
-    property "sonar.organization", "openlmis"
-    property "sonar.host.url", "https://sonarcloud.io"
-    property "sonar.java.source", "17"
-    property "sonar.coverage.jacoco.xmlReportPaths", "./report.xml"
-  }
+    properties {
+        property "sonar.projectKey", "OpenLMIS_openlmis-referencedata"
+        property "sonar.organization", "openlmis"
+        property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.java.source", "17"
+        property "sonar.coverage.jacoco.xmlReportPaths", "./report.xml"
+    }
 }
 
 pmd {
@@ -408,7 +428,7 @@ processResources {
 }
 
 check {
-     finalizedBy uploadArchives
+    finalizedBy uploadArchives
 }
 
 apply from: "registration.gradle"
