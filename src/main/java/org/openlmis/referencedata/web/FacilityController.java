@@ -16,7 +16,6 @@
 package org.openlmis.referencedata.web;
 
 import com.vividsolutions.jts.geom.Polygon;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityTypeApprovedProduct;
@@ -341,7 +339,8 @@ public class FacilityController extends BaseController {
             orderableName, pageable
         );
 
-    Page<ApprovedProductDto> list = toDto(products, pageable, profiler);
+    Page<ApprovedProductDto> list =
+        toDto(products, pageable, profiler.startNested("EXPORT_PRODUCTS_TO_DTO"));
 
     profiler.stop().log();
     return list;
@@ -480,8 +479,6 @@ public class FacilityController extends BaseController {
 
   private Page<ApprovedProductDto> toDto(Page<FacilityTypeApprovedProduct> products,
       Pageable pageable, Profiler profiler) {
-    profiler.start("EXPORT_PRODUCTS_TO_DTO");
-
     List<FacilityTypeApprovedProduct> ftaps = products.getContent();
 
     Set<UUID> orderableId = ftaps
@@ -489,14 +486,15 @@ public class FacilityController extends BaseController {
         .map(FacilityTypeApprovedProduct::getOrderableId)
         .collect(Collectors.toSet());
 
+    profiler.start("FIND_ALL_LATEST_ORDERABLES");
     Map<UUID, Orderable> orderables = orderableId.isEmpty()
         ? Collections.emptyMap()
         : orderableRepository
         .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
-        .getContent()
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));
 
+    profiler.start("EXPORT_FTAP_DTO");
     List<ApprovedProductDto> dtos = new ArrayList<>();
     for (FacilityTypeApprovedProduct ftap : ftaps) {
       ApprovedProductDto productDto = new ApprovedProductDto();

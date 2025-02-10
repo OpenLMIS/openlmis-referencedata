@@ -1932,7 +1932,7 @@ resourceTypes:
                       displayName: Program ID
                       type: string
                       required: false
-                      repeat: false
+                      repeat: true
                   fullSupply:
                       displayName: Full-supply orderable
                       type: boolean
@@ -2208,6 +2208,12 @@ resourceTypes:
               id:
                   displayName: ID
                   description: Program IDs
+                  type: string
+                  required: false
+                  repeat: true
+              code:
+                  displayName: Code
+                  description: Program Codes
                   type: string
                   required: false
                   repeat: true

@@ -34,8 +34,9 @@ public final class ProgramSearchParams {
 
   private static final String ID = "id";
   private static final String NAME = "name";
+  private static final String CODE = "code";
 
-  private static final List<String> ALL_PARAMETERS = asList(ID, NAME);
+  private static final List<String> ALL_PARAMETERS = asList(ID, NAME, CODE);
 
   private SearchParams queryParams;
 
@@ -69,6 +70,18 @@ public final class ProgramSearchParams {
       return Collections.emptySet();
     }
     return queryParams.getUuids(ID);
+  }
+
+  /**
+   * Gets {@link Set} of {@link String} for "code" key from params.
+   *
+   * @return List of codes from params, empty if there is no "code" param
+   */
+  public Set<String> getCodes() {
+    if (!queryParams.containsKey(CODE)) {
+      return Collections.emptySet();
+    }
+    return queryParams.getStrings(CODE);
   }
 
   /**
