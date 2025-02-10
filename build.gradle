@@ -216,7 +216,7 @@ dockerCompose {
 }
 
 jacoco {
-    toolVersion = '0.8.7'  // Make sure you're using a compatible version of JaCoCo
+    toolVersion = '0.8.7'
 }
 
 task integrationTest(type: Test) {
@@ -276,7 +276,6 @@ jacocoTestReport {
     // Merge the coverage data from both unit tests and integration tests
     executionData file("$buildDir/jacoco/test.exec"), file("$buildDir/jacoco/integrationTest.exec")
 
-    // Additional source directories for coverage calculation
     additionalSourceDirs(files(sourceSets.main.allJava.srcDirs))
 }
 
