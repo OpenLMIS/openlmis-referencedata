@@ -17,23 +17,22 @@ package org.openlmis.referencedata.service.export;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.util.EasyBatchUtils;
 import org.openlmis.referencedata.util.FileHelper;
 import org.openlmis.referencedata.util.TransactionUtils;
+import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +77,10 @@ public class GeographicZonesImportPersister
   }
 
   private int findLowestHierarchyLevelNumber() {
-    List<GeographicLevel> allGeoLevels = StreamSupport.stream(geographicLevelRepository.findAll()
-        .spliterator(), false).collect(Collectors.toList());
-
-    return Collections.max(allGeoLevels,
-        Comparator.comparing(GeographicLevel::getLevelNumber)).getLevelNumber();
+    return geographicLevelRepository
+        .findFirstByOrderByLevelNumberDesc()
+        .map(GeographicLevel::getLevelNumber)
+        .orElseThrow(() -> new NotFoundException(GeographicLevelMessageKeys.ERROR_NOT_FOUND));
   }
 
   private List<GeographicZoneDto> importBatch(List<GeographicZoneDto> importedDtosBatch,

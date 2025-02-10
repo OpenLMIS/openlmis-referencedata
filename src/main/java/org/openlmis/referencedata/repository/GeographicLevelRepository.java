@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Optional;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,8 @@ public interface GeographicLevelRepository
     extends BaseAuditableRepository<GeographicLevel, UUID> {
 
   GeographicLevel findByLevelNumber(Integer levelNumber);
+
+  Optional<GeographicLevel> findFirstByOrderByLevelNumberDesc();
 
   @Query(value = "SELECT\n"
       + "    gl.*\n"
