@@ -16,24 +16,38 @@
 package org.openlmis.referencedata.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.API_KEY_PREFIX;
 import static org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder.SERVICE_CLIENT_ID;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
+import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.testbuilder.OAuth2AuthenticationDataBuilder;
+import org.openlmis.referencedata.testbuilder.RightDataBuilder;
+import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -52,6 +66,12 @@ public class RightServiceTest {
   private RightAssignmentRepository rightAssignmentRepository;
 
   @Mock
+  private RightRepository rightRepository;
+
+  @Mock
+  private RoleRepository roleRepository;
+
+  @Mock
   private AuthenticationHelper authenticationHelper;
 
   @InjectMocks
@@ -63,7 +83,8 @@ public class RightServiceTest {
   private OAuth2Authentication apiKeyClient;
   private User user;
   private UUID userId;
-  
+  private Right right;
+
   @Before
   public void setUp() {
     securityContext = mock(SecurityContext.class);
@@ -81,6 +102,9 @@ public class RightServiceTest {
 
     ReflectionTestUtils.setField(rightService, "serviceTokenClientId", SERVICE_CLIENT_ID);
     ReflectionTestUtils.setField(rightService, "apiKeyPrefix", API_KEY_PREFIX);
+
+    String rightName = "right";
+    right = new RightDataBuilder().withName(rightName).build();
   }
   
   @Test
@@ -167,5 +191,54 @@ public class RightServiceTest {
         .thenReturn(false);
 
     assertThat(rightService.hasRight(RIGHT_NAME)).isFalse();
+  }
+
+  @Test
+  public void shouldDeleteRight() {
+    when(securityContext.getAuthentication()).thenReturn(trustedClient);
+    when(rightRepository.findById(right.getId())).thenReturn(Optional.ofNullable(right));
+    when(roleRepository.findAllByRightId(right.getId())).thenReturn(Collections.emptyList());
+
+    rightService.deleteRight(right.getId());
+
+    verify(rightAssignmentRepository).deleteAllByRightName(right.getName());
+    verify(rightRepository).delete(right);
+  }
+
+  @Test
+  public void shouldDeleteRightAndUnassignRoles() {
+    String role1Name = "role1";
+    String role2Name = "role2";
+    Role role1 = new RoleDataBuilder().withName(role1Name).withRights(right).build();
+    Role role2 = new RoleDataBuilder().withName(role2Name).withRights(right).build();
+    List<Role> roles = new ArrayList<>();
+    roles.add(role1);
+    roles.add(role2);
+
+    when(securityContext.getAuthentication()).thenReturn(trustedClient);
+    when(rightRepository.findById(right.getId())).thenReturn(Optional.ofNullable(right));
+    when(roleRepository.findAllByRightId(right.getId())).thenReturn(roles);
+
+    rightService.deleteRight(right.getId());
+
+    ArgumentCaptor<List<Role>> rolesCaptor = ArgumentCaptor.forClass(List.class);
+    verify(roleRepository).saveAll(rolesCaptor.capture());
+
+    List<Role> updatedRoles = rolesCaptor.getValue();
+
+    for (Role role : updatedRoles) {
+      assertFalse(role.getRights().contains(right), "Right should be removed from the role");
+    }
+
+    verify(rightAssignmentRepository).deleteAllByRightName(right.getName());
+    verify(rightRepository).delete(right);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void shouldNotDeleteNonExistingRight() {
+    when(securityContext.getAuthentication()).thenReturn(trustedClient);
+    when(rightRepository.findById(right.getId())).thenReturn(Optional.empty());
+
+    rightService.deleteRight(right.getId());
   }
 }

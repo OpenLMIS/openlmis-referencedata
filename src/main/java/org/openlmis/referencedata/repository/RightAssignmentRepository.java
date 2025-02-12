@@ -18,6 +18,7 @@ package org.openlmis.referencedata.repository;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.RightAssignment;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -41,4 +42,8 @@ public interface RightAssignmentRepository extends
 
   boolean existsByUserIdAndAndRightNameAndFacilityIdAndProgramId(UUID user, String rightName,
       UUID facilityId, UUID programId);
+
+  @Modifying
+  @Query("DELETE FROM RightAssignment ra WHERE ra.rightName = :rightName")
+  void deleteAllByRightName(@Param("rightName") String rightName);
 }

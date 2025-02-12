@@ -180,23 +180,14 @@ public class RightController extends BaseController {
   }
 
   /**
-   * Delete an existing right.
+   * Deletes a right, right assignments and unassigns rights from all associated roles.
    *
    * @param rightId id of the right to delete.
    */
   @RequestMapping(value = "/rights/{rightId}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deleteRight(@PathVariable("rightId") UUID rightId) {
-
-    rightService.checkRootAccess();
-
-    Right storedRight = rightRepository.findById(rightId).orElse(null);
-    if (storedRight == null) {
-      throw new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND);
-    }
-
-    LOGGER.debug("Deleting right");
-    rightRepository.deleteById(rightId);
+    rightService.deleteRight(rightId);
   }
 
   /**

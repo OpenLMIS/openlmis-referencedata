@@ -18,11 +18,19 @@ package org.openlmis.referencedata.service;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+import java.util.List;
 import java.util.UUID;
+
+import org.openlmis.referencedata.domain.Right;
+import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.repository.RightAssignmentRepository;
+import org.openlmis.referencedata.repository.RightRepository;
+import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.RightMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
@@ -45,6 +53,12 @@ public class RightService {
 
   @Autowired
   private RightAssignmentRepository rightAssignmentRepository;
+
+  @Autowired
+  private RightRepository rightRepository;
+
+  @Autowired
+  private RoleRepository roleRepository;
 
   @Autowired
   private AuthenticationHelper authenticationHelper;
@@ -131,6 +145,26 @@ public class RightService {
   }
 
   /**
+   * Deletes a right, right assignments and unassigns rights from all associated roles.
+   */
+  public void deleteRight(UUID rightId) {
+    checkRootAccess();
+
+    Right storedRight = rightRepository.findById(rightId)
+        .orElseThrow(() -> new NotFoundException(RightMessageKeys.ERROR_NOT_FOUND));
+
+    List<Role> roles = roleRepository.findAllByRightId(storedRight.getId());
+
+    if (!roles.isEmpty()) {
+      roles.forEach(role -> role.getRights().remove(storedRight));
+      roleRepository.saveAll(roles);
+    }
+
+    rightAssignmentRepository.deleteAllByRightName(storedRight.getName());
+    rightRepository.delete(storedRight);
+  }
+
+  /**
    * Check the client is a trusted client ("root" access).
    */
   public void checkRootAccess() {
@@ -173,6 +207,4 @@ public class RightService {
 
     return false;
   }
-
-
 }
