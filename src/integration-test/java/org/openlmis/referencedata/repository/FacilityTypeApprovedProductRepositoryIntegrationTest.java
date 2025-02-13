@@ -420,7 +420,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     List<UUID> orderableIds = emptyList();
 
     Page<FacilityTypeApprovedProduct> page = ftapRepository
-        .searchProducts(facility.getId(), null, true, orderableIds, null,
+        .searchProducts(facility.getId(), emptyList(), true, orderableIds, null,
             null, null, pageable
         );
 
@@ -441,7 +441,7 @@ public class FacilityTypeApprovedProductRepositoryIntegrationTest {
     expectedException.expect(ValidationMessageException.class);
     expectedException.expectMessage(FacilityMessageKeys.ERROR_NOT_FOUND);
 
-    ftapRepository.searchProducts(UUID.randomUUID(), null, true, emptyList(), null,
+    ftapRepository.searchProducts(UUID.randomUUID(), emptyList(), true, emptyList(), null,
         null, null, pageable
     );
   }

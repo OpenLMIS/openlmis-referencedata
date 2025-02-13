@@ -102,6 +102,7 @@ public class ProgramSearchParamsTest {
     queryMap.add(NAME, "some-name");
     ProgramSearchParams params = new ProgramSearchParams(queryMap);
 
-    ToStringTestUtils.verify(ProgramSearchParams.class, params, "NAME", "ID", "ALL_PARAMETERS");
+    ToStringTestUtils.verify(
+        ProgramSearchParams.class, params, "NAME", "ID", "CODE", "ALL_PARAMETERS");
   }
 }

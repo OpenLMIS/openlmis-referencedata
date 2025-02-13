@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.web;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
@@ -116,6 +117,7 @@ public class ProgramController extends BaseController {
 
     final Set<UUID> ids = params.getIds();
     final String name = params.getName();
+    final Set<String> codes = params.getCodes();
 
     profiler.start("REPOSITORY_SEARCH");
     Iterable<Program> programs;
@@ -125,6 +127,9 @@ public class ProgramController extends BaseController {
       programs = programRepository.findAllById(ids);
     } else if (null != name) {
       programs = programRepository.findByNameIgnoreCaseContaining(name);
+    } else if (!isEmpty(codes)) {
+      programs =
+          programRepository.findAllByCodeIn(codes.stream().map(Code::code).collect(toList()));
     } else {
       programs = programRepository.findAll();
     }
