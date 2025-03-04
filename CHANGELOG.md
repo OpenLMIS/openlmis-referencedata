@@ -4,6 +4,7 @@ Improvements:
 * [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET /facilities/{id}/approvedProducts supports multiple program id
  query parameters
 * [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET /programs has new program code repeatable query parameter
+* [OLMIS-8099](https://openlmis.atlassian.net/browse/OLMIS-8099): Delete unsed report rights, create new superset report rights
 
 Bux fixes:
 * [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fix NPE on adding programs to products
