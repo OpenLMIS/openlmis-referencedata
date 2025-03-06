@@ -15,12 +15,9 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
-import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -29,7 +26,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Lot;
-import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
@@ -43,49 +39,22 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
   private static final String EXPIRATION_DATE_FIELD = "expirationDate";
 
   /**
-   * This method is supposed to retrieve all lots with matched parameters.
-   * Method is ignoring case for lot code.
-   * To find all wanted lots by code and expiration date we use criteria query and like operator.
+   * This method is supposed to retrieve all lots with matched parameters. Method is ignoring case
+   * for lot code. To find all wanted lots by code and expiration date we use criteria query and
+   * like operator.
    *
-   * @param tradeItems list of TradeItems associated with Lot.
-   * @param expirationDate date of lot expiration.
-   * @param lotCode Part of wanted code.
+   * @param searchParams search params, not null
    * @return List of Facilities matching the parameters.
    */
-  public Page<Lot> search(
-          Collection<TradeItem> tradeItems,
-          LocalDate expirationDate,
-          String lotCode,
-          List<UUID> ids,
-          LocalDate expirationDateFrom,
-          LocalDate expirationDateTo,
-          Pageable pageable
-  ) {
+  @Override
+  public Page<Lot> search(SearchParams searchParams, Pageable pageable) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
 
     CriteriaQuery<Lot> lotQuery = builder.createQuery(Lot.class);
-    lotQuery = prepareQuery(
-            lotQuery,
-            tradeItems,
-            expirationDate,
-            lotCode,
-            ids,
-            expirationDateFrom,
-            expirationDateTo,
-            false
-    );
+    lotQuery = prepareQuery(lotQuery, searchParams, false);
 
     CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
-    countQuery = prepareQuery(
-            countQuery,
-            tradeItems,
-            expirationDate,
-            lotCode,
-            ids,
-            expirationDateFrom,
-            expirationDateTo,
-            true
-    );
+    countQuery = prepareQuery(countQuery, searchParams, true);
 
     Long count = entityManager.createQuery(countQuery).getSingleResult();
 
@@ -98,15 +67,7 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
   }
 
   private <T> CriteriaQuery<T> prepareQuery(
-          CriteriaQuery<T> query,
-          Collection<TradeItem> tradeItems,
-          LocalDate expirationDate,
-          String lotCode,
-          List<UUID> ids,
-          LocalDate expirationDateFrom,
-          LocalDate expirationDateTo,
-          boolean count
-  ) {
+      CriteriaQuery<T> query, SearchParams searchParams, boolean count) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Root<Lot> root = query.from(Lot.class);
 
@@ -117,40 +78,44 @@ public class LotRepositoryImpl implements LotRepositoryCustom {
 
     Predicate predicate = builder.conjunction();
 
-    if (!isEmpty(tradeItems)) {
-      predicate = builder.and(predicate, root.get("tradeItem").in(tradeItems));
+    if (isNotEmpty(searchParams.getTradeItems())) {
+      predicate = builder.and(predicate, root.get("tradeItem").in(searchParams.getTradeItems()));
     }
 
-    if (lotCode != null) {
+    if (isNotEmpty(searchParams.getExactCodes())) {
+      predicate =
+          builder.and(predicate, root.get("lotCode").in(searchParams.getExactCodes()));
+    } else if (searchParams.getCode() != null) {
       predicate = builder.and(predicate,
-          builder.like(builder.upper(root.get("lotCode")), "%" + lotCode.toUpperCase() + "%"));
+          builder.like(builder.upper(root.get("lotCode")),
+              "%" + searchParams.getCode().toUpperCase() + "%"));
     }
 
-    if (expirationDate != null) {
+    if (searchParams.getExpirationDate() != null) {
       predicate = builder.and(
               predicate,
-              builder.equal(root.get(EXPIRATION_DATE_FIELD), expirationDate)
+              builder.equal(root.get(EXPIRATION_DATE_FIELD), searchParams.getExpirationDate())
       );
     }
 
-    if (ids != null && ids.size() > 0) {
-      predicate = builder.and(predicate, root.get("id").in(ids));
+    if (isNotEmpty(searchParams.getIds())) {
+      predicate = builder.and(predicate, root.get("id").in(searchParams.getIds()));
     }
 
-    if (expirationDateFrom != null) {
+    if (searchParams.getExpirationDateFrom() != null) {
       predicate = builder.and(
               predicate,
               builder.greaterThanOrEqualTo(
-                      root.get(EXPIRATION_DATE_FIELD), expirationDateFrom
+                      root.get(EXPIRATION_DATE_FIELD), searchParams.getExpirationDateFrom()
               )
       );
     }
 
-    if (expirationDateTo != null) {
+    if (searchParams.getExpirationDateTo() != null) {
       predicate = builder.and(
               predicate,
               builder.lessThanOrEqualTo(
-                      root.get(EXPIRATION_DATE_FIELD), expirationDateTo
+                      root.get(EXPIRATION_DATE_FIELD), searchParams.getExpirationDateTo()
               )
       );
     }

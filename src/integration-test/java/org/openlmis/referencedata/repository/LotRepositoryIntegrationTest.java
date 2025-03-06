@@ -15,17 +15,19 @@
 
 package org.openlmis.referencedata.repository;
 
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.repository.lot.LotRepositorySearchParams;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,15 +85,11 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldFindLotsWithSimilarCode() {
     Lot expected = lotRepository.save(generateInstance());
 
-    Page<Lot> lotPage = lotRepository.search(
-        null,
-        null,
-        expected.getLotCode(),
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(
+                null, null, null, expected.getLotCode(), null, null, null),
+            pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -104,15 +102,10 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     lotTwo.setLotCode(lotOne.getLotCode());
     lotRepository.save(lotTwo);
 
-    Page<Lot> lotPage = lotRepository.search(
-        null,
-        null,
-        lotOne.getLotCode(),
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(null, null, null, lotOne.getLotCode(), null, null, null),
+            pageRequest);
 
     assertEquals(2, lotPage.getNumberOfElements());
     assertEquals(lotOne, lotPage.getContent().get(0));
@@ -125,7 +118,9 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     expected.setExpirationDate(now);
     expected = lotRepository.save(expected);
 
-    Page<Lot> lotPage = lotRepository.search(null, now, null, null, null, null, pageRequest);
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(null, now, null, null, null, null, null), pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -135,15 +130,17 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldFindLotsByTradeItem() {
     Lot expected = lotRepository.save(generateInstance());
 
-    Page<Lot> lotPage = lotRepository.search(
-        Collections.singletonList(expected.getTradeItem()),
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(
+                singleton(expected.getTradeItem()),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null),
+            pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -154,15 +151,17 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     Lot expected = lotRepository.save(generateInstance());
     Lot expected2 = lotRepository.save(generateInstance());
 
-    Page<Lot> lotPage = lotRepository.search(
-        ImmutableList.of(expected.getTradeItem(), expected2.getTradeItem()),
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(
+                ImmutableSet.of(expected.getTradeItem(), expected2.getTradeItem()),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null),
+            pageRequest);
 
     assertEquals(2, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -171,15 +170,10 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldFindAllLotsIfSearchByEmptyTradeItemList() {
-    Page<Lot> lotPage = lotRepository.search(
-        Collections.emptyList(),
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(emptySet(), null, null, null, null, null, null),
+            pageRequest);
 
     assertEquals(5, lotPage.getNumberOfElements());
   }
@@ -188,15 +182,17 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldFindLotsByAllParameters() {
     Lot expected = lotRepository.save(generateInstance());
 
-    Page<Lot> lotPage = lotRepository.search(
-        Collections.singletonList(expected.getTradeItem()),
-        expected.getExpirationDate(),
-        expected.getLotCode(),
-        Collections.singletonList(expected.getId()),
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(
+                singleton(expected.getTradeItem()),
+                expected.getExpirationDate(),
+                null,
+                expected.getLotCode(),
+                singleton(expected.getId()),
+                null,
+                null),
+            pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(expected, lotPage.getContent().get(0));
@@ -210,15 +206,17 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     Lot instanceTwo = generateInstance();
     repository.save(instanceTwo);
 
-    Page<Lot> lotPage = lotRepository.search(
-        null,
-        null,
-        null,
-        Arrays.asList(instanceOne.getId(), instanceTwo.getId()),
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(
+                null,
+                null,
+                null,
+                null,
+                ImmutableSet.of(instanceOne.getId(), instanceTwo.getId()),
+                null,
+                null),
+            pageRequest);
 
     assertEquals(2, lotPage.getNumberOfElements());
     assertEquals(lotPage.getContent(), Arrays.asList(instanceOne, instanceTwo));
@@ -226,7 +224,9 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
 
   @Test
   public void shouldReturnAllIfNoParamIsGiven() {
-    Page<Lot> lotPage = lotRepository.search(null, null, null, null, null, null, pageRequest);
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(null, null, null, null, null, null, null), pageRequest);
 
     assertEquals(5, lotPage.getNumberOfElements());
   }
@@ -266,15 +266,10 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
     entity.setExpirationDate(date);
     lotRepository.save(entity);
 
-    Page<Lot> lotPage = lotRepository.search(
-        null,
-        null,
-        entity.getLotCode(),
-        null,
-        null,
-        null,
-        pageRequest
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(null, null, null, entity.getLotCode(), null, null, null),
+            pageRequest);
 
     assertEquals(1, lotPage.getNumberOfElements());
     assertEquals(date, lotPage.getContent().get(0).getExpirationDate());
@@ -284,15 +279,9 @@ public class LotRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationT
   public void shouldRespectPaginationParameters() {
     Pageable pageable = PageRequest.of(1, 3);
 
-    Page<Lot> lotPage = lotRepository.search(
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        pageable
-    );
+    Page<Lot> lotPage =
+        lotRepository.search(
+            new LotRepositorySearchParams(null, null, null, null, null, null, null), pageable);
 
     assertEquals(2, lotPage.getNumberOfElements());
     assertEquals(lotOne, lotPage.getContent().get(0));

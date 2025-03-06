@@ -16,17 +16,17 @@
 package org.openlmis.referencedata.service;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,6 +40,7 @@ import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.repository.lot.LotRepositorySearchParams;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
@@ -81,31 +82,34 @@ public class LotServiceTest {
 
   @Test
   public void searchShouldReturnRepositoryResult() {
-    List<UUID> tradeItemIds = singletonList(tradeItem.getId());
-    LotSearchParams lotSearchParams = new LotSearchParams(
-        LocalDate.now(),
-        tradeItemIds,
-        lot.getLotCode(),
-        ImmutableList.of(lot.getId()),
-        null,
-        null,
-        Collections.emptyList(),
-            false
-    );
+    Set<UUID> tradeItemIds = singleton(tradeItem.getId());
+    LotSearchParams lotSearchParams =
+        new LotSearchParams(
+            LocalDate.now(),
+            tradeItemIds,
+            null,
+            lot.getLotCode(),
+            singleton(lot.getId()),
+            null,
+            null,
+            emptySet(),
+            false);
 
-    List<TradeItem> tradeItems = singletonList(tradeItem);
+    Set<TradeItem> tradeItems = singleton(tradeItem);
     when(tradeItemRepository.findAllById(tradeItemIds))
-        .thenReturn(tradeItems);
+        .thenReturn(new ArrayList<>(tradeItems));
 
     when(lotRepository.search(
-        tradeItems,
-        lotSearchParams.getExpirationDate(),
-        lotSearchParams.getLotCode(),
-        lotSearchParams.getId(),
-        null,
-        null,
-        pageable
-    )).thenReturn(expected);
+            new LotRepositorySearchParams(
+                tradeItems,
+                lotSearchParams.getExpirationDate(),
+                null,
+                lotSearchParams.getLotCode(),
+                lotSearchParams.getId(),
+                null,
+                null),
+            pageable))
+        .thenReturn(expected);
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
 
@@ -117,23 +121,26 @@ public class LotServiceTest {
     LotSearchParams lotSearchParams = new LotSearchParams(
         LocalDate.now(),
         null,
+        null,
         lot.getLotCode(),
         null,
         null,
         null,
-        Collections.emptyList(),
+        emptySet(),
             false
     );
 
     when(lotRepository.search(
-        eq(emptyList()),
-        eq(lotSearchParams.getExpirationDate()),
-        eq(lotSearchParams.getLotCode()),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(pageable)
-    )).thenReturn(expected);
+            new LotRepositorySearchParams(
+                emptySet(),
+                lotSearchParams.getExpirationDate(),
+                null,
+                lotSearchParams.getLotCode(),
+                null,
+                null,
+                null),
+            pageable))
+        .thenReturn(expected);
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
 
@@ -142,13 +149,14 @@ public class LotServiceTest {
 
   @Test
   public void searchShouldReturnEmptyListIfTradeItemDoesNotExist() {
-    when(tradeItemRepository.findAllById(singletonList(tradeItem.getId()))).thenReturn(emptyList());
+    when(tradeItemRepository.findAllById(singleton(tradeItem.getId()))).thenReturn(emptyList());
 
     LotSearchParams lotSearchParams = new LotSearchParams(
         LocalDate.now(),
-        singletonList(tradeItem.getId()),
+        singleton(tradeItem.getId()),
+        emptySet(),
         lot.getLotCode(),
-        ImmutableList.of(lot.getId()),
+        singleton(lot.getId()),
             null,
             null,
             null,
@@ -166,26 +174,19 @@ public class LotServiceTest {
 
   @Test
   public void searchShouldNotThrowExceptionIfRequestParamsAreNotGiven() {
-    when(lotRepository.search(
-            emptyList(),
+    when(lotRepository.search(new LotRepositorySearchParams(
+            emptySet(),
             null,
             null,
             null,
             null,
             null,
+            null),
             pageable
     )).thenReturn(expected);
 
-    LotSearchParams lotSearchParams = new LotSearchParams(
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            true
-    );
+    LotSearchParams lotSearchParams =
+        new LotSearchParams(null, null, null, null, null, null, null, null, true);
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
     assertThat(result.getContent(), hasSize(1));
@@ -193,16 +194,17 @@ public class LotServiceTest {
 
   @Test(expected = ValidationMessageException.class)
   public void searchShouldThrowValidationExceptionWhenTradeItemIdAndOrderableIdIsSet() {
-    LotSearchParams lotSearchParams = new LotSearchParams(
+    LotSearchParams lotSearchParams =
+        new LotSearchParams(
             null,
-            singletonList(UUID.randomUUID()),
+            singleton(UUID.randomUUID()),
             null,
             null,
             null,
             null,
-            singletonList(UUID.randomUUID()),
-            false
-    );
+            null,
+            singleton(UUID.randomUUID()),
+            false);
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
     assertThat(result.getContent(), hasSize(0));

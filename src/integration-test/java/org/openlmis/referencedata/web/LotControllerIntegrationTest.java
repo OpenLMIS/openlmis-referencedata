@@ -23,11 +23,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -52,6 +51,7 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.LotDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.repository.lot.LotRepositorySearchParams;
 import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
 import org.openlmis.referencedata.util.Message;
@@ -95,7 +95,7 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewLot() {
     mockUserHasRight(LOTS_MANAGE);
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
+    given(lotRepository.search(any(LotRepositorySearchParams.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -161,7 +161,12 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
     mockUserHasRight(LOTS_MANAGE);
     when(lotRepository.findById(lotId)).thenReturn(Optional.of(lot));
 
-    given(lotRepository.search(null, null, lot.getLotCode(), null, null, null, null))
+    given(
+            lotRepository.search(
+                eq(
+                    new LotRepositorySearchParams(
+                        null, null, null, lot.getLotCode(), null, null, null)),
+                any(Pageable.class)))
         .willReturn(Pagination.getPage(Collections.singletonList(lot), PageRequest.of(0, 10)));
 
     LotDto response = restAssured
@@ -225,10 +230,9 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
 
   @Test
   public void shouldFindLots() {
-    given(lotRepository.search(anyList(), any(LocalDate.class), anyString(),
-        nullable(List.class), any(LocalDate.class), any(LocalDate.class), any(Pageable.class)))
+    given(lotRepository.search(any(LotRepositorySearchParams.class), any(Pageable.class)))
         .willReturn(Pagination.getPage(singletonList(lot), pageable));
-    when(tradeItemRepository.findAllById(anyList()))
+    when(tradeItemRepository.findAllById(anySet()))
         .thenReturn(Collections.singletonList(new TradeItem()));
 
     String expirationDate = lot.getExpirationDate().format(DateTimeFormatter.ISO_DATE);
@@ -380,15 +384,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         new LotDataBuilder().build()
     );
 
-    given(lotRepository.search(
-        eq(emptyList()),
-        eq(null),
-        eq(null),
-        eq(Arrays.asList(lots.get(0).getId(), lots.get(1).getId())),
-        eq(null),
-        eq(null),
-        any(Pageable.class)
-    )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 10)));
+    given(lotRepository.search(any(LotRepositorySearchParams.class), any(Pageable.class)))
+        .willReturn(Pagination.getPage(lots, PageRequest.of(0, 10)));
 
     PageDto response = restAssured
         .given()
@@ -412,15 +409,8 @@ public class LotControllerIntegrationTest extends BaseWebIntegrationTest {
         new LotDataBuilder().build()
     );
 
-    given(lotRepository.search(
-        eq(emptyList()),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(null),
-        eq(PageRequest.of(0, 2))
-    )).willReturn(Pagination.getPage(lots, PageRequest.of(0, 2)));
+    given(lotRepository.search(any(LotRepositorySearchParams.class), eq(PageRequest.of(0, 2))))
+        .willReturn(Pagination.getPage(lots, PageRequest.of(0, 2)));
 
     PageDto response = restAssured
         .given()

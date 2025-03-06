@@ -13,37 +13,26 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.repository.lot;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
 
 @Getter
-@Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class LotSearchParams {
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDate;
-
-  private Set<UUID> tradeItemId;
-  private Set<String> exactCode;
-  private String lotCode;
-  private Set<UUID> id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDateFrom;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDateTo;
-
-  private Set<UUID> orderableId;
-  private boolean isTradeItemIdIgnored = false;
+@EqualsAndHashCode
+public class LotRepositorySearchParams implements LotRepositoryCustom.SearchParams {
+  private final Set<TradeItem> tradeItems;
+  private final LocalDate expirationDate;
+  private final Set<String> exactCodes;
+  private final String code;
+  private final Set<UUID> ids;
+  private final LocalDate expirationDateFrom;
+  private final LocalDate expirationDateTo;
 }

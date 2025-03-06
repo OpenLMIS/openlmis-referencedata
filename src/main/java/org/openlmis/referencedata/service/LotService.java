@@ -15,12 +15,15 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import org.openlmis.referencedata.domain.Lot;
 import org.openlmis.referencedata.domain.Orderable;
@@ -29,6 +32,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.repository.lot.LotRepositorySearchParams;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.LotMessageKeys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +60,10 @@ public class LotService {
    * @return the Page of lots found, or an empty page.
    */
   public Page<Lot> search(@NotNull LotSearchParams requestParams, Pageable pageable) {
-    List<UUID> tradeItemId = Optional.ofNullable(requestParams.getTradeItemId())
-            .orElse(Collections.emptyList());
-    List<UUID> orderableId = Optional.ofNullable(requestParams.getOrderableId())
-            .orElse(Collections.emptyList());
+    final Set<UUID> tradeItemId = Optional.ofNullable(requestParams.getTradeItemId())
+            .orElse(Collections.emptySet());
+    final Set<UUID> orderableId = Optional.ofNullable(requestParams.getOrderableId())
+            .orElse(Collections.emptySet());
 
     if (!tradeItemId.isEmpty() && !orderableId.isEmpty()) {
       throw new ValidationMessageException(
@@ -67,43 +71,43 @@ public class LotService {
       );
     }
 
-    List<TradeItem> tradeItems = Collections.emptyList();
-
-    if (!tradeItemId.isEmpty() && !requestParams.isTradeItemIdIgnored()) {
-      tradeItems = tradeItemRepository.findAllById(tradeItemId);
-
-      if (tradeItems.isEmpty()) {
-        return Pagination.getEmptyPage(pageable);
-      }
-    }
+    final List<TradeItem> tradeItems;
 
     if (!orderableId.isEmpty()) {
       Page<Orderable> orderables = orderableRepository.findAllLatestByIds(
-              requestParams.getOrderableId(),
-              null
+          requestParams.getOrderableId(),
+          null
       );
 
-      tradeItemId = orderables.getContent().stream()
-              .filter(o -> Objects.nonNull(o.getTradeItemIdentifier()))
-              .map(o -> UUID.fromString(o.getTradeItemIdentifier()))
-              .collect(Collectors.toList());
+      final Set<UUID> orderableTradeItems = orderables.getContent().stream()
+          .filter(o -> Objects.nonNull(o.getTradeItemIdentifier()))
+          .map(o -> UUID.fromString(o.getTradeItemIdentifier()))
+          .collect(toSet());
 
+      tradeItems = tradeItemRepository.findAllById(orderableTradeItems);
+
+      if (tradeItems.isEmpty()) {
+        return Pagination.getEmptyPage(pageable);
+      }
+    } else if (!tradeItemId.isEmpty() && !requestParams.isTradeItemIdIgnored()) {
       tradeItems = tradeItemRepository.findAllById(tradeItemId);
 
       if (tradeItems.isEmpty()) {
         return Pagination.getEmptyPage(pageable);
       }
+    } else {
+      tradeItems = Collections.emptyList();
     }
 
     return lotRepository.search(
-        tradeItems,
-        requestParams.getExpirationDate(),
-        requestParams.getLotCode(),
-        requestParams.getId(),
-        requestParams.getExpirationDateFrom(),
-        requestParams.getExpirationDateTo(),
-        pageable
-    );
+        new LotRepositorySearchParams(
+            new HashSet<>(tradeItems),
+            requestParams.getExpirationDate(),
+            requestParams.getExactCode(),
+            requestParams.getLotCode(),
+            requestParams.getId(),
+            requestParams.getExpirationDateFrom(),
+            requestParams.getExpirationDateTo()),
+        pageable);
   }
-
 }
