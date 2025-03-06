@@ -72,6 +72,7 @@ public class OrderableController extends BaseController {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableController.class);
   private static final String NAME = "name";
   private static final String CODE = "code";
+  private static final String EXACT_CODE = "exactCode";
   private static final String PROGRAM_CODE = "program";
 
   @Autowired
@@ -374,6 +375,7 @@ public class OrderableController extends BaseController {
       }
     }
     queryMap.add(NAME, searchParams.getName());
+    queryMap.add(EXACT_CODE, searchParams.getExactCodes());
     queryMap.add(CODE, searchParams.getCode());
     queryMap.add(PROGRAM_CODE, searchParams.getProgramCode());
 

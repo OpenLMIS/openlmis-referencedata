@@ -39,6 +39,17 @@ public class TradeItemDataBuilder {
   }
 
   /**
+   * Set Id.
+   *
+   * @param id the id
+   * @return this builder, never null
+   */
+  public TradeItemDataBuilder withId(UUID id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
    * Add classification based on data from {@link CommodityType}.
    */
   public TradeItemDataBuilder withClassification(CommodityType type) {

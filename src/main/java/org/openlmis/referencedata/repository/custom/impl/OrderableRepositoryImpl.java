@@ -15,10 +15,11 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import com.google.common.collect.Lists;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -243,7 +244,10 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
 
-      if (isNotBlank(searchParams.getCode())) {
+      if (isNotEmpty(searchParams.getExactCodes())) {
+        where =
+            builder.and(where, root.get(PRODUCT_CODE).get(CODE).in(searchParams.getExactCodes()));
+      } else if (isNotBlank(searchParams.getCode())) {
         where = builder.and(where, builder.like(builder.lower(root.get(PRODUCT_CODE).get(CODE)),
             "%" + searchParams.getCode().toLowerCase() + "%"));
       }
@@ -290,26 +294,29 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   private Query getLastUpdatedQuery(SearchParams searchParams, boolean count) {
     String startNativeQuery = count ? NATIVE_COUNT_LAST_UPDATED : NATIVE_SELECT_LAST_UPDATED;
     StringBuilder builder = new StringBuilder(startNativeQuery);
-    List<String> wheres = Lists.newArrayList();
-    String queryCondition;
+    List<String> wheres = new ArrayList<>();
 
+    // FIXME: Don't build raw HQL
     if (null != searchParams) {
       Set<String> programCodes = getProgramCodesLowerCase(searchParams);
       if (!isEmpty(programCodes)) {
         builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN + NATIVE_PROGRAM_INNER_JOIN);
-        queryCondition = "LOWER (p.code) IN ("
-            + generateProgramCodesText(programCodes) + ")";
+        final String queryCondition = "LOWER (p.code) IN (" + toHqlInList(programCodes) + ")";
         wheres.add(queryCondition);
       }
 
-      if (null != searchParams.getCode()) {
-        queryCondition = "LOWER (o.code) LIKE '%"
+      if (isNotEmpty(searchParams.getExactCodes())) {
+        final String queryCondition =
+            "o.code IN (" + toHqlInList(searchParams.getExactCodes()) + ")";
+        wheres.add(queryCondition);
+      } else if (null != searchParams.getCode()) {
+        final String queryCondition = "LOWER (o.code) LIKE '%"
             + searchParams.getCode().toLowerCase() + "%'";
         wheres.add(queryCondition);
       }
 
       if (null != searchParams.getName()) {
-        queryCondition = "LOWER (o.fullproductname) LIKE '%"
+        final String queryCondition = "LOWER (o.fullproductname) LIKE '%"
             + searchParams.getName().toLowerCase() + "%'";
         wheres.add(queryCondition);
       }
@@ -323,22 +330,12 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
       builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
     }
     String builderText = builder.toString();
-    XLOGGER.info("QueryParamString: " + builderText);
+    XLOGGER.info("QueryParamString: {}", builderText);
     return entityManager.createNativeQuery(builderText);
   }
 
-  private String generateProgramCodesText(Set<String> programCodesLowerCase) {
-
-    return programCodesLowerCase.stream()
-        .map(programCode -> {
-          StringBuilder builder = new StringBuilder();
-          builder
-              .append('\'')
-              .append(programCode)
-              .append('\'');
-          return builder.toString();
-        })
-        .collect(Collectors.joining(", "));
+  private String toHqlInList(Set<String> textValues) {
+    return textValues.stream().map(text -> '\'' + text + '\'').collect(joining(", "));
   }
 
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {

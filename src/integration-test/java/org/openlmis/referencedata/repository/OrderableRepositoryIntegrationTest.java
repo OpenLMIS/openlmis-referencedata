@@ -91,6 +91,7 @@ public class OrderableRepositoryIntegrationTest {
   private static final String EACH = "each";
   private static final String ORDERABLE_NAME = "abc";
   private static final String SOME_CODE = "some-code";
+  private static final String SIMILAR_CODE = "some-code-2";
   private final AtomicInteger instanceNumber = new AtomicInteger(0);
   private final PageRequest pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.Direction.ASC,
       "fullProductName");
@@ -321,7 +322,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams("something", "something", null, null), pageable);
+        .search(new TestSearchParams("something", null, "something", null, null), pageable);
 
     // then
     assertEquals(0, foundOrderables.getTotalElements());
@@ -338,7 +339,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, Collections.singleton(programCode), null),
+        new TestSearchParams(null, null, null, Collections.singleton(programCode), null),
         pageable);
 
     // then
@@ -396,7 +397,7 @@ public class OrderableRepositoryIntegrationTest {
     // when
     Page<Orderable> foundOrderables = repository.search(
         new TestSearchParams(
-            validOrderable.getProductCode().toString(), NAME,
+            validOrderable.getProductCode().toString(), null, NAME,
             Collections.singleton(validProgram.getCode().toString()), null),
         pageable);
 
@@ -406,7 +407,7 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
-  public void shouldFindByProductCode() throws Exception {
+  public void shouldFindByProductCode() {
     Orderable orderable = new OrderableDataBuilder().buildAsNew();
     Code productCode = orderable.getProductCode();
 
@@ -547,10 +548,26 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> actual = repository
-        .search(new TestSearchParams(SOME_CODE, null, null, null), pageable);
+        .search(new TestSearchParams(SOME_CODE, null, null, null, null), pageable);
 
     // then
     checkSingleResultOrderableVersion(actual.getContent(), orderable.getVersionNumber());
+  }
+
+  @Test
+  public void searchFindByExectCode() {
+    // given
+    Orderable orderable1 = saveAndGetOrderable(Code.code(SOME_CODE));
+    saveAndGetOrderable(Code.code(SIMILAR_CODE));
+
+    // when
+    Page<Orderable> actual =
+        repository.search(
+            new TestSearchParams(null, Collections.singleton(SOME_CODE), null, null, null),
+            pageable);
+
+    // then
+    checkSingleResultOrderableVersion(actual.getContent(), orderable1.getVersionNumber());
   }
 
   @Test
@@ -561,7 +578,7 @@ public class OrderableRepositoryIntegrationTest {
     Orderable orderable4 = saveAndGetOrderable();
 
     Page<Orderable> actual = repository.search(
-        new TestSearchParams(null, null, null,
+        new TestSearchParams(null, null, null, null,
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
                 Pair.of(orderable2.getId(), orderable2.getVersionNumber()))),
         pageable);
@@ -586,7 +603,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // current version
     Page<Orderable> actual = repository.search(
-        new TestSearchParams(null, null, null,
+        new TestSearchParams(null, null, null, null,
             Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber()))),
         pageable);
 
@@ -595,7 +612,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // previous version
     actual = repository.search(
-        new TestSearchParams(null, null, null,
+        new TestSearchParams(null, null, null, null,
             Sets.newHashSet(Pair.of(orderable.getId(), orderable.getVersionNumber() - 1))),
         pageable);
 
@@ -748,7 +765,7 @@ public class OrderableRepositoryIntegrationTest {
 
     //when
     ZonedDateTime lastUpdated = repository.findLatestModifiedDateByParams(
-        new TestSearchParams(orderable3.getProductCode().toString(),
+        new TestSearchParams(orderable3.getProductCode().toString(), null,
             orderable3.getFullProductName(), null,
             Sets.newHashSet(Pair.of(orderable1.getId(), orderable1.getVersionNumber()),
                 Pair.of(orderable2.getId(), orderable2.getVersionNumber()),
@@ -777,7 +794,7 @@ public class OrderableRepositoryIntegrationTest {
 
     // when
     Page<Orderable> foundOrderables = repository.search(
-        new TestSearchParams(null, null, Collections.singleton(programCode), null),
+        new TestSearchParams(null, null, null, Collections.singleton(programCode), null),
         pageable);
 
     // then
@@ -796,7 +813,7 @@ public class OrderableRepositoryIntegrationTest {
                                                Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
     Page<Orderable> foundOrderables = repository
-        .search(new TestSearchParams(code, name, Collections.singleton(programCode), null),
+        .search(new TestSearchParams(code, null, name, Collections.singleton(programCode), null),
             pageable);
 
     assertEquals(expectedSize, foundOrderables.getTotalElements());
@@ -889,6 +906,7 @@ public class OrderableRepositoryIntegrationTest {
   private static final class TestSearchParams implements SearchParams {
 
     private String code;
+    private Set<String> exactCodes;
     private String name;
     private Set<String> programCodes;
     private Set<Pair<UUID, Long>> identityPairs;

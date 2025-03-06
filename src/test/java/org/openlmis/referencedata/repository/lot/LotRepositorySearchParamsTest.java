@@ -13,37 +13,19 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service;
+package org.openlmis.referencedata.repository.lot;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.Test;
+import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class LotSearchParams {
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDate;
-
-  private Set<UUID> tradeItemId;
-  private Set<String> exactCode;
-  private String lotCode;
-  private Set<UUID> id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDateFrom;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-  private LocalDate expirationDateTo;
-
-  private Set<UUID> orderableId;
-  private boolean isTradeItemIdIgnored = false;
+public class LotRepositorySearchParamsTest {
+  @Test
+  public void testEqualsContract() {
+    EqualsVerifier.forClass(LotRepositorySearchParams.class)
+        .withPrefabValues(
+            TradeItem.class, new TradeItemDataBuilder().build(), new TradeItemDataBuilder().build())
+        .verify();
+  }
 }

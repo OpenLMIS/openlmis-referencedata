@@ -30,6 +30,7 @@ public interface OrderableRepositoryCustom {
   ZonedDateTime findLatestModifiedDateByParams(SearchParams searchParams);
 
   interface SearchParams {
+    Set<String> getExactCodes();
 
     String getCode();
 
@@ -40,6 +41,5 @@ public interface OrderableRepositoryCustom {
     Set<Pair<UUID, Long>> getIdentityPairs();
 
     Set<UUID> getTradeItemId();
-
   }
 }

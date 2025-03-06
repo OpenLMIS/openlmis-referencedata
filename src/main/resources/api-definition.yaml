@@ -756,8 +756,13 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: true
+              exactCode:
+                displayName: exact orderable code
+                type: string
+                required: false
+                repeat: true
               code:
-                  displayName: orderable code
+                  displayName: like orderable code
                   type: string
                   required: false
                   repeat: false
@@ -3558,6 +3563,11 @@ resourceTypes:
                   type: string
                   required: false
                   repeat: false
+              exactCode:
+                  displayName: exact lot code
+                  type: string
+                  required: false
+                  repeat: true
               lotCode:
                   displayName: lotCode
                   description: The code of the Lot.
