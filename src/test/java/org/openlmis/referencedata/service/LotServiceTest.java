@@ -18,9 +18,11 @@ package org.openlmis.referencedata.service;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.ImmutableList;
@@ -36,15 +38,19 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Lot;
+import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.LotRepository;
+import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
 import org.openlmis.referencedata.repository.lot.LotRepositorySearchParams;
 import org.openlmis.referencedata.testbuilder.LotDataBuilder;
+import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
 import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -56,6 +62,9 @@ public class LotServiceTest {
 
   @Mock
   private TradeItemRepository tradeItemRepository;
+
+  @Mock
+  private OrderableRepository orderableRepository;
 
   @InjectMocks
   private LotService lotService = new LotService();
@@ -208,5 +217,34 @@ public class LotServiceTest {
 
     Page<Lot> result = lotService.search(lotSearchParams, pageable);
     assertThat(result.getContent(), hasSize(0));
+  }
+
+  @Test
+  public void shouldFindByOrderableId() {
+    final UUID orderableId = UUID.fromString("0c6a0222-9b04-4519-a4e1-ab041a23cf3b");
+    final UUID tradeItemIdentifier = UUID.fromString("0c6a0222-9b04-4519-a4e1-ab041a23cf3c");
+    final Orderable orderable =
+        new OrderableDataBuilder()
+            .withId(orderableId)
+            .withIdentifier(Orderable.TRADE_ITEM, tradeItemIdentifier)
+            .build();
+    final TradeItem tradeItem = new TradeItemDataBuilder().withId(tradeItemIdentifier).build();
+    final Page<Lot> expectedResult = mock(Page.class);
+
+    when(orderableRepository.findAllLatestByIds(singleton(orderableId), null))
+        .thenReturn(new PageImpl<>(singletonList(orderable)));
+    when(tradeItemRepository.findAllById(singleton(tradeItemIdentifier)))
+        .thenReturn(singletonList(tradeItem));
+    when(lotRepository.search(
+            new LotRepositorySearchParams(singleton(tradeItem), null, null, null, null, null, null),
+            pageable))
+        .thenReturn(expectedResult);
+
+    final LotSearchParams lotSearchParams =
+        new LotSearchParams(
+            null, null, null, null, null, null, null, singleton(orderableId), false);
+
+    final Page<Lot> result = lotService.search(lotSearchParams, pageable);
+    assertEquals(expectedResult, result);
   }
 }

@@ -15,24 +15,17 @@
 
 package org.openlmis.referencedata.repository.lot;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.Test;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.repository.custom.LotRepositoryCustom;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
 
-@Getter
-@AllArgsConstructor
-@EqualsAndHashCode
-public final class LotRepositorySearchParams implements LotRepositoryCustom.SearchParams {
-  private final Set<TradeItem> tradeItems;
-  private final LocalDate expirationDate;
-  private final Set<String> exactCodes;
-  private final String code;
-  private final Set<UUID> ids;
-  private final LocalDate expirationDateFrom;
-  private final LocalDate expirationDateTo;
+public class LotRepositorySearchParamsTest {
+  @Test
+  public void testEqualsContract() {
+    EqualsVerifier.forClass(LotRepositorySearchParams.class)
+        .withPrefabValues(
+            TradeItem.class, new TradeItemDataBuilder().build(), new TradeItemDataBuilder().build())
+        .verify();
+  }
 }
