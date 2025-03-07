@@ -15,16 +15,24 @@
 
 package org.openlmis.referencedata.service;
 
+import static java.util.stream.Collectors.toList;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.UserContactDetailsDto;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -32,6 +40,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.repository.UserSearchParams;
+import org.openlmis.referencedata.service.export.ExportableDataService;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -48,7 +57,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class UserService implements ExportableDataService<UserDto> {
 
   protected static final String USERNAME = "username";
   protected static final String FIRST_NAME = "firstName";
@@ -75,7 +84,11 @@ public class UserService {
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
-  
+
+  @Autowired
+  private UserDetailsService userDetailsService;
+
+
   private ObjectMapper mapper = new ObjectMapper();
 
   /**
@@ -163,6 +176,63 @@ public class UserService {
     }
   }
 
+  @Override
+  public List<UserDto> findAllExportableItems() {
+    List<UserDto> users = userRepository.findAll().stream()
+        .map(UserDto::newInstance).collect(toList());
+
+    List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails =
+        userDetailsService.getUserContactDetails().getContent();
+
+    mergeUsersWithContactDetails(users, usersContactDetails);
+
+    return users;
+  }
+
+  @Override
+  public Class<UserDto> getExportableType() {
+    return UserDto.class;
+  }
+
+  /**
+   * Persists users in database.
+   *
+   * @param usersBatch batch with users data
+   * @param allFacilities all facilities available in system (needed to set home facility for users)
+   * @return list of {@link UserDto} persisted users
+   */
+  public List<UserDto> saveUsersFromFile(List<UserDto> usersBatch, List<Facility> allFacilities) {
+    List<User> toPersistBatch = createListToPersist(usersBatch, allFacilities);
+    List<User> persistedObjects = new ArrayList<>(userRepository.saveAll(toPersistBatch));
+
+    return UserDto.newInstances(persistedObjects);
+  }
+
+  private List<User> createListToPersist(List<UserDto> dtoList, List<Facility> allFacilities) {
+    List<User> persisList = new LinkedList<>();
+    for (UserDto userDto : dtoList) {
+      persisList.add(createOrUpdateUser(userDto, allFacilities));
+    }
+
+    return persisList;
+  }
+
+  private User createOrUpdateUser(UserDto userDto, List<Facility> allFacilities) {
+    User user = userRepository.findOneByUsernameIgnoreCase(userDto.getUsername());
+    Optional<Facility> facility = allFacilities.stream()
+        .filter(f -> StringUtils.equalsIgnoreCase(f.getCode(), userDto.getHomeFacilityCode()))
+        .findFirst();
+    if (user == null) {
+      user = new User();
+    }
+    user.updateFrom(userDto);
+    if (facility.isPresent()) {
+      user.setHomeFacilityId(facility.get().getId());
+    }
+
+    return user;
+  }
+
   private Set<User> searchByFulfillmentRight(Right right, UUID warehouseId) {
     if (warehouseId == null) {
       throw new ValidationMessageException(UserMessageKeys.WAREHOUSE_ID_REQUIRED);
@@ -201,4 +271,28 @@ public class UserService {
     return userRepository.findUsersBySupervisionRight(rightId, supervisoryNodeId, programId);
   }
 
+  private void mergeUsersWithContactDetails(List<UserDto> users,
+      List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails) {
+    for (UserDto userDto : users) {
+      Optional<UserContactDetailsDto.UserContactDetailsApiContract> contactDetails =
+          usersContactDetails.stream()
+              .filter(details -> details.getReferenceDataUserId().equals(userDto.getId()))
+              .findFirst();
+      if (contactDetails.isPresent()) {
+        UserContactDetailsDto.UserContactDetailsApiContract detailsValue = contactDetails.get();
+        userDto.setPhoneNumber(detailsValue.getPhoneNumber());
+        userDto.setEmail(detailsValue.getEmailDetails().getEmail());
+        userDto.setEmailVerified(detailsValue.getEmailDetails().getEmailVerified());
+        userDto.setAllowNotify(detailsValue.getAllowNotify());
+        setHomeFacilityCode(userDto);
+      }
+    }
+  }
+
+  private void setHomeFacilityCode(UserDto userDto) {
+    if (userDto.getHomeFacilityId() != null) {
+      Optional<Facility> facility = facilityRepository.findById(userDto.getHomeFacilityId());
+      facility.ifPresent(value -> userDto.setHomeFacilityCode(value.getCode()));
+    }
+  }
 }

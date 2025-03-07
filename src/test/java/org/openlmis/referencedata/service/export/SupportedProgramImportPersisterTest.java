@@ -38,8 +38,8 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.SupportedProgramCsvModel;
-import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.SupportedProgramRepository;
@@ -114,11 +114,11 @@ public class SupportedProgramImportPersisterTest {
         .thenReturn(emptyList());
 
     // When
-    List<SupportedProgramDto> result =
+    ImportResponseDto.ImportDetails result =
         supportedProgramPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(SupportedProgramCsvModel.class, dataStream);
     verify(supportedProgramRepository).saveAll(singletonList(supportedProgram));
   }
@@ -131,11 +131,11 @@ public class SupportedProgramImportPersisterTest {
         .thenReturn(singletonList(supportedProgram));
 
     // When
-    List<SupportedProgramDto> result =
+    ImportResponseDto.ImportDetails result =
         supportedProgramPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(SupportedProgramCsvModel.class, dataStream);
     verify(supportedProgramRepository).saveAll(singletonList(supportedProgram));
   }

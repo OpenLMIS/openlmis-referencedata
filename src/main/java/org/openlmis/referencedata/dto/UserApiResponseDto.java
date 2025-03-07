@@ -13,22 +13,44 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service.export;
+package org.openlmis.referencedata.dto;
 
-import java.io.InputStream;
+import java.util.List;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import org.openlmis.referencedata.dto.ImportResponseDto;
-import org.slf4j.profiler.Profiler;
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class UserApiResponseDto {
+  private List<UserResponse> successfulResults;
 
-/**
- * This interface handles importing data from files to database.
- *
- * @param <E> The entity type being imported.
- * @param <D> The DTO type containing parsed data.
- * @param <U> The DTO type for data retrieved from files.
- */
-public interface DataImportPersister<E, D, U> {
+  private List<FailedUserResponse> failedResults;
 
-  ImportResponseDto.ImportDetails processAndPersist(
-      InputStream dataStream, Profiler profiler) throws InterruptedException;
+  @ToString
+  @EqualsAndHashCode
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Setter
+  public static class UserResponse {
+    private UUID referenceDataUserId;
+  }
+
+  @ToString
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @Getter
+  @Setter
+  public static class FailedUserResponse extends UserResponse {
+    private List<String> errors;
+  }
 }

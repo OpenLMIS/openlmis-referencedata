@@ -33,7 +33,7 @@ public final class RequestHelper {
   /**
    * Creates a {@link URI} from the given string representation without any parameters.
    */
-  static URI createUri(String url) {
+  public static URI createUri(String url) {
     return createUri(url, null);
   }
 
@@ -53,17 +53,45 @@ public final class RequestHelper {
   }
 
   /**
-   * Creates an {@link HttpEntity} and adds an authorizatior header with the provided token.
+   * Creates an {@link HttpEntity} with the given payload as a body and adds an authorization
+   * header with the provided token.
+   * @param token the token to put into the authorization header
+   * @param payload the body of the request, pass null if no body
+   * @param <E> the type of the body for the request
+   * @return the {@link HttpEntity} to use
+   */
+  public static <E> HttpEntity<E> createEntity(E payload, String token) {
+    if (payload == null) {
+      return createEntity(createHeadersWithAuth(token));
+    } else {
+      return createEntity(payload, createHeadersWithAuth(token));
+    }
+  }
+
+  /**
+   * Creates an {@link HttpEntity} with the given payload as a body and headers.
+   */
+  public static <E> HttpEntity<E> createEntity(E payload, RequestHeaders headers) {
+    return new HttpEntity<>(payload, headers.toHeaders());
+  }
+
+  /**
+   * Creates an {@link HttpEntity} with the given headers.
+   */
+  public static <E> HttpEntity<E> createEntity(RequestHeaders headers) {
+    return new HttpEntity<>(headers.toHeaders());
+  }
+
+  /**
+   * Creates an {@link HttpEntity} and adds an authorization header with the provided token.
    * @param token the token to put into the authorization header
    * @return the {@link HttpEntity} to use
    */
-  static HttpEntity createEntity(String token) {
-    return new HttpEntity(createHeadersWithAuth(token));
+  public static HttpEntity createEntity(String token) {
+    return new HttpEntity(createHeadersWithAuth(token).toHeaders());
   }
 
-  private static HttpHeaders createHeadersWithAuth(String token) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-    return headers;
+  public static RequestHeaders createHeadersWithAuth(String token) {
+    return RequestHeaders.init().set(HttpHeaders.AUTHORIZATION, "Bearer " + token);
   }
 }

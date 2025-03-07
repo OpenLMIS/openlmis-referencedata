@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.GeographicLevel;
-import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -84,11 +83,11 @@ public class FacilityImportPersisterIntegrationTest {
     facilityOperatorRepository.save(
         new FacilityOperatorDataBuilder().withCode("TestOperator").buildAsNew());
 
-    final List<FacilityDto> facilityDtos =
+    final ImportResponseDto.ImportDetails facilityDtos =
         facilityImportPersister.processAndPersist(
             new ClassPathResource("/FacilityImportPersisterTest/facility.csv").getInputStream(),
             mock(Profiler.class));
 
-    assertEquals(1, facilityDtos.size());
+    assertEquals(Integer.valueOf(1), facilityDtos.getSuccessfulEntriesCount());
   }
 }

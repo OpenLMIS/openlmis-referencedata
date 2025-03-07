@@ -78,6 +78,7 @@ public abstract class MessageKeys {
   protected static final String PARAMETER = "parameter";
   protected static final String DATA = "data";
   protected static final String EXPORT = "export";
+  protected static final String IMPORT = "import";
   protected static final String RECORD = "record";
   protected static final String IDEAL_STOCK_AMOUNT = "idealStockAmount";
   protected static final String NOT_ALLOWED = "notAllowed";
@@ -127,6 +128,7 @@ public abstract class MessageKeys {
   protected static final String EXTENSION = "extension";
   protected static final String TOO = "too";
   protected static final String LARGE = "large";
+  protected static final String LONG = "long";
 
   // Common to subclasses
   protected static final String EMAIL = "email";
@@ -139,6 +141,9 @@ public abstract class MessageKeys {
       "orderableDisplayCategoryRepository";
   protected static final String FIRSTNAME = "firstName";
   protected static final String LASTNAME = "lastName";
+  protected static final String PHONE_NUMBER = "phoneNumber";
+  protected static final String TIMEZONE = "timezone";
+  protected static final String JOB_TITLE = "jobTitle";
 
   // Javers
   public static final String ERROR_JAVERS_EXISTING_ENTRY =

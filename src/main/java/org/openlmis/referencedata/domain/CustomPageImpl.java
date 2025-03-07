@@ -13,22 +13,30 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service.export;
+package org.openlmis.referencedata.domain;
 
-import java.io.InputStream;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
-import org.openlmis.referencedata.dto.ImportResponseDto;
-import org.slf4j.profiler.Profiler;
+@JsonIgnoreProperties({"pageable", "sort"})
+public class CustomPageImpl<T> extends PageImpl<T> {
 
-/**
- * This interface handles importing data from files to database.
- *
- * @param <E> The entity type being imported.
- * @param <D> The DTO type containing parsed data.
- * @param <U> The DTO type for data retrieved from files.
- */
-public interface DataImportPersister<E, D, U> {
+  @JsonCreator
+  public CustomPageImpl(@JsonProperty("content") List<T> content,
+                        @JsonProperty("totalElements") long totalElements) {
+    super(content, Pageable.unpaged(), totalElements);
+  }
 
-  ImportResponseDto.ImportDetails processAndPersist(
-      InputStream dataStream, Profiler profiler) throws InterruptedException;
+  public CustomPageImpl(List<T> content) {
+    super(content);
+  }
+
+  public CustomPageImpl() {
+    super(new ArrayList<>());
+  }
 }

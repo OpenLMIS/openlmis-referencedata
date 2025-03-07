@@ -28,9 +28,7 @@ import java.io.IOException;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
-import org.openlmis.referencedata.domain.Orderable;
-import org.openlmis.referencedata.dto.OrderableDto;
-import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.slf4j.profiler.Profiler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockMultipartFile;
@@ -40,8 +38,6 @@ public class DataImportControllerIntegrationTest extends BaseWebIntegrationTest 
 
   private static final MultipartFile file = new MockMultipartFile(
       "orderable.csv", "test-data".getBytes());
-  private final Orderable orderable = new OrderableDataBuilder().build();
-  private final OrderableDto orderableDto = OrderableDto.newInstance(orderable);
 
   @Before
   @Override
@@ -51,7 +47,7 @@ public class DataImportControllerIntegrationTest extends BaseWebIntegrationTest 
 
     try {
       given(dataImportService.importData(any(MultipartFile.class), any(Profiler.class)))
-          .willReturn(Collections.singletonList(orderableDto));
+          .willReturn(Collections.singletonList(new ImportResponseDto.ImportDetails()));
     } catch (InterruptedException ie) {
       // ignore in tests
     }

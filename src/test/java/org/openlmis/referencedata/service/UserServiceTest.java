@@ -40,10 +40,13 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.openlmis.referencedata.domain.CustomPageImpl;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.UserContactDetailsDto;
+import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -94,6 +97,9 @@ public class UserServiceTest {
 
   @Mock
   private Pageable pageable;
+
+  @Mock
+  private UserDetailsService userDetailsService;
 
   @InjectMocks
   private UserService userService;
@@ -348,6 +354,39 @@ public class UserServiceTest {
       verify(supervisoryNodeRepository).existsById(SUPERVISORY_NODE_ID);
       verifyZeroInteractions(facilityRepository, userRepository);
     }
+  }
+
+  @Test
+  public void shouldFindAllExportableItems() {
+    UUID userId = UUID.randomUUID();
+    User user = new User();
+    user.setId(userId);
+    user.setUsername("john");
+
+    UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails emailDetails =
+        new UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails("john@pl.pl", true);
+    UserContactDetailsDto.UserContactDetailsApiContract requestBody =
+        new UserContactDetailsDto.UserContactDetailsApiContract();
+    requestBody.setReferenceDataUserId(userId);
+    requestBody.setPhoneNumber("111222333");
+    requestBody.setEmailDetails(emailDetails);
+
+    when(userRepository.findAll()).thenReturn(Collections.singletonList(user));
+    when(userDetailsService.getUserContactDetails())
+        .thenReturn(new CustomPageImpl<>(Collections.singletonList(requestBody)));
+    Facility facility = new Facility();
+    facility.setCode("WH01");
+    when(facilityRepository.findById(any())).thenReturn(Optional.of(facility));
+
+    List<UserDto> result = userService.findAllExportableItems();
+
+    assertEquals(1, result.size());
+    assertEquals("111222333", result.get(0).getPhoneNumber());
+  }
+
+  @Test
+  public void shouldReturnCorrectExportableType() {
+    assertEquals(UserDto.class, userService.getExportableType());
   }
 
   private User generateUser() {

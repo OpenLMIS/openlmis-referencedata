@@ -237,7 +237,9 @@ public class User extends BaseEntity {
    * @param importer to import from
    */
   public void updateFrom(Importer importer) {
-    id = importer.getId();
+    if (importer.getId() != null) {
+      id = importer.getId();
+    }
     username = importer.getUsername();
     firstName = importer.getFirstName();
     lastName = importer.getLastName();

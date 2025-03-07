@@ -1,0 +1,3 @@
+username,firstName,lastName,email,phoneNumber,jobTitle,homeFacilityCode,timezone,isActive
+john1,John,Doe,john1@pl.pl,123456789,developer,WH01,UTC,true
+john2,John,Doe2,john2@pl.pl,123456789,developer,WH01,UTC,true

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.testbuilder.OrderableDataBuilder;
@@ -76,11 +76,11 @@ public class OrderableImportPersisterTest {
   @Test
   public void shouldSuccessfullyProcessAndPersistData() throws InterruptedException {
     // When
-    List<OrderableDto> result =
+    ImportResponseDto.ImportDetails result =
         orderableImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(OrderableDto.class, dataStream);
     verify(orderableRepository).saveAll(any());
   }

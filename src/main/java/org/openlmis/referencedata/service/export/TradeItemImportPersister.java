@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.dto.TradeItemDto;
@@ -46,9 +47,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("tradeItem.csv")
+@Service(TradeItemImportPersister.TRADE_ITEM_FILE_NAME)
 public class TradeItemImportPersister
     implements DataImportPersister<Orderable, TradeItemCsvModel, OrderableDto> {
+
+  public static final String TRADE_ITEM_FILE_NAME = "tradeItem.csv";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private TradeItemRepository tradeItemRepository;
@@ -60,7 +63,8 @@ public class TradeItemImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<OrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ_CSV");
     List<TradeItemCsvModel> importedDtos = fileHelper.readCsv(TradeItemCsvModel.class, dataStream);
@@ -74,7 +78,13 @@ public class TradeItemImportPersister
                 this::splitTradeItems);
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        TRADE_ITEM_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>()
+    );
   }
 
   private List<List<TradeItemCsvModel>> splitTradeItems(List<TradeItemCsvModel> allItems) {

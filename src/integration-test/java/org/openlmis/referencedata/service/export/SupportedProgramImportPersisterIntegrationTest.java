@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +31,7 @@ import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.FacilityType;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.dto.SupportedProgramDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -100,13 +99,13 @@ public class SupportedProgramImportPersisterIntegrationTest {
             .buildAsNew());
     programRepository.save(new ProgramDataBuilder().withCode("TestProgram1").buildAsNew());
 
-    final List<SupportedProgramDto> supportedProgramDtos =
+    final ImportResponseDto.ImportDetails supportedProgramDtos =
         supportedProgramImportPersister.processAndPersist(
             new ClassPathResource(
                     "/SupportedProgramImportPersisterIntegrationTest/supportedProgram.csv")
                 .getInputStream(),
             mock(Profiler.class));
 
-    assertEquals(1, supportedProgramDtos.size());
+    assertEquals(Integer.valueOf(1), supportedProgramDtos.getSuccessfulEntriesCount());
   }
 }

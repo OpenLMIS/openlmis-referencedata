@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.FileHelper;
 import org.openlmis.referencedata.util.Message;
@@ -38,12 +39,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class DataImportService {
   private static final List<String> IMPORT_ORDER =
       Arrays.asList(
-          "facility.csv",
-          "supportedProgram.csv",
-          "orderable.csv",
-          "programOrderable.csv",
-          "tradeItem.csv",
-          "geographicZone.csv");
+          FacilityImportPersister.FACILITY_FILE_NAME,
+          SupportedProgramImportPersister.SUPPORTED_PROGRAM_FILE_NAME,
+          OrderableImportPersister.ORDERABLE_FILE_NAME,
+          ProgramOrderableImportPersister.PROGRAM_ORDERABLE_FILE_NAME,
+          TradeItemImportPersister.TRADE_ITEM_FILE_NAME,
+          GeographicZonesImportPersister.GEOGRAPHIC_ZONE_FILE_NAME,
+          UserImportPersister.USER_FILE_NAME
+      );
 
   @Autowired private FileHelper fileHelper;
   @Autowired private BeanFactory beanFactory;
@@ -55,7 +58,7 @@ public class DataImportService {
    * @throws InterruptedException when it was interrupted
    */
   @Transactional
-  public List<BaseDto> importData(MultipartFile zipFile, Profiler profiler)
+  public List<ImportResponseDto.ImportDetails> importData(MultipartFile zipFile, Profiler profiler)
       throws InterruptedException {
     profiler.start("VALIDATE_ZIP_FILE");
     fileHelper.validateMultipartFile(zipFile);
@@ -68,7 +71,7 @@ public class DataImportService {
       fileHelper.validateCsvFile(fileName, IMPORT_ORDER);
     }
 
-    final List<BaseDto> result = new ArrayList<>();
+    final List<ImportResponseDto.ImportDetails> result = new ArrayList<>();
     for (String importFileName : IMPORT_ORDER) {
       final InputStream fileStream = fileMap.get(importFileName);
 
@@ -80,7 +83,7 @@ public class DataImportService {
         final Profiler entryProfiler = profiler.startNested("IMPORT_ZIP_ENTRY: " + importFileName);
         final DataImportPersister<?, ?, ? extends BaseDto> persister =
             beanFactory.getBean(importFileName, DataImportPersister.class);
-        result.addAll(persister.processAndPersist(fileStream, entryProfiler));
+        result.add(persister.processAndPersist(fileStream, entryProfiler));
       } catch (NoSuchBeanDefinitionException e) {
         throw new ValidationMessageException(
             e, new Message(CsvUploadMessageKeys.ERROR_FILE_NAME_INVALID, importFileName));
