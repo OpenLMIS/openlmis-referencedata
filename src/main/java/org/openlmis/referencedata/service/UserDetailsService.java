@@ -43,6 +43,9 @@ public class UserDetailsService {
   @Autowired
   private AuthService authService;
 
+  @Autowired
+  private UserImportHelper userImportHelper;
+
   @Value("${service.url}")
   private String serviceUrl;
 
@@ -140,8 +143,8 @@ public class UserDetailsService {
       return new ArrayList<>();
     }
 
-    UserImportHelper.addErrorsFromResponse(response, errors, batch);
+    userImportHelper.addErrorsFromResponse(response, errors, batch);
 
-    return UserImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    return userImportHelper.getSuccessfullyCreatedUsers(batch, response);
   }
 }

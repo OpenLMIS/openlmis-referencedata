@@ -65,9 +65,9 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
 
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
 
-  public UserAuthDetailsApiContract toUserAuthDetailsApiContract() {
+  public UserAuthDetailsApiContract toUserAuthDetailsApiContract(String defaultPassword) {
     return new UserAuthDetailsApiContract(this.getId(), this.getUsername(),
-        UserAuthDetailsApiContract.DEFAULT_PASSWORD, this.isActive());
+        defaultPassword, this.isActive());
   }
 
   /**
@@ -105,7 +105,5 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
     private String username;
     private String password;
     private Boolean enabled;
-
-    private static final String DEFAULT_PASSWORD = "password";
   }
 }

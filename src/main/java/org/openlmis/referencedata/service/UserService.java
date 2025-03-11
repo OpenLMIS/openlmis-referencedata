@@ -23,9 +23,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Right;
@@ -56,6 +59,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+@SuppressWarnings({"PMD.TooManyMethods"})
 @Service
 public class UserService implements ExportableDataService<UserDto> {
 
@@ -176,6 +180,15 @@ public class UserService implements ExportableDataService<UserDto> {
     }
   }
 
+  /**
+   * Deletes users.
+   *
+   * @param userIds identifiers of users who will be deleted
+   */
+  public void deleteUsersByIds(Set<UUID> userIds) {
+    userRepository.deleteUsersByIds(userIds);
+  }
+
   @Override
   public List<UserDto> findAllExportableItems() {
     List<UserDto> users = userRepository.findAll().stream()
@@ -224,6 +237,8 @@ public class UserService implements ExportableDataService<UserDto> {
         .findFirst();
     if (user == null) {
       user = new User();
+    } else {
+      userDto.setId(user.getId());
     }
     user.updateFrom(userDto);
     if (facility.isPresent()) {
@@ -273,25 +288,37 @@ public class UserService implements ExportableDataService<UserDto> {
 
   private void mergeUsersWithContactDetails(List<UserDto> users,
       List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails) {
+    Map<UUID, UserContactDetailsDto.UserContactDetailsApiContract> contactDetailsMap =
+        usersContactDetails.stream()
+            .collect(Collectors.toMap(
+                UserContactDetailsDto.UserContactDetailsApiContract::getReferenceDataUserId,
+                Function.identity()
+            ));
+
+    List<Facility> userFacilities = facilityRepository.findAllByIdIn(
+        users.stream()
+            .map(UserDto::getHomeFacilityId)
+            .filter(Objects::nonNull)
+            .collect(toList()));
+
     for (UserDto userDto : users) {
-      Optional<UserContactDetailsDto.UserContactDetailsApiContract> contactDetails =
-          usersContactDetails.stream()
-              .filter(details -> details.getReferenceDataUserId().equals(userDto.getId()))
-              .findFirst();
-      if (contactDetails.isPresent()) {
-        UserContactDetailsDto.UserContactDetailsApiContract detailsValue = contactDetails.get();
-        userDto.setPhoneNumber(detailsValue.getPhoneNumber());
-        userDto.setEmail(detailsValue.getEmailDetails().getEmail());
-        userDto.setEmailVerified(detailsValue.getEmailDetails().getEmailVerified());
-        userDto.setAllowNotify(detailsValue.getAllowNotify());
-        setHomeFacilityCode(userDto);
+      UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
+          contactDetailsMap.get(userDto.getId());
+      if (contactDetails != null) {
+        userDto.setPhoneNumber(contactDetails.getPhoneNumber());
+        userDto.setEmail(contactDetails.getEmailDetails().getEmail());
+        userDto.setEmailVerified(contactDetails.getEmailDetails().getEmailVerified());
+        userDto.setAllowNotify(contactDetails.getAllowNotify());
+        setHomeFacilityCode(userDto, userFacilities);
       }
     }
   }
 
-  private void setHomeFacilityCode(UserDto userDto) {
+  private void setHomeFacilityCode(UserDto userDto, List<Facility> userFacilities) {
     if (userDto.getHomeFacilityId() != null) {
-      Optional<Facility> facility = facilityRepository.findById(userDto.getHomeFacilityId());
+      Optional<Facility> facility = userFacilities.stream()
+          .filter(f -> f.getId().equals(userDto.getHomeFacilityId()))
+          .findFirst();
       facility.ifPresent(value -> userDto.setHomeFacilityCode(value.getCode()));
     }
   }

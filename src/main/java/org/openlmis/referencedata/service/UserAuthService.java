@@ -42,6 +42,9 @@ public class UserAuthService {
   @Autowired
   private AuthService authService;
 
+  @Autowired
+  private UserImportHelper userImportHelper;
+
   private String usersAuthApiUrl = "/api/users/auth";
 
   private RestOperations restTemplate = new RestTemplate();
@@ -93,7 +96,8 @@ public class UserAuthService {
   public List<UserDto> saveUserAuthDetailsFromFile(List<UserDto> batch,
                                              List<ImportResponseDto.ErrorDetails> errors) {
     List<UserDto.UserAuthDetailsApiContract> requestBodyList = new ArrayList<>();
-    batch.forEach(userDto -> requestBodyList.add(userDto.toUserAuthDetailsApiContract()));
+    batch.forEach(userDto -> requestBodyList.add(userDto.toUserAuthDetailsApiContract(
+        userImportHelper.getDefaultUserPassword())));
 
     UserApiResponseDto response;
     try {
@@ -104,8 +108,8 @@ public class UserAuthService {
       return new ArrayList<>();
     }
 
-    UserImportHelper.addErrorsFromResponse(response, errors, batch);
+    userImportHelper.addErrorsFromResponse(response, errors, batch);
 
-    return UserImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    return userImportHelper.getSuccessfullyCreatedUsers(batch, response);
   }
 }

@@ -26,12 +26,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserImportHelperTest {
+
+  @Autowired
+  private UserImportHelper userImportHelper;
+
   @Test
   public void shouldReturnSuccessfullyCreatedUsers() {
     UUID successfulId = UUID.randomUUID();
@@ -52,7 +62,7 @@ public class UserImportHelperTest {
         Collections.emptyList()
     );
 
-    List<UserDto> result = UserImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    List<UserDto> result = userImportHelper.getSuccessfullyCreatedUsers(batch, response);
 
     assertEquals(1, result.size());
     assertEquals("successUser", result.get(0).getUsername());
@@ -71,7 +81,7 @@ public class UserImportHelperTest {
         Collections.emptyList()
     );
 
-    List<UserDto> result = UserImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    List<UserDto> result = userImportHelper.getSuccessfullyCreatedUsers(batch, response);
 
     assertTrue(result.isEmpty());
   }
@@ -108,7 +118,7 @@ public class UserImportHelperTest {
 
     List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
 
-    UserImportHelper.addErrorsFromResponse(response, errors, batch);
+    userImportHelper.addErrorsFromResponse(response, errors, batch);
 
     assertEquals(1, errors.size());
     assertEquals(errorMessages, errors.get(0).getErrors());

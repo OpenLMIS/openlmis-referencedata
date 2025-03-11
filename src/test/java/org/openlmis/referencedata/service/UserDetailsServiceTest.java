@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +43,7 @@ import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.service.export.UserImportHelper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +61,9 @@ public class UserDetailsServiceTest {
 
   @Mock
   private AuthService authService;
+
+  @Mock
+  private UserImportHelper userImportHelper;
 
   @Before
   public void setUp() {
@@ -120,7 +125,6 @@ public class UserDetailsServiceTest {
     UserDto importedDto2 = new UserDto();
     importedDto2.setUsername("john");
     importedDto2.setId(userId);
-    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
 
     ArgumentCaptor<List<UserContactDetailsDto.UserContactDetailsApiContract>> userDetailsCaptor =
         ArgumentCaptor.forClass(List.class);
@@ -134,7 +138,11 @@ public class UserDetailsServiceTest {
         ArgumentMatchers.<ParameterizedTypeReference<UserApiResponseDto>>any(),
         userDetailsCaptor.capture()
     )).thenReturn(ResponseEntity.ok(mockResponse));
+    doNothing().when(userImportHelper).addErrorsFromResponse(any(),anyList(), anyList());
+    when(userImportHelper.getSuccessfullyCreatedUsers(anyList(), any()))
+        .thenReturn(Collections.emptyList());
 
+    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
     userDetailsService.saveUsersContactDetailsFromFile(Collections.singletonList(user),
         Arrays.asList(importedDto1, importedDto2), errors);
 

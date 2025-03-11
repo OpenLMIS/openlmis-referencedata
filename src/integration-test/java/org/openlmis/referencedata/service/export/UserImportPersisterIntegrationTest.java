@@ -57,7 +57,7 @@ public class UserImportPersisterIntegrationTest {
   private UserAuthService userAuthService;
 
   @Mock
-  private UserImportCleaner userImportCleaner;
+  private UserImportRollback userImportRollback;
 
   @Before
   public void setup() {
@@ -65,7 +65,7 @@ public class UserImportPersisterIntegrationTest {
         MoreExecutors.newDirectExecutorService());
     ReflectionTestUtils.setField(userImportPersister, "userDetailsService", userDetailsService);
     ReflectionTestUtils.setField(userImportPersister, "userAuthService", userAuthService);
-    ReflectionTestUtils.setField(userImportPersister, "userImportCleaner", userImportCleaner);
+    ReflectionTestUtils.setField(userImportPersister, "userImportRollback", userImportRollback);
   }
 
   @Test
@@ -76,7 +76,7 @@ public class UserImportPersisterIntegrationTest {
     when(userAuthService.saveUserAuthDetailsFromFile(anyList(),anyList()))
         .thenReturn(Collections.singletonList(new UserDto()));
 
-    doNothing().when(userImportCleaner).cleanupInconsistentData(anyList(), anyList());
+    doNothing().when(userImportRollback).cleanupInconsistentData(anyList(), anyList());
 
     final ImportResponseDto.ImportDetails result = userImportPersister.processAndPersist(
         new ClassPathResource("/UserImportPersisterTest/user.csv").getInputStream(),

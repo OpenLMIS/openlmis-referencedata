@@ -77,7 +77,7 @@ public class GeographicZoneImportPersisterIntegrationTest {
     GeographicZone geographicZone = new GeographicZoneDataBuilder()
         .withLevel(geographicLevel).withCode("ZONE").buildAsNew();
 
-    geographicZoneRepository.save(geographicZone);
+    GeographicZone savedGeoZone = geographicZoneRepository.save(geographicZone);
 
     final ImportResponseDto.ImportDetails geographicZoneDtos =
         geographicZonesImportPersister.processAndPersist(
@@ -86,5 +86,6 @@ public class GeographicZoneImportPersisterIntegrationTest {
             mock(Profiler.class));
 
     assertEquals(Integer.valueOf(1), geographicZoneDtos.getSuccessfulEntriesCount());
+    assertEquals(Integer.valueOf(200), savedGeoZone.getCatchmentPopulation());
   }
 }

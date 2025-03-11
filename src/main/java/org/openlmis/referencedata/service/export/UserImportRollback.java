@@ -21,14 +21,14 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
+import org.openlmis.referencedata.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserImportCleaner {
+public class UserImportRollback {
 
   @Autowired
   private UserAuthService userAuthService;
@@ -37,7 +37,7 @@ public class UserImportCleaner {
   private UserDetailsService userDetailsService;
 
   @Autowired
-  private UserRepository userRepository;
+  private UserService userService;
 
   /**
    * Removes inconsistent data created during user import.
@@ -66,7 +66,7 @@ public class UserImportCleaner {
     if (!idsToRemove.isEmpty()) {
       userAuthService.deleteAuthUsersByUserUuids(idsToRemove);
       userDetailsService.deleteUserContactDetailsByUserUuids(idsToRemove);
-      userRepository.deleteUsersByIds(idsToRemove);
+      userService.deleteUsersByIds(idsToRemove);
     }
   }
 }

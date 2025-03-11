@@ -23,8 +23,15 @@ import java.util.stream.Collectors;
 import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserImportHelper {
+
+  @Value("${referencedata.user.import.default.password}")
+  private String defaultPassword;
+
   /**
    * Gets successfully created users based on API response.
    *
@@ -32,8 +39,8 @@ public class UserImportHelper {
    * @param response API response
    * @return filtered list of {@link UserDto} objects - only successfully created users
    */
-  public static List<UserDto> getSuccessfullyCreatedUsers(List<UserDto> batch,
-                                                          UserApiResponseDto response) {
+  public List<UserDto> getSuccessfullyCreatedUsers(List<UserDto> batch,
+                                                   UserApiResponseDto response) {
     Set<UUID> successfulIds = response.getSuccessfulResults()
         .stream()
         .map(UserApiResponseDto.UserResponse::getReferenceDataUserId)
@@ -63,7 +70,7 @@ public class UserImportHelper {
    * @param errors list of errors
    * @param batch list of users
    */
-  public static void addErrorsFromResponse(UserApiResponseDto response,
+  public void addErrorsFromResponse(UserApiResponseDto response,
                                            List<ImportResponseDto.ErrorDetails> errors,
                                            List<UserDto> batch) {
     for (UserApiResponseDto.FailedUserResponse failedEntry : response.getFailedResults()) {
@@ -73,5 +80,9 @@ public class UserImportHelper {
           .ifPresent(dto -> errors.add(
               new ImportResponseDto.UserErrorDetails(failedEntry.getErrors(), dto.getUsername())));
     }
+  }
+
+  public String getDefaultUserPassword() {
+    return defaultPassword;
   }
 }

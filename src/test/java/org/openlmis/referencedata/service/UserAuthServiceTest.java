@@ -38,6 +38,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.service.export.UserImportHelper;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -56,9 +57,13 @@ public class UserAuthServiceTest {
   @Mock
   private AuthService authService;
 
+  @Mock
+  private UserImportHelper userImportHelper;
+
   @Before
   public void setUp() {
     when(authService.obtainAccessToken()).thenReturn("token");
+    when(userImportHelper.getDefaultUserPassword()).thenReturn("password");
   }
 
   @Test

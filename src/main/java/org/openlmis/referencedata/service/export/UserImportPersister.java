@@ -60,7 +60,7 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
   private UserService userService;
 
   @Autowired
-  private UserImportCleaner userImportCleaner;
+  private UserImportRollback userImportRollback;
 
   @Override
   public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
@@ -98,7 +98,7 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
     List<UserDto> successfulAuthDetails =
         userAuthService.saveUserAuthDetailsFromFile(successfulContactDetails, errors);
 
-    userImportCleaner.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
 
     return successfulAuthDetails;
   }

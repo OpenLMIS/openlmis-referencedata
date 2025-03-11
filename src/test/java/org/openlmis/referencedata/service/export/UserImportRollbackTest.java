@@ -31,12 +31,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
+import org.openlmis.referencedata.service.UserService;
 
 @RunWith(MockitoJUnitRunner.class)
-public class UserImportCleanerTest {
+public class UserImportRollbackTest {
   @Mock
   private UserAuthService userAuthService;
 
@@ -44,10 +44,10 @@ public class UserImportCleanerTest {
   private UserDetailsService userDetailsService;
 
   @Mock
-  private UserRepository userRepository;
+  private UserService userService;
 
   @InjectMocks
-  private UserImportCleaner userImportCleaner;
+  private UserImportRollback userImportRollback;
 
   private UUID userId1;
   private UUID userId2;
@@ -71,13 +71,13 @@ public class UserImportCleanerTest {
     List<UserDto> persistedUsers = Arrays.asList(user1, user2);
     List<UserDto> successfulAuthDetails = Collections.singletonList(user1);
 
-    userImportCleaner.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
 
     Set<UUID> expectedIdsToRemove = Collections.singleton(userId2);
 
     verify(userAuthService).deleteAuthUsersByUserUuids(expectedIdsToRemove);
     verify(userDetailsService).deleteUserContactDetailsByUserUuids(expectedIdsToRemove);
-    verify(userRepository).deleteUsersByIds(expectedIdsToRemove);
+    verify(userService).deleteUsersByIds(expectedIdsToRemove);
   }
 
   @Test
@@ -85,11 +85,11 @@ public class UserImportCleanerTest {
     List<UserDto> persistedUsers = Arrays.asList(user1, user2);
     List<UserDto> successfulAuthDetails = Arrays.asList(user1, user2);
 
-    userImportCleaner.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());
-    verify(userRepository, never()).deleteUsersByIds(any());
+    verify(userService, never()).deleteUsersByIds(any());
   }
 
   @Test
@@ -97,10 +97,10 @@ public class UserImportCleanerTest {
     List<UserDto> persistedUsers = Collections.emptyList();
     List<UserDto> successfulAuthDetails = Collections.emptyList();
 
-    userImportCleaner.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());
-    verify(userRepository, never()).deleteUsersByIds(any());
+    verify(userService, never()).deleteUsersByIds(any());
   }
 }
