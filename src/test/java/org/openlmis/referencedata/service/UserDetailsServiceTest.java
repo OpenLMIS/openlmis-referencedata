@@ -19,11 +19,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -39,7 +37,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.CustomPageImpl;
-import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -138,13 +135,13 @@ public class UserDetailsServiceTest {
         ArgumentMatchers.<ParameterizedTypeReference<UserApiResponseDto>>any(),
         userDetailsCaptor.capture()
     )).thenReturn(ResponseEntity.ok(mockResponse));
-    doNothing().when(userImportHelper).addErrorsFromResponse(any(),anyList(), anyList());
-    when(userImportHelper.getSuccessfullyCreatedUsers(anyList(), any()))
+    when(userImportHelper.collectErrorsFromResponse(any(UserApiResponseDto.class), anyList()))
+        .thenReturn(Collections.emptyList());
+    when(userImportHelper.getSuccessfullyCreatedUsers(anyList(), any(UserApiResponseDto.class)))
         .thenReturn(Collections.emptyList());
 
-    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
     userDetailsService.saveUsersContactDetailsFromFile(Collections.singletonList(user),
-        Arrays.asList(importedDto1, importedDto2), errors);
+        Arrays.asList(importedDto1, importedDto2));
 
     verify(restTemplate).exchange(
         contains(EXTERNAL_API_URL),

@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.service.export;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -67,12 +68,11 @@ public class UserImportHelper {
    * Adds errors to error list captured when importing users.
    *
    * @param response API response
-   * @param errors list of errors
    * @param batch list of users
    */
-  public void addErrorsFromResponse(UserApiResponseDto response,
-                                           List<ImportResponseDto.ErrorDetails> errors,
-                                           List<UserDto> batch) {
+  public List<ImportResponseDto.ErrorDetails> collectErrorsFromResponse(
+      UserApiResponseDto response, List<UserDto> batch) {
+    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
     for (UserApiResponseDto.FailedUserResponse failedEntry : response.getFailedResults()) {
       batch.stream()
           .filter(user -> user.getId().equals(failedEntry.getReferenceDataUserId()))
@@ -80,6 +80,7 @@ public class UserImportHelper {
           .ifPresent(dto -> errors.add(
               new ImportResponseDto.UserErrorDetails(failedEntry.getErrors(), dto.getUsername())));
     }
+    return errors;
   }
 
   public String getDefaultUserPassword() {

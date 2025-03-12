@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -98,7 +97,7 @@ public class UserImportHelperTest {
   }
 
   @Test
-  public void shouldAddErrorsFromResponse() {
+  public void shouldCollectErrorsFromResponse() {
     UUID failedId = UUID.randomUUID();
     UserDto failedUser = new UserDto();
     failedUser.setId(failedId);
@@ -116,9 +115,8 @@ public class UserImportHelperTest {
         Collections.singletonList(failedResponse)
     );
 
-    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
-
-    userImportHelper.addErrorsFromResponse(response, errors, batch);
+    List<ImportResponseDto.ErrorDetails> errors =
+        userImportHelper.collectErrorsFromResponse(response, batch);
 
     assertEquals(1, errors.size());
     assertEquals(errorMessages, errors.get(0).getErrors());

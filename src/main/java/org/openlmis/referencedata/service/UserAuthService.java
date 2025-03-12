@@ -16,10 +16,13 @@
 package org.openlmis.referencedata.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.export.UserImportHelper;
@@ -90,26 +93,26 @@ public class UserAuthService {
    * Prepares data from file and calls saving auth user details.
    *
    * @param batch batch with users to be saved
-   * @param errors list that stores errors returned from external API call
-   * @return list of users for whom auth details were saved successfully
+   * @return {@link SaveBatchResultDto} object with import batch results
    */
-  public List<UserDto> saveUserAuthDetailsFromFile(List<UserDto> batch,
-                                             List<ImportResponseDto.ErrorDetails> errors) {
+  public SaveBatchResultDto<UserDto> saveUserAuthDetailsFromFile(List<UserDto> batch) {
     List<UserDto.UserAuthDetailsApiContract> requestBodyList = new ArrayList<>();
     batch.forEach(userDto -> requestBodyList.add(userDto.toUserAuthDetailsApiContract(
         userImportHelper.getDefaultUserPassword())));
 
+    List<ImportResponseDto.ErrorDetails> errorList = new ArrayList<>();
     UserApiResponseDto response;
     try {
       response = saveUsersAuthDetails(requestBodyList);
     } catch (HttpStatusCodeException ex) {
-      errors.add(UserImportHelper.createError(
+      errorList.add(UserImportHelper.createError(
           "Something went wrong during communication with auth service ", ex));
-      return new ArrayList<>();
+      return new SaveBatchResultDto<>(Collections.emptyList(), errorList);
     }
 
-    userImportHelper.addErrorsFromResponse(response, errors, batch);
+    List<UserDto> successfulEntries = userImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    errorList = userImportHelper.collectErrorsFromResponse(response, batch);
 
-    return userImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    return new SaveBatchResultDto<>(successfulEntries, errorList);
   }
 }

@@ -18,10 +18,15 @@ package org.openlmis.referencedata.service.export;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.service.UserAuthService;
@@ -37,7 +42,6 @@ import org.springframework.stereotype.Service;
 
 @Service(UserImportPersister.USER_FILE_NAME)
 public class UserImportPersister implements DataImportPersister<User, UserDto, UserDto> {
-
   public static final String USER_FILE_NAME = "user.csv";
 
   @Autowired
@@ -70,12 +74,20 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
     List<UserDto> importedData = fileHelper.readCsv(UserDto.class, dataStream);
     UserImportValidator.validateFileEntries(importedData);
 
+    Map<String, Facility> facilityMap = facilityRepository.findAllByCodeIn(
+        importedData.stream()
+            .map(UserDto::getHomeFacilityCode)
+            .filter(Objects::nonNull)
+            .distinct()
+            .collect(Collectors.toList()))
+        .stream()
+        .collect(Collectors.toMap(Facility::getCode, Function.identity(),
+            (existing, replacement) -> existing));
     List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
-    List<Facility> allFacilities = facilityRepository.findAll();
     List<UserDto> successResults = new EasyBatchUtils(importExecutorService)
         .processInBatches(
             importedData,
-            batch -> saveCompleteUsers(batch, importedData, allFacilities, errors)
+            batch -> saveCompleteUsers(batch, importedData, errors, facilityMap)
         );
 
     profiler.start("RETURN");
@@ -90,16 +102,20 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
   }
 
   private List<UserDto> saveCompleteUsers(List<UserDto> batch, List<UserDto> importedDtos,
-                                          List<Facility> allFacilities,
-                                          List<ImportResponseDto.ErrorDetails> errors) {
-    List<UserDto> persistedUsers = userService.saveUsersFromFile(batch, allFacilities);
-    List<UserDto> successfulContactDetails =
-        userDetailsService.saveUsersContactDetailsFromFile(persistedUsers, importedDtos, errors);
-    List<UserDto> successfulAuthDetails =
-        userAuthService.saveUserAuthDetailsFromFile(successfulContactDetails, errors);
+                                          List<ImportResponseDto.ErrorDetails> errors,
+                                          Map<String, Facility> facilityMap) {
+    List<UserDto> persistedUsers = userService.saveUsersFromFile(batch, facilityMap);
+    SaveBatchResultDto<UserDto> contactDetailsBatchResult =
+        userDetailsService.saveUsersContactDetailsFromFile(persistedUsers, importedDtos);
+    errors.addAll(contactDetailsBatchResult.getErrors());
+    SaveBatchResultDto<UserDto> authDetailsBatchResult =
+        userAuthService.saveUserAuthDetailsFromFile(
+            contactDetailsBatchResult.getSuccessfulEntries());
+    errors.addAll(authDetailsBatchResult.getErrors());
 
-    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(
+        persistedUsers, authDetailsBatchResult.getSuccessfulEntries());
 
-    return successfulAuthDetails;
+    return authDetailsBatchResult.getSuccessfulEntries();
   }
 }

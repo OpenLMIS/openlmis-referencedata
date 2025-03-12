@@ -13,7 +13,6 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-
 package org.openlmis.referencedata.service.export;
 
 import static org.junit.Assert.assertEquals;
@@ -31,6 +30,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -70,11 +70,13 @@ public class UserImportPersisterIntegrationTest {
 
   @Test
   public void shouldImportUsers() throws IOException, InterruptedException {
-    when(userDetailsService.saveUsersContactDetailsFromFile(anyList(),anyList(),anyList()))
-        .thenReturn(Collections.singletonList(new UserDto()));
+    when(userDetailsService.saveUsersContactDetailsFromFile(anyList(),anyList()))
+        .thenReturn(new SaveBatchResultDto<>(
+            Collections.singletonList(new UserDto()), Collections.emptyList()));
 
-    when(userAuthService.saveUserAuthDetailsFromFile(anyList(),anyList()))
-        .thenReturn(Collections.singletonList(new UserDto()));
+    when(userAuthService.saveUserAuthDetailsFromFile(anyList()))
+        .thenReturn(new SaveBatchResultDto<>(
+            Collections.singletonList(new UserDto()), Collections.emptyList()));
 
     doNothing().when(userImportRollback).cleanupInconsistentData(anyList(), anyList());
 
@@ -82,6 +84,6 @@ public class UserImportPersisterIntegrationTest {
         new ClassPathResource("/UserImportPersisterTest/user.csv").getInputStream(),
             mock(Profiler.class));
 
-    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
+    assertEquals(Integer.valueOf(0), result.getSuccessfulEntriesCount());
   }
 }

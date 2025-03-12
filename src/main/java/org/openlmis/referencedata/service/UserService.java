@@ -24,12 +24,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
@@ -58,6 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 @Service
@@ -185,6 +184,7 @@ public class UserService implements ExportableDataService<UserDto> {
    *
    * @param userIds identifiers of users who will be deleted
    */
+  @Transactional
   public void deleteUsersByIds(Set<UUID> userIds) {
     userRepository.deleteUsersByIds(userIds);
   }
@@ -211,39 +211,41 @@ public class UserService implements ExportableDataService<UserDto> {
    * Persists users in database.
    *
    * @param usersBatch batch with users data
-   * @param allFacilities all facilities available in system (needed to set home facility for users)
+   * @param facilityMap map of facilities from imported file
    * @return list of {@link UserDto} persisted users
    */
-  public List<UserDto> saveUsersFromFile(List<UserDto> usersBatch, List<Facility> allFacilities) {
-    List<User> toPersistBatch = createListToPersist(usersBatch, allFacilities);
+  public List<UserDto> saveUsersFromFile(List<UserDto> usersBatch,
+                                         Map<String, Facility> facilityMap) {
+    List<User> toPersistBatch = createListToPersist(usersBatch, facilityMap);
     List<User> persistedObjects = new ArrayList<>(userRepository.saveAll(toPersistBatch));
 
     return UserDto.newInstances(persistedObjects);
   }
 
-  private List<User> createListToPersist(List<UserDto> dtoList, List<Facility> allFacilities) {
+  private List<User> createListToPersist(List<UserDto> dtoList, Map<String, Facility> facilityMap) {
     List<User> persisList = new LinkedList<>();
     for (UserDto userDto : dtoList) {
-      persisList.add(createOrUpdateUser(userDto, allFacilities));
+      persisList.add(createOrUpdateUser(userDto, facilityMap));
     }
 
     return persisList;
   }
 
-  private User createOrUpdateUser(UserDto userDto, List<Facility> allFacilities) {
+  private User createOrUpdateUser(UserDto userDto, Map<String, Facility> facilityMap) {
     User user = userRepository.findOneByUsernameIgnoreCase(userDto.getUsername());
-    Optional<Facility> facility = allFacilities.stream()
-        .filter(f -> StringUtils.equalsIgnoreCase(f.getCode(), userDto.getHomeFacilityCode()))
-        .findFirst();
+
     if (user == null) {
       user = new User();
     } else {
       userDto.setId(user.getId());
     }
-    user.updateFrom(userDto);
-    if (facility.isPresent()) {
-      user.setHomeFacilityId(facility.get().getId());
+
+    Facility facility = facilityMap.get(userDto.getHomeFacilityCode());
+    if (facility != null) {
+      userDto.setHomeFacilityId(facility.getId());
     }
+
+    user.updateFrom(userDto);
 
     return user;
   }
@@ -295,11 +297,12 @@ public class UserService implements ExportableDataService<UserDto> {
                 Function.identity()
             ));
 
-    List<Facility> userFacilities = facilityRepository.findAllByIdIn(
+    Map<UUID, Facility> facilityMap = facilityRepository.findAllByIdIn(
         users.stream()
             .map(UserDto::getHomeFacilityId)
             .filter(Objects::nonNull)
-            .collect(toList()));
+            .collect(toList()))
+        .stream().collect(Collectors.toMap(Facility::getId, Function.identity()));
 
     for (UserDto userDto : users) {
       UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
@@ -309,17 +312,14 @@ public class UserService implements ExportableDataService<UserDto> {
         userDto.setEmail(contactDetails.getEmailDetails().getEmail());
         userDto.setEmailVerified(contactDetails.getEmailDetails().getEmailVerified());
         userDto.setAllowNotify(contactDetails.getAllowNotify());
-        setHomeFacilityCode(userDto, userFacilities);
+        setHomeFacilityCode(userDto, facilityMap);
       }
     }
   }
 
-  private void setHomeFacilityCode(UserDto userDto, List<Facility> userFacilities) {
+  private void setHomeFacilityCode(UserDto userDto, Map<UUID, Facility> facilityMap) {
     if (userDto.getHomeFacilityId() != null) {
-      Optional<Facility> facility = userFacilities.stream()
-          .filter(f -> f.getId().equals(userDto.getHomeFacilityId()))
-          .findFirst();
-      facility.ifPresent(value -> userDto.setHomeFacilityCode(value.getCode()));
+      userDto.setHomeFacilityCode(facilityMap.get(userDto.getHomeFacilityId()).getCode());
     }
   }
 }

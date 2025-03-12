@@ -16,12 +16,14 @@
 package org.openlmis.referencedata.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.CustomPageImpl;
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -116,11 +118,10 @@ public class UserDetailsService {
    *
    * @param batch batch with users to be saved
    * @param importedDtos list with imported data from file
-   * @param errors list that stores errors returned from external API call
-   * @return list of users for whom auth details were saved successfully
+   * @return {@link SaveBatchResultDto} object with import batch results
    */
-  public List<UserDto> saveUsersContactDetailsFromFile(List<UserDto> batch,
-      List<UserDto> importedDtos, List<ImportResponseDto.ErrorDetails> errors) {
+  public SaveBatchResultDto<UserDto> saveUsersContactDetailsFromFile(List<UserDto> batch,
+                                                                     List<UserDto> importedDtos) {
     List<UserContactDetailsDto.UserContactDetailsApiContract> requestBodyList = new ArrayList<>();
     for (UserDto userDto : batch) {
       Optional<UserDto> userWithDataFromFile = importedDtos.stream()
@@ -134,17 +135,19 @@ public class UserDetailsService {
       }
     }
 
+    List<ImportResponseDto.ErrorDetails> errorList = new ArrayList<>();
     UserApiResponseDto response;
     try {
       response = saveUsersContactDetails(requestBodyList);
     } catch (HttpStatusCodeException ex) {
-      errors.add(UserImportHelper.createError(
+      errorList.add(UserImportHelper.createError(
           "Something went wrong during communication with notification service ", ex));
-      return new ArrayList<>();
+      return new SaveBatchResultDto<>(Collections.emptyList(), errorList);
     }
 
-    userImportHelper.addErrorsFromResponse(response, errors, batch);
+    List<UserDto> successfulEntries = userImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    errorList = userImportHelper.collectErrorsFromResponse(response, batch);
 
-    return userImportHelper.getSuccessfullyCreatedUsers(batch, response);
+    return new SaveBatchResultDto<>(successfulEntries, errorList);
   }
 }

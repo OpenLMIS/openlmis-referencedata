@@ -21,11 +21,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -35,7 +33,6 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.export.UserImportHelper;
@@ -94,9 +91,8 @@ public class UserAuthServiceTest {
     UserDto user = new UserDto();
     user.setId(UUID.randomUUID());
     user.setUsername("john");
-    List<ImportResponseDto.ErrorDetails> errors = new ArrayList<>();
 
-    userAuthService.saveUserAuthDetailsFromFile(Collections.singletonList(user), errors);
+    userAuthService.saveUserAuthDetailsFromFile(Collections.singletonList(user));
 
     verify(restTemplate).exchange(
         contains(EXTERNAL_API_URL),
