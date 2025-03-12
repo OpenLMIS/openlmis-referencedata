@@ -53,8 +53,8 @@ import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.BaseDto;
 import org.openlmis.referencedata.dto.DispensableDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
@@ -272,11 +272,13 @@ public class DataImportServiceIntegrationTest {
         ORDERABLE_CORRECT_HEADERS, ORDERABLES_FILE);
 
     // when
-    List<BaseDto> result = dataImportService.importData(multipartFile, profiler);
+    List<ImportResponseDto.ImportDetails> result =
+        dataImportService.importData(multipartFile, profiler);
 
     // then check if result is present
     assertNotNull(result);
-    assertEquals(ORDERABLE_CORRECT_RECORDS.size(), result.size());
+    assertEquals((Integer) ORDERABLE_CORRECT_RECORDS.size(),
+        result.get(0).getSuccessfulEntriesCount());
 
     // then fetch imported objects
     Orderable importedOrderable1 = orderableRepository
@@ -314,11 +316,13 @@ public class DataImportServiceIntegrationTest {
         PROGRAM_ORDERABLE_CORRECT_HEADERS, PROGRAM_ORDERABLES_FILE);
 
     // when
-    List<BaseDto> result = dataImportService.importData(multipartFile, profiler);
+    List<ImportResponseDto.ImportDetails> result =
+        dataImportService.importData(multipartFile, profiler);
 
     // then check if result is present
     assertNotNull(result);
-    assertEquals(PROGRAM_ORDERABLE_CORRECT_RECORDS.size(), result.size());
+    assertEquals((Integer) PROGRAM_ORDERABLE_CORRECT_RECORDS.size(),
+        result.get(0).getSuccessfulEntriesCount());
 
     // then fetch imported objects
     ProgramOrderable importedProgramOrderable1 = programOrderableRepository
@@ -362,11 +366,13 @@ public class DataImportServiceIntegrationTest {
         TRADE_ITEM_CORRECT_HEADERS, TRADE_ITEM_FILE);
 
     // when
-    List<BaseDto> result = dataImportService.importData(multipartFile, profiler);
+    List<ImportResponseDto.ImportDetails> result =
+        dataImportService.importData(multipartFile, profiler);
 
     // then check if result is present
     assertNotNull(result);
-    assertEquals(ORDERABLE_CORRECT_RECORDS.size(), result.size());
+    assertEquals((Integer) ORDERABLE_CORRECT_RECORDS.size(),
+        result.get(0).getSuccessfulEntriesCount());
 
     // then fetch imported objects
     final Orderable importedOrderable1 = orderableRepository

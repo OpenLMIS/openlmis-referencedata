@@ -15,7 +15,10 @@
 
 package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Sets;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +29,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.web.csv.model.ImportField;
 
 @Getter
 @Setter
@@ -33,14 +37,70 @@ import org.openlmis.referencedata.domain.User;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public final class UserDto extends BaseDto implements User.Exporter, User.Importer {
+public final class UserDto extends UserContactDetailsDto implements User.Exporter, User.Importer {
+  @ImportField(name = "username")
   private String username;
+
+  @ImportField(name = "firstName")
   private String firstName;
+
+  @ImportField(name = "lastName")
   private String lastName;
+
+  @ImportField(name = "jobTitle")
   private String jobTitle;
+
+  @ImportField(name = "timezone")
   private String timezone;
+
   private UUID homeFacilityId;
+
+  @ImportField(name = "homeFacilityCode")
+  private String homeFacilityCode;
+
+  @ImportField(name = "isActive")
   private boolean active;
+
   private Map<String, Object> extraData;
+
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
+
+  public UserAuthDetailsApiContract toUserAuthDetailsApiContract(String defaultPassword) {
+    return new UserAuthDetailsApiContract(this.getId(), this.getUsername(),
+        defaultPassword, this.isActive());
+  }
+
+  /**
+   * Creates a new instance of UserDTO based on passed {@link User}.
+   *
+   * @param user user object from which UserDTO is created
+   * @return UserDTO object
+   */
+  public static UserDto newInstance(User user) {
+    UserDto dto = new UserDto();
+    user.export(dto);
+    return dto;
+  }
+
+  /**
+   * Creates a new list of UserDto based on given list of {@link User}.
+   *
+   * @param users list of users
+   * @return new list of UserDto
+   */
+  public static List<UserDto> newInstances(Iterable<User> users) {
+    List<UserDto> userDtos = new LinkedList<>();
+    users.forEach(u -> userDtos.add(newInstance(u)));
+    return userDtos;
+  }
+
+  @AllArgsConstructor
+  @Getter
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public static class UserAuthDetailsApiContract {
+    private UUID id;
+    private String username;
+    private String password;
+    private Boolean enabled;
+  }
 }

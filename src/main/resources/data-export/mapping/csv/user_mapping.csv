@@ -1,0 +1,10 @@
+from,to,type,entityName,defaultValue
+username,username,DIRECT,,
+firstName,firstName,DIRECT,,
+lastName,lastName,DIRECT,,
+email,email,DIRECT,,
+phoneNumber,phoneNumber,DIRECT,,
+jobTitle,jobTitle,DIRECT,,
+homeFacilityCode,homeFacilityId,TO_ID_BY_CODE,Facility
+timezone,timezone,DIRECT,,
+isActive,active,DIRECT,,

@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.SupportedProgram;
 import org.openlmis.referencedata.domain.SupportedProgramPrimaryKey;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.SupportedProgramCsvModel;
 import org.openlmis.referencedata.dto.SupportedProgramDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -49,10 +51,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("supportedProgram.csv")
+@Service(SupportedProgramImportPersister.SUPPORTED_PROGRAM_FILE_NAME)
 public class SupportedProgramImportPersister
     implements DataImportPersister<
         SupportedProgram, SupportedProgramCsvModel, SupportedProgramDto> {
+
+  public static final String SUPPORTED_PROGRAM_FILE_NAME = "supportedProgram.csv";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private SupportedProgramRepository supportedProgramRepository;
@@ -65,7 +69,8 @@ public class SupportedProgramImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<SupportedProgramDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ_CSV");
     List<SupportedProgramCsvModel> importedDtos =
@@ -79,7 +84,13 @@ public class SupportedProgramImportPersister
                 batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        SUPPORTED_PROGRAM_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>()
+    );
   }
 
   private List<SupportedProgramDto> importBatch(List<SupportedProgramCsvModel> importedDtosBatch) {

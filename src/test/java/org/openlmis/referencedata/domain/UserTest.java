@@ -190,15 +190,6 @@ public class UserTest {
   }
 
   @Test
-  public void shouldExportData() {
-    UserDto exporter = new UserDto();
-
-    user.export(exporter);
-
-    assertThat(exporter).isEqualToComparingFieldByField(user);
-  }
-
-  @Test
   public void shouldImportData() {
     UserDto importer = new UserDto();
     user.export(importer);

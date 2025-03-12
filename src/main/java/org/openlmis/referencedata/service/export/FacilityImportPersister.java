@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import org.openlmis.referencedata.dto.FacilityDto;
 import org.openlmis.referencedata.dto.FacilityOperatorDto;
 import org.openlmis.referencedata.dto.FacilityTypeDto;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.MinimalFacilityDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
@@ -52,9 +54,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("facility.csv")
+@Service(FacilityImportPersister.FACILITY_FILE_NAME)
 public class FacilityImportPersister
     implements DataImportPersister<Facility, FacilityDto, FacilityDto> {
+
+  public static final String FACILITY_FILE_NAME = "facility.csv";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private FacilityRepository facilityRepository;
@@ -68,7 +72,8 @@ public class FacilityImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<FacilityDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ_CSV");
     List<FacilityDto> importedDtos = fileHelper.readCsv(FacilityDto.class, dataStream);
@@ -81,7 +86,12 @@ public class FacilityImportPersister
                 batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        FACILITY_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>());
   }
 
   private List<FacilityDto> importBatch(List<FacilityDto> importedDtosBatch) {

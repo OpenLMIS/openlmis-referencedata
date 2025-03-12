@@ -13,22 +13,15 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.service.export;
+package org.openlmis.referencedata.dto;
 
-import java.io.InputStream;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-import org.openlmis.referencedata.dto.ImportResponseDto;
-import org.slf4j.profiler.Profiler;
-
-/**
- * This interface handles importing data from files to database.
- *
- * @param <E> The entity type being imported.
- * @param <D> The DTO type containing parsed data.
- * @param <U> The DTO type for data retrieved from files.
- */
-public interface DataImportPersister<E, D, U> {
-
-  ImportResponseDto.ImportDetails processAndPersist(
-      InputStream dataStream, Profiler profiler) throws InterruptedException;
+@AllArgsConstructor
+@Getter
+public class SaveBatchResultDto<T> {
+  private List<T> successfulEntries;
+  private List<? extends ImportResponseDto.ErrorDetails> errors;
 }

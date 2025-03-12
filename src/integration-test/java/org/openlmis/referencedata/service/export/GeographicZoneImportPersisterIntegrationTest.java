@@ -22,7 +22,6 @@ import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,7 @@ import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
-import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
@@ -78,15 +77,15 @@ public class GeographicZoneImportPersisterIntegrationTest {
     GeographicZone geographicZone = new GeographicZoneDataBuilder()
         .withLevel(geographicLevel).withCode("ZONE").buildAsNew();
 
-    geographicZoneRepository.save(geographicZone);
+    GeographicZone savedGeoZone = geographicZoneRepository.save(geographicZone);
 
-    final List<GeographicZoneDto> geographicZoneDtos =
+    final ImportResponseDto.ImportDetails geographicZoneDtos =
         geographicZonesImportPersister.processAndPersist(
             new ClassPathResource("/GeographicZoneImportPersisterTest/geographicZone.csv")
                 .getInputStream(),
             mock(Profiler.class));
 
-    assertEquals(1, geographicZoneDtos.size());
-    assertEquals(Integer.valueOf(200), geographicZoneDtos.get(0).getCatchmentPopulation());
+    assertEquals(Integer.valueOf(1), geographicZoneDtos.getSuccessfulEntriesCount());
+    assertEquals(Integer.valueOf(200), savedGeoZone.getCatchmentPopulation());
   }
 }

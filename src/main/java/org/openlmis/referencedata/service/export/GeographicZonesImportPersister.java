@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.GeographicLevelRepository;
@@ -40,9 +41,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Service("geographicZone.csv")
+@Service(GeographicZonesImportPersister.GEOGRAPHIC_ZONE_FILE_NAME)
 public class GeographicZonesImportPersister
     implements DataImportPersister<GeographicZone, GeographicZoneDto, GeographicZoneDto> {
+
+  public static final String GEOGRAPHIC_ZONE_FILE_NAME = "geographicZone.csv";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private GeographicZoneRepository geographicZoneRepository;
@@ -57,7 +60,8 @@ public class GeographicZonesImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<GeographicZoneDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ CSV");
     List<GeographicZoneDto> importedDtos = fileHelper.readCsv(GeographicZoneDto.class, dataStream)
@@ -73,7 +77,13 @@ public class GeographicZonesImportPersister
                 importBatch(batch, lowestLevelNumber)));
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        GEOGRAPHIC_ZONE_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>()
+    );
   }
 
   private int findLowestHierarchyLevelNumber() {

@@ -37,6 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.dto.FacilityDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.FacilityTypeRepository;
@@ -100,11 +101,11 @@ public class FacilityImportPersisterTest {
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.empty());
 
     // When
-    List<FacilityDto> result =
+    ImportResponseDto.ImportDetails result =
         facilityImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(FacilityDto.class, dataStream);
     verify(facilityRepository).saveAll(singletonList(facility));
   }
@@ -115,11 +116,11 @@ public class FacilityImportPersisterTest {
     when(facilityRepository.findByCode(facility.getCode())).thenReturn(Optional.of(facility));
 
     // When
-    List<FacilityDto> result =
+    ImportResponseDto.ImportDetails result =
         facilityImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(FacilityDto.class, dataStream);
     verify(facilityRepository).saveAll(singletonList(facility));
   }

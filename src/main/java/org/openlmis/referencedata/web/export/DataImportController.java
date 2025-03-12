@@ -19,7 +19,7 @@ import static org.openlmis.referencedata.web.export.DataImportController.RESOURC
 
 import java.util.List;
 import org.openlmis.referencedata.domain.RightName;
-import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.service.export.DataImportService;
 import org.openlmis.referencedata.web.BaseController;
 import org.slf4j.ext.XLogger;
@@ -50,7 +50,7 @@ public class DataImportController extends BaseController {
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<List<BaseDto>> importData(@RequestPart("file") MultipartFile file)
+  public ResponseEntity<ImportResponseDto> importData(@RequestPart("file") MultipartFile file)
       throws InterruptedException {
     final Profiler profiler = new Profiler("DATA_IMPORT");
     profiler.setLogger(XLOGGER);
@@ -58,10 +58,10 @@ public class DataImportController extends BaseController {
     profiler.start("CHECK_ADMIN_RIGHT");
     rightService.checkAdminRight(RightName.DATA_IMPORT);
 
-    final List<BaseDto> importedData =
+    final List<ImportResponseDto.ImportDetails> importedDataSummary =
         dataImportService.importData(file, profiler.startNested("IMPORT_DATA"));
 
     profiler.stop().log();
-    return ResponseEntity.ok().body(importedData);
+    return ResponseEntity.ok().body(new ImportResponseDto(importedDataSummary));
   }
 }

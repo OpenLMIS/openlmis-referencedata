@@ -35,6 +35,7 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.ProgramOrderable;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.ProgramOrderableCsvModel;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
@@ -50,10 +51,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-@Service("programOrderable.csv")
+@Service(ProgramOrderableImportPersister.PROGRAM_ORDERABLE_FILE_NAME)
 public class ProgramOrderableImportPersister
     implements DataImportPersister<
         ProgramOrderable, ProgramOrderableCsvModel, ProgramOrderableDto> {
+
+  public static final String PROGRAM_ORDERABLE_FILE_NAME = "programOrderable.csv";
 
   @Value("${currencyCode}")
   private String currencyCode;
@@ -70,7 +73,8 @@ public class ProgramOrderableImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<ProgramOrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ_CSV");
     List<ProgramOrderableCsvModel> importedDtos =
@@ -84,7 +88,13 @@ public class ProgramOrderableImportPersister
                 batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        PROGRAM_ORDERABLE_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>()
+    );
   }
 
   private List<ProgramOrderableDto> importBatch(List<ProgramOrderableCsvModel> importedDtosBatch) {

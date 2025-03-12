@@ -25,7 +25,6 @@ import com.google.common.util.concurrent.MoreExecutors;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +38,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
-import org.openlmis.referencedata.dto.OrderableDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.TradeItemRepository;
@@ -95,11 +94,11 @@ public class TradeItemImportPersisterTest {
     setupMocksForSuccess();
 
     // When
-    List<OrderableDto> result =
+    ImportResponseDto.ImportDetails result =
         tradeItemImportPersister.processAndPersist(dataStream, mock(Profiler.class));
 
     // Then
-    assertEquals(1, result.size());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
     verify(fileHelper).readCsv(TradeItemCsvModel.class, dataStream);
     verify(tradeItemRepository).saveAll(any());
     verify(orderableRepository).saveAll(any());

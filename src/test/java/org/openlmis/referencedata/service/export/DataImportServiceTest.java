@@ -24,7 +24,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +35,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openlmis.referencedata.dto.BaseDto;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.util.FileHelper;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.BeanFactory;
@@ -72,10 +71,11 @@ public class DataImportServiceTest {
     when(beanFactory.getBean(anyString(), eq(DataImportPersister.class)))
         .thenReturn(dataImportPersister);
     when(dataImportPersister.processAndPersist(any(InputStream.class), any(Profiler.class)))
-        .thenReturn((List) Collections.singletonList(mock(BaseDto.class)));
+        .thenReturn(mock(ImportResponseDto.ImportDetails.class));
 
     // When
-    List<BaseDto> result = dataImportService.importData(mock(MultipartFile.class), profiler);
+    List<ImportResponseDto.ImportDetails> result =
+        dataImportService.importData(mock(MultipartFile.class), profiler);
 
     // Then
     assertNotNull(result);

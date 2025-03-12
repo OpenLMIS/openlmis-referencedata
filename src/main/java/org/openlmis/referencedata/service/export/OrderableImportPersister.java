@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.util.EasyBatchUtils;
@@ -38,9 +40,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-@Service("orderable.csv")
+@Service(OrderableImportPersister.ORDERABLE_FILE_NAME)
 public class OrderableImportPersister
     implements DataImportPersister<Orderable, OrderableDto, OrderableDto> {
+
+  public static final String ORDERABLE_FILE_NAME = "orderable.csv";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private OrderableRepository orderableRepository;
@@ -51,7 +55,8 @@ public class OrderableImportPersister
   private ExecutorService importExecutorService;
 
   @Override
-  public List<OrderableDto> processAndPersist(InputStream dataStream, Profiler profiler)
+  public ImportResponseDto.ImportDetails processAndPersist(InputStream dataStream,
+                                                           Profiler profiler)
       throws InterruptedException {
     profiler.start("READ_CSV");
     List<OrderableDto> importedDtos = fileHelper.readCsv(OrderableDto.class, dataStream);
@@ -64,7 +69,13 @@ public class OrderableImportPersister
                 batch -> transactionUtils.runInOwnTransaction(() -> importBatch(batch)));
 
     profiler.start("RETURN");
-    return result;
+    return new ImportResponseDto.ImportDetails(
+        ORDERABLE_FILE_NAME,
+        importedDtos.size(),
+        result.size(),
+        0,
+        new ArrayList<>()
+    );
   }
 
   private List<OrderableDto> importBatch(List<OrderableDto> importedDtosBatch) {
