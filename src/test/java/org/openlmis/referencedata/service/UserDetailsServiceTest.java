@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.contains;
@@ -37,6 +38,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openlmis.referencedata.domain.CustomPageImpl;
+import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserApiResponseDto;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
@@ -138,11 +140,13 @@ public class UserDetailsServiceTest {
     when(userImportHelper.collectErrorsFromResponse(any(UserApiResponseDto.class), anyList()))
         .thenReturn(Collections.emptyList());
     when(userImportHelper.getSuccessfullyCreatedUsers(anyList(), any(UserApiResponseDto.class)))
-        .thenReturn(Collections.emptyList());
+        .thenReturn(Collections.singletonList(user));
 
-    userDetailsService.saveUsersContactDetailsFromFile(Collections.singletonList(user),
-        Arrays.asList(importedDto1, importedDto2));
+    SaveBatchResultDto<UserDto> result = userDetailsService.saveUsersContactDetailsFromFile(
+        Collections.singletonList(user), Arrays.asList(importedDto1, importedDto2));
 
+    assertEquals(1, result.getSuccessfulEntries().size());
+    assertEquals(0, result.getErrors().size());
     verify(restTemplate).exchange(
         contains(EXTERNAL_API_URL),
         eq(HttpMethod.PUT),

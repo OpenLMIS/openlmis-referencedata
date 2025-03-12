@@ -18,14 +18,10 @@ package org.openlmis.referencedata.dto;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-@ToString
-@EqualsAndHashCode
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -35,8 +31,6 @@ public class UserApiResponseDto {
 
   private List<FailedUserResponse> failedResults;
 
-  @ToString
-  @EqualsAndHashCode
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter
@@ -45,7 +39,6 @@ public class UserApiResponseDto {
     private UUID referenceDataUserId;
   }
 
-  @ToString
   @NoArgsConstructor
   @AllArgsConstructor
   @Getter

@@ -84,6 +84,6 @@ public class UserImportPersisterIntegrationTest {
         new ClassPathResource("/UserImportPersisterTest/user.csv").getInputStream(),
             mock(Profiler.class));
 
-    assertEquals(Integer.valueOf(0), result.getSuccessfulEntriesCount());
+    assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
   }
 }
