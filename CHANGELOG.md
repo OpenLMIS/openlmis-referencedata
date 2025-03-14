@@ -1,18 +1,19 @@
 15.3.0 / wip
 ==================
+
 Improvements:
-* [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET /facilities/{id}/approvedProducts supports multiple program id
- query parameters
-* [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET /programs has new program code repeatable query parameter
-* [OLMIS-8099](https://openlmis.atlassian.net/browse/OLMIS-8099): Delete unsed report rights, create new superset report rights
-* [OE-87](https://openlmis.atlassian.net/browse/OE-87): GET /orderables and /lots have new repeatebale `exectCode` query
- parameter to filter by exact codes (opposed to `code` doing contains condition)
+* [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET `/facilities/{id}/approvedProducts` now supports multiple `programId` query parameters.
+* [OE-86](https://openlmis.atlassian.net/browse/OE-86): GET `/programs` now includes a repeatable `code` query parameter.
+* [OE-87](https://openlmis.atlassian.net/browse/OE-87): GET `/orderables` and GET `/lots` now support a repeatable `exectCode` query parameter to filter by exact codes (opposed to `code` parameter, which filters using a contains condition).
+* [OLMIS-8061](https://openlmis.atlassian.net/browse/OLMIS-8061): Automated the unassignment of rights from roles when a right is deleted.
+* [OLMIS-8099](https://openlmis.atlassian.net/browse/OLMIS-8099): Deleted unused report rights and introduced new Superset report rights.
 
-Bux fixes:
-* [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fix NPE on adding programs to products
+Bux Fixes
+* [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fixed a Null Pointer Exception (NPE) when adding programs to products.
 
-New functionality:
-* [OLMIS-8072](https://openlmis.atlassian.net/browse/OLMIS-8072): Add functionality to export geographic zone codes with their catchment population.
+New Functionality:
+* [OLMIS-8072](https://openlmis.atlassian.net/browse/OLMIS-8072): Added the ability to export geographic zone codes along with their catchment population.
+* [OLMIS-8065](https://openlmis.atlassian.net/browse/OLMIS-8065): Extended import/export functionalities to include user import/export.
 
 15.2.9 / 2025-01-14
 ==================
