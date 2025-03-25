@@ -34,6 +34,7 @@ import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.dto.UserPersistResult;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -91,6 +92,8 @@ public class UserService implements ExportableDataService<UserDto> {
   @Autowired
   private UserDetailsService userDetailsService;
 
+  @Autowired
+  private UserAuthService userAuthService;
 
   private ObjectMapper mapper = new ObjectMapper();
 
@@ -197,7 +200,10 @@ public class UserService implements ExportableDataService<UserDto> {
     List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails =
         userDetailsService.getUserContactDetails().getContent();
 
-    mergeUsersWithContactDetails(users, usersContactDetails);
+    List<UserDto.UserAuthDetailsApiContract> usersAuthDetails =
+        userAuthService.getAuthUserDetails();
+
+    mergeUsersWithContactAndAuthDetails(users, usersContactDetails, usersAuthDetails);
 
     return users;
   }
@@ -214,12 +220,13 @@ public class UserService implements ExportableDataService<UserDto> {
    * @param facilityMap map of facilities from imported file
    * @return list of {@link UserDto} persisted users
    */
-  public List<UserDto> saveUsersFromFile(List<UserDto> usersBatch,
-                                         Map<String, Facility> facilityMap) {
+  public UserPersistResult saveUsersFromFile(List<UserDto> usersBatch,
+                                             Map<String, Facility> facilityMap) {
     List<User> toPersistBatch = createListToPersist(usersBatch, facilityMap);
+    Map<String, Boolean> newUserStatusMap = getNewUserStatusMap(toPersistBatch);
     List<User> persistedObjects = new ArrayList<>(userRepository.saveAll(toPersistBatch));
 
-    return UserDto.newInstances(persistedObjects);
+    return new UserPersistResult(UserDto.newInstances(persistedObjects), newUserStatusMap);
   }
 
   private List<User> createListToPersist(List<UserDto> dtoList, Map<String, Facility> facilityMap) {
@@ -248,6 +255,14 @@ public class UserService implements ExportableDataService<UserDto> {
     user.updateFrom(userDto);
 
     return user;
+  }
+
+  private Map<String, Boolean> getNewUserStatusMap(List<User> toPersistBatch) {
+    return toPersistBatch.stream()
+        .collect(Collectors.toMap(
+            User::getUsername,
+            user -> user.getId() == null
+        ));
   }
 
   private Set<User> searchByFulfillmentRight(Right right, UUID warehouseId) {
@@ -288,12 +303,20 @@ public class UserService implements ExportableDataService<UserDto> {
     return userRepository.findUsersBySupervisionRight(rightId, supervisoryNodeId, programId);
   }
 
-  private void mergeUsersWithContactDetails(List<UserDto> users,
-      List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails) {
+  private void mergeUsersWithContactAndAuthDetails(List<UserDto> users,
+      List<UserContactDetailsDto.UserContactDetailsApiContract> usersContactDetails,
+      List<UserDto.UserAuthDetailsApiContract> usersAuthDetails) {
     Map<UUID, UserContactDetailsDto.UserContactDetailsApiContract> contactDetailsMap =
         usersContactDetails.stream()
             .collect(Collectors.toMap(
                 UserContactDetailsDto.UserContactDetailsApiContract::getReferenceDataUserId,
+                Function.identity()
+            ));
+
+    Map<UUID, UserDto.UserAuthDetailsApiContract> authDetailsMap =
+        usersAuthDetails.stream()
+            .collect(Collectors.toMap(
+                UserDto.UserAuthDetailsApiContract::getId,
                 Function.identity()
             ));
 
@@ -307,7 +330,10 @@ public class UserService implements ExportableDataService<UserDto> {
     for (UserDto userDto : users) {
       UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
           contactDetailsMap.get(userDto.getId());
+      UserDto.UserAuthDetailsApiContract authDetails = authDetailsMap.get(userDto.getId());
       if (contactDetails != null) {
+        userDto.setUsername(authDetails.getUsername());
+        userDto.setActive(authDetails.getEnabled());
         userDto.setPhoneNumber(contactDetails.getPhoneNumber());
         userDto.setEmail(contactDetails.getEmailDetails().getEmail());
         userDto.setEmailVerified(contactDetails.getEmailDetails().getEmailVerified());

@@ -74,6 +74,26 @@ public class UserAuthService {
   }
 
   /**
+   * Gets auth user details.
+   *
+   * @return list of auth user details.
+   */
+  public List<UserDto.UserAuthDetailsApiContract> getAuthUserDetails() {
+    String url = serviceUrl + usersAuthApiUrl + "/batch";
+
+    ResponseEntity<List<UserDto.UserAuthDetailsApiContract>> response =
+        restTemplate.exchange(
+            url,
+            HttpMethod.GET,
+            RequestHelper.createEntity(
+                RequestHelper.createHeadersWithAuth(authService.obtainAccessToken())),
+            new ParameterizedTypeReference<List<UserDto.UserAuthDetailsApiContract>>() {}
+        );
+
+    return response.getBody();
+  }
+
+  /**
    * Deletes auth users by their ids.
    *
    * @param ids set of user ids (UUIDs)

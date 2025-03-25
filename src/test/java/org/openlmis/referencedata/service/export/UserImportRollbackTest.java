@@ -21,7 +21,9 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -61,17 +63,22 @@ public class UserImportRollbackTest {
 
     user1 = new UserDto();
     user1.setId(userId1);
+    user1.setUsername("John");
 
     user2 = new UserDto();
     user2.setId(userId2);
+    user2.setUsername("Paul");
   }
 
   @Test
   public void shouldRemoveUsersWhenAuthDetailsAreMissing() {
     List<UserDto> persistedUsers = Arrays.asList(user1, user2);
     List<UserDto> successfulAuthDetails = Collections.singletonList(user1);
+    Map<String, Boolean> userStatusMap = new HashMap<>();
+    userStatusMap.put("Paul", true);
 
-    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(
+        persistedUsers, successfulAuthDetails, userStatusMap);
 
     Set<UUID> expectedIdsToRemove = Collections.singleton(userId2);
 
@@ -84,8 +91,10 @@ public class UserImportRollbackTest {
   public void shouldNotRemoveUsersWhenAllHaveAuthDetails() {
     List<UserDto> persistedUsers = Arrays.asList(user1, user2);
     List<UserDto> successfulAuthDetails = Arrays.asList(user1, user2);
+    Map<String, Boolean> userStatusMap = Collections.emptyMap();
 
-    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(
+        persistedUsers, successfulAuthDetails, userStatusMap);
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());
@@ -96,8 +105,10 @@ public class UserImportRollbackTest {
   public void shouldNotRemoveUsersWhenNoUsersPersisted() {
     List<UserDto> persistedUsers = Collections.emptyList();
     List<UserDto> successfulAuthDetails = Collections.emptyList();
+    Map<String, Boolean> userStatusMap = Collections.emptyMap();
 
-    userImportRollback.cleanupInconsistentData(persistedUsers, successfulAuthDetails);
+    userImportRollback.cleanupInconsistentData(
+        persistedUsers, successfulAuthDetails, userStatusMap);
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());

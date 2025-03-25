@@ -94,8 +94,10 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
     return userDtos;
   }
 
+  @NoArgsConstructor
   @AllArgsConstructor
   @Getter
+  @Setter
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public static class UserAuthDetailsApiContract {
     private UUID id;
