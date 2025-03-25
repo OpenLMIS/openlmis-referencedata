@@ -43,7 +43,7 @@ public class UserContactDetailsDto extends BaseDto {
   private String email;
 
   @ImportField(name = "isEmailVerified")
-  private Boolean emailVerified = false;
+  private Boolean emailVerified;
 
   /**
    * Builds api contract object from current dto class.
