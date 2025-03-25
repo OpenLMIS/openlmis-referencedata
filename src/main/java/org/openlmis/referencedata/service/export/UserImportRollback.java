@@ -17,9 +17,11 @@ package org.openlmis.referencedata.service.export;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -46,12 +48,10 @@ public class UserImportRollback {
    * @param successfulAuthDetails list of successfully created auth user details during import
    */
   public void cleanupInconsistentData(List<UserDto> persistedUsers,
-                                       List<UserDto> successfulAuthDetails) {
-    Set<UUID> persistedUserIds = extractUserIds(persistedUsers);
-    Set<UUID> authIds = extractUserIds(successfulAuthDetails);
-
+                                       List<UserDto> successfulAuthDetails,
+                                      Map<String, Boolean> newUserStatusMap) {
     if (successfulAuthDetails.size() < persistedUsers.size()) {
-      removeUsersData(persistedUserIds, authIds);
+      removeUsersData(persistedUsers, successfulAuthDetails, newUserStatusMap);
     }
   }
 
@@ -59,14 +59,21 @@ public class UserImportRollback {
     return users.stream().map(UserDto::getId).collect(Collectors.toSet());
   }
 
-  private void removeUsersData(Set<UUID> persistedUserIds, Set<UUID> validIds) {
-    Set<UUID> idsToRemove = new HashSet<>(persistedUserIds);
-    idsToRemove.removeAll(validIds);
+  private void removeUsersData(List<UserDto> persistedUsers, List<UserDto> successfulAuthDetails,
+                               Map<String, Boolean> newUserStatusMap) {
+    Set<UUID> idsToRemove = new HashSet<>(extractUserIds(persistedUsers));
+    idsToRemove.removeAll(extractUserIds(successfulAuthDetails));
 
-    if (!idsToRemove.isEmpty()) {
-      userAuthService.deleteAuthUsersByUserUuids(idsToRemove);
-      userDetailsService.deleteUserContactDetailsByUserUuids(idsToRemove);
-      userService.deleteUsersByIds(idsToRemove);
+    Set<UUID> filteredIdsToRemove = persistedUsers.stream()
+        .filter(user -> idsToRemove.contains(user.getId()))
+        .filter(user -> Boolean.TRUE.equals(newUserStatusMap.get(user.getUsername())))
+        .map(UserDto::getId)
+        .collect(Collectors.toSet());
+
+    if (!filteredIdsToRemove.isEmpty()) {
+      userAuthService.deleteAuthUsersByUserUuids(filteredIdsToRemove);
+      userDetailsService.deleteUserContactDetailsByUserUuids(filteredIdsToRemove);
+      userService.deleteUsersByIds(filteredIdsToRemove);
     }
   }
 }

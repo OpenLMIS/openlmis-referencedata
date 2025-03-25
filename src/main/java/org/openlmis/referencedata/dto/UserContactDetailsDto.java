@@ -42,6 +42,7 @@ public class UserContactDetailsDto extends BaseDto {
   @ImportField(name = "email")
   private String email;
 
+  @ImportField(name = "isEmailVerified")
   private Boolean emailVerified = false;
 
   /**

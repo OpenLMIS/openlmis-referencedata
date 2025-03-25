@@ -28,6 +28,7 @@ import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserDto;
+import org.openlmis.referencedata.dto.UserPersistResult;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -104,17 +105,18 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
   private List<UserDto> saveCompleteUsers(List<UserDto> batch, List<UserDto> importedDtos,
                                           List<ImportResponseDto.ErrorDetails> errors,
                                           Map<String, Facility> facilityMap) {
-    List<UserDto> persistedUsers = userService.saveUsersFromFile(batch, facilityMap);
+    UserPersistResult userPersistResult = userService.saveUsersFromFile(batch, facilityMap);
     SaveBatchResultDto<UserDto> contactDetailsBatchResult =
-        userDetailsService.saveUsersContactDetailsFromFile(persistedUsers, importedDtos);
+        userDetailsService.saveUsersContactDetailsFromFile(
+            userPersistResult.getPersistedUsers(), importedDtos);
     errors.addAll(contactDetailsBatchResult.getErrors());
     SaveBatchResultDto<UserDto> authDetailsBatchResult =
         userAuthService.saveUserAuthDetailsFromFile(
             contactDetailsBatchResult.getSuccessfulEntries());
     errors.addAll(authDetailsBatchResult.getErrors());
 
-    userImportRollback.cleanupInconsistentData(
-        persistedUsers, authDetailsBatchResult.getSuccessfulEntries());
+    userImportRollback.cleanupInconsistentData(userPersistResult.getPersistedUsers(),
+        authDetailsBatchResult.getSuccessfulEntries(), userPersistResult.getUserStatusMap());
 
     return authDetailsBatchResult.getSuccessfulEntries();
   }

@@ -61,7 +61,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-
 @SuppressWarnings("PMD.TooManyMethods")
 public class UserServiceTest {
 
@@ -100,6 +99,9 @@ public class UserServiceTest {
 
   @Mock
   private UserDetailsService userDetailsService;
+
+  @Mock
+  private UserAuthService userAuthService;
 
   @InjectMocks
   private UserService userService;
@@ -365,15 +367,23 @@ public class UserServiceTest {
 
     UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails emailDetails =
         new UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails("john@pl.pl", true);
-    UserContactDetailsDto.UserContactDetailsApiContract requestBody =
+    UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
         new UserContactDetailsDto.UserContactDetailsApiContract();
-    requestBody.setReferenceDataUserId(userId);
-    requestBody.setPhoneNumber("111222333");
-    requestBody.setEmailDetails(emailDetails);
+    contactDetails.setReferenceDataUserId(userId);
+    contactDetails.setPhoneNumber("111222333");
+    contactDetails.setEmailDetails(emailDetails);
+
+    UserDto.UserAuthDetailsApiContract authDetails =
+        new UserDto.UserAuthDetailsApiContract();
+    authDetails.setId(userId);
+    authDetails.setUsername("john");
+    authDetails.setEnabled(true);
 
     when(userRepository.findAll()).thenReturn(Collections.singletonList(user));
     when(userDetailsService.getUserContactDetails())
-        .thenReturn(new CustomPageImpl<>(Collections.singletonList(requestBody)));
+        .thenReturn(new CustomPageImpl<>(Collections.singletonList(contactDetails)));
+    when(userAuthService.getAuthUserDetails())
+        .thenReturn(Collections.singletonList(authDetails));
     Facility facility = new Facility();
     facility.setCode("WH01");
     when(facilityRepository.findById(any())).thenReturn(Optional.of(facility));
