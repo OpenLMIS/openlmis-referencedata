@@ -1,4 +1,4 @@
-15.3.0 / wip
+15.3.0 / 2025-03-31
 ==================
 
 Improvements:
@@ -7,6 +7,7 @@ Improvements:
 * [OE-87](https://openlmis.atlassian.net/browse/OE-87): GET `/orderables` and GET `/lots` now support a repeatable `exectCode` query parameter to filter by exact codes (opposed to `code` parameter, which filters using a contains condition).
 * [OLMIS-8061](https://openlmis.atlassian.net/browse/OLMIS-8061): Automated the unassignment of rights from roles when a right is deleted.
 * [OLMIS-8099](https://openlmis.atlassian.net/browse/OLMIS-8099): Deleted unused report rights and introduced new Superset report rights.
+* Minor coverage updates and code analysis improvements.
 
 Bux Fixes
 * [OLMIS-8068](https://openlmis.atlassian.net/browse/OLMIS-8068): Fixed a Null Pointer Exception (NPE) when adding programs to products.
