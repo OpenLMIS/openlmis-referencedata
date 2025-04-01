@@ -15,6 +15,8 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.domain.DirectRoleAssignment.DIRECT_TYPE;
+
 import com.google.common.collect.Sets;
 import java.util.Set;
 import javax.persistence.DiscriminatorValue;
@@ -23,10 +25,12 @@ import lombok.NoArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
-@DiscriminatorValue("direct")
+@DiscriminatorValue(DIRECT_TYPE)
 @NoArgsConstructor
 @TypeName("DirectRoleAssignment")
 public class DirectRoleAssignment extends RoleAssignment {
+
+  public static final String DIRECT_TYPE = "direct";
 
   /**
    * Default constructor. Must always have a role and a user.

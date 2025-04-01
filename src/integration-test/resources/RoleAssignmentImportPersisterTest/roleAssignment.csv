@@ -1,0 +1,5 @@
+username,roleName,programCode,warehouseCode,supervisoryNodeCode,type
+john,Stock Viewer,PRG001,,,supervision
+john,Warehouse Clerk,,N076,,fulfillment
+john,System Administrator,,,,direct
+john,System Administrator,PRG001,,,supervision

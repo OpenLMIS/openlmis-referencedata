@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.SupervisoryNode;
@@ -30,6 +31,8 @@ public interface SupervisoryNodeRepository
     BaseAuditableRepository<SupervisoryNode, UUID> {
 
   <S extends SupervisoryNode> S findByCode(String code);
+
+  <S extends SupervisoryNode> List<S> findAllByCodeIn(List<String> codes);
 
   boolean existsByCode(String code);
 

@@ -26,7 +26,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Setter
 public class ImportResponseDto {
   private List<ImportDetails> results;
 
@@ -67,6 +66,17 @@ public class ImportResponseDto {
     public UserErrorDetails(List<String> errors, String username) {
       super(errors);
       this.username = username;
+    }
+  }
+
+  @Getter
+  @Setter
+  public static class UserRoleErrorDetails extends UserErrorDetails {
+    private String role;
+
+    public UserRoleErrorDetails(String role, List<String> errors, String username) {
+      super(errors, username);
+      this.role = role;
     }
   }
 }

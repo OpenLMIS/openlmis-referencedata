@@ -28,10 +28,12 @@ import lombok.NoArgsConstructor;
 import org.javers.core.metamodel.annotation.TypeName;
 
 @Entity
-@DiscriminatorValue("fulfillment")
+@DiscriminatorValue(FulfillmentRoleAssignment.FULFILLMENT_TYPE)
 @NoArgsConstructor
 @TypeName("FulfillmentRoleAssignment")
 public class FulfillmentRoleAssignment extends RoleAssignment {
+
+  public static final String FULFILLMENT_TYPE = "fulfillment";
 
   @ManyToOne
   @JoinColumn(name = "warehouseid")

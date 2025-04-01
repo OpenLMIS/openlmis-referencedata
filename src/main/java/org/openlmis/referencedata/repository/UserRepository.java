@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -110,4 +111,6 @@ public interface UserRepository extends
   @Modifying
   @Query(value = "DELETE FROM referencedata.users u WHERE u.id IN (:userIds)", nativeQuery = true)
   void deleteUsersByIds(@Param("userIds") Set<UUID> userIds);
+
+  List<User> findAllByUsernameIn(Collection<String> usernames);
 }

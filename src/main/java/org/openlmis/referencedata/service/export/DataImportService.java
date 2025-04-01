@@ -45,7 +45,8 @@ public class DataImportService {
           ProgramOrderableImportPersister.PROGRAM_ORDERABLE_FILE_NAME,
           TradeItemImportPersister.TRADE_ITEM_FILE_NAME,
           GeographicZonesImportPersister.GEOGRAPHIC_ZONE_FILE_NAME,
-          UserImportPersister.USER_FILE_NAME
+          UserImportPersister.USER_FILE_NAME,
+          RoleAssignmentPersister.ROLE_ASSIGNMENT_FILE
       );
 
   @Autowired private FileHelper fileHelper;

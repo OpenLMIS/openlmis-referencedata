@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import static java.util.Collections.singleton;
 import static org.openlmis.referencedata.domain.RightType.SUPERVISION;
+import static org.openlmis.referencedata.domain.SupervisionRoleAssignment.SUPERVISION_TYPE;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -34,10 +35,12 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 
 @Entity
-@DiscriminatorValue("supervision")
+@DiscriminatorValue(SUPERVISION_TYPE)
 @NoArgsConstructor
 @TypeName("SupervisionRoleAssignment")
 public class SupervisionRoleAssignment extends RoleAssignment {
+
+  public static final String SUPERVISION_TYPE = "supervision";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SupervisionRoleAssignment.class);
 
