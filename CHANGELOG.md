@@ -1,5 +1,8 @@
-Upcoming Version (WIP)
+15.3.1 (WIP)
 ==================
+
+New Functionality:
+* [OLMIS-8125](https://openlmis.atlassian.net/browse/OLMIS-8125): Added user roles import/export functionalities.
 
 15.3.0 / 2025-03-31
 ==================

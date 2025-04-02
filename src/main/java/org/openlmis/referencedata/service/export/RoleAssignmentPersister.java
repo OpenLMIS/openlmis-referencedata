@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.DirectRoleAssignment;
 import org.openlmis.referencedata.domain.Facility;
@@ -43,6 +45,7 @@ import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.dto.RoleAssignmentCreatorResult;
 import org.openlmis.referencedata.dto.RoleAssignmentImportDto;
 import org.openlmis.referencedata.dto.SaveBatchResultDto;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -165,6 +168,8 @@ public class RoleAssignmentPersister implements
       if (user == null) {
         userRoles.forEach(dto -> addError(errors, dto, USER_NOT_FOUND));
       } else {
+        user.clearRoleAssignments();
+        userRepository.saveAndFlush(user);
         RoleAssignmentCreatorResult roleAssignmentCreatorResult =
             processUserRoles(userRoles, importContext, user, errors);
         user.assignRoles(
@@ -183,16 +188,15 @@ public class RoleAssignmentPersister implements
 
     for (RoleAssignmentImportDto dto : userRoles) {
       Role role = importContext.rolesByName.get(dto.getRoleName());
-
       if (role == null) {
         addError(errors, dto, ROLE_NOT_FOUND);
       } else {
         try {
-          RoleAssignment ra = createRoleAssignment(user, role, dto, importContext);
-          successAssignments.add(ra);
+          RoleAssignment roleAssignment = createRoleAssignment(user, role, dto, importContext);
+          successAssignments.add(roleAssignment);
           successDtos.add(dto);
-        } catch (ValidationMessageException vme) {
-          addError(errors, dto, vme.asMessage().getKey());
+        } catch (ValidationMessageException | NotFoundException ex) {
+          addError(errors, dto, ex.asMessage().getKey());
         } catch (Exception ex) {
           addError(errors, dto, ex.getMessage());
         }
@@ -206,18 +210,29 @@ public class RoleAssignmentPersister implements
                                               ImportContext importContext) {
     RoleAssignment roleAssignment;
     if (SupervisionRoleAssignment.SUPERVISION_TYPE.equalsIgnoreCase(dto.getType())) {
-      Program program = importContext.programsByCode.get(dto.getProgramCode());
-      SupervisoryNode supervisoryNode =
-          importContext.supervisoryNodesByCode.get(dto.getSupervisoryNodeCode());
+      Program program = requireNotNullOrThrow(
+          importContext.programsByCode.get(dto.getProgramCode()), "program");
+      SupervisoryNode supervisoryNode = StringUtils.isBlank(dto.getSupervisoryNodeCode())
+          ? null
+          : requireNotNullOrThrow(importContext.supervisoryNodesByCode
+              .get(dto.getSupervisoryNodeCode()), "supervisoryNode");
       roleAssignment = new SupervisionRoleAssignment(role, user, program, supervisoryNode);
     } else if (FulfillmentRoleAssignment.FULFILLMENT_TYPE.equalsIgnoreCase(dto.getType())) {
-      Facility warehouse = importContext.facilitiesByCode.get(dto.getWarehouseCode());
+      Facility warehouse = requireNotNullOrThrow(
+          importContext.facilitiesByCode.get(dto.getWarehouseCode()), "warehouse");
       roleAssignment = new FulfillmentRoleAssignment(role, user, warehouse);
     } else {
       roleAssignment = new DirectRoleAssignment(role, user);
     }
 
     return roleAssignment;
+  }
+
+  private <T> T requireNotNullOrThrow(T object, String field) {
+    if (object == null) {
+      throw new NotFoundException("referenceData.error.user.import." + field + ".notFound");
+    }
+    return object;
   }
 
   private void addError(List<ImportResponseDto.ErrorDetails> errors, RoleAssignmentImportDto dto,

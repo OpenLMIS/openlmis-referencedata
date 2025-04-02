@@ -32,14 +32,19 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
+import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Facility;
+import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.Role;
+import org.openlmis.referencedata.domain.SupervisoryNode;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ImportResponseDto;
 import org.openlmis.referencedata.repository.FacilityRepository;
+import org.openlmis.referencedata.repository.ProgramRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
+import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +71,12 @@ public class RoleAssignmentPersisterIntegrationTest {
   @Mock
   private FacilityRepository facilityRepository;
 
+  @Mock
+  private ProgramRepository programRepository;
+
+  @Mock
+  private SupervisoryNodeRepository supervisoryNodeRepository;
+
   @Before
   public void setup() {
     ReflectionTestUtils.setField(roleAssignmentPersister, "importExecutorService",
@@ -73,6 +84,9 @@ public class RoleAssignmentPersisterIntegrationTest {
     ReflectionTestUtils.setField(roleAssignmentPersister, "userRepository", userRepository);
     ReflectionTestUtils.setField(roleAssignmentPersister, "roleRepository", roleRepository);
     ReflectionTestUtils.setField(roleAssignmentPersister, "facilityRepository", facilityRepository);
+    ReflectionTestUtils.setField(roleAssignmentPersister, "programRepository", programRepository);
+    ReflectionTestUtils.setField(
+        roleAssignmentPersister, "supervisoryNodeRepository", supervisoryNodeRepository);
   }
 
   @Test
@@ -88,6 +102,14 @@ public class RoleAssignmentPersisterIntegrationTest {
     warehouse.setCode("N076");
     when(facilityRepository.findAllByCodeIn(anyList()))
         .thenReturn(Collections.singletonList(warehouse));
+    Program program = new Program();
+    program.setCode(Code.code("PRG001"));
+    when(programRepository.findAllByCodeIn(anyList()))
+        .thenReturn(Collections.singletonList(program));
+    SupervisoryNode supervisoryNode = new SupervisoryNode();
+    supervisoryNode.setCode("110");
+    when(supervisoryNodeRepository.findAllByCodeIn(anyList()))
+        .thenReturn(Collections.singletonList(supervisoryNode));
 
     final ImportResponseDto.ImportDetails result = roleAssignmentPersister.processAndPersist(
         new ClassPathResource("/RoleAssignmentImportPersisterTest/roleAssignment.csv")
