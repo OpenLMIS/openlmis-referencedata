@@ -32,9 +32,9 @@ import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.RightType;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ImportedUserItemDto;
 import org.openlmis.referencedata.dto.UserContactDetailsDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.dto.UserPersistResult;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.repository.ProgramRepository;
@@ -220,17 +220,30 @@ public class UserService implements ExportableDataService<UserDto> {
    * @param facilityMap map of facilities from imported file
    * @return list of {@link UserDto} persisted users
    */
-  public UserPersistResult saveUsersFromFile(List<UserDto> usersBatch,
+  public List<ImportedUserItemDto> saveUsersFromFile(List<UserDto> usersBatch,
                                              Map<String, Facility> facilityMap) {
-    List<User> toPersistBatch = createListToPersist(usersBatch, facilityMap);
-    Map<String, Boolean> newUserStatusMap = getNewUserStatusMap(toPersistBatch);
-    List<User> persistedObjects = new ArrayList<>(userRepository.saveAll(toPersistBatch));
+    List<ImportedUserItemDto> toPersistBatch = createListToPersist(usersBatch, facilityMap);
 
-    return new UserPersistResult(UserDto.newInstances(persistedObjects), newUserStatusMap);
+    Map<String, Boolean> isNewUserMap = toPersistBatch.stream()
+        .collect(Collectors.toMap(
+            item -> item.getUser().getUsername(),
+            ImportedUserItemDto::isNewUser
+        ));
+
+    List<User> persistedObjects = new ArrayList<>(userRepository.saveAll(
+        toPersistBatch.stream()
+            .map(ImportedUserItemDto::getUser)
+            .collect(toList())));
+
+    return persistedObjects.stream()
+        .map(user ->
+            new ImportedUserItemDto(user, isNewUserMap.getOrDefault(user.getUsername(), false)))
+        .collect(toList());
   }
 
-  private List<User> createListToPersist(List<UserDto> dtoList, Map<String, Facility> facilityMap) {
-    List<User> persisList = new LinkedList<>();
+  private List<ImportedUserItemDto> createListToPersist(
+      List<UserDto> dtoList, Map<String, Facility> facilityMap) {
+    List<ImportedUserItemDto> persisList = new LinkedList<>();
     for (UserDto userDto : dtoList) {
       persisList.add(createOrUpdateUser(userDto, facilityMap));
     }
@@ -238,13 +251,17 @@ public class UserService implements ExportableDataService<UserDto> {
     return persisList;
   }
 
-  private User createOrUpdateUser(UserDto userDto, Map<String, Facility> facilityMap) {
+  private ImportedUserItemDto createOrUpdateUser(
+      UserDto userDto, Map<String, Facility> facilityMap) {
+    ImportedUserItemDto importedUserItemDto = new ImportedUserItemDto();
     User user = userRepository.findOneByUsernameIgnoreCase(userDto.getUsername());
 
     if (user == null) {
       user = new User();
+      importedUserItemDto.setNewUser(true);
     } else {
       userDto.setId(user.getId());
+      importedUserItemDto.setNewUser(false);
     }
 
     Facility facility = facilityMap.get(userDto.getHomeFacilityCode());
@@ -253,8 +270,9 @@ public class UserService implements ExportableDataService<UserDto> {
     }
 
     user.updateFrom(userDto);
+    importedUserItemDto.setUser(user);
 
-    return user;
+    return importedUserItemDto;
   }
 
   private Map<String, Boolean> getNewUserStatusMap(List<User> toPersistBatch) {

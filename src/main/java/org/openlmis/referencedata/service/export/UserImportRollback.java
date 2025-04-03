@@ -17,11 +17,12 @@ package org.openlmis.referencedata.service.export;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ImportedUserItemDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -44,30 +45,34 @@ public class UserImportRollback {
   /**
    * Removes inconsistent data created during user import.
    *
-   * @param persistedUsers list of successfully created users during import
-   * @param successfulAuthDetails list of successfully created auth user details during import
+   * @param userImportResult object with import result lists
    */
-  public void cleanupInconsistentData(List<UserDto> persistedUsers,
-                                       List<UserDto> successfulAuthDetails,
-                                      Map<String, Boolean> newUserStatusMap) {
-    if (successfulAuthDetails.size() < persistedUsers.size()) {
-      removeUsersData(persistedUsers, successfulAuthDetails, newUserStatusMap);
+  public void cleanupInconsistentData(UserImportResult userImportResult) {
+    if (userImportResult.getSuccessfulAuthDetails().size()
+        < userImportResult.getSuccessfulUsers().size()) {
+      removeUsersData(userImportResult);
     }
   }
 
-  private Set<UUID> extractUserIds(List<UserDto> users) {
+  private Set<UUID> extractUserIdsFromUserDtos(List<UserDto> users) {
     return users.stream().map(UserDto::getId).collect(Collectors.toSet());
   }
 
-  private void removeUsersData(List<UserDto> persistedUsers, List<UserDto> successfulAuthDetails,
-                               Map<String, Boolean> newUserStatusMap) {
-    Set<UUID> idsToRemove = new HashSet<>(extractUserIds(persistedUsers));
-    idsToRemove.removeAll(extractUserIds(successfulAuthDetails));
+  private Set<UUID> extractUserIdsFromUsers(List<User> users) {
+    return users.stream().map(User::getId).collect(Collectors.toSet());
+  }
+
+  private void removeUsersData(UserImportResult userImportResult) {
+    List<ImportedUserItemDto> persistedUsers = userImportResult.getSuccessfulUsers();
+    Set<UUID> idsToRemove = new HashSet<>(extractUserIdsFromUsers(persistedUsers.stream()
+        .map(ImportedUserItemDto::getUser)
+        .collect(Collectors.toList())));
+    idsToRemove.removeAll(extractUserIdsFromUserDtos(userImportResult.getSuccessfulAuthDetails()));
 
     Set<UUID> filteredIdsToRemove = persistedUsers.stream()
-        .filter(user -> idsToRemove.contains(user.getId()))
-        .filter(user -> Boolean.TRUE.equals(newUserStatusMap.get(user.getUsername())))
-        .map(UserDto::getId)
+        .filter(item -> idsToRemove.contains(item.getUser().getId()))
+        .filter(item -> Boolean.TRUE.equals(item.isNewUser()))
+        .map(item -> item.getUser().getId())
         .collect(Collectors.toSet());
 
     if (!filteredIdsToRemove.isEmpty()) {

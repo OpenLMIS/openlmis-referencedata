@@ -21,9 +21,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.junit.Before;
@@ -32,6 +29,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.ImportedUserItemDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -53,32 +52,35 @@ public class UserImportRollbackTest {
 
   private UUID userId1;
   private UUID userId2;
-  private UserDto user1;
-  private UserDto user2;
+  private User user1;
+  ImportedUserItemDto user1Item;
+  private User user2;
+  ImportedUserItemDto user2Item;
 
   @Before
   public void setUp() {
     userId1 = UUID.randomUUID();
     userId2 = UUID.randomUUID();
 
-    user1 = new UserDto();
+    user1 = new User();
     user1.setId(userId1);
     user1.setUsername("John");
+    user1Item = new ImportedUserItemDto(user1, true);
 
-    user2 = new UserDto();
+    user2 = new User();
     user2.setId(userId2);
     user2.setUsername("Paul");
+    user2Item = new ImportedUserItemDto(user2, true);
   }
 
   @Test
   public void shouldRemoveUsersWhenAuthDetailsAreMissing() {
-    List<UserDto> persistedUsers = Arrays.asList(user1, user2);
-    List<UserDto> successfulAuthDetails = Collections.singletonList(user1);
-    Map<String, Boolean> userStatusMap = new HashMap<>();
-    userStatusMap.put("Paul", true);
+    UserImportResult userImportResult = new UserImportResult();
+    userImportResult.setSuccessfulUsers(Arrays.asList(user1Item, user2Item));
+    userImportResult.setSuccessfulAuthDetails(
+        Collections.singletonList(UserDto.newInstance(user1)));
 
-    userImportRollback.cleanupInconsistentData(
-        persistedUsers, successfulAuthDetails, userStatusMap);
+    userImportRollback.cleanupInconsistentData(userImportResult);
 
     Set<UUID> expectedIdsToRemove = Collections.singleton(userId2);
 
@@ -89,12 +91,12 @@ public class UserImportRollbackTest {
 
   @Test
   public void shouldNotRemoveUsersWhenAllHaveAuthDetails() {
-    List<UserDto> persistedUsers = Arrays.asList(user1, user2);
-    List<UserDto> successfulAuthDetails = Arrays.asList(user1, user2);
-    Map<String, Boolean> userStatusMap = Collections.emptyMap();
+    UserImportResult userImportResult = new UserImportResult();
+    userImportResult.setSuccessfulUsers(Arrays.asList(user1Item, user2Item));
+    userImportResult.setSuccessfulAuthDetails(
+        Arrays.asList(UserDto.newInstance(user1), UserDto.newInstance(user2)));
 
-    userImportRollback.cleanupInconsistentData(
-        persistedUsers, successfulAuthDetails, userStatusMap);
+    userImportRollback.cleanupInconsistentData(userImportResult);
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());
@@ -103,12 +105,8 @@ public class UserImportRollbackTest {
 
   @Test
   public void shouldNotRemoveUsersWhenNoUsersPersisted() {
-    List<UserDto> persistedUsers = Collections.emptyList();
-    List<UserDto> successfulAuthDetails = Collections.emptyList();
-    Map<String, Boolean> userStatusMap = Collections.emptyMap();
-
-    userImportRollback.cleanupInconsistentData(
-        persistedUsers, successfulAuthDetails, userStatusMap);
+    userImportRollback.cleanupInconsistentData(new UserImportResult(Collections.emptyList(),
+        Collections.emptyList(), Collections.emptyList()));
 
     verify(userAuthService, never()).deleteAuthUsersByUserUuids(any());
     verify(userDetailsService, never()).deleteUserContactDetailsByUserUuids(any());

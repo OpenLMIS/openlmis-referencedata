@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.Role;
@@ -50,4 +51,6 @@ public interface RoleRepository extends JpaRepository<Role, UUID>, RoleRepositor
 
   @Query("SELECT r FROM Role r JOIN r.rights rights WHERE rights.id = :rightId")
   List<Role> findAllByRightId(@Param("rightId") UUID rightId);
+
+  List<Role> findAllByNameIn(Collection<String> roleNames);
 }

@@ -16,8 +16,8 @@
 package org.openlmis.referencedata.service.export;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -79,12 +79,16 @@ public class UserImportPersisterIntegrationTest {
         .thenReturn(new SaveBatchResultDto<>(
             Collections.singletonList(new UserDto()), Collections.emptyList()));
 
-    doNothing().when(userImportRollback).cleanupInconsistentData(anyList(), anyList(), anyMap());
+    doNothing().when(userImportRollback).cleanupInconsistentData(any(UserImportResult.class));
 
     final ImportResponseDto.ImportDetails result = userImportPersister.processAndPersist(
         new ClassPathResource("/UserImportPersisterTest/user.csv").getInputStream(),
             mock(Profiler.class));
 
+    assertEquals("user.csv", result.getFileName());
+    assertEquals(Integer.valueOf(1), result.getTotalEntriesCount());
     assertEquals(Integer.valueOf(1), result.getSuccessfulEntriesCount());
+    assertEquals(Integer.valueOf(0), result.getFailedEntriesCount());
+    assertEquals(0, result.getErrors().size());
   }
 }

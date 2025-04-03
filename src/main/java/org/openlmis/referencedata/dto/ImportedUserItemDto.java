@@ -15,15 +15,17 @@
 
 package org.openlmis.referencedata.dto;
 
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.openlmis.referencedata.domain.User;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class UserPersistResult {
-  private List<UserDto> persistedUsers;
-
-  private Map<String, Boolean> userStatusMap;
+@Setter
+public class ImportedUserItemDto {
+  private User user;
+  private boolean isNewUser;
 }

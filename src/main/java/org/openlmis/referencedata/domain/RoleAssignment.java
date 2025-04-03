@@ -20,6 +20,7 @@ import static org.openlmis.referencedata.util.messagekeys.RoleAssignmentMessageK
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.ColumnResult;
 import javax.persistence.ConstructorResult;
 import javax.persistence.DiscriminatorColumn;
@@ -100,7 +101,12 @@ public abstract class RoleAssignment extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "userid")
+  @Getter
   protected User user;
+
+  @Column(name = "type", insertable = false, updatable = false)
+  @Getter
+  private String type;
 
   /**
    * Default constructor. Must always have a role and a user.

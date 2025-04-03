@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.ImportedUserItemDto;
 import org.openlmis.referencedata.dto.SaveBatchResultDto;
 import org.openlmis.referencedata.dto.UserDto;
-import org.openlmis.referencedata.dto.UserPersistResult;
 import org.openlmis.referencedata.repository.FacilityRepository;
 import org.openlmis.referencedata.service.UserAuthService;
 import org.openlmis.referencedata.service.UserDetailsService;
@@ -105,19 +105,28 @@ public class UserImportPersister implements DataImportPersister<User, UserDto, U
   private List<UserDto> saveCompleteUsers(List<UserDto> batch, List<UserDto> importedDtos,
                                           List<ImportResponseDto.ErrorDetails> errors,
                                           Map<String, Facility> facilityMap) {
-    UserPersistResult userPersistResult = userService.saveUsersFromFile(batch, facilityMap);
+    List<ImportedUserItemDto> userPersistResult = userService.saveUsersFromFile(batch, facilityMap);
     SaveBatchResultDto<UserDto> contactDetailsBatchResult =
         userDetailsService.saveUsersContactDetailsFromFile(
-            userPersistResult.getPersistedUsers(), importedDtos);
+            toUserDtos(userPersistResult), importedDtos);
     errors.addAll(contactDetailsBatchResult.getErrors());
     SaveBatchResultDto<UserDto> authDetailsBatchResult =
         userAuthService.saveUserAuthDetailsFromFile(
             contactDetailsBatchResult.getSuccessfulEntries());
     errors.addAll(authDetailsBatchResult.getErrors());
 
-    userImportRollback.cleanupInconsistentData(userPersistResult.getPersistedUsers(),
-        authDetailsBatchResult.getSuccessfulEntries(), userPersistResult.getUserStatusMap());
+    UserImportResult userImportResult = new UserImportResult(
+        userPersistResult, contactDetailsBatchResult.getSuccessfulEntries(),
+        authDetailsBatchResult.getSuccessfulEntries());
+
+    userImportRollback.cleanupInconsistentData(userImportResult);
 
     return authDetailsBatchResult.getSuccessfulEntries();
+  }
+
+  private List<UserDto> toUserDtos(List<ImportedUserItemDto> userPersistResult) {
+    return UserDto.newInstances(userPersistResult.stream()
+        .map(ImportedUserItemDto::getUser)
+        .collect(Collectors.toList()));
   }
 }

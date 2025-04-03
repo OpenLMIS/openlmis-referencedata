@@ -16,15 +16,17 @@
 package org.openlmis.referencedata.util;
 
 import java.util.Locale;
+
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.MessageSource;
-
 
 /**
  * Immutable value object for a message that is localizable.
  */
 public class Message {
+  @Getter
   private String key;
   private Object[] params;
 
