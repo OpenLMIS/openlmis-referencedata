@@ -1,3 +1,8 @@
+15.3.0-hotfix / 2025-04-04
+==================
+
+* Removed two latest migrations with removing and adding rights for superset reports.
+
 15.3.0 / 2025-03-31
 ==================
 
