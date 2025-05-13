@@ -18,8 +18,8 @@ package org.openlmis.referencedata.web;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
 
 import com.google.common.collect.Sets;
 import guru.nidi.ramltester.junit.RamlMatchers;

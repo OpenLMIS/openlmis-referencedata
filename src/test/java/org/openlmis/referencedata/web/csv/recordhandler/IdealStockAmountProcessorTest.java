@@ -16,7 +16,7 @@
 package org.openlmis.referencedata.web.csv.recordhandler;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyListOf;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
