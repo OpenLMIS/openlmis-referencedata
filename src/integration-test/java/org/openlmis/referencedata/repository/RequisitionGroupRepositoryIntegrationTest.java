@@ -26,8 +26,8 @@ import static org.mockito.Mockito.mock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import org.javers.common.collections.Sets;
 import org.junit.Before;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Code;
@@ -198,7 +198,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   @Test
   public void shouldAddMemberFacilitiesToRequisitionGroup() {
     RequisitionGroup group = prepareAndSaveRequisitionGroupAndSchedule();
-    group.setMemberFacilities(Sets.asSet(facility));
+    group.setMemberFacilities(new HashSet<>(Arrays.asList(facility)));
     RequisitionGroup actual = repository.save(group);
 
     assertNotNull(actual);
@@ -209,7 +209,7 @@ public class RequisitionGroupRepositoryIntegrationTest
   @Test
   public void shouldRemoveMemberFacilitiesFromRequisitionGroup() {
     RequisitionGroup group = prepareAndSaveRequisitionGroupAndSchedule();
-    group.setMemberFacilities(Sets.asSet(facility));
+    group.setMemberFacilities(new HashSet<>(Arrays.asList(facility)));
     RequisitionGroup actual = repository.save(group);
 
     assertEquals(1, actual.getMemberFacilities().size());

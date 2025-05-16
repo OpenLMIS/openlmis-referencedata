@@ -16,7 +16,7 @@
 package org.openlmis.referencedata.dto;
 
 import static org.javers.common.collections.Sets.asSet;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
