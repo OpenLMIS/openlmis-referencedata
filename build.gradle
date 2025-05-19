@@ -52,7 +52,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-redis'
     compile 'org.javers:javers-spring-boot-starter-sql:2.8.1'
     compile "org.projectlombok:lombok"
-    compile "org.postgresql:postgresql:42.0.0"
+    compile "org.postgresql:postgresql:42.6.2"
     compile "org.springframework:spring-test"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
