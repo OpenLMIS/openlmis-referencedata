@@ -354,7 +354,6 @@ public class UserService implements ExportableDataService<UserDto> {
         userDto.setActive(authDetails.getEnabled());
         userDto.setPhoneNumber(contactDetails.getPhoneNumber());
         userDto.setEmail(contactDetails.getEmailDetails().getEmail());
-        userDto.setEmailVerified(contactDetails.getEmailDetails().getEmailVerified());
         userDto.setAllowNotify(contactDetails.getAllowNotify());
         setHomeFacilityCode(userDto, facilityMap);
       }

@@ -42,9 +42,6 @@ public class UserContactDetailsDto extends BaseDto {
   @ImportField(name = "email")
   private String email;
 
-  @ImportField(name = "isEmailVerified")
-  private Boolean emailVerified;
-
   /**
    * Builds api contract object from current dto class.
    *
@@ -52,7 +49,7 @@ public class UserContactDetailsDto extends BaseDto {
    */
   public UserContactDetailsApiContract toUserContactDetailsApiContract() {
     UserContactDetailsApiContract.EmailDetails emailDetails =
-        new UserContactDetailsApiContract.EmailDetails(this.getEmail(), this.getEmailVerified());
+        new UserContactDetailsApiContract.EmailDetails(this.getEmail());
 
     return new UserContactDetailsApiContract(
         this.getPhoneNumber(), this.getAllowNotify(), emailDetails);
@@ -93,7 +90,6 @@ public class UserContactDetailsDto extends BaseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class EmailDetails {
       private String email;
-      private Boolean emailVerified;
     }
   }
 }
