@@ -366,7 +366,7 @@ public class UserServiceTest {
     user.setUsername("john");
 
     UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails emailDetails =
-        new UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails("john@pl.pl", true);
+        new UserContactDetailsDto.UserContactDetailsApiContract.EmailDetails("john@pl.pl");
     UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
         new UserContactDetailsDto.UserContactDetailsApiContract();
     contactDetails.setReferenceDataUserId(userId);
