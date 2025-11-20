@@ -1,6 +1,8 @@
 Upcoming Version (WIP)
 ==================
 
+Changes: 
+* [OLMIS-8125](https://openlmis.atlassian.net/browse/OLMIS-8125): Removed `isEmailVerified` field from the Users import process.
 
 15.3.1 / 2025-05-16
 ==================
