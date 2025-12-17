@@ -344,20 +344,25 @@ public class UserService implements ExportableDataService<UserDto> {
             .filter(Objects::nonNull)
             .collect(toList()))
         .stream().collect(Collectors.toMap(Facility::getId, Function.identity()));
+    List<UserDto> invalidUsers = new ArrayList<>();
 
     for (UserDto userDto : users) {
       UserContactDetailsDto.UserContactDetailsApiContract contactDetails =
           contactDetailsMap.get(userDto.getId());
       UserDto.UserAuthDetailsApiContract authDetails = authDetailsMap.get(userDto.getId());
-      if (contactDetails != null) {
+      if (contactDetails != null && authDetails != null) {
         userDto.setUsername(authDetails.getUsername());
         userDto.setActive(authDetails.getEnabled());
         userDto.setPhoneNumber(contactDetails.getPhoneNumber());
         userDto.setEmail(contactDetails.getEmailDetails().getEmail());
         userDto.setAllowNotify(contactDetails.getAllowNotify());
         setHomeFacilityCode(userDto, facilityMap);
+      } else if (authDetails == null) {
+        invalidUsers.add(userDto);
       }
     }
+    // Do not export any invalid user (without existing authDetails)
+    users.removeAll(invalidUsers);
   }
 
   private void setHomeFacilityCode(UserDto userDto, Map<UUID, Facility> facilityMap) {
