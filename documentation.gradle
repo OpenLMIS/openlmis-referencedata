@@ -7,31 +7,38 @@ def ramlToCopy = copySpec {
         rename { 'api-definition.raml' }
         filter(ReplaceTokens, tokens: [
                 baseUrl: "http://localhost",
-                version: version])
-        filter{
-            line -> line.replaceAll("\"schemas(.*).json\"","\"#/schemas\$1\"")
+                version: project.version
+        ])
+        filter { line ->
+            line.replaceAll("\"schemas(.*).json\"", "\"#/schemas\$1\"")
         }
     }
+
     from('src/main/resources') {
         include 'api-definition.yaml'
         rename { 'api-definition-raml.yaml' }
         filter(ReplaceTokens, tokens: [
                 baseUrl: "http://localhost",
-                version: version])
+                version: project.version
+        ])
     }
+
     from('src/main/resources/schemas') {
         include '*.json'
         into 'schemas'
     }
+
     // those files are needed by Api Console
     from('src/main/resources/schemas') {
         include '*.json'
         into 'static/referencedata/docs/schemas'
     }
+
     from('src/main/resources/schemas/fhir') {
         include '*.json'
         into 'static/referencedata/docs/schemas/fhir'
     }
+
     // those files are needed by IT
     from('src/main/resources/schemas/fhir') {
         include '*.json'
@@ -40,9 +47,25 @@ def ramlToCopy = copySpec {
     }
 }
 
-task copyRamlToBuild(type:Copy) {
+tasks.register('copyRamlToBuild', Copy) {
+    group = 'documentation'
     with ramlToCopy
     into 'build/resources/main'
 }
-project.tasks['npm_run_runApiHtmlConverter'].dependsOn copyRamlToBuild
 
+tasks.register('ramlToHtml', Exec) {
+    group = 'documentation'
+    description = 'Convert RAML to HTML document'
+
+    dependsOn 'npmInstall', 'copyRamlToBuild'
+
+    commandLine 'npm', 'run', 'runApiHtmlConverter'
+}
+
+tasks.register('copyRamlHtmlToBuild', Copy) {
+    group = 'documentation'
+    dependsOn 'ramlToHtml'
+    from 'build/resources/main'
+    include 'api-definition.html'
+    into 'build/resources/main'
+}

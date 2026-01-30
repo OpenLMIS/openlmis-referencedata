@@ -1,14 +1,17 @@
 {
   "service": {
     "Name": "referencedata",
+    "Id": "referencedata-service",
     "Port": 8080,
     "Tags": ["openlmis-service"],
     "check": {
       "interval": "10s",
-      "http": "http://HOST:PORT/actuator/health"
+      "http": "http://HOST:PORT/actuator/health",
+      "timeout": "5s",
+      "deregisterCriticalServiceAfter": "10m"
     }
   },
-  "raml": "src/main/resources/api-definition.yaml",
+  "raml": "/consul/api-definition.yaml",
   "path": [
     "referencedata",
     "referencedata/docs",
