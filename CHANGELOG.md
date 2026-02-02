@@ -1,6 +1,9 @@
 Upcoming Version (WIP)
 ==================
 
+Improvements:
+* Stabilized consul registration and health checks
+
 15.4.0 / 2025-11-27
 ==================
 
