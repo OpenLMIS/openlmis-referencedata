@@ -436,7 +436,7 @@ apply from: "registration.gradle"
 
 assemble {
     dependsOn npm_run_runApiHtmlConverter
-    dependsOn copyConsulRegistrationToBuild
+    dependsOn prepareConsulBuild
     dependsOn jacocoTestReport
 }
 
