@@ -1,10 +1,10 @@
-INSERT INTO referencedata.rights (id, description, name, type) 
-values
-('d231dde3-f444-4769-ab50-0ae5ad62ce32', null, 'REPORTING_RATE_AND_TIMELINESS_RIGHT', 'REPORTS'),
-('6dceb95d-dcc3-4385-92b7-1e754a351efd', null, 'STOCK_STATUS_RIGHT', 'REPORTS'),
-('d8491f16-4910-46f9-b231-dee2c355769c', null, 'STOCKOUTS_RIGHT', 'REPORTS'),
-('41723b11-7249-4b07-9473-3c90f9f1c908', null, 'CONSUMPTION_RIGHT', 'REPORTS'),
-('4e74d46a-910d-4e4c-84ed-4290ea9801d9', null, 'ORDERS_RIGHT', 'REPORTS'),
-('9b564d7c-48b3-492c-a763-cd5798aa65c0', null, 'ADJUSTMENTS_RIGHT', 'REPORTS'),
-('b4d7f99b-d981-4bab-8d9f-5e1ba336cb22', null, 'ADMINISTRATIVE_RIGHT', 'REPORTS')
-ON CONFLICT (id) DO NOTHING;
+--INSERT INTO referencedata.rights (id, description, name, type)
+--values
+--('d231dde3-f444-4769-ab50-0ae5ad62ce32', null, 'REPORTING_RATE_AND_TIMELINESS_RIGHT', 'REPORTS'),
+--('6dceb95d-dcc3-4385-92b7-1e754a351efd', null, 'STOCK_STATUS_RIGHT', 'REPORTS'),
+--('d8491f16-4910-46f9-b231-dee2c355769c', null, 'STOCKOUTS_RIGHT', 'REPORTS'),
+--('41723b11-7249-4b07-9473-3c90f9f1c908', null, 'CONSUMPTION_RIGHT', 'REPORTS'),
+--('4e74d46a-910d-4e4c-84ed-4290ea9801d9', null, 'ORDERS_RIGHT', 'REPORTS'),
+--('9b564d7c-48b3-492c-a763-cd5798aa65c0', null, 'ADJUSTMENTS_RIGHT', 'REPORTS'),
+--('b4d7f99b-d981-4bab-8d9f-5e1ba336cb22', null, 'ADMINISTRATIVE_RIGHT', 'REPORTS')
+--ON CONFLICT (id) DO NOTHING;
