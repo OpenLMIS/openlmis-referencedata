@@ -48,8 +48,10 @@ import org.springframework.util.StopWatch;
 import org.springframework.util.StreamUtils;
 
 /**
- * RightAssignmentService service re-generates right assignments into the database, after
- * truncating the existing right assignments.
+ * Service responsible for the asynchronous regeneration of user right assignments.
+ * * <p>This implementation uses a "Shadow Table" strategy: it populates
+ * a temporary table in the background and atomically swaps it with the live table
+ * upon completion, ensuring users never experience missing permissions.
  */
 @Service
 public class RightAssignmentService {
@@ -162,21 +164,19 @@ public class RightAssignmentService {
   }
 
   /**
-   * Performs a transactional, bulk refresh of the {@code referencedata.right_assignments} table.
+   * Performs a replacement of the {@code referencedata.right_assignments} table
+   * using a "Shadow Table" strategy.
    *
    * <p>The method replaces the entire table contents by:
    * <ul>
-   *   <li>Temporarily dropping constraints</li>
-   *   <li>Truncating the table</li>
-   *   <li>Bulk-inserting the new dataset</li>
-   *   <li>Recreating constraints and updating statistics</li>
+   *   <li>Creating a temporary shadow table with the same schema and constraints</li>
+   *   <li>Bulk-inserting the new dataset into the shadow table</li>
+   *   <li>Swapping the shadow table with the live table (DROP + RENAME)</li>
+   *   <li>Updating table statistics (ANALYZE)</li>
    * </ul>
    *
-   * <p>The operation runs in a single transaction with {@link Isolation#READ_COMMITTED}
-   * to keep the transaction short-lived while ensuring that users never observe
-   * a partially populated table.
-   *
    * @param rowsToInsert list of right assignments representing the full replacement dataset
+   * @param profiler     profiler instance for performance tracking
    */
   @Transactional(isolation = Isolation.READ_COMMITTED)
   public void updateDatabase(List<Object[]> rowsToInsert, Profiler profiler) {
