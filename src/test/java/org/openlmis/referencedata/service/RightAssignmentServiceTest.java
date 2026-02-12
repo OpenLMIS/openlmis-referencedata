@@ -18,79 +18,96 @@ package org.openlmis.referencedata.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
-import org.apache.commons.io.IOUtils;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RightAssignmentServiceTest {
 
   private static final String RIGHT_NAME = "rightName";
+  private static final String SQL_CONTENT = "SELECT 1";
 
   @Mock
   private JdbcTemplate jdbcTemplate;
+  @Mock
+  private Resource rightAssignmentsRes;
+  @Mock
+  private Resource nodeProgramFacilityRes;
 
-  @InjectMocks
   private RightAssignmentService rightAssignmentService;
 
   private UUID userId;
   private UUID supervisoryNodeId;
   private UUID programId;
-  
+
   @Before
-  public void setUp() {
+  public void setUp() throws IOException {
     userId = UUID.randomUUID();
     supervisoryNodeId = UUID.randomUUID();
     programId = UUID.randomUUID();
+
+    when(rightAssignmentsRes.getInputStream())
+        .thenReturn(new ByteArrayInputStream(SQL_CONTENT.getBytes(StandardCharsets.UTF_8)));
+
+    when(nodeProgramFacilityRes.getInputStream())
+        .thenReturn(new ByteArrayInputStream(SQL_CONTENT.getBytes(StandardCharsets.UTF_8)));
+
+    rightAssignmentService = new RightAssignmentService(
+        jdbcTemplate,
+        rightAssignmentsRes,
+        nodeProgramFacilityRes
+    );
   }
 
   @Test
-  public void convertForInsertShouldConvertDirectFulfillmentAndHomeFacilityRightAssignments()
-      throws IOException {
+  public void convertForInsertShouldConvertDirectFulfillmentAndHomeFacilityRightAssignments() {
     // given
+    UUID facilityId = UUID.randomUUID();
     RightAssignmentDto expected = new RightAssignmentDto(
         userId,
         RIGHT_NAME,
-        UUID.randomUUID(),
+        facilityId,
         programId,
         null);
 
     // when
-    Set<RightAssignmentDto> actual = rightAssignmentService
-        .convertForInsert(Collections.singletonList(expected), null);
+    List<Object[]> actual = rightAssignmentService
+        .convertForInsert(Collections.singletonList(expected));
 
     // then
     assertEquals(1, actual.size());
-    assertEquals(expected, actual.iterator().next());
+
+    // Verify the Object[] row content
+    Object[] row = actual.get(0);
+    // [0]=ID, [1]=UserID, [2]=RightName, [3]=FacilityID, [4]=ProgramID
+    assertEquals(expected.getUserId(), row[1]);
+    assertEquals(RIGHT_NAME, row[2]);
+    assertEquals(expected.getFacilityId(), row[3]);
+    assertEquals(programId, row[4]);
   }
 
   @Test
-  public void convertForInsertShouldConvertSupervisoryNodeRightAssignments()
-      throws IOException {
+  public void convertForInsertShouldConvertSupervisoryNodeRightAssignments() {
     // given
-    Resource resource = mock(Resource.class);
-    when(resource.getDescription()).thenReturn("description");
-    InputStream inputStream = spy(IOUtils.toInputStream("some data"));
-    when(resource.getInputStream()).thenReturn(inputStream);
-
     RightAssignmentDto rightAssignmentDto = new RightAssignmentDto(
         userId,
         RIGHT_NAME,
@@ -100,24 +117,27 @@ public class RightAssignmentServiceTest {
 
     UUID facility1Id = UUID.randomUUID();
     UUID facility2Id = UUID.randomUUID();
-    List<UUID> facilityIds = Arrays.asList(facility1Id, facility2Id);
-    when(jdbcTemplate.queryForList(
-        any(String.class),
-        any(Class.class),
-        any(UUID.class),
-        any(UUID.class))).thenReturn(facilityIds);
-    
+
+    Map<String, List<UUID>> mockHierarchyMap = new HashMap<>();
+    String cacheKey = supervisoryNodeId.toString() + "_" + programId.toString();
+    mockHierarchyMap.put(cacheKey, Arrays.asList(facility1Id, facility2Id));
+
+    // Mock the cache loading
+    when(jdbcTemplate.query(any(String.class), any(ResultSetExtractor.class)))
+        .thenReturn(mockHierarchyMap);
+
     // when
-    Set<RightAssignmentDto> actual = rightAssignmentService
-        .convertForInsert(Collections.singletonList(rightAssignmentDto), resource);
+    List<Object[]> actual = rightAssignmentService
+        .convertForInsert(Collections.singletonList(rightAssignmentDto));
 
     // then
     assertEquals(2, actual.size());
-    for (RightAssignmentDto current : actual) {
-      assertEquals(userId, current.getUserId());
-      assertEquals(RIGHT_NAME, current.getRightName());
-      assertEquals(programId, current.getProgramId());
-      assertTrue(facilityIds.contains(current.getFacilityId()));
-    }
+
+    List<UUID> actualFacilityIds = actual.stream()
+        .map(row -> (UUID) row[3])
+        .collect(Collectors.toList());
+
+    assertTrue(actualFacilityIds.contains(facility1Id));
+    assertTrue(actualFacilityIds.contains(facility2Id));
   }
 }
