@@ -22,12 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * This DTO is used in two ways; 1) to get an intermediate right assignment from the database, 
- * and 2) to provide a structure for inserting back into the database. The first can potentially 
- * have a supervisorynodeid set, while the second only uses the fields which match a right 
- * assignment (i.e. not the supervisorynodeid).
- */
+/** Data structure for right assignments and supervisory node expansion. */
 @Getter
 @Setter
 @NoArgsConstructor
