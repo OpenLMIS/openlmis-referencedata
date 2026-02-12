@@ -49,7 +49,8 @@ import org.springframework.util.StreamUtils;
 
 /**
  * Service responsible for the asynchronous regeneration of user right assignments.
- * * <p>This implementation uses a "Shadow Table" strategy: it populates
+ *
+ * <p>This implementation uses a "Shadow Table" strategy: it populates
  * a temporary table in the background and atomically swaps it with the live table
  * upon completion, ensuring users never experience missing permissions.
  */
