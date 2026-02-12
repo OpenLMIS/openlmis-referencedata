@@ -276,6 +276,7 @@ public class RightAssignmentService {
 
   /**
    * Loads the complete supervisory node hierarchy into memory to optimize performance.
+   *
    * <p>
    * This method executes a single bulk SQL query to retrieve every valid combination of
    * Supervisory Node, Program, and Facility. It groups these results into a Map to allow
