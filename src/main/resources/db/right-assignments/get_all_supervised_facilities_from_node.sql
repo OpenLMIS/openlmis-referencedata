@@ -1,4 +1,5 @@
--- This SQL query is necessary in order to conceptually separate out the recursion involved in 
+-- REPLACED WITH get_all_node_facility_program_mappings.sql
+-- This SQL query is necessary in order to conceptually separate out the recursion involved in
 -- getting all supervised facilities, direct and indirect, under a supervisory node.
 --
 -- The recursive CTE supervisory_nodes_recursive returns a list of all supervisory node IDs that 

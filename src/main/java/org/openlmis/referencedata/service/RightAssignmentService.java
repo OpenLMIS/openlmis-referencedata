@@ -15,27 +15,28 @@
 
 package org.openlmis.referencedata.service;
 
-import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.openlmis.referencedata.dto.RightAssignmentDto;
-import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -43,183 +44,306 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StreamUtils;
 
 /**
- * RightAssignmentInitializer runs after its associated Spring application has loaded. It 
- * automatically re-generates right assignments into the database, after dropping the existing 
- * right assignments. This component only runs when the "refresh-db" Spring profile is set.
+ * Service responsible for the asynchronous regeneration of user right assignments.
+ *
+ * <p>This implementation uses a "Shadow Table" strategy: it populates
+ * a temporary table in the background and atomically swaps it with the live table
+ * upon completion, ensuring users never experience missing permissions.
  */
 @Service
 public class RightAssignmentService {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightAssignmentService.class);
 
-  private static final String USER_ID = "userid";
+  // Constants
   private static final String RIGHT_NAME = "rightname";
-  private static final String RIGHT_ASSIGNMENTS_PATH = "classpath:db/right-assignments/";
+  private static final String USER_ID = "userid";
+  private static final String FACILITY_ID = "facilityid";
+  private static final String PROGRAM_ID = "programid";
+  private static final String SUPERVISORY_NODE_ID = "supervisorynodeid";
+  private static final int BATCH_SIZE = 5000;
 
-  static final String DELETE_SQL = "DELETE FROM referencedata.right_assignments;";
-
-  @Value(value = RIGHT_ASSIGNMENTS_PATH + "get_right_assignments.sql")
-  private Resource rightAssignmentsResource;
-
-  @Value(value = RIGHT_ASSIGNMENTS_PATH + "get_all_supervised_facilities_from_node.sql")
-  private Resource supervisedFacilitiesResource;
+  // SQL Resources
+  private final String rightAssignmentsSql;
+  private final String nodeProgramFacilitySql;
+  private final JdbcTemplate template;
 
   @Autowired
-  private JdbcTemplate template;
+  @Lazy
+  private RightAssignmentService self;
 
   /**
-   * Re-generates right assignments. This operation needs to be transactional so that dropping 
-   * and re-generating is one transaction. The isolation level is specified to READ_COMMITTED, 
-   * to allow proper reads on the right assignments table. This is so that any permission checks 
-   * do not have to wait for this re-generation to finish, but can use the "old" right 
-   * assignments. This is acceptable since the right assignments table is not expected to change 
-   * very often, and the re-generation could take several seconds to finish.
+   * Constructs the RightAssignmentService with required dependencies.
+   * Loads SQL resources from the classpath during initialization.
+   *
+   * @param template               the JdbcTemplate used for database operations
+   * @param rightAssignmentsRes    the SQL resource for fetching raw assignments
+   * @param nodeProgramFacilitySql the SQL resource for fetching facilities for snode program pairs
+   */
+  public RightAssignmentService(JdbcTemplate template,
+      @Value("classpath:db/right-assignments/get_right_assignments.sql")
+      Resource rightAssignmentsRes,
+      @Value("classpath:db/right-assignments/get_all_node_facility_program_mappings.sql")
+      Resource nodeProgramFacilitySql) {
+
+    this.template = template;
+    this.rightAssignmentsSql = resourceToString(rightAssignmentsRes);
+    this.nodeProgramFacilitySql = resourceToString(nodeProgramFacilitySql);
+  }
+
+  /**
+   * Asynchronously regenerates right assignments by fetching them from DB,
+   * expanding by supervisory nodes hierarchy, and updating.
+   *
+   * @return a Future representing the completion of the async task
    */
   @Async("rightAssignmentTaskExecutor")
-  @Transactional(isolation = Isolation.READ_COMMITTED)
   public Future<Void> regenerateRightAssignments() {
     Profiler profiler = new Profiler("REGENERATE_RIGHT_ASSIGNMENTS");
     profiler.setLogger(XLOGGER);
+
+    StopWatch stopWatch = new StopWatch("Right Assignment Regeneration");
+
     XLOGGER.entry();
+    XLOGGER.info("Starting right assignment regeneration...");
 
-    // Drop existing rows; we are regenerating from scratch
-    profiler.start("DROP_RIGHT_ASSIGNMENTS");
-    template.update(DELETE_SQL);
-
-    // Get a right assignment matrix from database
-    profiler.start("GET_INTERMEDIATE_RIGHT_ASSIGNMENTS");
-    List<RightAssignmentDto> dbRightAssignments = new ArrayList<>();
     try {
-      dbRightAssignments = getRightAssignmentsFromDbResource(rightAssignmentsResource);
-    } catch (IOException ioe) {
-      XLOGGER.warn("Error when getting right assignments: " + ioe.getMessage());
-    }
+      profiler.start("GET_RIGHT_ASSIGNMENTS");
+      stopWatch.start("Get Right Assignments From DB");
 
-    profiler.start("RESOURCE_2_DB");
-    Resource2Db r2db = new Resource2Db(template);
-    try {
-      profiler.start("CHANGE_SUPERVISORY_NODES_TO_FACILITIES_IN_RIGHT_ASSIGNMENTS");
-      Set<RightAssignmentDto> rightAssignmentsToInsert = convertForInsert(dbRightAssignments,
-          supervisedFacilitiesResource);
+      List<RightAssignmentDto> dbRightAssignments = getRightAssignmentsFromDb();
 
-      profiler.start("INSERT_INTO_DB");
-      for (List partialRightAssignments : Iterables.partition(rightAssignmentsToInsert, 100)) {
-        insertFromDbRightAssignmentList(r2db, partialRightAssignments);
+      stopWatch.stop();
+      XLOGGER.debug("Fetched {} assignments in {} ms", dbRightAssignments.size(),
+          stopWatch.getLastTaskTimeMillis());
+
+      profiler.start("EXPAND_BY_SUPERVISORY_NODES");
+      stopWatch.start("Expand By Supervisory Nodes & Convert");
+
+      List<Object[]> rowsToInsert = convertForInsert(dbRightAssignments);
+
+      stopWatch.stop();
+      XLOGGER.debug("Converted to {} rows (expanded) in {} ms", rowsToInsert.size(),
+          stopWatch.getLastTaskTimeMillis());
+
+
+      profiler.start("BATCH_INSERT_INTO_DB");
+      stopWatch.start("Batch Insert into DB");
+
+      self.updateDatabase(rowsToInsert, profiler);
+
+      stopWatch.stop();
+      XLOGGER.debug("Database update complete in {} ms", stopWatch.getLastTaskTimeMillis());
+
+      profiler.start("ANALYZE_TABLE");
+      stopWatch.start("Analyze Table");
+
+      template.execute("ANALYZE referencedata.right_assignments;");
+
+      stopWatch.stop();
+
+    } catch (Exception e) {
+      XLOGGER.error("Unexpected system error during right regeneration. Total time: {} ms",
+          stopWatch.getTotalTimeMillis(), e);
+    } finally {
+      XLOGGER.exit();
+      profiler.stop().log();
+
+      if (XLOGGER.isDebugEnabled()) {
+        XLOGGER.debug(stopWatch.prettyPrint());
+      } else {
+        XLOGGER.info("Regeneration finished. Total time: {} ms",
+            stopWatch.getTotalTimeMillis());
       }
-    } catch (IOException ioe) {
-      XLOGGER.warn("Error when getting inserting right assignments: " + ioe.getMessage());
     }
 
-    XLOGGER.exit();
-    profiler.stop().log();
     return new AsyncResult<>(null);
   }
 
-  private void insertFromDbRightAssignmentList(Resource2Db resource2Db,
-      List<RightAssignmentDto> rightAssignmentDtos) {
-    // Convert set of right assignments to insert to a set of SQL inserts
-    XLOGGER.debug("Convert right assignments to SQL inserts");
-    MutablePair dataWithHeader = new MutablePair<List<String>, List<Object[]>>();
-    dataWithHeader.setRight(rightAssignmentDtos.stream()
-        .map(rad -> rad.toColumnArray())
-        .collect(Collectors.toList()));
+  /**
+   * Performs a replacement of the {@code referencedata.right_assignments} table
+   * using a "Shadow Table" strategy.
+   *
+   * <p>The method replaces the entire table contents by:
+   * <ul>
+   *   <li>Creating a temporary shadow table with the same schema and constraints</li>
+   *   <li>Bulk-inserting the new dataset into the shadow table</li>
+   *   <li>Swapping the shadow table with the live table (DROP + RENAME)</li>
+   *   <li>Updating table statistics (ANALYZE)</li>
+   * </ul>
+   *
+   * @param rowsToInsert list of right assignments representing the full replacement dataset
+   * @param profiler     profiler instance for performance tracking
+   */
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public void updateDatabase(List<Object[]> rowsToInsert, Profiler profiler) {
+    XLOGGER.info("Starting the zero-downtime bulk update...");
 
-    // set column headers
-    dataWithHeader.setLeft(Arrays.asList("id",
-        USER_ID,
-        RIGHT_NAME,
-        "facilityid",
-        "programid"));
+    profiler.start("DB_CREATE_SHADOW_TABLE");
+    template.execute("CREATE TABLE referencedata.right_assignments_new "
+        + "(LIKE referencedata.right_assignments INCLUDING ALL)");
 
-    // insert into right_assignments
-    XLOGGER.debug("Perform SQL inserts");
-    resource2Db.insertToDbFromBatchedPair("referencedata.right_assignments", dataWithHeader);
+    profiler.start("DB_BATCH_INSERT_ROWS");
+    template.batchUpdate("INSERT INTO referencedata.right_assignments_new "
+            + "(id, userid, rightname, facilityid, programid) VALUES (?, ?, ?, ?, ?)",
+        rowsToInsert, BATCH_SIZE,
+        (PreparedStatement ps, Object[] row) -> {
+          ps.setObject(1, row[0]);
+          ps.setObject(2, row[1]);
+          ps.setObject(3, row[2]);
+          ps.setObject(4, row[3]);
+          ps.setObject(5, row[4]);
+        });
+
+    profiler.start("DB_SWAP_TABLES");
+    template.execute("DROP TABLE referencedata.right_assignments");
+    template.execute("ALTER TABLE referencedata.right_assignments_new "
+        + "RENAME TO right_assignments");
+
+    template.execute("ANALYZE referencedata.right_assignments");
+    XLOGGER.info("The bulk update swap complete.");
   }
 
-  List<RightAssignmentDto> getRightAssignmentsFromDbResource(Resource resource)
-      throws IOException {
-    return template.query(
-        resourceToString(resource),
-        (ResultSet rs, int rowNum) -> {
+  /**
+   * Retrieves raw right assignment records from the database and maps them into DTOs.
+   *
+   * @return a list of {@link RightAssignmentDto} objects representing the current assignment data
+   */
+  private List<RightAssignmentDto> getRightAssignmentsFromDb() {
+    return template.query(rightAssignmentsSql, (rs, rowNum) -> {
+      RightAssignmentDto dto = new RightAssignmentDto();
 
-          RightAssignmentDto rightAssignmentMap = new RightAssignmentDto();
-          rightAssignmentMap.setUserId(UUID.fromString(rs.getString(USER_ID)));
-          rightAssignmentMap.setRightName(rs.getString(RIGHT_NAME));
-          if (null != rs.getString("facilityid")) {
-            rightAssignmentMap.setFacilityId(UUID.fromString(rs.getString("facilityid")));
-          }
-          if (null != rs.getString("programid")) {
-            rightAssignmentMap.setProgramId(UUID.fromString(rs.getString("programid")));
-          }
-          if (null != rs.getString("supervisorynodeid")) {
-            rightAssignmentMap.setSupervisoryNodeId(
-                UUID.fromString(rs.getString("supervisorynodeid")));
-          }
-          return rightAssignmentMap;
-        }
-    );
+      dto.setUserId(UUID.fromString(rs.getString(USER_ID)));
+      dto.setRightName(rs.getString(RIGHT_NAME));
+
+
+      String facilityIdStr = rs.getString(FACILITY_ID);
+      if (facilityIdStr != null) {
+        dto.setFacilityId(UUID.fromString(facilityIdStr));
+      }
+
+      String programIdStr = rs.getString(PROGRAM_ID);
+      if (programIdStr != null) {
+        dto.setProgramId(UUID.fromString(programIdStr));
+      }
+
+      String supervisoryNodeIdStr = rs.getString(SUPERVISORY_NODE_ID);
+      if (supervisoryNodeIdStr != null) {
+        dto.setSupervisoryNodeId(UUID.fromString(supervisoryNodeIdStr));
+      }
+
+      return dto;
+    });
   }
 
-  Set<RightAssignmentDto> convertForInsert(List<RightAssignmentDto> rightAssignments,
-      Resource supervisedFacilitiesResource)
-      throws IOException {
-    Set<RightAssignmentDto> rightAssignmentsToInsert = new HashSet<>();
-    for (RightAssignmentDto rightAssignment : rightAssignments) {
+  /**
+   * Optimized conversion that avoids N+1 queries by pre-fetching the data.
+   *
+   * @param rightAssignments the initial list of assignments from the DB
+   * @return a list of object arrays ready for batch insertion
+   */
+  protected List<Object[]> convertForInsert(List<RightAssignmentDto> rightAssignments) {
+    Map<String, List<UUID>> nodeProgramFacilitiesCache = loadNodeProgramFacilitiesCache();
+    Set<RightAssignmentDto> uniqueAssignments = new HashSet<>();
 
-      if (null != rightAssignment.getSupervisoryNodeId()) {
-
-        // Special case: supervisory node is present. We need to expand the supervisory node and 
-        // turn it into a list of all facility IDs being supervised by this node.
-
-        // Get all supervised facilities. Add each facility to the set.
-        List<UUID> facilityIds = getSupervisedFacilityIds(supervisedFacilitiesResource,
-            rightAssignment.getSupervisoryNodeId(),
-            rightAssignment.getProgramId());
+    for (RightAssignmentDto dto : rightAssignments) {
+      if (dto.getSupervisoryNodeId() != null) {
+        String key = generateCacheKey(dto.getSupervisoryNodeId(), dto.getProgramId());
+        List<UUID> facilityIds = nodeProgramFacilitiesCache
+            .getOrDefault(key, Collections.emptyList());
 
         for (UUID facilityId : facilityIds) {
-
-          rightAssignmentsToInsert.add(new RightAssignmentDto(
-              rightAssignment.getUserId(),
-              rightAssignment.getRightName(),
+          uniqueAssignments.add(new RightAssignmentDto(
+              dto.getUserId(),
+              dto.getRightName(),
               facilityId,
-              rightAssignment.getProgramId()));
+              dto.getProgramId(),
+              null
+          ));
         }
       } else {
-
-        // All other cases: home facility supervision, fulfillment and direct right assignments.
-        // Just copy everything but the supervisoryNodeId and add it to the set.
-        rightAssignmentsToInsert.add(new RightAssignmentDto(
-            rightAssignment.getUserId(),
-            rightAssignment.getRightName(),
-            rightAssignment.getFacilityId(),
-            rightAssignment.getProgramId()));
+        uniqueAssignments.add(dto);
       }
     }
 
-    return rightAssignmentsToInsert;
+    return uniqueAssignments.stream()
+        .map(dto -> createRowArray(dto, dto.getFacilityId()))
+        .collect(Collectors.toList());
   }
 
-  private List<UUID> getSupervisedFacilityIds(Resource supervisedFacilitiesResource,
-      UUID supervisoryNodeId, UUID programId)
-      throws IOException {
+  /**
+   * Loads the complete supervisory node hierarchy into memory to optimize performance.
+   *
+   * <p>
+   * This method executes a single bulk SQL query to retrieve every valid combination of
+   * Supervisory Node, Program, and Facility. It groups these results into a Map to allow
+   * O(1) lookups during the expansion phase, instead of the N+1 query problem.
+   * </p>
+   *
+   * @return a Map where the key is a composite string of NodeID and ProgramID,
+   *         and the value is a List of facility UUIDs supervised by that node.
+   */
+  private Map<String, List<UUID>> loadNodeProgramFacilitiesCache() {
+    return template.query(nodeProgramFacilitySql, (ResultSet rs) -> {
+      Map<String, List<UUID>> cache = new HashMap<>();
+      while (rs.next()) {
+        UUID nodeId = rs.getObject(SUPERVISORY_NODE_ID, UUID.class);
+        UUID programId = rs.getObject(PROGRAM_ID, UUID.class);
+        UUID facilityId = rs.getObject(FACILITY_ID, UUID.class);
 
-    return template.queryForList(
-        resourceToString(supervisedFacilitiesResource),
-        UUID.class,
-        supervisoryNodeId,
-        programId);
+        String key = generateCacheKey(nodeId, programId);
+        cache.computeIfAbsent(key, k -> new ArrayList<>()).add(facilityId);
+      }
+      return cache;
+    });
   }
 
-  private String resourceToString(final Resource resource) throws IOException {
-    XLOGGER.entry(resource.getDescription());
-    String str;
+  /**
+   * Generates a composite cache key for the supervisory node and program.
+   *
+   * @param nodeId    the UUID of the supervisory node
+   * @param programId the UUID of the program (can be null)
+   * @return a unique string key for map lookups
+   */
+  private String generateCacheKey(UUID nodeId, UUID programId) {
+    return nodeId + "_" + (programId != null ? programId : "null");
+  }
+
+  /**
+   * Creates an object array suitable for JDBC batch insertion.
+   *
+   * @param dto        the data source
+   * @param facilityId the facility UUID
+   * @return an array of objects for the PreparedStatement
+   */
+  private Object[] createRowArray(RightAssignmentDto dto, UUID facilityId) {
+    return new Object[] {
+        UUID.randomUUID(),
+        dto.getUserId(),
+        dto.getRightName(),
+        facilityId,
+        dto.getProgramId()
+    };
+  }
+
+  /**
+   * Reads the content of a Spring Resource into a String using the default charset.
+   * This is used during service initialization to load SQL files from the classpath.
+   *
+   * @param resource the Spring Resource to read (must not be null)
+   * @return the content of the resource as a String
+   */
+  private static String resourceToString(Resource resource) {
+    String str = "";
     try (InputStream is = resource.getInputStream()) {
-      str = StreamUtils.copyToString(is, Charset.defaultCharset());
+      str = StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+    } catch (IOException ioe) {
+      XLOGGER.warn("Could not load SQL resource: {}", ioe.getMessage());
     }
-    XLOGGER.exit();
     return str;
   }
 }
