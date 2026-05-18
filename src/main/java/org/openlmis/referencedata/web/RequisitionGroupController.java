@@ -30,7 +30,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.RequisitionGroupRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.service.RequisitionGroupService;
-import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.RegenerateRightAssignmentsEvent;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.RequisitionGroupMessageKeys;
 import org.openlmis.referencedata.validate.RequisitionGroupValidator;
@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -78,7 +79,7 @@ public class RequisitionGroupController extends BaseController {
   private RequisitionGroupService requisitionGroupService;
 
   @Autowired
-  private RightAssignmentService rightAssignmentService;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   private SupervisoryNodeRepository supervisoryNodeRepository;
@@ -112,7 +113,7 @@ public class RequisitionGroupController extends BaseController {
       requisitionGroupRepository.saveAndFlush(requisitionGroup);
 
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-      rightAssignmentService.regenerateRightAssignments();
+      applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
 
       LOGGER.info("Created new requisitionGroup with id: {}", requisitionGroup.getId());
       profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
@@ -208,7 +209,7 @@ public class RequisitionGroupController extends BaseController {
       requisitionGroupToUpdate = requisitionGroupRepository.saveAndFlush(requisitionGroupToUpdate);
 
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-      rightAssignmentService.regenerateRightAssignments();
+      applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
 
       LOGGER.info("Saved requisitionGroup with id: {}", requisitionGroupToUpdate.getId());
       profiler.start("EXPORT_REQUISITION_GROUP_TO_DTO");
@@ -248,7 +249,7 @@ public class RequisitionGroupController extends BaseController {
       requisitionGroupRepository.flush();
 
       profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-      rightAssignmentService.regenerateRightAssignments();
+      applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
 
       profiler.stop().log();
     }

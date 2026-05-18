@@ -34,12 +34,13 @@ import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
-import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.RegenerateRightAssignmentsEvent;
 import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class RoleController extends BaseController {
   private RightRepository rightRepository;
   
   @Autowired
-  private RightAssignmentService rightAssignmentService;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   /**
    * Get all roles in the system.
@@ -208,7 +209,7 @@ public class RoleController extends BaseController {
     roleRepository.saveAndFlush(roleToSave);
 
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-    rightAssignmentService.regenerateRightAssignments();
+    applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
     
     LOGGER.info("Saved role with id: {}", roleToSave.getId());
 

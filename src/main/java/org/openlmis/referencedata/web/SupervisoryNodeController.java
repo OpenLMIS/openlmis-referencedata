@@ -40,7 +40,7 @@ import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
 import org.openlmis.referencedata.repository.custom.impl.SupervisoryNodeDtoRedisRepository;
-import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.RegenerateRightAssignmentsEvent;
 import org.openlmis.referencedata.service.SupervisoryNodeBuilder;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -95,7 +96,7 @@ public class SupervisoryNodeController extends BaseController {
   private UserRepository userRepository;
 
   @Autowired
-  private RightAssignmentService rightAssignmentService;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   private SupervisoryNodeValidator validator;
@@ -228,7 +229,7 @@ public class SupervisoryNodeController extends BaseController {
     }
 
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-    rightAssignmentService.regenerateRightAssignments();
+    applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
 
     LOGGER.info("Updated supervisoryNode with id: {}", supervisoryNodeId);
     profiler.start("EXPORT_SUPERVISORY_NODE_TO_DTO");

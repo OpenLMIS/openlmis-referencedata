@@ -44,6 +44,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StreamUtils;
 
@@ -101,6 +103,15 @@ public class RightAssignmentService {
    *
    * @return a Future representing the completion of the async task
    */
+  /**
+   * Fires after the publishing transaction commits, so the async regeneration sees the
+   * post-edit entity state instead of the pre-commit snapshot.
+   */
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void onRegenerateRightAssignmentsEvent(RegenerateRightAssignmentsEvent event) {
+    self.regenerateRightAssignments();
+  }
+
   @Async("rightAssignmentTaskExecutor")
   public Future<Void> regenerateRightAssignments() {
     Profiler profiler = new Profiler("REGENERATE_RIGHT_ASSIGNMENTS");
