@@ -20,15 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.fhir.FhirClient;
+import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.service.GeographicZoneBuilder;
 import org.openlmis.referencedata.service.GeographicZoneService;
+import org.openlmis.referencedata.util.Message;
+import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.validate.GeographicZoneValidator;
 import org.slf4j.ext.XLogger;
@@ -60,6 +65,9 @@ public class GeographicZoneController extends BaseController {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
+
+  @Autowired
+  private GeographicLevelRepository geographicLevelRepository;
 
   @Autowired
   private GeographicZoneService geographicZoneService;
@@ -121,12 +129,27 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
+  public Page<GeographicZoneSimpleDto> getAllGeographicZones(
+      @RequestParam(required = false) Integer levelNumber,
+      Pageable pageable) {
     Profiler profiler = new Profiler("GET_ALL_GEO_ZONES");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("FIND_ALL");
-    Page<GeographicZone> page = geographicZoneRepository.findAll(pageable);
+    Page<GeographicZone> page;
+    if (levelNumber != null) {
+      profiler.start("FIND_LEVEL");
+      GeographicLevel level = geographicLevelRepository.findByLevelNumber(levelNumber);
+      if (level == null) {
+        throw new ValidationMessageException(
+            new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
+      }
+      profiler.start("SEARCH_BY_LEVEL");
+      page = geographicZoneRepository.search(null, null, null, level, pageable);
+    } else {
+      profiler.start("FIND_ALL");
+      page = geographicZoneRepository.findAll(pageable);
+    }
+
     List<GeographicZoneSimpleDto> dtos = toSimpleDto(page.getContent(), profiler);
     Page<GeographicZoneSimpleDto> response = toPage(dtos, pageable,
         page.getTotalElements(), profiler);

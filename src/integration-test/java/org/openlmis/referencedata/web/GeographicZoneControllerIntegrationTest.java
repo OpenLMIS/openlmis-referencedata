@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -44,6 +45,7 @@ import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.util.Pagination;
+import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.data.domain.Page;
@@ -208,6 +210,59 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
         .body(CONTENT_ID, hasItems(countryZone.getId().toString(), regionZone.getId().toString(),
             districtZone.getId().toString()));
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldGetGeographicZonesFilteredByLevelNumber() {
+    // given
+    List<GeographicZone> geographicZones = Collections.singletonList(districtZone);
+    Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, pageable);
+
+    Integer levelNumber = districtZone.getLevel().getLevelNumber();
+    given(geographicLevelRepository.findByLevelNumber(levelNumber))
+        .willReturn(districtZone.getLevel());
+    given(geographicZoneRepository.search(null, null, null, districtZone.getLevel(), pageable))
+        .willReturn(geographicZonesPage);
+
+    // when
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(PAGE, pageable.getPageNumber())
+        .queryParam(SIZE, pageable.getPageSize())
+        .queryParam(LEVEL_NUMBER, levelNumber)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK)
+        .body(CONTENT, hasSize(geographicZones.size()))
+        .body(CONTENT_ID, hasItems(districtZone.getId().toString()));
+
+    // then
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getAllShouldReturnBadRequestWhenLevelNumberIsUnknown() {
+    // given
+    Integer unknownLevelNumber = 99;
+    given(geographicLevelRepository.findByLevelNumber(unknownLevelNumber)).willReturn(null);
+
+    // when
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam(LEVEL_NUMBER, unknownLevelNumber)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(HttpStatus.SC_BAD_REQUEST)
+        .body(MESSAGE_KEY, is(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER));
+
+    // then
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

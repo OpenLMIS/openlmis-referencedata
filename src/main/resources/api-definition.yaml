@@ -2439,6 +2439,13 @@ resourceTypes:
       get:
           is: [ secured, paginated ]
           description: Get all geographicZones.
+          queryParameters:
+              levelNumber:
+                  displayName: levelNumber
+                  description: Number of the GeographicLevel to filter by.
+                  type: integer
+                  required: false
+                  repeat: false
           responses:
               "200":
                   headers:
@@ -2446,6 +2453,10 @@ resourceTypes:
                   body:
                     application/json:
                       schema: geographicZonePage
+              "400":
+                  body:
+                    application/json:
+                      schema: localizedErrorResponse
               401:
                   headers:
                     Keep-Alive:
