@@ -98,20 +98,22 @@ public class RightAssignmentService {
   }
 
   /**
-   * Asynchronously regenerates right assignments by fetching them from DB,
-   * expanding by supervisory nodes hierarchy, and updating.
-   *
-   * @return a Future representing the completion of the async task
-   */
-  /**
    * Fires after the publishing transaction commits, so the async regeneration sees the
    * post-edit entity state instead of the pre-commit snapshot.
+   *
+   * @param event the regenerate trigger event published by an admin operation
    */
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onRegenerateRightAssignmentsEvent(RegenerateRightAssignmentsEvent event) {
     self.regenerateRightAssignments();
   }
 
+  /**
+   * Asynchronously regenerates right assignments by fetching them from DB,
+   * expanding by supervisory nodes hierarchy, and updating.
+   *
+   * @return a Future representing the completion of the async task
+   */
   @Async("rightAssignmentTaskExecutor")
   public Future<Void> regenerateRightAssignments() {
     Profiler profiler = new Profiler("REGENERATE_RIGHT_ASSIGNMENTS");

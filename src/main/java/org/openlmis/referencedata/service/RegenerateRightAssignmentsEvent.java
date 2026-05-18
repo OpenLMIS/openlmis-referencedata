@@ -10,7 +10,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Affero General Public License for more details. You should have received a copy of
  * the GNU Affero General Public License along with this program. If not, see
- * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
+ * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
 package org.openlmis.referencedata.service;
@@ -19,8 +19,8 @@ import org.springframework.context.ApplicationEvent;
 
 /**
  * Published when an admin operation has changed an entity that feeds the right_assignments cache
- * (roles, facilities, supervisory nodes, requisition groups). Handled by a
- * @TransactionalEventListener(AFTER_COMMIT) so regeneration runs only after the surrounding
+ * (roles, facilities, supervisory nodes, requisition groups). Handled by a transactional event
+ * listener bound to the AFTER_COMMIT phase, so regeneration runs only after the surrounding
  * transaction commits, avoiding a stale read of pre-commit entity state.
  */
 public class RegenerateRightAssignmentsEvent extends ApplicationEvent {
