@@ -220,7 +220,7 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
     Page<GeographicZone> geographicZonesPage = Pagination.getPage(geographicZones, pageable);
 
     Integer levelNumber = districtZone.getLevel().getLevelNumber();
-    given(geographicLevelRepository.findByLevelNumber(levelNumber))
+    given(geographicZoneService.findGeographicLevel(levelNumber))
         .willReturn(districtZone.getLevel());
     given(geographicZoneRepository.search(null, null, null, districtZone.getLevel(), pageable))
         .willReturn(geographicZonesPage);
@@ -248,7 +248,8 @@ public class GeographicZoneControllerIntegrationTest extends BaseWebIntegrationT
   public void getAllShouldReturnBadRequestWhenLevelNumberIsUnknown() {
     // given
     Integer unknownLevelNumber = 99;
-    given(geographicLevelRepository.findByLevelNumber(unknownLevelNumber)).willReturn(null);
+    doThrow(new ValidationMessageException(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER))
+        .when(geographicZoneService).findGeographicLevel(unknownLevelNumber);
 
     // when
     restAssured

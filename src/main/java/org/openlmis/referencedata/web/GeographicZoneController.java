@@ -26,14 +26,10 @@ import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
 import org.openlmis.referencedata.dto.GeographicZoneSimpleDto;
 import org.openlmis.referencedata.exception.NotFoundException;
-import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.fhir.FhirClient;
-import org.openlmis.referencedata.repository.GeographicLevelRepository;
 import org.openlmis.referencedata.repository.GeographicZoneRepository;
 import org.openlmis.referencedata.service.GeographicZoneBuilder;
 import org.openlmis.referencedata.service.GeographicZoneService;
-import org.openlmis.referencedata.util.Message;
-import org.openlmis.referencedata.util.messagekeys.GeographicLevelMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.GeographicZoneMessageKeys;
 import org.openlmis.referencedata.validate.GeographicZoneValidator;
 import org.slf4j.ext.XLogger;
@@ -65,9 +61,6 @@ public class GeographicZoneController extends BaseController {
 
   @Autowired
   private GeographicZoneRepository geographicZoneRepository;
-
-  @Autowired
-  private GeographicLevelRepository geographicLevelRepository;
 
   @Autowired
   private GeographicZoneService geographicZoneService;
@@ -138,11 +131,7 @@ public class GeographicZoneController extends BaseController {
     Page<GeographicZone> page;
     if (levelNumber != null) {
       profiler.start("FIND_LEVEL");
-      GeographicLevel level = geographicLevelRepository.findByLevelNumber(levelNumber);
-      if (level == null) {
-        throw new ValidationMessageException(
-            new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
-      }
+      GeographicLevel level = geographicZoneService.findGeographicLevel(levelNumber);
       profiler.start("SEARCH_BY_LEVEL");
       page = geographicZoneRepository.search(null, null, null, level, pageable);
     } else {

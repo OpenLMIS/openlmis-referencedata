@@ -128,13 +128,23 @@ public class GeographicZoneService implements
   }
 
   private GeographicLevel findGeographicLevel(String levelNumber) {
-    GeographicLevel level = null;
     if (!StringUtils.isEmpty(levelNumber)) {
-      level = geographicLevelRepository.findByLevelNumber(Integer.parseInt(levelNumber));
-      if (level == null) {
-        throw new ValidationMessageException(
-            new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
-      }
+      return findGeographicLevel(Integer.parseInt(levelNumber));
+    }
+    return null;
+  }
+
+  /**
+   * Find geographic level for provided Level Number.
+   *
+   * @param levelNumber the level number
+   * @return the geographic level
+   */
+  public GeographicLevel findGeographicLevel(Integer levelNumber) {
+    GeographicLevel level = geographicLevelRepository.findByLevelNumber(levelNumber);
+    if (level == null) {
+      throw new ValidationMessageException(
+        new Message(GeographicLevelMessageKeys.ERROR_NOT_FOUND_WITH_NUMBER, levelNumber));
     }
     return level;
   }
