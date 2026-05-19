@@ -39,10 +39,11 @@ import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.repository.RightRepository;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
-import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.RegenerateRightAssignmentsEvent;
 import org.openlmis.referencedata.service.RightService;
 import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -62,7 +63,7 @@ public class RoleControllerTest {
   private RightService rightService;
   
   @Mock
-  private RightAssignmentService rightAssignmentService;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   @InjectMocks
   private RoleController controller = new RoleController();
@@ -181,7 +182,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
-    verify(rightAssignmentService).regenerateRightAssignments();
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
   }
 
   @Test
@@ -198,7 +199,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
-    verify(rightAssignmentService).regenerateRightAssignments();
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
   }
 
   @Test
@@ -218,7 +219,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
-    verify(rightAssignmentService).regenerateRightAssignments();
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
   }
 
   @Test
@@ -238,7 +239,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
-    verify(rightAssignmentService).regenerateRightAssignments();
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
   }
 
   @Test
@@ -255,7 +256,7 @@ public class RoleControllerTest {
 
     //then
     verify(repository).saveAndFlush(updatedRole1);
-    verify(rightAssignmentService).regenerateRightAssignments();
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
   }
 
   @Test

@@ -42,13 +42,14 @@ import org.openlmis.referencedata.repository.FacilityTypeApprovedProductReposito
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.FacilityBuilder;
 import org.openlmis.referencedata.service.FacilityService;
-import org.openlmis.referencedata.service.RightAssignmentService;
+import org.openlmis.referencedata.service.RegenerateRightAssignmentsEvent;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.validate.FacilityValidator;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -95,7 +96,7 @@ public class FacilityController extends BaseController {
   private FacilityValidator facilityValidator;
 
   @Autowired
-  private RightAssignmentService rightAssignmentService;
+  private ApplicationEventPublisher applicationEventPublisher;
 
   @Autowired
   private FhirClient fhirClient;
@@ -279,7 +280,7 @@ public class FacilityController extends BaseController {
     fhirClient.synchronizeFacility(facilityToSave);
 
     profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-    rightAssignmentService.regenerateRightAssignments();
+    applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
 
     XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);

@@ -44,6 +44,8 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StreamUtils;
 
@@ -93,6 +95,17 @@ public class RightAssignmentService {
     this.template = template;
     this.rightAssignmentsSql = resourceToString(rightAssignmentsRes);
     this.nodeProgramFacilitySql = resourceToString(nodeProgramFacilitySql);
+  }
+
+  /**
+   * Fires after the publishing transaction commits, so the async regeneration sees the
+   * post-edit entity state instead of the pre-commit snapshot.
+   *
+   * @param event the regenerate trigger event published by an admin operation
+   */
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void onRegenerateRightAssignmentsEvent(RegenerateRightAssignmentsEvent event) {
+    self.regenerateRightAssignments();
   }
 
   /**

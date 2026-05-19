@@ -7,6 +7,7 @@ Improvements:
 
 Bug fixes:
 * [OLMIS-8223](https://openlmis.atlassian.net/browse/OLMIS-8223): Fix placeholder bug in messages
+* [OLMIS-8230](https://openlmis.atlassian.net/browse/OLMIS-8230): Fix regenerating right assigment race condition
 
 
 15.4.0 / 2025-11-27
