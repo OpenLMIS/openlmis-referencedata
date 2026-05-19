@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.openlmis.referencedata.domain.GeographicLevel;
 import org.openlmis.referencedata.domain.GeographicZone;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.GeographicZoneDto;
@@ -121,12 +122,23 @@ public class GeographicZoneController extends BaseController {
   @RequestMapping(value = RESOURCE_PATH, method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public Page<GeographicZoneSimpleDto> getAllGeographicZones(Pageable pageable) {
+  public Page<GeographicZoneSimpleDto> getAllGeographicZones(
+      @RequestParam(required = false) Integer levelNumber,
+      Pageable pageable) {
     Profiler profiler = new Profiler("GET_ALL_GEO_ZONES");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("FIND_ALL");
-    Page<GeographicZone> page = geographicZoneRepository.findAll(pageable);
+    Page<GeographicZone> page;
+    if (levelNumber != null) {
+      profiler.start("FIND_LEVEL");
+      GeographicLevel level = geographicZoneService.findGeographicLevel(levelNumber);
+      profiler.start("SEARCH_BY_LEVEL");
+      page = geographicZoneRepository.search(null, null, null, level, pageable);
+    } else {
+      profiler.start("FIND_ALL");
+      page = geographicZoneRepository.findAll(pageable);
+    }
+
     List<GeographicZoneSimpleDto> dtos = toSimpleDto(page.getContent(), profiler);
     Page<GeographicZoneSimpleDto> response = toPage(dtos, pageable,
         page.getTotalElements(), profiler);
