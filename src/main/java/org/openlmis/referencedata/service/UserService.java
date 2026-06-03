@@ -58,6 +58,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @SuppressWarnings({"PMD.TooManyMethods"})
 @Service
@@ -113,6 +114,40 @@ public class UserService implements ExportableDataService<UserDto> {
     }
 
     return searchUsers(searchParams, pageable);
+  }
+
+  /**
+   * Narrows the search params' id filter (in place) to the auth users matching the requested
+   * lockout state, so pagination stays correct. Returns their id-to-lockout-state map for response
+   * enrichment, or {@code null} when no lockout filtering is requested.
+   *
+   * @param searchParams the user search params
+   * @return the lockout-state map, or {@code null} when no lockout filtering is requested
+   */
+  public Map<UUID, Boolean> applyLockoutFilter(UserSearchParams searchParams) {
+    if (searchParams.getLockedOut() == null) {
+      return null;
+    }
+
+    Map<UUID, Boolean> lockoutStateById = userAuthService
+        .getAuthUserDetails(searchParams.getLockedOut())
+        .stream()
+        .collect(Collectors.toMap(
+            UserDto.UserAuthDetailsApiContract::getId,
+            UserDto.UserAuthDetailsApiContract::getLockedOut));
+
+    Set<String> ids = lockoutStateById.keySet().stream()
+        .map(UUID::toString)
+        .collect(Collectors.toSet());
+
+    if (!CollectionUtils.isEmpty(searchParams.getId())) {
+      ids.retainAll(searchParams.getId());
+      lockoutStateById.keySet().removeIf(id -> !ids.contains(id.toString()));
+    }
+
+    searchParams.setId(ids);
+
+    return lockoutStateById;
   }
 
   /**

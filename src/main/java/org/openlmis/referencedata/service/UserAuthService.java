@@ -79,7 +79,21 @@ public class UserAuthService {
    * @return list of auth user details.
    */
   public List<UserDto.UserAuthDetailsApiContract> getAuthUserDetails() {
+    return getAuthUserDetails(null);
+  }
+
+  /**
+   * Gets auth user details, optionally filtered by lockout state.
+   *
+   * @param lockedOut when not {@code null}, only auth users with the matching lockout state are
+   *                  returned; when {@code null} no filtering is applied.
+   * @return list of auth user details.
+   */
+  public List<UserDto.UserAuthDetailsApiContract> getAuthUserDetails(Boolean lockedOut) {
     String url = serviceUrl + usersAuthApiUrl + "/batch";
+    if (lockedOut != null) {
+      url += "?lockedOut=" + lockedOut;
+    }
 
     ResponseEntity<List<UserDto.UserAuthDetailsApiContract>> response =
         restTemplate.exchange(

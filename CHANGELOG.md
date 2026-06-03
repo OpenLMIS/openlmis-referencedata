@@ -4,6 +4,7 @@ Upcoming Version (WIP)
 Improvements:
 * Stabilized consul registration and health checks
 * Added the ability to filter geographic zones by level through GET request
+* [MW-1476](https://openlmis.atlassian.net/browse/MW-1476): Add param `lockedOut` to getUsers endpoint
 
 Bug fixes:
 * [OLMIS-8223](https://openlmis.atlassian.net/browse/OLMIS-8223): Fix placeholder bug in messages

@@ -49,6 +49,7 @@ public final class UserSearchParams {
   private String lastName;
   private String homeFacilityId;
   private Boolean active;
+  private Boolean lockedOut;
   private Map<String, String> extraData;
 
   /**

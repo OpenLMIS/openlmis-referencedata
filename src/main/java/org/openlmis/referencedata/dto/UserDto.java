@@ -61,13 +61,16 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
   @ImportField(name = "isActive")
   private boolean active;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean lockedOut;
+
   private Map<String, Object> extraData;
 
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
 
   public UserAuthDetailsApiContract toUserAuthDetailsApiContract(String defaultPassword) {
     return new UserAuthDetailsApiContract(this.getId(), this.getUsername(),
-        defaultPassword, this.isActive());
+        defaultPassword, this.isActive(), null);
   }
 
   /**
@@ -104,5 +107,6 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
     private String username;
     private String password;
     private Boolean enabled;
+    private Boolean lockedOut;
   }
 }
