@@ -85,7 +85,7 @@ public class OrderableValidatorTest {
   public void shouldNotFindErrorsWhenOrderableIsValid() {
     validator.validate(orderableDto, errors);
 
-    assertThat(errors.getErrorCount()).isEqualTo(0);
+    assertThat(errors.getErrorCount()).isZero();
   }
 
   @Test
@@ -193,7 +193,7 @@ public class OrderableValidatorTest {
 
     validator.validate(orderableDto, errors);
 
-    assertThat(errors.getErrorCount()).isEqualTo(0);
+    assertThat(errors.getErrorCount()).isZero();
   }
 
   @Test
@@ -235,7 +235,7 @@ public class OrderableValidatorTest {
 
     validator.validate(orderableDto, errors);
 
-    assertThat(errors.getErrorCount()).isEqualTo(0);
+    assertThat(errors.getErrorCount()).isZero();
   }
 
   @Test
@@ -267,7 +267,7 @@ public class OrderableValidatorTest {
 
     validator.validate(orderableDto, errors);
 
-    assertThat(errors.getErrorCount()).isEqualTo(0);
+    assertThat(errors.getErrorCount()).isZero();
   }
 
   @Test
