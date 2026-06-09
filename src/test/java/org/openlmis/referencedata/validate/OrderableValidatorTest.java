@@ -16,12 +16,14 @@
 package org.openlmis.referencedata.validate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.validate.OrderableValidator.IN_BOX_CUBE_DIMENSION;
 import static org.openlmis.referencedata.validate.OrderableValidator.MAXIMUM_TEMPERATURE;
 import static org.openlmis.referencedata.validate.OrderableValidator.MINIMUM_TEMPERATURE;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +36,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Orderable;
+import org.openlmis.referencedata.dto.ObjectReferenceDto;
+import org.openlmis.referencedata.dto.OrderableChildDto;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.dto.ProgramOrderableDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
@@ -253,5 +257,26 @@ public class OrderableValidatorTest {
     validator.validate(orderableDto, errors);
 
     assertThat(errors.getErrorCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void shouldPassWhenChildQuantityIsWithinIntegerRange() {
+    OrderableChildDto child = new OrderableChildDto(
+        new ObjectReferenceDto(), (long) Integer.MAX_VALUE);
+    orderableDto.setChildren(new HashSet<>(Collections.singletonList(child)));
+
+    validator.validate(orderableDto, errors);
+
+    assertThat(errors.getErrorCount()).isEqualTo(0);
+  }
+
+  @Test
+  public void shouldRejectWhenChildQuantityExceedsIntegerMax() {
+    OrderableChildDto child = new OrderableChildDto(
+        new ObjectReferenceDto(), (long) Integer.MAX_VALUE + 1);
+    orderableDto.setChildren(new HashSet<>(Collections.singletonList(child)));
+
+    assertThatThrownBy(() -> validator.validate(orderableDto, errors))
+        .isInstanceOf(ValidationMessageException.class);
   }
 }
