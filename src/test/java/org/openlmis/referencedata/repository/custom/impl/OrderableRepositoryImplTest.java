@@ -29,6 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.CODE;
+import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.FULL_PRODUCT_NAME;
 import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.ID;
 import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.IDENTITY;
 import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.PRODUCT_CODE;
@@ -53,6 +54,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
@@ -236,6 +238,10 @@ public class OrderableRepositoryImplTest {
         .from(Orderable.class)).thenReturn(orderableRoot);
     Path orderablePath = mock(Path.class);
     when(orderableRoot.get(IDENTITY)).thenReturn(orderablePath);
+    Path fullProductNamePath = mock(Path.class);
+    when(orderableRoot.get(FULL_PRODUCT_NAME)).thenReturn(fullProductNamePath);
+    Order ascOrder = mock(Order.class);
+    when(criteriaBuilder.asc(fullProductNamePath)).thenReturn(ascOrder);
     when(orderablePath
         .in(any(List.class))).thenReturn(inPredicate);
     when(orderableCriteriaQuery.select(orderableRoot))
@@ -279,5 +285,6 @@ public class OrderableRepositoryImplTest {
     verify(lowerExpression, times(2)).in(codesArgumentCaptor.capture());
     assertTrue(codesArgumentCaptor.getAllValues().stream()
         .allMatch(codeList -> codeList.containsAll(programCodes)));
+    verify(orderableCriteriaQuery).orderBy(ascOrder);
   }
 }
