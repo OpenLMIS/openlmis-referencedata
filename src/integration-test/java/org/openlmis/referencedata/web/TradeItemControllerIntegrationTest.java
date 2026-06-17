@@ -45,6 +45,8 @@ import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.utils.AuditLogHelper;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -52,6 +54,10 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
   private static final String CID = "cid";
+  private static final String MANUFACTURER_ONE_NAME = "one";
+  private static final String GTIN_ONE = "11111111";
+  private static final String MANUFACTURER_TWO_NAME = "two";
+  private static final String GTIN_TWO = "22222222";
 
   @Before
   public void setUp() {
@@ -94,10 +100,10 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveAllTradeItems() {
 
-    List<TradeItem> items = asList(generateItem("one", "11111111"),
-        generateItem("two", "22222222"));
+    List<TradeItem> items = asList(generateItem(MANUFACTURER_ONE_NAME, GTIN_ONE),
+        generateItem(MANUFACTURER_TWO_NAME, GTIN_TWO));
 
-    when(tradeItemRepository.findAll()).thenReturn(items);
+    when(tradeItemRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(items));
 
     PageDto response = restAssured
         .given()
@@ -116,10 +122,35 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldRetrieveTradeItemsByIds() {
+
+    List<TradeItem> items = asList(generateItem(MANUFACTURER_ONE_NAME, GTIN_ONE),
+        generateItem(MANUFACTURER_TWO_NAME, GTIN_TWO));
+
+    when(tradeItemRepository.findAllById(any())).thenReturn(items);
+
+    PageDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("id", UUID.randomUUID().toString())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    List<TradeItemDto> expected = newInstance(items);
+    checkIfEquals(response, expected);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldRetrieveTradeItemsByPartialMatch() {
 
-    List<TradeItem> items = asList(generateItem("one", "11111111"),
-        generateItem("two", "22222222"));
+    List<TradeItem> items = asList(generateItem(MANUFACTURER_ONE_NAME, GTIN_ONE),
+        generateItem(MANUFACTURER_TWO_NAME, GTIN_TWO));
 
     when(tradeItemRepository.findByClassificationIdLike(CID)).thenReturn(items);
 
@@ -143,8 +174,8 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   @Test
   public void shouldRetrieveTradeItemsByFullMatch() {
 
-    List<TradeItem> items = asList(generateItem("one", "11111111"),
-        generateItem("two", "22222222"));
+    List<TradeItem> items = asList(generateItem(MANUFACTURER_ONE_NAME, GTIN_ONE),
+        generateItem(MANUFACTURER_TWO_NAME, GTIN_TWO));
 
     when(tradeItemRepository.findByClassificationId(CID)).thenReturn(items);
 
