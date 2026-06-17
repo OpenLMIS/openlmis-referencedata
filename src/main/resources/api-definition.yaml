@@ -911,8 +911,13 @@ resourceTypes:
                       schema: localizedErrorResponse
       get:
           is: [ secured, paginated ]
-          description: Retrieve trade items. Optionally filter by the classification ID, either by full or partial match.
+          description: Retrieve trade items. Optionally filter by trade item IDs, or by the classification ID using either a full or partial match.
           queryParameters:
+              id:
+                      displayName: id
+                      type: string
+                      required: false
+                      repeat: true
               classificationId:
                       displayName: classificaitonID
                       type: string

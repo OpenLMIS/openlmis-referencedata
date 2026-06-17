@@ -1,6 +1,9 @@
 15.6.0-SNAPSHOT (WIP)
 ==================
 
+Improvements:
+* GET `/tradeItems` now supports a repeatable `id` query parameter to filter trade items by their identifiers.
+
 15.5.0 / 2026-06-09
 ==================
 

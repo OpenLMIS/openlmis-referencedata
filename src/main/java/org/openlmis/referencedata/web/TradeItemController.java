@@ -18,14 +18,18 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemDto;
 import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.service.TradeItemSearchParams;
+import org.openlmis.referencedata.service.TradeItemService;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.openlmis.referencedata.validate.TradeItemValidator;
+import org.slf4j.ext.XLogger;
+import org.slf4j.ext.XLoggerFactory;
+import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,11 +50,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TradeItemController extends BaseController {
 
+  private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TradeItemController.class);
+
   @Autowired
   private TradeItemRepository repository;
 
   @Autowired
   private TradeItemValidator validator;
+
+  @Autowired
+  private TradeItemService tradeItemService;
 
   /**
    * Create or update a trade item.
@@ -103,31 +113,30 @@ public class TradeItemController extends BaseController {
   }
 
   /**
-   * Retrieves trade items. Allows searching by classification id, either using a full
-   * or a partial match.
-
-   * @param classificationId the classification id to search by
-   * @param fullMatch true to search by a full match, false to search by partial match
-   * @return a list of matching trade items
+   * Gets trade items.
+   *
+   * @param requestParams the request params
+   * @param pageable      the pageable
+   * @return the trade items
    */
-  @Transactional
-  @RequestMapping(value = "/tradeItems", method = RequestMethod.GET)
-  public Page<TradeItemDto> retrieveTradeItems(
-      @RequestParam(required = false) String classificationId,
-      @RequestParam(required = false, defaultValue = "false") boolean fullMatch,
+  @Transactional(readOnly = true)
+  @GetMapping("/tradeItems")
+  public Page<TradeItemDto> getTradeItems(
+      TradeItemSearchParams requestParams,
       Pageable pageable) {
+    XLOGGER.entry(requestParams, pageable);
+    Profiler profiler = new Profiler("TRADE_ITEMS_SEARCH");
+    profiler.setLogger(XLOGGER);
 
-    Iterable<TradeItem> result;
-    if (StringUtils.isBlank(classificationId)) {
-      result = repository.findAll();
-    } else {
-      if (fullMatch) {
-        result = repository.findByClassificationId(classificationId);
-      } else {
-        result = repository.findByClassificationIdLike(classificationId);
-      }
-    }
+    profiler.start("TRADE_ITEM_SERVICE_SEARCH");
+    Page<TradeItem> tradeItemsPage = tradeItemService.search(requestParams, pageable);
 
-    return Pagination.getPage(TradeItemDto.newInstance(result), pageable);
+    profiler.start("TRADE_ITEM_TO_DTO");
+    Page<TradeItemDto> page = Pagination.getPage(TradeItemDto.newInstance(
+            tradeItemsPage.getContent()), pageable, tradeItemsPage.getTotalElements());
+
+    profiler.stop().log();
+    XLOGGER.exit(page);
+    return page;
   }
 }
