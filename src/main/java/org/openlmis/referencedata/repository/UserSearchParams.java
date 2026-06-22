@@ -79,7 +79,7 @@ public final class UserSearchParams {
     }
 
     return Stream
-        .of(username, firstName, lastName, homeFacilityId, active, extraData)
+        .of(username, firstName, lastName, homeFacilityId, active, lockedOut, extraData)
         .allMatch(Objects::isNull);
   }
 
