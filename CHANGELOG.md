@@ -1,3 +1,7 @@
+15.6.0-SNAPSHOT (WIP)
+==================
+* [OLMIS-8118](https://openlmis.atlassian.net/browse/OLMIS-8118): Reject kit child quantity exceeding Integer max.
+
 15.5.0 / 2026-06-09
 ==================
 
