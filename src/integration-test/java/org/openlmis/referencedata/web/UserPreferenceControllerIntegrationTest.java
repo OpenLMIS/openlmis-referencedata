@@ -36,6 +36,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
   private static final String RESOURCE_URL = "/api/users/{userId}/preferences";
   private static final String QUANTITY_UNIT = "quantityUnit";
   private static final String PACKS = "PACKS";
+  private static final String USER_ID = "userId";
 
   @MockBean
   private UserPreferenceRepository userPreferenceRepository;
@@ -51,7 +52,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("userId", userId)
+        .pathParam(USER_ID, userId)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -68,7 +69,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
     restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .pathParam("userId", userId)
+        .pathParam(USER_ID, userId)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -90,7 +91,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("userId", userId)
+        .pathParam(USER_ID, userId)
         .body(Collections.singletonMap(QUANTITY_UNIT, PACKS))
         .when()
         .put(RESOURCE_URL)
@@ -110,7 +111,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("userId", userId)
+        .pathParam(USER_ID, userId)
         .body(Collections.singletonMap("", PACKS))
         .when()
         .put(RESOURCE_URL)
@@ -129,7 +130,7 @@ public class UserPreferenceControllerIntegrationTest extends BaseWebIntegrationT
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
         .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .pathParam("userId", userId)
+        .pathParam(USER_ID, userId)
         .body(Collections.singletonMap(QUANTITY_UNIT, PACKS))
         .when()
         .put(RESOURCE_URL)
