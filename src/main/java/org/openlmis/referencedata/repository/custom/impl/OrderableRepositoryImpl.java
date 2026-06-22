@@ -340,10 +340,11 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
 
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {
     CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Orderable> criteriaQuery =
-        criteriaBuilder.createQuery(Orderable.class);
+    CriteriaQuery<Orderable> criteriaQuery = criteriaBuilder.createQuery(Orderable.class);
     Root<Orderable> root = criteriaQuery.from(Orderable.class);
-    criteriaQuery.select(root).where(root.get(IDENTITY).in(identities));
+    criteriaQuery.select(root);
+    criteriaQuery.where(root.get(IDENTITY).in(identities));
+    criteriaQuery.orderBy(criteriaBuilder.asc(root.get(FULL_PRODUCT_NAME)));
 
     return retrieveOrderables(criteriaQuery);
   }

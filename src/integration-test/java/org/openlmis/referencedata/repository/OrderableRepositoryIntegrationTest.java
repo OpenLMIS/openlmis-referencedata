@@ -809,6 +809,26 @@ public class OrderableRepositoryIntegrationTest {
         foundOrderable.getProgramOrderable(secondProgram).getId());
   }
 
+  @Test
+  public void searchShouldSortOrderablesByFullProductNameWhenFiltering() {
+    // given orderables in a program, created in non-alphabetical order of names
+    Program program = createProgram(SOME_CODE);
+    createOrderableWithProgramAndName(program, "c product");
+    createOrderableWithProgramAndName(program, "a product");
+    createOrderableWithProgramAndName(program, "b product");
+
+    // when filtering by the program
+    Page<Orderable> foundOrderables = repository.search(
+        new TestSearchParams(null, null, null, Collections.singleton(SOME_CODE), null),
+        pageable);
+
+    // then results are sorted by full product name
+    assertEquals(3, foundOrderables.getTotalElements());
+    assertEquals("a product", foundOrderables.getContent().get(0).getFullProductName());
+    assertEquals("b product", foundOrderables.getContent().get(1).getFullProductName());
+    assertEquals("c product", foundOrderables.getContent().get(2).getFullProductName());
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
                                                Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
@@ -851,6 +871,19 @@ public class OrderableRepositoryIntegrationTest {
     programOrderables.add(createProgramOrderable(validProgram, validOrderable));
     validOrderable = repository.save(validOrderable);
     return validOrderable;
+  }
+
+  private Orderable createOrderableWithProgramAndName(Program program, String fullProductName) {
+    int instanceNumber = getNextInstanceNumber();
+    Orderable orderable = new OrderableDataBuilder()
+        .withProductCode(Code.code(CODE + instanceNumber))
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName(fullProductName)
+        .buildAsNew();
+    orderable = repository.save(orderable);
+    orderable.setProgramOrderables(
+        Lists.newArrayList(createProgramOrderable(program, orderable)));
+    return repository.save(orderable);
   }
 
   private Program createProgram(String code) {

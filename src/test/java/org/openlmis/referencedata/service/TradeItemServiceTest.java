@@ -19,18 +19,29 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.repository.TradeItemRepository;
+import org.openlmis.referencedata.testbuilder.TradeItemDataBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TradeItemServiceTest {
+
+  private static final Pageable PAGEABLE = PageRequest.of(0, 10);
 
   @Mock
   private TradeItemRepository tradeItemRepository;
@@ -59,6 +70,61 @@ public class TradeItemServiceTest {
     Class<?> resultType = service.getExportableType();
 
     assertEquals(model.getClass(), resultType);
+  }
+
+  @Test
+  public void shouldSearchTradeItemsByIds() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    Set<UUID> ids = Collections.singleton(tradeItem.getId());
+    TradeItemSearchParams params = new TradeItemSearchParams(ids, null, false);
+    when(tradeItemRepository.findAllById(ids)).thenReturn(Lists.newArrayList(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findAllById(ids);
+    assertEquals(1, result.getContent().size());
+    assertEquals(tradeItem, result.getContent().get(0));
+  }
+
+  @Test
+  public void shouldSearchTradeItemsByClassificationIdWithFullMatch() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    String classificationId = "classification-1";
+    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, true);
+    when(tradeItemRepository.findByClassificationId(classificationId))
+        .thenReturn(Lists.newArrayList(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findByClassificationId(classificationId);
+    assertEquals(1, result.getContent().size());
+  }
+
+  @Test
+  public void shouldSearchTradeItemsByClassificationIdWithPartialMatch() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    String classificationId = "classification";
+    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, false);
+    when(tradeItemRepository.findByClassificationIdLike(classificationId))
+        .thenReturn(Lists.newArrayList(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findByClassificationIdLike(classificationId);
+    assertEquals(1, result.getContent().size());
+  }
+
+  @Test
+  public void shouldReturnAllTradeItemsWhenNoParamsProvided() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false);
+    Page<TradeItem> page = new PageImpl<>(Lists.newArrayList(tradeItem));
+    when(tradeItemRepository.findAll(PAGEABLE)).thenReturn(page);
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findAll(PAGEABLE);
+    assertEquals(1, result.getContent().size());
   }
 
 }
