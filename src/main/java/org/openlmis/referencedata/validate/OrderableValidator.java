@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.validate;
 
+import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_CHILD_QUANTITY_TOO_LARGE;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NET_CONTENT_REQUIRED;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_NULL;
 import static org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys.ERROR_PACK_ROUNDING_THRESHOLD_REQUIRED;
@@ -90,6 +91,18 @@ public class OrderableValidator implements BaseValidator {
     validateTemperature(dto, errors);
     validateVolumeMeasurement(dto, errors);
     validateProductCode(dto, errors);
+    validateChildren(dto);
+  }
+
+  private void validateChildren(OrderableDto dto) {
+    if (dto.getChildren() == null) {
+      return;
+    }
+    dto.getChildren().forEach(child -> {
+      if (child.getQuantity() != null && child.getQuantity() > Integer.MAX_VALUE) {
+        throw new ValidationMessageException(ERROR_CHILD_QUANTITY_TOO_LARGE);
+      }
+    });
   }
 
   private void validatePrograms(OrderableDto dto) {

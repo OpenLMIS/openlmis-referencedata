@@ -22,6 +22,9 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   private static final String NOT_SUPPORTED = "notSupported";
   private static final String NEGATIVE_PRICE_PER_PACK = "negativePricePerPackNotAllowed";
   private static final String PRODUCT_CODE = "productCode";
+  private static final String CHILD = "child";
+  private static final String QUANTITY = "quantity";
+  private static final String TOO_LARGE = "tooLarge";
 
   public static final String ERROR_NOT_FOUND = join(ERROR, NOT_FOUND);
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -80,4 +83,6 @@ public abstract class OrderableMessageKeys extends MessageKeys {
   public static final String ERROR_NEGATIVE_PRICE_PER_PACK = join(ERROR, NEGATIVE_PRICE_PER_PACK);
   public static final String ERROR_PRODUCT_CODE_MUST_BE_UNIQUE =
           join(ERROR, PRODUCT_CODE, MUST_BE_UNIQUE);
+  public static final String ERROR_CHILD_QUANTITY_TOO_LARGE =
+          join(ERROR, CHILD, QUANTITY, TOO_LARGE);
 }
