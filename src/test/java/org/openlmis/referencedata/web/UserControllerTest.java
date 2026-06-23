@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -25,6 +26,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import com.google.common.collect.Sets;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -211,6 +213,60 @@ public class UserControllerTest {
 
     //then
     assertThat(userDtos.getContent()).isEqualTo(expectedUserDtos);
+  }
+
+  @Test
+  public void shouldGetUsersWithoutLockoutStateWhenNotRequested() {
+    //given
+    List<User> foundUsers = Lists.newArrayList(user1, user2);
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder().withLockedOut(null).build();
+    when(userService.searchUsersById(searchParams, pageable))
+        .thenReturn(Pagination.getPage(foundUsers, PageRequest.of(0, foundUsers.size())));
+
+    //when
+    Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
+
+    //then - no auth lookup is performed and lockout state is not merged in, preserving
+    //behaviour for existing consumers
+    verify(userService, never()).applyLockoutFilter(any());
+    assertThat(userDtos.getContent()).allMatch(dto -> dto.getLockedOut() == null);
+  }
+
+  @Test
+  public void shouldGetUsersFilteredAndEnrichedByLockoutState() {
+    //given
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .withId(Sets.newHashSet(user1.getId().toString()))
+        .withLockedOut(true)
+        .build();
+    Map<UUID, Boolean> lockoutState = Collections.singletonMap(user1.getId(), true);
+    when(userService.applyLockoutFilter(searchParams)).thenReturn(lockoutState);
+    when(userService.searchUsersById(searchParams, pageable))
+        .thenReturn(Pagination.getPage(Lists.newArrayList(user1), PageRequest.of(0, 1)));
+
+    //when
+    Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
+
+    //then
+    assertThat(userDtos.getContent()).hasSize(1);
+    assertThat(userDtos.getContent().get(0).getLockedOut()).isTrue();
+  }
+
+  @Test
+  public void shouldReturnEmptyPageWhenNoUserMatchesLockoutState() {
+    //given
+    UserSearchParams searchParams = new UserSearchParamsDataBuilder()
+        .withId(Collections.emptySet())
+        .withLockedOut(true)
+        .build();
+    when(userService.applyLockoutFilter(searchParams)).thenReturn(Collections.emptyMap());
+
+    //when
+    Page<UserDto> userDtos = controller.getUsers(searchParams, pageable);
+
+    //then - no DB search is performed when the auth layer returns no matching users
+    assertThat(userDtos.getContent()).isEmpty();
+    verify(userService, never()).searchUsersById(any(), any());
   }
 
   @Test

@@ -17,12 +17,13 @@ package org.openlmis.referencedata.service;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
@@ -270,7 +271,7 @@ public class UserServiceTest {
     try {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
-      verifyZeroInteractions(userRepository, facilityRepository,
+      verifyNoInteractions(userRepository, facilityRepository,
           supervisoryNodeRepository, programRepository);
     }
   }
@@ -283,7 +284,7 @@ public class UserServiceTest {
     try {
       userService.rightSearch(RIGHT_ID, null, null, null);
     } finally {
-      verifyZeroInteractions(userRepository, supervisoryNodeRepository,
+      verifyNoInteractions(userRepository, supervisoryNodeRepository,
           facilityRepository, programRepository);
     }
   }
@@ -298,7 +299,7 @@ public class UserServiceTest {
       userService.rightSearch(RIGHT_ID, null, null, WAREHOUSE_ID);
     } finally {
       verify(facilityRepository).findById(WAREHOUSE_ID);
-      verifyZeroInteractions(supervisoryNodeRepository, programRepository,
+      verifyNoInteractions(supervisoryNodeRepository, programRepository,
           userRepository);
     }
   }
@@ -323,7 +324,7 @@ public class UserServiceTest {
     try {
       userService.rightSearch(RIGHT_ID, null, SUPERVISORY_NODE_ID, null);
     } finally {
-      verifyZeroInteractions(userRepository, supervisoryNodeRepository,
+      verifyNoInteractions(userRepository, supervisoryNodeRepository,
           programRepository, facilityRepository);
     }
   }
@@ -339,7 +340,7 @@ public class UserServiceTest {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
       verify(programRepository).existsById(PROGRAM_ID);
-      verifyZeroInteractions(facilityRepository, userRepository);
+      verifyNoInteractions(facilityRepository, userRepository);
     }
   }
 
@@ -354,7 +355,7 @@ public class UserServiceTest {
       userService.rightSearch(RIGHT_ID, PROGRAM_ID, SUPERVISORY_NODE_ID, null);
     } finally {
       verify(supervisoryNodeRepository).existsById(SUPERVISORY_NODE_ID);
-      verifyZeroInteractions(facilityRepository, userRepository);
+      verifyNoInteractions(facilityRepository, userRepository);
     }
   }
 
@@ -397,6 +398,58 @@ public class UserServiceTest {
   @Test
   public void shouldReturnCorrectExportableType() {
     assertEquals(UserDto.class, userService.getExportableType());
+  }
+
+  @Test
+  public void applyLockoutFilterShouldReturnNullWhenLockedOutNotRequested() {
+    UserSearchParams params = new UserSearchParamsDataBuilder().withLockedOut(null).build();
+
+    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+
+    assertNull(result);
+    verifyNoInteractions(userAuthService);
+  }
+
+  @Test
+  public void applyLockoutFilterShouldSetIdsFromAuthService() {
+    UUID lockedUserId = UUID.randomUUID();
+    UserDto.UserAuthDetailsApiContract authDetails =
+        new UserDto.UserAuthDetailsApiContract(lockedUserId, "john", null, true, true);
+
+    when(userAuthService.getAuthUserDetails(true))
+        .thenReturn(Collections.singletonList(authDetails));
+
+    UserSearchParams params = new UserSearchParamsDataBuilder()
+        .withId(null)
+        .withLockedOut(true)
+        .build();
+
+    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+
+    assertEquals(Boolean.TRUE, result.get(lockedUserId));
+    assertEquals(Collections.singleton(lockedUserId.toString()), params.getId());
+    verify(userAuthService).getAuthUserDetails(true);
+  }
+
+  @Test
+  public void applyLockoutFilterShouldIntersectWithExistingIdFilter() {
+    UUID lockedUserOne = UUID.randomUUID();
+    UUID lockedUserTwo = UUID.randomUUID();
+
+    when(userAuthService.getAuthUserDetails(true)).thenReturn(Arrays.asList(
+        new UserDto.UserAuthDetailsApiContract(lockedUserOne, "one", null, true, true),
+        new UserDto.UserAuthDetailsApiContract(lockedUserTwo, "two", null, true, true)));
+
+    UserSearchParams params = new UserSearchParamsDataBuilder()
+        .withId(newHashSet(lockedUserOne.toString()))
+        .withLockedOut(true)
+        .build();
+
+    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+
+    assertEquals(Collections.singleton(lockedUserOne.toString()), params.getId());
+    assertEquals(1, result.size());
+    assertTrue(result.containsKey(lockedUserOne));
   }
 
   private User generateUser() {

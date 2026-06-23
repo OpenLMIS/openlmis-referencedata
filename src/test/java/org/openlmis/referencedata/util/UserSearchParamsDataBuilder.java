@@ -31,6 +31,7 @@ public class UserSearchParamsDataBuilder {
   private String lastName = "lastName";
   private String homeFacilityId = UUID.randomUUID().toString();
   private Boolean active = true;
+  private Boolean lockedOut = null;
   private Map<String, String> extraData = emptyMap();
 
   /**
@@ -38,7 +39,7 @@ public class UserSearchParamsDataBuilder {
    */
   public UserSearchParams build() {
     return new UserSearchParams(id, username, firstName, lastName, homeFacilityId,
-        active, extraData);
+        active, lockedOut, extraData);
   }
 
   /**
@@ -51,6 +52,7 @@ public class UserSearchParamsDataBuilder {
     lastName = null;
     homeFacilityId = null;
     active = null;
+    lockedOut = null;
     extraData = null;
 
     return this;
@@ -83,6 +85,11 @@ public class UserSearchParamsDataBuilder {
 
   public UserSearchParamsDataBuilder withActive(Boolean active) {
     this.active = active;
+    return this;
+  }
+
+  public UserSearchParamsDataBuilder withLockedOut(Boolean lockedOut) {
+    this.lockedOut = lockedOut;
     return this;
   }
 

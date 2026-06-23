@@ -49,6 +49,7 @@ public final class UserSearchParams {
   private String lastName;
   private String homeFacilityId;
   private Boolean active;
+  private Boolean lockedOut;
   private Map<String, String> extraData;
 
   /**
@@ -78,7 +79,7 @@ public final class UserSearchParams {
     }
 
     return Stream
-        .of(username, firstName, lastName, homeFacilityId, active, extraData)
+        .of(username, firstName, lastName, homeFacilityId, active, lockedOut, extraData)
         .allMatch(Objects::isNull);
   }
 

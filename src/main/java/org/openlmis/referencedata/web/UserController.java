@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -256,11 +257,32 @@ public class UserController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
 
     LOGGER.debug("Getting all users");
+
+    boolean filterByLockout = requestParams.getLockedOut() != null;
+    Map<UUID, Boolean> lockoutStateById = null;
+
+    if (filterByLockout) {
+      profiler.start("APPLY_LOCKOUT_FILTER");
+      lockoutStateById = userService.applyLockoutFilter(requestParams);
+
+      if (requestParams.getId().isEmpty()) {
+        profiler.stop().log();
+        return Pagination.getPage(Collections.emptyList(), pageable, 0);
+      }
+    }
+
     profiler.start("SEARCH_USERS");
     Page<User> result = userService.searchUsersById(requestParams, pageable);
 
     profiler.start("EXPORT_TO_DTOS");
     Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
+
+    if (filterByLockout) {
+      profiler.start("ENRICH_WITH_LOCKOUT_STATE");
+      for (UserDto userDto : userDtos.getContent()) {
+        userDto.setLockedOut(lockoutStateById.get(userDto.getId()));
+      }
+    }
 
     profiler.stop().log();
     return userDtos;
