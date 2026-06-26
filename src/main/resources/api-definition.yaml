@@ -32,6 +32,15 @@ schemas:
           }
       }
 
+  - userPreferences: |
+      {
+          "type": "object",
+          "$schema": "http://json-schema.org/draft-04/schema",
+          "title": "UserPreferences",
+          "description": "Map of user preference key to value",
+          "additionalProperties": { "type": "string" }
+      }
+
   - errorResponse: |
       {   "type": "object",
           "$schema": "http://json-schema.org/draft-03/schema",
@@ -1640,6 +1649,56 @@ resourceTypes:
                           body:
                             application/json:
                               schema: namedResourceArray
+                      "403":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+                      "404":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+          /preferences:
+              is: [ secured ]
+              displayName: User preferences
+              get:
+                  is: [ secured ]
+                  description: Returns the user's preferences as a key-value map. Accessible to the user themselves or an administrator with the USERS_MANAGE right.
+                  responses:
+                      "200":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: userPreferences
+                      "403":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
+              put:
+                  is: [ secured ]
+                  description: Creates or updates the user's preferences (key-value map). Accessible to the user themselves or an administrator with the USERS_MANAGE right.
+                  body:
+                      application/json:
+                          schema: userPreferences
+                  responses:
+                      "200":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: userPreferences
+                      "400":
+                          headers:
+                            Keep-Alive:
+                          body:
+                            application/json:
+                              schema: localizedErrorResponse
                       "403":
                           headers:
                             Keep-Alive:

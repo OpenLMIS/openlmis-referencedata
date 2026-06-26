@@ -1,5 +1,6 @@
 15.6.0-SNAPSHOT (WIP)
 ==================
+* [OLMIS-8238](https://openlmis.atlassian.net/browse/OLMIS-8238): Add user preferences endpoint.
 
 Improvements:
 * GET `/tradeItems` now supports a repeatable `id` query parameter to filter trade items by their identifiers.
