@@ -34,6 +34,7 @@ public class UserImportMessageKeys extends MessageKeys {
   public static final String ERROR_USERNAME_DUPLICATED = join(ERROR, USERNAME, DUPLICATED);
   public static final String ERROR_EMAIL_DUPLICATED = join(ERROR, EMAIL, DUPLICATED);
 
+  public static final String ERROR_USERNAME_INVALID_FORMAT = join(ERROR, USERNAME, INVALID, FORMAT);
   public static final String ERROR_EMAIL_INVALID_FORMAT = join(ERROR, EMAIL, INVALID, FORMAT);
 
   public static final String ERROR_USERNAME_TOO_LONG = join(ERROR, USERNAME, TOO, LONG);
