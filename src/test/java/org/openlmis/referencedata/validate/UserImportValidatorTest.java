@@ -100,6 +100,17 @@ public class UserImportValidatorTest {
   }
 
   @Test
+  public void shouldThrowExceptionWhenWrongUsernameFormat() {
+    user2.setUsername("john.doe");
+
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(
+        "referenceData.error.user.import.username.invalid.format");
+
+    UserImportValidator.validateFileEntries(createEntryList());
+  }
+
+  @Test
   public void shouldThrowExceptionWhenWrongEmailFormat() {
     user2.setEmail("john1pl.pl");
 

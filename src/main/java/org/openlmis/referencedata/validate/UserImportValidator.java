@@ -24,6 +24,7 @@ import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.
 import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_PHONE_NUMBER_TOO_LONG;
 import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_TIMEZONE_TOO_LONG;
 import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_USERNAME_DUPLICATED;
+import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_USERNAME_INVALID_FORMAT;
 import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_USERNAME_REQUIRED_FOR_ALL_USERS;
 import static org.openlmis.referencedata.util.messagekeys.UserImportMessageKeys.ERROR_USERNAME_TOO_LONG;
 
@@ -46,6 +47,9 @@ public class UserImportValidator {
       "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
+  private static final String USERNAME_REGEX = "\\w+";
+  private static final Pattern USERNAME_PATTERN = Pattern.compile(USERNAME_REGEX);
+
   /**
    * Validates list of {@link UserDto} entries read from file.
    *
@@ -54,6 +58,7 @@ public class UserImportValidator {
   public static void validateFileEntries(List<UserDto> entries) {
     validateMandatoryFields(entries);
     validateDuplicatedFields(entries);
+    validateUsernameFormats(entries);
     validateEmailFormats(entries);
     validateTooLongFields(entries);
   }
@@ -102,6 +107,18 @@ public class UserImportValidator {
     if (!duplicatedEmails.isEmpty()) {
       throw new ValidationMessageException(
           new Message(ERROR_EMAIL_DUPLICATED, String.join(", ", duplicatedEmails)));
+    }
+  }
+
+  private static void validateUsernameFormats(List<UserDto> entries) {
+    List<String> invalidUsernames = entries.stream()
+        .map(UserDto::getUsername)
+        .filter(username -> !USERNAME_PATTERN.matcher(username).matches())
+        .collect(Collectors.toList());
+
+    if (!invalidUsernames.isEmpty()) {
+      throw new ValidationMessageException(
+          new Message(ERROR_USERNAME_INVALID_FORMAT, String.join(", ", invalidUsernames)));
     }
   }
 
