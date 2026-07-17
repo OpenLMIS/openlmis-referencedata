@@ -429,7 +429,8 @@ public class UserServiceTest {
     Map<UUID, UserDto.UserAuthDetailsApiContract> result = userService.applyLockoutFilter(params);
 
     assertEquals(Boolean.TRUE, result.get(lockedUserId).getLockedOut());
-    assertEquals(attemptDate, result.get(lockedUserId).getLastUnsuccessfulAuthenticationAttemptDate());
+    assertEquals(attemptDate,
+        result.get(lockedUserId).getLastUnsuccessfulAuthenticationAttemptDate());
     assertEquals(Collections.singleton(lockedUserId.toString()), params.getId());
     verify(userAuthService).getAuthUserDetails(true);
   }
