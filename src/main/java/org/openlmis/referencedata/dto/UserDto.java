@@ -17,6 +17,7 @@ package org.openlmis.referencedata.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Sets;
+import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,13 +65,16 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean lockedOut;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private ZonedDateTime lastUnsuccessfulAuthenticationAttemptDate;
+
   private Map<String, Object> extraData;
 
   private Set<RoleAssignmentDto> roleAssignments = Sets.newHashSet();
 
   public UserAuthDetailsApiContract toUserAuthDetailsApiContract(String defaultPassword) {
     return new UserAuthDetailsApiContract(this.getId(), this.getUsername(),
-        defaultPassword, this.isActive(), null);
+        defaultPassword, this.isActive(), null, null);
   }
 
   /**
@@ -108,5 +112,6 @@ public final class UserDto extends UserContactDetailsDto implements User.Exporte
     private String password;
     private Boolean enabled;
     private Boolean lockedOut;
+    private ZonedDateTime lastUnsuccessfulAuthenticationAttemptDate;
   }
 }
