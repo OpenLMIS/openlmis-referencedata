@@ -118,36 +118,38 @@ public class UserService implements ExportableDataService<UserDto> {
 
   /**
    * Narrows the search params' id filter (in place) to the auth users matching the requested
-   * lockout state, so pagination stays correct. Returns their id-to-lockout-state map for response
-   * enrichment, or {@code null} when no lockout filtering is requested.
+   * lockout state, so pagination stays correct. Returns their id-to-auth-details map (lockout
+   * state and last unsuccessful login date) for response enrichment, or {@code null} when no
+   * lockout filtering is requested.
    *
    * @param searchParams the user search params
-   * @return the lockout-state map, or {@code null} when no lockout filtering is requested
+   * @return the id-to-auth-details map, or {@code null} when no lockout filtering is requested
    */
-  public Map<UUID, Boolean> applyLockoutFilter(UserSearchParams searchParams) {
+  public Map<UUID, UserDto.UserAuthDetailsApiContract> applyLockoutFilter(
+      UserSearchParams searchParams) {
     if (searchParams.getLockedOut() == null) {
       return null;
     }
 
-    Map<UUID, Boolean> lockoutStateById = userAuthService
+    Map<UUID, UserDto.UserAuthDetailsApiContract> authDetailsById = userAuthService
         .getAuthUserDetails(searchParams.getLockedOut())
         .stream()
         .collect(Collectors.toMap(
             UserDto.UserAuthDetailsApiContract::getId,
-            UserDto.UserAuthDetailsApiContract::getLockedOut));
+            contract -> contract));
 
-    Set<String> ids = lockoutStateById.keySet().stream()
+    Set<String> ids = authDetailsById.keySet().stream()
         .map(UUID::toString)
         .collect(Collectors.toSet());
 
     if (!CollectionUtils.isEmpty(searchParams.getId())) {
       ids.retainAll(searchParams.getId());
-      lockoutStateById.keySet().removeIf(id -> !ids.contains(id.toString()));
+      authDetailsById.keySet().removeIf(id -> !ids.contains(id.toString()));
     }
 
     searchParams.setId(ids);
 
-    return lockoutStateById;
+    return authDetailsById;
   }
 
   /**

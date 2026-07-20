@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.google.common.collect.Sets;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -239,8 +240,12 @@ public class UserControllerTest {
         .withId(Sets.newHashSet(user1.getId().toString()))
         .withLockedOut(true)
         .build();
-    Map<UUID, Boolean> lockoutState = Collections.singletonMap(user1.getId(), true);
-    when(userService.applyLockoutFilter(searchParams)).thenReturn(lockoutState);
+    ZonedDateTime attemptDate = ZonedDateTime.now();
+    UserDto.UserAuthDetailsApiContract details = new UserDto.UserAuthDetailsApiContract(
+        user1.getId(), user1.getUsername(), null, true, true, attemptDate);
+    Map<UUID, UserDto.UserAuthDetailsApiContract> authDetails =
+        Collections.singletonMap(user1.getId(), details);
+    when(userService.applyLockoutFilter(searchParams)).thenReturn(authDetails);
     when(userService.searchUsersById(searchParams, pageable))
         .thenReturn(Pagination.getPage(Lists.newArrayList(user1), PageRequest.of(0, 1)));
 
@@ -250,6 +255,8 @@ public class UserControllerTest {
     //then
     assertThat(userDtos.getContent()).hasSize(1);
     assertThat(userDtos.getContent().get(0).getLockedOut()).isTrue();
+    assertThat(userDtos.getContent().get(0).getLastUnsuccessfulAuthenticationAttemptDate())
+        .isEqualTo(attemptDate);
   }
 
   @Test

@@ -259,11 +259,11 @@ public class UserController extends BaseController {
     LOGGER.debug("Getting all users");
 
     boolean filterByLockout = requestParams.getLockedOut() != null;
-    Map<UUID, Boolean> lockoutStateById = null;
+    Map<UUID, UserDto.UserAuthDetailsApiContract> authDetailsById = null;
 
     if (filterByLockout) {
       profiler.start("APPLY_LOCKOUT_FILTER");
-      lockoutStateById = userService.applyLockoutFilter(requestParams);
+      authDetailsById = userService.applyLockoutFilter(requestParams);
 
       if (requestParams.getId().isEmpty()) {
         profiler.stop().log();
@@ -280,7 +280,12 @@ public class UserController extends BaseController {
     if (filterByLockout) {
       profiler.start("ENRICH_WITH_LOCKOUT_STATE");
       for (UserDto userDto : userDtos.getContent()) {
-        userDto.setLockedOut(lockoutStateById.get(userDto.getId()));
+        UserDto.UserAuthDetailsApiContract details = authDetailsById.get(userDto.getId());
+        if (details != null) {
+          userDto.setLockedOut(details.getLockedOut());
+          userDto.setLastUnsuccessfulAuthenticationAttemptDate(
+              details.getLastUnsuccessfulAuthenticationAttemptDate());
+        }
       }
     }
 

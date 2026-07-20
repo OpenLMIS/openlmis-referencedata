@@ -29,6 +29,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -404,7 +405,7 @@ public class UserServiceTest {
   public void applyLockoutFilterShouldReturnNullWhenLockedOutNotRequested() {
     UserSearchParams params = new UserSearchParamsDataBuilder().withLockedOut(null).build();
 
-    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+    Map<UUID, UserDto.UserAuthDetailsApiContract> result = userService.applyLockoutFilter(params);
 
     assertNull(result);
     verifyNoInteractions(userAuthService);
@@ -413,8 +414,9 @@ public class UserServiceTest {
   @Test
   public void applyLockoutFilterShouldSetIdsFromAuthService() {
     UUID lockedUserId = UUID.randomUUID();
+    ZonedDateTime attemptDate = ZonedDateTime.now();
     UserDto.UserAuthDetailsApiContract authDetails =
-        new UserDto.UserAuthDetailsApiContract(lockedUserId, "john", null, true, true);
+        new UserDto.UserAuthDetailsApiContract(lockedUserId, "john", null, true, true, attemptDate);
 
     when(userAuthService.getAuthUserDetails(true))
         .thenReturn(Collections.singletonList(authDetails));
@@ -424,9 +426,11 @@ public class UserServiceTest {
         .withLockedOut(true)
         .build();
 
-    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+    Map<UUID, UserDto.UserAuthDetailsApiContract> result = userService.applyLockoutFilter(params);
 
-    assertEquals(Boolean.TRUE, result.get(lockedUserId));
+    assertEquals(Boolean.TRUE, result.get(lockedUserId).getLockedOut());
+    assertEquals(attemptDate,
+        result.get(lockedUserId).getLastUnsuccessfulAuthenticationAttemptDate());
     assertEquals(Collections.singleton(lockedUserId.toString()), params.getId());
     verify(userAuthService).getAuthUserDetails(true);
   }
@@ -437,15 +441,15 @@ public class UserServiceTest {
     UUID lockedUserTwo = UUID.randomUUID();
 
     when(userAuthService.getAuthUserDetails(true)).thenReturn(Arrays.asList(
-        new UserDto.UserAuthDetailsApiContract(lockedUserOne, "one", null, true, true),
-        new UserDto.UserAuthDetailsApiContract(lockedUserTwo, "two", null, true, true)));
+        new UserDto.UserAuthDetailsApiContract(lockedUserOne, "one", null, true, true, null),
+        new UserDto.UserAuthDetailsApiContract(lockedUserTwo, "two", null, true, true, null)));
 
     UserSearchParams params = new UserSearchParamsDataBuilder()
         .withId(newHashSet(lockedUserOne.toString()))
         .withLockedOut(true)
         .build();
 
-    Map<UUID, Boolean> result = userService.applyLockoutFilter(params);
+    Map<UUID, UserDto.UserAuthDetailsApiContract> result = userService.applyLockoutFilter(params);
 
     assertEquals(Collections.singleton(lockedUserOne.toString()), params.getId());
     assertEquals(1, result.size());
