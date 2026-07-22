@@ -2,6 +2,7 @@
 ==================
 
 Improvements:
+* [SELV3-858](https://openlmis.atlassian.net/browse/SELV3-858): Added the `STOCK_EVENTS_CANCEL` supervision right (used by the stockmanagement service to authorize cancelling issue/receive movements) and granted it to the demo Stock Manager role.
 * GET `/tradeItems` now supports a repeatable `id` query parameter to filter trade items by their identifiers.
 * [OLMIS-8118](https://openlmis.atlassian.net/browse/OLMIS-8118): Reject kit child quantity exceeding Integer max.
 
