@@ -3,6 +3,7 @@
 
 Improvements:
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Migrated the SonarCloud analysis to Java 21 by running it through the SonarQube scan action instead of the Gradle plugin, and removed the now-unused Gradle sonar plugin and configuration.
+* [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Removed the axios dependency from the Consul registration script, replacing it with the native Node `http` client (no more axios security advisories to track).
 * GET `/tradeItems` now supports a repeatable `id` query parameter to filter trade items by their identifiers.
 * [OLMIS-8118](https://openlmis.atlassian.net/browse/OLMIS-8118): Reject kit child quantity exceeding Integer max.
 
