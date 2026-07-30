@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.CommodityType;
@@ -77,7 +78,9 @@ public class CommodityTypeController extends BaseController {
     validator.validate(commodityTypeDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
 
-    CommodityType commodityType = CommodityType.newInstance(commodityTypeDto);
+    CommodityType commodityType = Objects.requireNonNull(
+        CommodityType.newInstance(commodityTypeDto),
+        "commodityType must not be null for a validated commodityTypeDto");
 
     if (null != commodityType.getId()) {
       UUID productId = commodityType.getId();
