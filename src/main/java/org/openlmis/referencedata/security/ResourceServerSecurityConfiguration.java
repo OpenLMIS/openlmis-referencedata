@@ -91,6 +91,7 @@ public class ResourceServerSecurityConfiguration implements ResourceServerConfig
             "/webjars/**",
             "/referencedata/webjars/**",
             "/actuator/health",
+            "/actuator/prometheus",
             "/referencedata/docs/**",
             "/localeSettings",
             "/togglz-console/**",
