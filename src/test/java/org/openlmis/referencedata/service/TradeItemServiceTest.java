@@ -50,6 +50,8 @@ public class TradeItemServiceTest {
   private static final String GTIN_13 = "5901234123457";
   private static final String PADDED_GTIN_13 = "05901234123457";
   private static final String GTIN_14 = "05890123456786";
+  private static final String NOT_A_GTIN = "not-a-gtin";
+  private static final String PADDED_NOT_A_GTIN = "0000" + NOT_A_GTIN;
 
   @Mock
   private TradeItemRepository tradeItemRepository;
@@ -154,17 +156,19 @@ public class TradeItemServiceTest {
 
     Page<TradeItem> result = service.search(params, PAGEABLE);
 
+    verify(tradeItemRepository).findByGtin(GTIN_14);
     assertEquals(0, result.getContent().size());
     assertEquals(0, result.getTotalElements());
   }
 
   @Test
   public void shouldReturnEmptyPageWhenGtinCannotMatchAnyTradeItem() {
-    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, "not-a-gtin");
-    when(tradeItemRepository.findByGtin("0000not-a-gtin")).thenReturn(Optional.empty());
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, NOT_A_GTIN);
+    when(tradeItemRepository.findByGtin(PADDED_NOT_A_GTIN)).thenReturn(Optional.empty());
 
     Page<TradeItem> result = service.search(params, PAGEABLE);
 
+    verify(tradeItemRepository).findByGtin(PADDED_NOT_A_GTIN);
     assertEquals(0, result.getContent().size());
   }
 
