@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
+import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.repository.TradeItemRepository;
@@ -51,16 +52,28 @@ public class TradeItemService implements ExportableDataService<TradeItemCsvModel
 
   /**
    * Searches for trade items matching the given parameters. Filters are applied with the following
-   * precedence: if any {@code id} is provided, trade items are looked up by those identifiers and
-   * the remaining filters are ignored; otherwise, if a {@code classificationId} is provided, it is
+   * precedence: if a {@code gtin} is provided, the trade item registered with it is returned and
+   * the remaining filters are ignored; otherwise, if any {@code id} is provided, trade items are
+   * looked up by those identifiers; otherwise, if a {@code classificationId} is provided, it is
    * matched either fully or partially depending on the {@code fullMatch} flag; when no filter is
-   * provided, all trade items are returned.
+   * provided, all trade items are returned. The {@code gtin} is normalized but not validated - a
+   * value that cannot identify a trade item simply matches nothing.
    *
-   * @param requestParams the search parameters (trade item ids, classification id, full match flag)
+   * @param requestParams the search parameters (gtin, trade item ids, classification id, full match
+   *                      flag)
    * @param pageable      the pagination parameters
    * @return a page of matching trade items
    */
   public Page<TradeItem> search(@NotNull TradeItemSearchParams requestParams, Pageable pageable) {
+    String gtin = requestParams.getGtin();
+    if (StringUtils.isNotBlank(gtin)) {
+      List<TradeItem> found = tradeItemRepository
+          .findByGtin(Gtin.normalize(gtin))
+          .map(Collections::singletonList)
+          .orElse(Collections.emptyList());
+      return Pagination.getPage(found, pageable);
+    }
+
     final Set<UUID> id = Optional.ofNullable(requestParams.getId()).orElse(Collections.emptySet());
     if (!id.isEmpty()) {
       return Pagination.getPage(tradeItemRepository.findAllById(id), pageable);

@@ -31,4 +31,5 @@ public class TradeItemSearchParams {
   private Set<UUID> id;
   private String classificationId;
   private boolean fullMatch;
+  private String gtin;
 }

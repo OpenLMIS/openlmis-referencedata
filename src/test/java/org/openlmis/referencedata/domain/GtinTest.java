@@ -17,16 +17,31 @@ package org.openlmis.referencedata.domain;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_INVALID_CHECK_DIGIT;
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_INVALID_LENGTH;
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_NUMERIC;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class GtinTest {
 
-  private Gtin gtin1 = new Gtin("11111111111111");
-  private Gtin gtin2 = new Gtin("22222222");
+  private static final String GTIN_8 = "96385074";
+  private static final String GTIN_12 = "614141000036";
+  private static final String GTIN_13 = "5901234123457";
+  private static final String GTIN_14 = "05890123456786";
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
+  private Gtin gtin1 = new Gtin("11111111111113");
+  private Gtin gtin2 = new Gtin("22222220");
 
   @Test
   public void shouldBeEqualByGtin() {
@@ -54,18 +69,133 @@ public class GtinTest {
         .verify();
   }
 
-  @Test(expected = ValidationMessageException.class)
+  @Test
+  public void shouldKeepGtin14AsIs() {
+    assertEquals(GTIN_14, new Gtin(GTIN_14).getGtin());
+  }
+
+  @Test
+  public void shouldPadGtin13To14Digits() {
+    assertEquals("05901234123457", new Gtin(GTIN_13).getGtin());
+  }
+
+  @Test
+  public void shouldPadGtin12To14Digits() {
+    assertEquals("00614141000036", new Gtin(GTIN_12).getGtin());
+  }
+
+  @Test
+  public void shouldPadGtin8To14Digits() {
+    assertEquals("00000096385074", new Gtin(GTIN_8).getGtin());
+  }
+
+  @Test
+  public void shouldBeEqualToTheSameGtinInAnotherStructure() {
+    assertEquals(new Gtin(GTIN_13), new Gtin("05901234123457"));
+    assertEquals(new Gtin(GTIN_8), new Gtin("00000096385074"));
+  }
+
+  @Test
   public void shouldThrowExceptionIfGtinIsNotNumeric() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_NUMERIC);
+
     new Gtin("ab12345678ba");
   }
 
-  @Test(expected = ValidationMessageException.class)
+  @Test
+  public void shouldThrowExceptionIfGtinUsesNonAsciiDigits() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_NUMERIC);
+
+    // Arabic-Indic digits for 96385074 - accepted by Character.isDigit, unusable by a scanner
+    new Gtin(new String(new char[] {0x0669, 0x0666, 0x0663, 0x0668, 0x0665, 0x0660, 0x0667,
+        0x0664}));
+  }
+
+  @Test
+  public void shouldThrowExceptionIfGtinIsNull() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_NUMERIC);
+
+    new Gtin(null);
+  }
+
+  @Test
+  public void shouldThrowExceptionIfGtinIsEmpty() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_NUMERIC);
+
+    new Gtin("");
+  }
+
+  @Test
   public void shouldThrowExceptionIfGtinIsTooShort() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_LENGTH);
+
     new Gtin("1234567");
   }
 
-  @Test(expected = ValidationMessageException.class)
+  @Test
   public void shouldThrowExceptionIfGtinIsTooLong() {
-    new Gtin("123456789012345");
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_LENGTH);
+
+    new Gtin("059012341234570");
+  }
+
+  @Test
+  public void shouldThrowExceptionIfGtinHasLengthBetweenDefinedStructures() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_LENGTH);
+
+    // 9, 10 and 11 digits are not GTIN structures, but were accepted before
+    new Gtin("963850740");
+  }
+
+  @Test
+  public void shouldThrowExceptionIfGtinHasTenDigits() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_LENGTH);
+
+    new Gtin("9638507400");
+  }
+
+  @Test
+  public void shouldThrowExceptionIfGtinHasElevenDigits() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_LENGTH);
+
+    new Gtin("96385074000");
+  }
+
+  @Test
+  public void shouldThrowExceptionIfCheckDigitIsInvalid() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_CHECK_DIGIT);
+
+    new Gtin("05890123456787");
+  }
+
+  @Test
+  public void shouldThrowExceptionIfCheckDigitOfShorterStructureIsInvalid() {
+    expectedException.expect(ValidationMessageException.class);
+    expectedException.expectMessage(ERROR_GTIN_INVALID_CHECK_DIGIT);
+
+    new Gtin("96385075");
+  }
+
+  @Test
+  public void shouldNormalizeToFourteenDigits() {
+    assertEquals("05901234123457", Gtin.normalize(GTIN_13));
+    assertEquals("00000096385074", Gtin.normalize(GTIN_8));
+  }
+
+  @Test
+  public void shouldNotChangeValueThatCannotBeNormalized() {
+    assertNull(Gtin.normalize(null));
+    assertEquals(GTIN_14, Gtin.normalize(GTIN_14));
+    assertEquals("059012341234570", Gtin.normalize("059012341234570"));
   }
 }

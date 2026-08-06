@@ -16,6 +16,7 @@
 package org.openlmis.referencedata.repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.TradeItemCsvModel;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TradeItemRepository
     extends JpaRepository<TradeItem, UUID>, TradeItemRepositoryCustom,
@@ -49,5 +51,14 @@ public interface TradeItemRepository
 
   @Query(nativeQuery = true)
   List<TradeItemCsvModel> findAllTradeItemCsvModels();
+
+  /**
+   * Finds the trade item registered with the given GTIN, by equality on the indexed column.
+   *
+   * @param gtin the normalized, 14-digit GTIN
+   * @return the matching trade item, if any
+   */
+  @Query("SELECT t FROM TradeItem t WHERE t.gtin.gtin = :gtin")
+  Optional<TradeItem> findByGtin(@Param("gtin") String gtin);
 
 }

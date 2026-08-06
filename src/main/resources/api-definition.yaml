@@ -911,8 +911,14 @@ resourceTypes:
                       schema: localizedErrorResponse
       get:
           is: [ secured, paginated ]
-          description: Retrieve trade items. Optionally filter by trade item IDs, or by the classification ID using either a full or partial match.
+          description: Retrieve trade items. Optionally filter by GTIN, by trade item IDs, or by the classification ID using either a full or partial match. The gtin filter takes precedence.
           queryParameters:
+              gtin:
+                      displayName: gtin
+                      description: GTIN of the trade item, matched in the stored 14-digit form, so a GTIN-8, GTIN-12 or GTIN-13 value resolves the same trade item. Returns at most one.
+                      type: string
+                      required: false
+                      repeat: false
               id:
                       displayName: id
                       type: string

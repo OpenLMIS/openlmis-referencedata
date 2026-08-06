@@ -20,9 +20,15 @@ import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.iterableWithSize;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Optional;
 import java.util.UUID;
+import javax.persistence.EntityManager;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.TradeItem;
@@ -34,12 +40,21 @@ import org.springframework.data.repository.CrudRepository;
 public class TradeItemRepositoryIntegrationTest extends
     BaseCrudRepositoryIntegrationTest<TradeItem> {
 
+  private static final String GTIN_8 = "96385074";
+  private static final String GTIN_13 = "5901234123457";
+  private static final String PADDED_GTIN_13 = "05901234123457";
+  private static final String GTIN_14 = "05890123456786";
+  private static final String LEGACY_GTIN = "123456789";
+
   private TradeItem tradeItem1;
   private TradeItem tradeItem2;
   private TradeItem tradeItem3;
 
   @Autowired
   private TradeItemRepository repository;
+
+  @Autowired
+  private EntityManager entityManager;
 
   @Override
   CrudRepository<TradeItem, UUID> getRepository() {
@@ -108,15 +123,81 @@ public class TradeItemRepositoryIntegrationTest extends
   @Test(expected = DataIntegrityViolationException.class)
   public void shouldNotAllowDuplicateGtin() {
     TradeItem tradeItem = generateInstance();
-    tradeItem.setGtin(new Gtin("12345678"));
+    tradeItem.setGtin(new Gtin(GTIN_8));
 
     TradeItem anotherTradeItem = generateInstance();
-    anotherTradeItem.setGtin(new Gtin("12345678"));
+    anotherTradeItem.setGtin(new Gtin(GTIN_8));
 
     repository.save(tradeItem);
     repository.save(anotherTradeItem);
 
     repository.flush();
+  }
+
+  @Test(expected = DataIntegrityViolationException.class)
+  public void shouldNotAllowGtinDuplicatedByNormalization() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.setGtin(new Gtin(GTIN_13));
+
+    TradeItem anotherTradeItem = generateInstance();
+    anotherTradeItem.setGtin(new Gtin(PADDED_GTIN_13));
+
+    repository.save(tradeItem);
+    repository.save(anotherTradeItem);
+
+    repository.flush();
+  }
+
+  @Test
+  public void shouldFindByGtin() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.setGtin(new Gtin(GTIN_14));
+    repository.saveAndFlush(tradeItem);
+
+    Optional<TradeItem> result = repository.findByGtin(GTIN_14);
+
+    assertTrue(result.isPresent());
+    assertEquals(tradeItem, result.get());
+  }
+
+  @Test
+  public void shouldFindByGtinStoredInShorterStructure() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.setGtin(new Gtin(GTIN_13));
+    repository.saveAndFlush(tradeItem);
+
+    Optional<TradeItem> result = repository.findByGtin(PADDED_GTIN_13);
+
+    assertTrue(result.isPresent());
+    assertEquals(tradeItem, result.get());
+  }
+
+  @Test
+  public void shouldReadTradeItemWithGtinViolatingCurrentValidationRules() {
+    // rows from earlier versions are not migrated, so reading a now-invalid GTIN must still work
+    TradeItem tradeItem = generateInstance();
+    repository.saveAndFlush(tradeItem);
+
+    entityManager
+        .createNativeQuery("UPDATE referencedata.trade_items SET gtin = ?1 WHERE id = ?2")
+        .setParameter(1, LEGACY_GTIN)
+        .setParameter(2, tradeItem.getId())
+        .executeUpdate();
+    entityManager.clear();
+
+    TradeItem result = repository.findById(tradeItem.getId()).orElse(null);
+
+    assertNotNull(result);
+    assertEquals(LEGACY_GTIN, result.getGtin().getGtin());
+  }
+
+  @Test
+  public void shouldNotFindByUnknownGtin() {
+    TradeItem tradeItem = generateInstance();
+    tradeItem.setGtin(new Gtin(GTIN_14));
+    repository.saveAndFlush(tradeItem);
+
+    assertFalse(repository.findByGtin(PADDED_GTIN_13).isPresent());
   }
 
   private void setUpTradeItemsWithClassifications() {

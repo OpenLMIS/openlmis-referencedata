@@ -61,6 +61,7 @@ public abstract class MessageKeys {
   protected static final String MUST_BE_PROVIDED = "mustBeProvided";
   protected static final String MISMATCH = "mismatch";
   protected static final String INVALID_LENGTH = "invalidLength";
+  protected static final String INVALID_CHECK_DIGIT = "invalidCheckDigit";
   protected static final String INVALID_PARAMS = "invalidParams";
   protected static final String FORMAT = "format";
   protected static final String UUID = "uuid";
