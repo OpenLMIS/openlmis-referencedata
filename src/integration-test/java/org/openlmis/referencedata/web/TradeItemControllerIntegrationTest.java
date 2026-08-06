@@ -52,10 +52,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+@SuppressWarnings("PMD.TooManyMethods")
 public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
   private static final String RESOURCE_URL = "/api/tradeItems";
   private static final String CID = "cid";
+  private static final String GTIN = "gtin";
   private static final String MANUFACTURER_ONE_NAME = "one";
   private static final String GTIN_ONE = "96385074";
   private static final String MANUFACTURER_TWO_NAME = "two";
@@ -210,7 +212,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("gtin", GTIN_14)
+        .queryParam(GTIN, GTIN_14)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -232,7 +234,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("gtin", GTIN_13)
+        .queryParam(GTIN, GTIN_13)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -252,7 +254,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
     PageDto response = restAssured
         .given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .queryParam("gtin", GTIN_14)
+        .queryParam(GTIN, GTIN_14)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when()
         .get(RESOURCE_URL)
@@ -270,7 +272,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     restAssured
         .given()
-        .queryParam("gtin", GTIN_14)
+        .queryParam(GTIN, GTIN_14)
         .when()
         .get(RESOURCE_URL)
         .then()
@@ -406,7 +408,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
           retrieved.get("manufacturerOfTradeItem"));
       String expectedGtin = (expected.get(i).getGtin() == null)
           ? null : expected.get(i).getGtin().toString();
-      assertEquals(expectedGtin, retrieved.get("gtin"));
+      assertEquals(expectedGtin, retrieved.get(GTIN));
     }
   }
 }
