@@ -17,6 +17,7 @@ package org.openlmis.referencedata.util.messagekeys;
 
 public abstract class TradeItemMessageKeys extends MessageKeys {
   private static final String ERROR = join(SERVICE_ERROR, TRADE_ITEM);
+  private static final String GTIN = "gtin";
 
   public static final String ERROR_NOT_FOUND_WITH_ID = join(ERROR, NOT_FOUND, WITH, ID);
   public static final String ERROR_NULL = join(ERROR, NULL);
@@ -25,9 +26,11 @@ public abstract class TradeItemMessageKeys extends MessageKeys {
       join(ERROR, "manufacturerOfTradeItem", REQUIRED);
 
   public static final String ERROR_GTIN_NUMERIC =
-      join(ERROR, "gtin", NUMERIC);
+      join(ERROR, GTIN, NUMERIC);
   public static final String ERROR_GTIN_INVALID_LENGTH =
-      join(ERROR, "gtin", INVALID_LENGTH);
+      join(ERROR, GTIN, INVALID_LENGTH);
+  public static final String ERROR_GTIN_INVALID_CHECK_DIGIT =
+      join(ERROR, GTIN, INVALID_CHECK_DIGIT);
   public static final String ERROR_GTIN_DUPLICATED =
-      join(ERROR, "gtin", DUPLICATED);
+      join(ERROR, GTIN, DUPLICATED);
 }

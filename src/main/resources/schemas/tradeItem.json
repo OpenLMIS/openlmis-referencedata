@@ -14,7 +14,8 @@
     },
     "gtin": {
       "type": "string",
-      "title": "gtin"
+      "title": "gtin",
+      "description": "Global Trade Item Number, accepted as GTIN-8/12/13/14 with a valid check digit and returned zero-padded to 14 digits."
     },
     "classifications": {
       "type": "array",

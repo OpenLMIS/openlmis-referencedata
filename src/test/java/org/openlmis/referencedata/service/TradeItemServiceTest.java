@@ -16,11 +16,15 @@
 package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.assertj.core.util.Lists;
@@ -39,9 +43,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
+@SuppressWarnings("PMD.TooManyMethods")
 public class TradeItemServiceTest {
 
   private static final Pageable PAGEABLE = PageRequest.of(0, 10);
+  private static final String GTIN_13 = "5901234123457";
+  private static final String PADDED_GTIN_13 = "05901234123457";
+  private static final String GTIN_14 = "05890123456786";
 
   @Mock
   private TradeItemRepository tradeItemRepository;
@@ -76,7 +84,7 @@ public class TradeItemServiceTest {
   public void shouldSearchTradeItemsByIds() {
     TradeItem tradeItem = new TradeItemDataBuilder().build();
     Set<UUID> ids = Collections.singleton(tradeItem.getId());
-    TradeItemSearchParams params = new TradeItemSearchParams(ids, null, false);
+    TradeItemSearchParams params = new TradeItemSearchParams(ids, null, false, null);
     when(tradeItemRepository.findAllById(ids)).thenReturn(Lists.newArrayList(tradeItem));
 
     Page<TradeItem> result = service.search(params, PAGEABLE);
@@ -90,7 +98,7 @@ public class TradeItemServiceTest {
   public void shouldSearchTradeItemsByClassificationIdWithFullMatch() {
     TradeItem tradeItem = new TradeItemDataBuilder().build();
     String classificationId = "classification-1";
-    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, true);
+    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, true, null);
     when(tradeItemRepository.findByClassificationId(classificationId))
         .thenReturn(Lists.newArrayList(tradeItem));
 
@@ -104,7 +112,7 @@ public class TradeItemServiceTest {
   public void shouldSearchTradeItemsByClassificationIdWithPartialMatch() {
     TradeItem tradeItem = new TradeItemDataBuilder().build();
     String classificationId = "classification";
-    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, false);
+    TradeItemSearchParams params = new TradeItemSearchParams(null, classificationId, false, null);
     when(tradeItemRepository.findByClassificationIdLike(classificationId))
         .thenReturn(Lists.newArrayList(tradeItem));
 
@@ -115,9 +123,84 @@ public class TradeItemServiceTest {
   }
 
   @Test
+  public void shouldSearchTradeItemsByGtin() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, GTIN_14);
+    when(tradeItemRepository.findByGtin(GTIN_14)).thenReturn(Optional.of(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findByGtin(GTIN_14);
+    assertEquals(1, result.getContent().size());
+    assertEquals(tradeItem, result.getContent().get(0));
+  }
+
+  @Test
+  public void shouldNormalizeGtinBeforeSearching() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, GTIN_13);
+    when(tradeItemRepository.findByGtin(PADDED_GTIN_13)).thenReturn(Optional.of(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findByGtin(PADDED_GTIN_13);
+    assertEquals(1, result.getContent().size());
+  }
+
+  @Test
+  public void shouldReturnEmptyPageWhenNoTradeItemIsRegisteredWithGtin() {
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, GTIN_14);
+    when(tradeItemRepository.findByGtin(GTIN_14)).thenReturn(Optional.empty());
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    assertEquals(0, result.getContent().size());
+    assertEquals(0, result.getTotalElements());
+  }
+
+  @Test
+  public void shouldReturnEmptyPageWhenGtinCannotMatchAnyTradeItem() {
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, "not-a-gtin");
+    when(tradeItemRepository.findByGtin("0000not-a-gtin")).thenReturn(Optional.empty());
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    assertEquals(0, result.getContent().size());
+  }
+
+  @Test
+  public void shouldIgnoreOtherFiltersWhenGtinIsProvided() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    TradeItemSearchParams params = new TradeItemSearchParams(
+        Collections.singleton(UUID.randomUUID()), "classification-1", true, GTIN_14);
+    when(tradeItemRepository.findByGtin(GTIN_14)).thenReturn(Optional.of(tradeItem));
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    assertEquals(1, result.getContent().size());
+    verify(tradeItemRepository).findByGtin(GTIN_14);
+    verify(tradeItemRepository, never()).findAllById(any());
+    verify(tradeItemRepository, never()).findByClassificationId(anyString());
+  }
+
+  @Test
+  public void shouldIgnoreBlankGtin() {
+    TradeItem tradeItem = new TradeItemDataBuilder().build();
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, " ");
+    Page<TradeItem> page = new PageImpl<>(Lists.newArrayList(tradeItem));
+    when(tradeItemRepository.findAll(PAGEABLE)).thenReturn(page);
+
+    Page<TradeItem> result = service.search(params, PAGEABLE);
+
+    verify(tradeItemRepository).findAll(PAGEABLE);
+    verify(tradeItemRepository, never()).findByGtin(anyString());
+    assertEquals(1, result.getContent().size());
+  }
+
+  @Test
   public void shouldReturnAllTradeItemsWhenNoParamsProvided() {
     TradeItem tradeItem = new TradeItemDataBuilder().build();
-    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false);
+    TradeItemSearchParams params = new TradeItemSearchParams(null, null, false, null);
     Page<TradeItem> page = new PageImpl<>(Lists.newArrayList(tradeItem));
     when(tradeItemRepository.findAll(PAGEABLE)).thenReturn(page);
 

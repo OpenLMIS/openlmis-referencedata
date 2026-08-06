@@ -7,6 +7,7 @@ Improvements:
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Removed the axios dependency from the Consul registration script, replacing it with the native Node `http` client (no more axios security advisories to track).
 * GET `/tradeItems` now supports a repeatable `id` query parameter to filter trade items by their identifiers.
 * [OLMIS-8118](https://openlmis.atlassian.net/browse/OLMIS-8118): Reject kit child quantity exceeding Integer max.
+* [OLMIS-8287](https://openlmis.atlassian.net/browse/OLMIS-8287): GET `/tradeItems` now supports a `gtin` query parameter; GTINs are normalized to 14 digits and validated (length, GS1 check digit) on write.
 
 15.5.0 / 2026-06-09
 ==================

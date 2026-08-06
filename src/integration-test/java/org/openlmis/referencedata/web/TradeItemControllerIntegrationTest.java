@@ -25,6 +25,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 import static org.openlmis.referencedata.dto.TradeItemDto.newInstance;
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_INVALID_CHECK_DIGIT;
+import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_GTIN_INVALID_LENGTH;
 import static org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys.ERROR_MANUFACTURER_REQUIRED;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
@@ -55,9 +57,12 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String RESOURCE_URL = "/api/tradeItems";
   private static final String CID = "cid";
   private static final String MANUFACTURER_ONE_NAME = "one";
-  private static final String GTIN_ONE = "11111111";
+  private static final String GTIN_ONE = "96385074";
   private static final String MANUFACTURER_TWO_NAME = "two";
-  private static final String GTIN_TWO = "22222222";
+  private static final String GTIN_TWO = "22222220";
+  private static final String GTIN_13 = "5901234123457";
+  private static final String PADDED_GTIN_13 = "05901234123457";
+  private static final String GTIN_14 = "05890123456786";
 
   @Before
   public void setUp() {
@@ -68,7 +73,7 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
   public void shouldCreateNewTradeItem() {
     mockUserHasRight(ORDERABLES_MANAGE);
 
-    TradeItem tradeItem = generateItem("item", "12345678");
+    TradeItem tradeItem = generateItem("item", GTIN_14);
 
     when(tradeItemRepository.save(any(TradeItem.class))).thenAnswer(new SaveAnswer<TradeItem>());
 
@@ -192,6 +197,127 @@ public class TradeItemControllerIntegrationTest extends BaseWebIntegrationTest {
 
     List<TradeItemDto> expected = newInstance(items);
     checkIfEquals(response, expected);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRetrieveTradeItemByGtin() {
+    TradeItem item = generateItem(MANUFACTURER_ONE_NAME, GTIN_14);
+
+    when(tradeItemRepository.findByGtin(GTIN_14)).thenReturn(Optional.of(item));
+
+    PageDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("gtin", GTIN_14)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    checkIfEquals(response, newInstance(Collections.singletonList(item)));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRetrieveTradeItemByGtinInShorterStructure() {
+    TradeItem item = generateItem(MANUFACTURER_ONE_NAME, GTIN_13);
+
+    when(tradeItemRepository.findByGtin(PADDED_GTIN_13)).thenReturn(Optional.of(item));
+
+    PageDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("gtin", GTIN_13)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    checkIfEquals(response, newInstance(Collections.singletonList(item)));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnEmptyPageIfGtinIsNotRegistered() {
+    when(tradeItemRepository.findByGtin(GTIN_14)).thenReturn(Optional.empty());
+
+    PageDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .queryParam("gtin", GTIN_14)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    checkIfEquals(response, Collections.emptyList());
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void getByGtinShouldReturnUnauthorizedWithoutAuthorization() {
+
+    restAssured
+        .given()
+        .queryParam("gtin", GTIN_14)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(401);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectCreateIfGtinHasInvalidCheckDigit() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    TradeItemDto object = newInstance(generateItem(MANUFACTURER_ONE_NAME, GTIN_14));
+    object.setGtin("05890123456787");
+
+    checkBadRequestBody(object, ERROR_GTIN_INVALID_CHECK_DIGIT, RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldRejectCreateIfGtinHasInvalidLength() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    TradeItemDto object = newInstance(generateItem(MANUFACTURER_ONE_NAME, GTIN_14));
+    object.setGtin("963850740");
+
+    checkBadRequestBody(object, ERROR_GTIN_INVALID_LENGTH, RESOURCE_URL);
+  }
+
+  @Test
+  public void shouldStoreGtinPaddedToFourteenDigits() {
+    mockUserHasRight(ORDERABLES_MANAGE);
+
+    TradeItemDto object = newInstance(generateItem(MANUFACTURER_ONE_NAME, GTIN_14));
+    object.setGtin(GTIN_13);
+
+    TradeItemDto response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(object)
+        .when()
+        .put(RESOURCE_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(TradeItemDto.class);
+
+    assertEquals(PADDED_GTIN_13, response.getGtin());
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
