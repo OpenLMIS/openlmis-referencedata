@@ -17,6 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,6 +49,7 @@ import org.mockito.Mock;
 import org.openlmis.referencedata.Application;
 import org.openlmis.referencedata.domain.Code;
 import org.openlmis.referencedata.domain.Dispensable;
+import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.OrderableDisplayCategory;
 import org.openlmis.referencedata.domain.Program;
@@ -55,6 +57,7 @@ import org.openlmis.referencedata.domain.ProgramOrderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.DispensableDto;
 import org.openlmis.referencedata.dto.ImportResponseDto;
+import org.openlmis.referencedata.dto.TradeItemCsvModel;
 import org.openlmis.referencedata.repository.OrderableDisplayCategoryRepository;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.repository.ProgramOrderableRepository;
@@ -189,6 +192,18 @@ public class DataImportServiceIntegrationTest {
       Arrays.asList(ORDERABLE_CODE_1, ITEM_MANUFACTURER_1),
       Arrays.asList(ORDERABLE_CODE_2, ITEM_MANUFACTURER_2),
       Arrays.asList(ORDERABLE_CODE_3, ITEM_MANUFACTURER_3)
+  );
+
+  private static final String GTIN_13 = "4006381333931";
+  private static final String GTIN_13_PADDED = "04006381333931";
+  private static final String GTIN_8 = "96385074";
+  private static final String GTIN_8_PADDED = "00000096385074";
+  private static final List<String> TRADE_ITEM_GTIN_HEADERS = Arrays.asList(
+      "productCode", "manufacturerOfTradeItem", "gtin");
+  private static final List<List<String>> TRADE_ITEM_GTIN_RECORDS = Arrays.asList(
+      Arrays.asList(ORDERABLE_CODE_1, ITEM_MANUFACTURER_1, GTIN_13),
+      Arrays.asList(ORDERABLE_CODE_2, ITEM_MANUFACTURER_2, GTIN_8),
+      Arrays.asList(ORDERABLE_CODE_3, ITEM_MANUFACTURER_3, "")
   );
 
   private Program persistedProgram;
@@ -348,19 +363,7 @@ public class DataImportServiceIntegrationTest {
   @Test
   public void shouldImportTradeItemFromValidCsvFile() throws IOException, InterruptedException {
     // given
-    final TradeItem persistedTradeItem1 = createAndPersistTradeItem(TEST_MANUFACTURER);
-    final TradeItem persistedTradeItem2 = createAndPersistTradeItem(TEST_MANUFACTURER);
-
-    createAndPersistOrderable(
-        ORDERABLE_CODE_1, TEST_NAME, TEST_DISPENSABLE,
-        Pair.of(COMMODITY_TYPE, persistedTradeItem1.getId().toString()));
-
-    createAndPersistOrderable(
-        ORDERABLE_CODE_2, TEST_NAME, TEST_DISPENSABLE,
-        Pair.of(TRADE_ITEM, persistedTradeItem2.getId().toString()));
-
-    createAndPersistOrderable(
-        ORDERABLE_CODE_3, TEST_NAME, TEST_DISPENSABLE);
+    setUpThreeOrderableTradeItemFixture();
 
     MockMultipartFile multipartFile = createZippedCsv(TRADE_ITEM_CORRECT_RECORDS,
         TRADE_ITEM_CORRECT_HEADERS, TRADE_ITEM_FILE);
@@ -371,24 +374,16 @@ public class DataImportServiceIntegrationTest {
 
     // then check if result is present
     assertNotNull(result);
-    assertEquals((Integer) ORDERABLE_CORRECT_RECORDS.size(),
+    assertEquals((Integer) TRADE_ITEM_CORRECT_RECORDS.size(),
         result.get(0).getSuccessfulEntriesCount());
 
     // then fetch imported objects
-    final Orderable importedOrderable1 = orderableRepository
-        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_1));
-    final TradeItem importedTradeItem1 = tradeItemRepository.findById(
-        UUID.fromString(importedOrderable1.getTradeItemIdentifier())).get();
-
-    final Orderable importedOrderable2 = orderableRepository
-        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_2));
-    final TradeItem importedTradeItem2 = tradeItemRepository.findById(
-        UUID.fromString(importedOrderable2.getTradeItemIdentifier())).get();
-
-    final Orderable importedOrderable3 = orderableRepository
-        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(ORDERABLE_CODE_3));
-    final TradeItem importedTradeItem3 = tradeItemRepository.findById(
-        UUID.fromString(importedOrderable3.getTradeItemIdentifier())).get();
+    final Orderable importedOrderable1 = fetchImportedOrderable(ORDERABLE_CODE_1);
+    final TradeItem importedTradeItem1 = fetchImportedTradeItem(ORDERABLE_CODE_1);
+    final Orderable importedOrderable2 = fetchImportedOrderable(ORDERABLE_CODE_2);
+    final TradeItem importedTradeItem2 = fetchImportedTradeItem(ORDERABLE_CODE_2);
+    final Orderable importedOrderable3 = fetchImportedOrderable(ORDERABLE_CODE_3);
+    final TradeItem importedTradeItem3 = fetchImportedTradeItem(ORDERABLE_CODE_3);
 
     // then check if orderable with commodityType identifier was updated
     assertTrue(importedOrderable1.getIdentifiers().containsKey(TRADE_ITEM));
@@ -407,6 +402,84 @@ public class DataImportServiceIntegrationTest {
     assertEquals(importedOrderable3.getTradeItemIdentifier(),
         importedTradeItem3.getId().toString());
     assertEquals(importedTradeItem3.getManufacturerOfTradeItem(), ITEM_MANUFACTURER_3);
+  }
+
+  @Test
+  public void shouldImportTradeItemWithGtinFromValidCsvFile()
+      throws IOException, InterruptedException {
+    // given
+    setUpThreeOrderableTradeItemFixture();
+
+    MockMultipartFile multipartFile = createZippedCsv(TRADE_ITEM_GTIN_RECORDS,
+        TRADE_ITEM_GTIN_HEADERS, TRADE_ITEM_FILE);
+
+    // when
+    List<ImportResponseDto.ImportDetails> result =
+        dataImportService.importData(multipartFile, profiler);
+
+    // then
+    assertNotNull(result);
+    assertEquals((Integer) TRADE_ITEM_GTIN_RECORDS.size(),
+        result.get(0).getSuccessfulEntriesCount());
+
+    final TradeItem importedTradeItem1 = fetchImportedTradeItem(ORDERABLE_CODE_1);
+    final TradeItem importedTradeItem2 = fetchImportedTradeItem(ORDERABLE_CODE_2);
+    final TradeItem importedTradeItem3 = fetchImportedTradeItem(ORDERABLE_CODE_3);
+
+    // a shorter GTIN is stored zero-padded to the 14-digit form (create path)
+    assertEquals(GTIN_13_PADDED, importedTradeItem1.getGtin().getGtin());
+    // and via the update path onto an existing trade item
+    assertEquals(GTIN_8_PADDED, importedTradeItem2.getGtin().getGtin());
+    // a blank gtin cell registers no GTIN
+    assertNull(importedTradeItem3.getGtin());
+  }
+
+  @Test
+  public void shouldIncludeGtinInExportableTradeItemCsvModels() {
+    // given a trade item that carries a (short) GTIN, linked to an orderable
+    TradeItem tradeItem = new TradeItemDataBuilder()
+        .withManufacturerOfTradeItem(TEST_MANUFACTURER)
+        .buildAsNew();
+    tradeItem.setGtin(new Gtin(GTIN_8));
+    tradeItemRepository.saveAndFlush(tradeItem);
+
+    createAndPersistOrderable(
+        ORDERABLE_CODE_1, TEST_NAME, TEST_DISPENSABLE,
+        Pair.of(TRADE_ITEM, tradeItem.getId().toString()));
+
+    // when the shared export projection is read
+    List<TradeItemCsvModel> exported = tradeItemRepository.findAllTradeItemCsvModels();
+
+    // then it carries the stored (normalized) GTIN alongside code and manufacturer
+    TradeItemCsvModel exportedModel = exported.stream()
+        .filter(model -> ORDERABLE_CODE_1.equals(model.getCode()))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("no exported model for code " + ORDERABLE_CODE_1));
+    assertEquals(GTIN_8_PADDED, exportedModel.getGtin());
+    assertEquals(TEST_MANUFACTURER, exportedModel.getManufacturerOfTradeItem());
+  }
+
+  private void setUpThreeOrderableTradeItemFixture() {
+    final TradeItem persistedTradeItem1 = createAndPersistTradeItem(TEST_MANUFACTURER);
+    final TradeItem persistedTradeItem2 = createAndPersistTradeItem(TEST_MANUFACTURER);
+
+    createAndPersistOrderable(
+        ORDERABLE_CODE_1, TEST_NAME, TEST_DISPENSABLE,
+        Pair.of(COMMODITY_TYPE, persistedTradeItem1.getId().toString()));
+    createAndPersistOrderable(
+        ORDERABLE_CODE_2, TEST_NAME, TEST_DISPENSABLE,
+        Pair.of(TRADE_ITEM, persistedTradeItem2.getId().toString()));
+    createAndPersistOrderable(ORDERABLE_CODE_3, TEST_NAME, TEST_DISPENSABLE);
+  }
+
+  private Orderable fetchImportedOrderable(String orderableCode) {
+    return orderableRepository
+        .findFirstByProductCodeOrderByIdentityVersionNumberDesc(Code.code(orderableCode));
+  }
+
+  private TradeItem fetchImportedTradeItem(String orderableCode) {
+    return tradeItemRepository.findById(
+        UUID.fromString(fetchImportedOrderable(orderableCode).getTradeItemIdentifier())).get();
   }
 
   private void assertOrderables(Orderable importedOrderable, String name, String description,
