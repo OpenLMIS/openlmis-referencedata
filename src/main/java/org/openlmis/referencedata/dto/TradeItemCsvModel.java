@@ -32,11 +32,17 @@ public class TradeItemCsvModel {
 
   private static final String PRODUCT_CODE = "productCode";
   private static final String MANUFACTURER_OF_TRADE_ITEM = "manufacturerOfTradeItem";
+  private static final String GTIN = "gtin";
 
+  // Field order must match the @ConstructorResult column order in
+  // TradeItem.findAllTradeItemCsvModels - the CSV export projection maps by @AllArgsConstructor.
   @ImportField(name = PRODUCT_CODE, type = "code", mandatory = true)
   private String code;
 
   @ImportField(name = MANUFACTURER_OF_TRADE_ITEM)
   private String manufacturerOfTradeItem;
+
+  @ImportField(name = GTIN)
+  private String gtin;
 
 }

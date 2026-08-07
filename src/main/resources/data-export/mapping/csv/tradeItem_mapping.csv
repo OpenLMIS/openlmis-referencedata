@@ -1,3 +1,4 @@
 from,to,type,entityName,defaultValue
 productCode,productCode,DIRECT,,
 manufacturerOfTradeItem,manufacturerOfTradeItem,DIRECT,,
+gtin,gtin,DIRECT,,

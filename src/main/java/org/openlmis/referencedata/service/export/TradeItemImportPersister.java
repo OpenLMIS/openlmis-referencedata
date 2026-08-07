@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import org.openlmis.referencedata.domain.Code;
+import org.openlmis.referencedata.domain.Gtin;
 import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.domain.TradeItem;
 import org.openlmis.referencedata.dto.ImportResponseDto;
@@ -52,6 +53,8 @@ public class TradeItemImportPersister
     implements DataImportPersister<Orderable, TradeItemCsvModel, OrderableDto> {
 
   public static final String TRADE_ITEM_FILE_NAME = "tradeItem.csv";
+
+  private static final String TRADE_ITEM_IDENTIFIER_KEY = "tradeItem";
 
   @Autowired private FileHelper fileHelper;
   @Autowired private TradeItemRepository tradeItemRepository;
@@ -143,7 +146,7 @@ public class TradeItemImportPersister
 
       UUID tradeItemId = tradeItem.getId();
       Map<String, String> identifiers = new HashMap<>();
-      identifiers.put("tradeItem", tradeItemId.toString());
+      identifiers.put(TRADE_ITEM_IDENTIFIER_KEY, tradeItemId.toString());
       orderable.setIdentifiers(identifiers);
 
       orderablePersistList.add(orderable);
@@ -168,12 +171,10 @@ public class TradeItemImportPersister
       TradeItem tradeItem;
       Map<String, String> identifiers = orderable.getIdentifiers();
 
-      if (identifiers == null || !identifiers.containsKey("tradeItem")) {
-        TradeItemDto tradeItemDto = new TradeItemDto();
-        tradeItemDto.setManufacturerOfTradeItem(dto.getManufacturerOfTradeItem());
-        tradeItem = TradeItem.newInstance(tradeItemDto);
+      if (identifiers == null || !identifiers.containsKey(TRADE_ITEM_IDENTIFIER_KEY)) {
+        tradeItem = TradeItem.newInstance(new TradeItemDto());
       } else {
-        String tradeItemIdentifier = identifiers.get("tradeItem");
+        String tradeItemIdentifier = identifiers.get(TRADE_ITEM_IDENTIFIER_KEY);
         tradeItem =
             tradeItemRepository
                 .findById(UUID.fromString(tradeItemIdentifier))
@@ -181,12 +182,20 @@ public class TradeItemImportPersister
                     () ->
                         new NotFoundException(
                             "Could not find trade item with id: " + tradeItemIdentifier));
-        tradeItem.setManufacturerOfTradeItem(dto.getManufacturerOfTradeItem());
       }
+
+      applyCsvFields(tradeItem, dto);
 
       tradeItemPersistMap.put(orderable, tradeItem);
     }
 
     return tradeItemPersistMap;
+  }
+
+  private void applyCsvFields(TradeItem tradeItem, TradeItemCsvModel dto) {
+    tradeItem.setManufacturerOfTradeItem(dto.getManufacturerOfTradeItem());
+    if (dto.getGtin() != null) {
+      tradeItem.setGtin(new Gtin(dto.getGtin()));
+    }
   }
 }
