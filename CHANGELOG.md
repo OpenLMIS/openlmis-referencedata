@@ -1,5 +1,6 @@
 15.6.0-SNAPSHOT (WIP)
 ==================
+* [OLMIS-8238](https://openlmis.atlassian.net/browse/OLMIS-8238): Add user preferences endpoint.
 
 Improvements:
 * [SELV3-858](https://openlmis.atlassian.net/browse/SELV3-858): Added the `STOCK_EVENTS_CANCEL` supervision right (used by the stockmanagement service to authorize cancelling issue/receive movements) and granted it to the demo Stock Manager role.
