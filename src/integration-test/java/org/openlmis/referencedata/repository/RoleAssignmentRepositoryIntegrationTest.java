@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
 import org.junit.Before;
@@ -97,6 +99,23 @@ public class RoleAssignmentRepositoryIntegrationTest
         new CountResource(role1.getId(), 2L),
         new CountResource(role2.getId(), 3L),
         new CountResource(role3.getId(), 1L)));
+  }
+
+  @Test
+  public void shouldFindRoleAssignmentsForGivenUsers() {
+    generateAndSaveRoleAssignment(role1, user1);
+    generateAndSaveRoleAssignment(role2, user1);
+    generateAndSaveRoleAssignment(role3, user2);
+    generateAndSaveRoleAssignment(role1, user3);
+
+    List<UserRoleAssignmentResource> result =
+        repository.findByUsers(asList(user1.getId(), user2.getId()));
+
+    assertThat(result, hasSize(3));
+    assertThat(result, hasItems(
+        new UserRoleAssignmentResource(user1.getId(), role1.getId(), null, null, null),
+        new UserRoleAssignmentResource(user1.getId(), role2.getId(), null, null, null),
+        new UserRoleAssignmentResource(user2.getId(), role3.getId(), null, null, null)));
   }
 
   private RoleAssignment generateAndSaveRoleAssignment(Role role, User user) {

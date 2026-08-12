@@ -57,6 +57,7 @@ import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.repository.RoleRepository;
 import org.openlmis.referencedata.repository.SupervisoryNodeRepository;
 import org.openlmis.referencedata.repository.UserRepository;
+import org.openlmis.referencedata.repository.UserRoleAssignmentResource;
 import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.service.UserService;
 import org.openlmis.referencedata.util.Message;
@@ -276,6 +277,9 @@ public class UserController extends BaseController {
 
     profiler.start("EXPORT_TO_DTOS");
     Page<UserDto> userDtos = exportUsersToDtos(result, pageable);
+
+    profiler.start("ADD_ROLE_ASSIGNMENTS_TO_USER_DTOS");
+    addRoleAssignmentIdsToUserDtos(userDtos.getContent());
 
     if (filterByLockout) {
       profiler.start("ENRICH_WITH_LOCKOUT_STATE");
@@ -841,6 +845,29 @@ public class UserController extends BaseController {
             .orElse(Collections.emptySet());
     
     userDto.setRoleAssignments(roleAssignmentDtos);
+  }
+
+  private void addRoleAssignmentIdsToUserDtos(List<UserDto> userDtos) {
+    if (userDtos.isEmpty()) {
+      return;
+    }
+
+    Set<UUID> userIds = userDtos.stream().map(UserDto::getId).collect(Collectors.toSet());
+
+    Map<UUID, Set<RoleAssignmentDto>> roleAssignmentsByUserId = roleAssignmentRepository
+        .findByUsers(userIds)
+        .stream()
+        .collect(Collectors.groupingBy(
+            UserRoleAssignmentResource::getUserId,
+            Collectors.mapping(UserRoleAssignmentResource::toRoleAssignmentDto,
+                Collectors.toSet())));
+
+    for (UserDto userDto : userDtos) {
+      Set<RoleAssignmentDto> roleAssignmentDtos = roleAssignmentsByUserId.get(userDto.getId());
+      if (roleAssignmentDtos != null) {
+        userDto.setRoleAssignments(roleAssignmentDtos);
+      }
+    }
   }
 
   private Set<FacilityDto> facilitiesToDto(Collection<Facility> facilities) {

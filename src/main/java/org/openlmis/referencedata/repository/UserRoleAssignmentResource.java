@@ -15,24 +15,42 @@
 
 package org.openlmis.referencedata.repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import org.openlmis.referencedata.domain.RoleAssignment;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID> {
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode
+@ToString
+public final class UserRoleAssignmentResource {
 
-  @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
-  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
+  @Getter
+  @Setter
+  private UUID userId;
 
-  @Query(name = "RoleAssignment.findByUsers", nativeQuery = true)
-  List<UserRoleAssignmentResource> findByUsers(@Param("userIds") Collection<UUID> userIds);
+  @Getter
+  @Setter
+  private UUID roleId;
 
-  @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
-  List<CountResource> countUsersAssignedToRoles();
+  @Getter
+  @Setter
+  private UUID programId;
+
+  @Getter
+  @Setter
+  private UUID supervisoryNodeId;
+
+  @Getter
+  @Setter
+  private UUID warehouseId;
+
+  public RoleAssignmentDto toRoleAssignmentDto() {
+    return new RoleAssignmentDto(roleId, programId, supervisoryNodeId, warehouseId);
+  }
 }
