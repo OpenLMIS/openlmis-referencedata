@@ -52,6 +52,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(MockitoJUnitRunner.class)
 public class TradeItemImportPersisterTest {
 
+  private static final String GTIN_8 = "96385074";
+  private static final String PADDED_GTIN_8 = "00000096385074";
+
   private InputStream dataStream;
   private TradeItemCsvModel csvModel;
   private Orderable orderable;
@@ -72,7 +75,7 @@ public class TradeItemImportPersisterTest {
 
     // Initialize objects
     identifier = UUID.randomUUID().toString();
-    csvModel = new TradeItemCsvModel("code", "manufacturer");
+    csvModel = new TradeItemCsvModel("code", "manufacturer", null);
     tradeItem = new TradeItemDataBuilder().build();
     orderable = new OrderableDataBuilder().withIdentifier("tradeItem", identifier).build();
 
@@ -102,6 +105,19 @@ public class TradeItemImportPersisterTest {
     verify(fileHelper).readCsv(TradeItemCsvModel.class, dataStream);
     verify(tradeItemRepository).saveAll(any());
     verify(orderableRepository).saveAll(any());
+  }
+
+  @Test
+  public void shouldNormalizeGtinWhenPresent() throws InterruptedException {
+    // Given a short, check-digit-valid GTIN-8
+    csvModel = new TradeItemCsvModel("code", "manufacturer", GTIN_8);
+    setupMocksForSuccess();
+
+    // When
+    tradeItemImportPersister.processAndPersist(dataStream, mock(Profiler.class));
+
+    // Then it is stored zero-padded to the 14-digit form
+    assertEquals(PADDED_GTIN_8, tradeItem.getGtin().getGtin());
   }
 
   private void setupMocksForSuccess() {

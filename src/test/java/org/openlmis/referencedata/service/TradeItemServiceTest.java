@@ -61,8 +61,8 @@ public class TradeItemServiceTest {
 
   @Test
   public void shouldReturnAllTradeItemCsvModels() {
-    TradeItemCsvModel model1 = new TradeItemCsvModel("product-code-1", "manufacturer-1");
-    TradeItemCsvModel model2 = new TradeItemCsvModel("product-code-2", "manufacturer-2");
+    TradeItemCsvModel model1 = new TradeItemCsvModel("product-code-1", "manufacturer-1", null);
+    TradeItemCsvModel model2 = new TradeItemCsvModel("product-code-2", "manufacturer-2", null);
     List<TradeItemCsvModel> modelList = Lists.newArrayList(model1, model2);
     final int modelListSize = modelList.size();
     when(tradeItemRepository.findAllTradeItemCsvModels()).thenReturn(modelList);

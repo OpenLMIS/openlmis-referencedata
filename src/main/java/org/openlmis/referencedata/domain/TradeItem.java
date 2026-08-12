@@ -52,7 +52,7 @@ import org.openlmis.referencedata.dto.TradeItemCsvModel;
  */
 @NamedNativeQueries(
         @NamedNativeQuery(name = "TradeItem.findAllTradeItemCsvModels",
-                query = "select ti.manufactureroftradeitem, oio.code \n"
+                query = "select ti.manufactureroftradeitem, oio.code, ti.gtin \n"
                         + "from referencedata.trade_items ti, \n"
                         + "(select oi.value, o.code, MAX(o.versionnumber) \n"
                         + "from referencedata.orderable_identifiers oi \n"
@@ -71,7 +71,8 @@ import org.openlmis.referencedata.dto.TradeItemCsvModel;
                         columns = {
                                 @ColumnResult(name = "code", type = String.class),
                                 @ColumnResult(name = "manufacturerOfTradeItem",
-                                        type = String.class)
+                                        type = String.class),
+                                @ColumnResult(name = "gtin", type = String.class)
                         }
                 )
         )
