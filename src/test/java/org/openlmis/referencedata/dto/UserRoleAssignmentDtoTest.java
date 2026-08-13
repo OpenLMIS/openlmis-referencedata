@@ -15,23 +15,28 @@
 
 package org.openlmis.referencedata.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@Getter
-@ToString
-@AllArgsConstructor
-@EqualsAndHashCode
-public class UserRoleAssignmentDto {
+public class UserRoleAssignmentDtoTest {
 
-  private UUID userId;
-  private UUID roleId;
-  private UUID programId;
-  private UUID supervisoryNodeId;
-  private UUID warehouseId;
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(UserRoleAssignmentDto.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .suppress(Warning.STRICT_INHERITANCE)
+        .verify();
+  }
+
+  @Test
+  public void shouldImplementToString() {
+    UserRoleAssignmentDto dto = new UserRoleAssignmentDto(
+        UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+        UUID.randomUUID());
+    ToStringTestUtils.verify(UserRoleAssignmentDto.class, dto);
+  }
 }
