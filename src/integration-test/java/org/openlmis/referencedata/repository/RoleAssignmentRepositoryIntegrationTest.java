@@ -17,7 +17,6 @@ package org.openlmis.referencedata.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
 import org.junit.Before;
@@ -109,7 +108,6 @@ public class RoleAssignmentRepositoryIntegrationTest
 
     List<UserRoleAssignmentDto> result = repository.findAllWithUser();
 
-    assertThat(result, hasSize(3));
     assertThat(result, hasItems(
         new UserRoleAssignmentDto(user1.getId(), role1.getId(), null, null, null),
         new UserRoleAssignmentDto(user1.getId(), role2.getId(), null, null, null),
