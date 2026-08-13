@@ -15,9 +15,13 @@
 
 package org.openlmis.referencedata.domain;
 
+import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_LOT_CODE_INVALID_FORMAT;
+import static org.openlmis.referencedata.util.messagekeys.LotMessageKeys.ERROR_LOT_CODE_TOO_LONG;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +33,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.javers.core.metamodel.annotation.TypeName;
+import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.util.Message;
 
 @Entity
 @Table(name = "lots", schema = "referencedata")
@@ -38,6 +44,13 @@ import org.javers.core.metamodel.annotation.TypeName;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Lot extends BaseEntity {
+
+  private static final int LOT_CODE_MAX_LENGTH = 20;
+
+  // GS1 Application Identifier (10) encodable character set: digits, upper and lower case letters
+  // and the GS1 invariant special characters. Kept in sync with the barcode scan parser's set.
+  private static final Pattern LOT_CODE_PATTERN =
+      Pattern.compile("[!\"%&'()*+,\\-./0-9:;<=>?A-Z_a-z]*");
 
   @Column(nullable = false, columnDefinition = "text")
   private String lotCode;
@@ -52,6 +65,29 @@ public class Lot extends BaseEntity {
 
   @Column(nullable = false, columnDefinition = "boolean DEFAULT false")
   private boolean active;
+
+  /**
+   * Sets the lot code after enforcing the GS1 Application Identifier (10) contract: a maximum
+   * length and the GS1 invariant character set. Enforcing it here, rather than only in the
+   * pluggable {@link org.openlmis.referencedata.extension.point.LotValidator}, keeps the bound on
+   * every write path, including a lot created by another service through the API. A null or empty
+   * code is left to the required-field check in the validator.
+   *
+   * @param lotCode the lot code to set
+   * @throws ValidationMessageException if the code is too long or has disallowed characters
+   */
+  public void setLotCode(String lotCode) {
+    if (lotCode != null) {
+      if (lotCode.length() > LOT_CODE_MAX_LENGTH) {
+        throw new ValidationMessageException(
+            new Message(ERROR_LOT_CODE_TOO_LONG, LOT_CODE_MAX_LENGTH));
+      }
+      if (!LOT_CODE_PATTERN.matcher(lotCode).matches()) {
+        throw new ValidationMessageException(new Message(ERROR_LOT_CODE_INVALID_FORMAT));
+      }
+    }
+    this.lotCode = lotCode;
+  }
 
   /**
    * Creates new lot object based on data from {@link Importer} and tradeItem argument.

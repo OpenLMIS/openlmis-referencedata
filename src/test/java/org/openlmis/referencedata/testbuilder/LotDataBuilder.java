@@ -24,7 +24,7 @@ public class LotDataBuilder {
   private static int instanceNumber = 0;
 
   private UUID id = UUID.randomUUID();
-  private String lotCode = "code #" + Integer.toString(instanceNumber++);
+  private String lotCode = "CODE" + Integer.toString(instanceNumber++);
   private LocalDate expirationDate;
   private LocalDate manufacturedDate;
   private TradeItem tradeItem = new TradeItemDataBuilder().build();
