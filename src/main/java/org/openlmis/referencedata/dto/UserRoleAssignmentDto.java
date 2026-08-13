@@ -13,8 +13,9 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,35 +23,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@ToString
-public final class UserRoleAssignmentResource {
+public class UserRoleAssignmentDto {
 
-  @Getter
-  @Setter
   private UUID userId;
-
-  @Getter
-  @Setter
   private UUID roleId;
-
-  @Getter
-  @Setter
   private UUID programId;
-
-  @Getter
-  @Setter
   private UUID supervisoryNodeId;
-
-  @Getter
-  @Setter
   private UUID warehouseId;
-
-  public RoleAssignmentDto toRoleAssignmentDto() {
-    return new RoleAssignmentDto(roleId, programId, supervisoryNodeId, warehouseId);
-  }
 }

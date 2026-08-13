@@ -82,7 +82,6 @@ import org.openlmis.referencedata.dto.ResultDto;
 import org.openlmis.referencedata.dto.UserDto;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
-import org.openlmis.referencedata.repository.UserRoleAssignmentResource;
 import org.openlmis.referencedata.repository.UserSearchParams;
 import org.openlmis.referencedata.service.PageDto;
 import org.openlmis.referencedata.testbuilder.FacilityDataBuilder;
@@ -200,32 +199,6 @@ public class UserControllerIntegrationTest extends BaseWebIntegrationTest {
         .extract().as(PageDto.class);
 
     assertThat(response.getContent().size(), is(2));
-    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
-  }
-
-  @Test
-  public void shouldGetAllUsersWithTheirRoleAssignments() {
-    mockUserHasRight(RightName.USERS_MANAGE_RIGHT);
-
-    UUID roleId = UUID.randomUUID();
-    UUID programId = UUID.randomUUID();
-    given(userService.searchUsersById(eq(new UserSearchParams()), any(Pageable.class)))
-        .willReturn(Pagination.getPage(Lists.newArrayList(user1), PageRequest.of(0, 10)));
-    when(roleAssignmentRepository.findByUsers(Collections.singleton(user1.getId())))
-        .thenReturn(Collections.singletonList(new UserRoleAssignmentResource(
-            user1.getId(), roleId, programId, null, null)));
-
-    restAssured
-        .given()
-        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
-        .when()
-        .get(RESOURCE_URL)
-        .then()
-        .statusCode(200)
-        .body("content[0].roleAssignments.size()", is(1))
-        .body("content[0].roleAssignments[0].roleId", is(roleId.toString()))
-        .body("content[0].roleAssignments[0].programId", is(programId.toString()));
-
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

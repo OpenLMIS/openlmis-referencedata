@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "User Role Assignment",
+  "description": "A single role assignment with the user it belongs to",
+  "properties": {
+    "userId": {
+      "type": "string",
+      "title": "userId"
+    },
+    "roleId": {
+      "type": "string",
+      "title": "roleId"
+    },
+    "programId": {
+      "type": "string",
+      "title": "programId"
+    },
+    "supervisoryNodeId": {
+      "type": "string",
+      "title": "supervisoryNodeId"
+    },
+    "warehouseId": {
+      "type": "string",
+      "title": "warehouseId"
+    }
+  },
+  "required": [
+    "userId",
+    "roleId"
+  ]
+}

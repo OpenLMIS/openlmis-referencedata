@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.repository;
 
-import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -27,6 +26,7 @@ import org.openlmis.referencedata.domain.Right;
 import org.openlmis.referencedata.domain.Role;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.domain.User;
+import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
 import org.openlmis.referencedata.testbuilder.DirectRoleAssignmentDataBuilder;
 import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
@@ -102,20 +102,18 @@ public class RoleAssignmentRepositoryIntegrationTest
   }
 
   @Test
-  public void shouldFindRoleAssignmentsForGivenUsers() {
+  public void shouldFindAllRoleAssignmentsWithTheirUser() {
     generateAndSaveRoleAssignment(role1, user1);
     generateAndSaveRoleAssignment(role2, user1);
     generateAndSaveRoleAssignment(role3, user2);
-    generateAndSaveRoleAssignment(role1, user3);
 
-    List<UserRoleAssignmentResource> result =
-        repository.findByUsers(asList(user1.getId(), user2.getId()));
+    List<UserRoleAssignmentDto> result = repository.findAllWithUser();
 
     assertThat(result, hasSize(3));
     assertThat(result, hasItems(
-        new UserRoleAssignmentResource(user1.getId(), role1.getId(), null, null, null),
-        new UserRoleAssignmentResource(user1.getId(), role2.getId(), null, null, null),
-        new UserRoleAssignmentResource(user2.getId(), role3.getId(), null, null, null)));
+        new UserRoleAssignmentDto(user1.getId(), role1.getId(), null, null, null),
+        new UserRoleAssignmentDto(user1.getId(), role2.getId(), null, null, null),
+        new UserRoleAssignmentDto(user2.getId(), role3.getId(), null, null, null)));
   }
 
   private RoleAssignment generateAndSaveRoleAssignment(Role role, User user) {

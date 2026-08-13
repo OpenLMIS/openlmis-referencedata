@@ -39,9 +39,9 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
+import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CountResource;
-import org.openlmis.referencedata.repository.UserRoleAssignmentResource;
 import org.openlmis.referencedata.util.Message;
 
 @Entity
@@ -59,14 +59,13 @@ import org.openlmis.referencedata.util.Message;
             + " FROM referencedata.role_assignments ra"
             + " WHERE ra.userid = :userId",
         resultSetMapping = "RoleAssignment.idResource"),
-    @NamedNativeQuery(name = "RoleAssignment.findByUsers",
+    @NamedNativeQuery(name = "RoleAssignment.findAllWithUser",
         query = "SELECT ra.userid"
             + "   , ra.roleid"
             + "   , ra.programid"
             + "   , ra.supervisorynodeid"
             + "   , ra.warehouseid"
-            + " FROM referencedata.role_assignments ra"
-            + " WHERE ra.userid IN (:userIds)",
+            + " FROM referencedata.role_assignments ra",
         resultSetMapping = "RoleAssignment.userIdResource"),
     @NamedNativeQuery(name = "RoleAssignment.countUsersAssignedToRoles",
         query = "SELECT ra.roleid as id, COUNT(DISTINCT ra.userid) as count"
@@ -93,7 +92,7 @@ import org.openlmis.referencedata.util.Message;
         name = "RoleAssignment.userIdResource",
         classes = {
             @ConstructorResult(
-                targetClass = UserRoleAssignmentResource.class,
+                targetClass = UserRoleAssignmentDto.class,
                 columns = {
                     @ColumnResult(name = "userid", type = UUID.class),
                     @ColumnResult(name = "roleid", type = UUID.class),
