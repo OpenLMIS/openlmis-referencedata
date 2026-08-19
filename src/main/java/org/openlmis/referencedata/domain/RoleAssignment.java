@@ -59,14 +59,6 @@ import org.openlmis.referencedata.util.Message;
             + " FROM referencedata.role_assignments ra"
             + " WHERE ra.userid = :userId",
         resultSetMapping = "RoleAssignment.idResource"),
-    @NamedNativeQuery(name = "RoleAssignment.findAllWithUser",
-        query = "SELECT ra.userid"
-            + "   , ra.roleid"
-            + "   , ra.programid"
-            + "   , ra.supervisorynodeid"
-            + "   , ra.warehouseid"
-            + " FROM referencedata.role_assignments ra",
-        resultSetMapping = "RoleAssignment.userIdResource"),
     @NamedNativeQuery(name = "RoleAssignment.countUsersAssignedToRoles",
         query = "SELECT ra.roleid as id, COUNT(DISTINCT ra.userid) as count"
             + " FROM referencedata.role_assignments ra"

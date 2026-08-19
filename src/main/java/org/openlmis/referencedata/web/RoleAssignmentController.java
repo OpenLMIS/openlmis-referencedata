@@ -15,7 +15,6 @@
 
 package org.openlmis.referencedata.web;
 
-import java.util.List;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
@@ -36,7 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @NoArgsConstructor
 @Controller
-@Transactional
+@Transactional(readOnly = true)
 public class RoleAssignmentController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RoleAssignmentController.class);
@@ -60,9 +59,7 @@ public class RoleAssignmentController extends BaseController {
     checkAdminRight(RightName.USERS_MANAGE_RIGHT, profiler);
 
     profiler.start("FIND_ALL_ROLE_ASSIGNMENTS");
-    List<UserRoleAssignmentDto> roleAssignments = roleAssignmentRepository.findAllWithUser();
-
-    Page<UserRoleAssignmentDto> page = toPage(roleAssignments, pageable, profiler);
+    Page<UserRoleAssignmentDto> page = roleAssignmentRepository.findAllWithUser(pageable);
 
     profiler.stop().log();
     return page;

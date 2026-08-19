@@ -3155,7 +3155,7 @@ resourceTypes:
   /roleAssignments:
       displayName: RoleAssignment
       get:
-            is: [ secured ]
+            is: [ secured, paginated ]
             description: Get all role assignments of all users, each tagged with its user.
             responses:
                 "200":

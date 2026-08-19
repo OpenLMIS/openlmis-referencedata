@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Collections;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 
 public class RoleAssignmentControllerIntegrationTest extends BaseWebIntegrationTest {
@@ -39,8 +42,9 @@ public class RoleAssignmentControllerIntegrationTest extends BaseWebIntegrationT
     UUID userId = UUID.randomUUID();
     UUID roleId = UUID.randomUUID();
     UUID programId = UUID.randomUUID();
-    given(roleAssignmentRepository.findAllWithUser()).willReturn(Collections.singletonList(
-        new UserRoleAssignmentDto(userId, roleId, programId, null, null)));
+    given(roleAssignmentRepository.findAllWithUser(any(Pageable.class)))
+        .willReturn(new PageImpl<>(Collections.singletonList(
+            new UserRoleAssignmentDto(userId, roleId, programId, null, null))));
 
     restAssured
         .given()

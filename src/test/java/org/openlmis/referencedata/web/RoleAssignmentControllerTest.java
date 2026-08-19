@@ -32,7 +32,9 @@ import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
 import org.openlmis.referencedata.repository.RoleAssignmentRepository;
 import org.openlmis.referencedata.service.RightService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @SuppressWarnings({"PMD.UnusedPrivateField"})
 public class RoleAssignmentControllerTest {
@@ -47,19 +49,22 @@ public class RoleAssignmentControllerTest {
   private RoleAssignmentController controller;
 
   private UserRoleAssignmentDto roleAssignment;
+  private Pageable pageable;
 
   @Before
   public void setUp() {
     initMocks(this);
+    pageable = PageRequest.of(0, 10);
     roleAssignment = new UserRoleAssignmentDto(UUID.randomUUID(), UUID.randomUUID(),
         UUID.randomUUID(), null, null);
   }
 
   @Test
   public void shouldReturnAllRoleAssignments() {
-    when(roleAssignmentRepository.findAllWithUser()).thenReturn(singletonList(roleAssignment));
+    when(roleAssignmentRepository.findAllWithUser(pageable))
+        .thenReturn(new PageImpl<>(singletonList(roleAssignment), pageable, 1));
 
-    Page<UserRoleAssignmentDto> result = controller.getRoleAssignments(PageRequest.of(0, 10));
+    Page<UserRoleAssignmentDto> result = controller.getRoleAssignments(pageable);
 
     List<UserRoleAssignmentDto> content = result.getContent();
     assertEquals(1, content.size());
@@ -69,9 +74,10 @@ public class RoleAssignmentControllerTest {
 
   @Test
   public void shouldCheckAdminRightBeforeReturningRoleAssignments() {
-    when(roleAssignmentRepository.findAllWithUser()).thenReturn(singletonList(roleAssignment));
+    when(roleAssignmentRepository.findAllWithUser(pageable))
+        .thenReturn(new PageImpl<>(singletonList(roleAssignment), pageable, 1));
 
-    controller.getRoleAssignments(PageRequest.of(0, 10));
+    controller.getRoleAssignments(pageable);
 
     verify(rightService).checkAdminRight(RightName.USERS_MANAGE_RIGHT, true, null);
   }

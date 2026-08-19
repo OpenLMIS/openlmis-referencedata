@@ -16,7 +16,9 @@
 package org.openlmis.referencedata.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 import java.util.List;
 import org.junit.Before;
@@ -31,6 +33,8 @@ import org.openlmis.referencedata.testbuilder.RightDataBuilder;
 import org.openlmis.referencedata.testbuilder.RoleDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 public class RoleAssignmentRepositoryIntegrationTest
     extends BaseCrudRepositoryIntegrationTest<RoleAssignment> {
@@ -106,12 +110,25 @@ public class RoleAssignmentRepositoryIntegrationTest
     generateAndSaveRoleAssignment(role2, user1);
     generateAndSaveRoleAssignment(role3, user2);
 
-    List<UserRoleAssignmentDto> result = repository.findAllWithUser();
+    List<UserRoleAssignmentDto> result =
+        repository.findAllWithUser(PageRequest.of(0, 100)).getContent();
 
     assertThat(result, hasItems(
         new UserRoleAssignmentDto(user1.getId(), role1.getId(), null, null, null),
         new UserRoleAssignmentDto(user1.getId(), role2.getId(), null, null, null),
         new UserRoleAssignmentDto(user2.getId(), role3.getId(), null, null, null)));
+  }
+
+  @Test
+  public void shouldPageRoleAssignmentsWithTheirUser() {
+    generateAndSaveRoleAssignment(role1, user1);
+    generateAndSaveRoleAssignment(role2, user1);
+    generateAndSaveRoleAssignment(role3, user2);
+
+    Page<UserRoleAssignmentDto> page = repository.findAllWithUser(PageRequest.of(0, 2));
+
+    assertThat(page.getContent(), hasSize(2));
+    assertThat(page.getTotalElements(), greaterThan(2L));
   }
 
   private RoleAssignment generateAndSaveRoleAssignment(Role role, User user) {

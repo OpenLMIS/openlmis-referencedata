@@ -20,18 +20,16 @@ import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.domain.RoleAssignment;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
+import org.openlmis.referencedata.repository.custom.RoleAssignmentRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID> {
+public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID>,
+    RoleAssignmentRepositoryCustom {
 
   @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
   Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
-
-  @Query(name = "RoleAssignment.findAllWithUser", nativeQuery = true)
-  List<UserRoleAssignmentDto> findAllWithUser();
 
   @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
   List<CountResource> countUsersAssignedToRoles();
