@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @NoArgsConstructor
 @Controller
-@Transactional(readOnly = true)
+@Transactional
 public class RoleAssignmentController extends BaseController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RoleAssignmentController.class);
@@ -49,6 +49,7 @@ public class RoleAssignmentController extends BaseController {
    * @param pageable pagination parameters
    * @return page of role assignments
    */
+  @Transactional(readOnly = true)
   @RequestMapping(value = "/roleAssignments", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
