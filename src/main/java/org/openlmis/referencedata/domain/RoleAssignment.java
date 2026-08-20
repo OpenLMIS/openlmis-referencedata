@@ -39,6 +39,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.openlmis.referencedata.dto.RoleAssignmentDto;
+import org.openlmis.referencedata.dto.UserRoleAssignmentDto;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.repository.CountResource;
 import org.openlmis.referencedata.util.Message;
@@ -71,6 +72,21 @@ import org.openlmis.referencedata.util.Message;
             @ConstructorResult(
                 targetClass = RoleAssignmentDto.class,
                 columns = {
+                    @ColumnResult(name = "roleid", type = UUID.class),
+                    @ColumnResult(name = "programid", type = UUID.class),
+                    @ColumnResult(name = "supervisorynodeid", type = UUID.class),
+                    @ColumnResult(name = "warehouseid", type = UUID.class)
+                }
+            )
+        }
+    ),
+    @SqlResultSetMapping(
+        name = "RoleAssignment.userIdResource",
+        classes = {
+            @ConstructorResult(
+                targetClass = UserRoleAssignmentDto.class,
+                columns = {
+                    @ColumnResult(name = "userid", type = UUID.class),
                     @ColumnResult(name = "roleid", type = UUID.class),
                     @ColumnResult(name = "programid", type = UUID.class),
                     @ColumnResult(name = "supervisorynodeid", type = UUID.class),

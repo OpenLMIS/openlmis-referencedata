@@ -13,24 +13,25 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.dto;
 
-import java.util.List;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.openlmis.referencedata.repository.custom.RoleAssignmentRepositoryCustom;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID>,
-    RoleAssignmentRepositoryCustom {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Getter
+@ToString
+@AllArgsConstructor
+@EqualsAndHashCode
+public class UserRoleAssignmentDto {
 
-  @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
-  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
-
-  @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
-  List<CountResource> countUsersAssignedToRoles();
+  private UUID userId;
+  private UUID roleId;
+  private UUID programId;
+  private UUID supervisoryNodeId;
+  private UUID warehouseId;
 }

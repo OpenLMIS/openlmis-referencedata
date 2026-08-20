@@ -184,6 +184,10 @@ schemas:
 
   - userQueryDto: !include schemas/userQueryDto.json
 
+  - userRoleAssignmentDto: !include schemas/userRoleAssignmentDto.json
+
+  - userRoleAssignmentDtoPage: !include schemas/userRoleAssignmentDtoPage.json
+
   - detailedRoleAssignmentDto: !include schemas/detailedRoleAssignmentDto.json
 
   - detailedRoleAssignmentDtoArray: |
@@ -3148,6 +3152,25 @@ resourceTypes:
                                     schema: localizedErrorResponse
       /{id}/auditLog:
           type: instanceAuditLog
+  /roleAssignments:
+      displayName: RoleAssignment
+      get:
+            is: [ secured, paginated ]
+            description: Get all role assignments of all users, each tagged with its user.
+            responses:
+                "200":
+                    headers:
+                      Keep-Alive:
+                    body:
+                        application/json:
+                          schema: userRoleAssignmentDtoPage
+                "403":
+                    headers:
+                      Keep-Alive:
+                    body:
+                        application/json:
+                          schema: localizedErrorResponse
+
   /roles:
       displayName: Role
       post:

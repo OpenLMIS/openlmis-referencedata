@@ -5,6 +5,7 @@ Upcoming Version / WIP
 ==================
 
 Improvements:
+* [ODRC-120](https://openlmis.atlassian.net/browse/ODRC-120): Added GET `/api/roleAssignments` returning a page of all users' role assignments, each tagged with its user.
 * [SELV3-858](https://openlmis.atlassian.net/browse/SELV3-858): Added the `STOCK_EVENTS_CANCEL` supervision right (used by the stockmanagement service to authorize cancelling issue/receive movements) and granted it to the demo Stock Manager role.
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Migrated the SonarCloud analysis to Java 21 by running it through the SonarQube scan action instead of the Gradle plugin, and removed the now-unused Gradle sonar plugin and configuration.
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Removed the axios dependency from the Consul registration script, replacing it with the native Node `http` client (no more axios security advisories to track).

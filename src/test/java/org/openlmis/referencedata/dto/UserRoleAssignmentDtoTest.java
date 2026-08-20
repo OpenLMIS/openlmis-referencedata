@@ -13,24 +13,30 @@
  * http://www.gnu.org/licenses.  For additional information contact info@OpenLMIS.org.
  */
 
-package org.openlmis.referencedata.repository;
+package org.openlmis.referencedata.dto;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import org.openlmis.referencedata.domain.RoleAssignment;
-import org.openlmis.referencedata.dto.RoleAssignmentDto;
-import org.openlmis.referencedata.repository.custom.RoleAssignmentRepositoryCustom;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
+import org.junit.Test;
+import org.openlmis.referencedata.ToStringTestUtils;
 
-public interface RoleAssignmentRepository extends JpaRepository<RoleAssignment, UUID>,
-    RoleAssignmentRepositoryCustom {
+public class UserRoleAssignmentDtoTest {
 
-  @Query(name = "RoleAssignment.findByUser", nativeQuery = true)
-  Set<RoleAssignmentDto> findByUser(@Param("userId") UUID userId);
+  @Test
+  public void equalsContract() {
+    EqualsVerifier
+        .forClass(UserRoleAssignmentDto.class)
+        .suppress(Warning.NONFINAL_FIELDS) // we can't make fields as final in DTO
+        .suppress(Warning.STRICT_INHERITANCE)
+        .verify();
+  }
 
-  @Query(name = "RoleAssignment.countUsersAssignedToRoles", nativeQuery = true)
-  List<CountResource> countUsersAssignedToRoles();
+  @Test
+  public void shouldImplementToString() {
+    UserRoleAssignmentDto dto = new UserRoleAssignmentDto(
+        UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
+        UUID.randomUUID());
+    ToStringTestUtils.verify(UserRoleAssignmentDto.class, dto);
+  }
 }
