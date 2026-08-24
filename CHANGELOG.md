@@ -1,5 +1,6 @@
 Upcoming Version / WIP
 ==================
+* [OLMIS-8238](https://openlmis.atlassian.net/browse/OLMIS-8238): Add user preferences endpoint.
 
 15.6.0 / 2026-08-12
 ==================
