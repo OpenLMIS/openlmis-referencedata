@@ -1,11 +1,14 @@
 Upcoming Version / WIP
 ==================
 
+Improvements:
+* [ODRC-120](https://openlmis.atlassian.net/browse/ODRC-120): Added GET `/api/roleAssignments` returning a page of all users' role assignments, each tagged with its user.
+* [OLMIS-8288](https://openlmis.atlassian.net/browse/OLMIS-8288): Lot codes are now bounded to the GS1 AI(10) contract (at most 20 characters and the GS1 invariant character set) on create and update. The bound is enforced in the `Lot` domain so it holds on every write path, including lots created by another service, rather than only in the pluggable lot validator. Pre-existing over-long codes remain readable but cannot be re-saved without being shortened.
+
 15.6.0 / 2026-08-12
 ==================
 
 Improvements:
-* [ODRC-120](https://openlmis.atlassian.net/browse/ODRC-120): Added GET `/api/roleAssignments` returning a page of all users' role assignments, each tagged with its user.
 * [SELV3-858](https://openlmis.atlassian.net/browse/SELV3-858): Added the `STOCK_EVENTS_CANCEL` supervision right (used by the stockmanagement service to authorize cancelling issue/receive movements) and granted it to the demo Stock Manager role.
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Migrated the SonarCloud analysis to Java 21 by running it through the SonarQube scan action instead of the Gradle plugin, and removed the now-unused Gradle sonar plugin and configuration.
 * [OLMIS-8280](https://openlmis.atlassian.net/browse/OLMIS-8280) Removed the axios dependency from the Consul registration script, replacing it with the native Node `http` client (no more axios security advisories to track).
@@ -13,7 +16,6 @@ Improvements:
 * [OLMIS-8118](https://openlmis.atlassian.net/browse/OLMIS-8118): Reject kit child quantity exceeding Integer max.
 * [OLMIS-8287](https://openlmis.atlassian.net/browse/OLMIS-8287): GET `/tradeItems` now supports a `gtin` query parameter; GTINs are normalized to 14 digits and validated (length, GS1 check digit) on write.
 * [OLMIS-8289](https://openlmis.atlassian.net/browse/OLMIS-8289): The trade item CSV import now accepts an optional `gtin` column, normalized and validated on write like any other GTIN. Files without the column import as before. Because import and export share one model, the trade item CSV export now includes a `gtin` column as well - existing export consumers will see the extra column.
-* [OLMIS-8288](https://openlmis.atlassian.net/browse/OLMIS-8288): Lot codes are now bounded to the GS1 AI(10) contract (at most 20 characters and the GS1 invariant character set) on create and update. The bound is enforced in the `Lot` domain so it holds on every write path, including lots created by another service, rather than only in the pluggable lot validator. Pre-existing over-long codes remain readable but cannot be re-saved without being shortened.
 
 15.5.0 / 2026-06-09
 ==================
