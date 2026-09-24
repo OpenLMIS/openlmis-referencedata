@@ -85,6 +85,11 @@ public class EasyBatchUtils {
         result.addAll(invokedTask.get());
       } catch (ExecutionException ee) {
         XLOGGER.error("Failed to run batch in EasyBatchUtils", ee);
+
+        if (ee.getCause() instanceof ValidationMessageException) {
+          throw (ValidationMessageException) ee.getCause();
+        }
+
         throw new ValidationMessageException(
             ee, EasyBatchMessageKeys.ERROR_FAILED_TO_PROCESS_BATCH, ee.getMessage());
       }
