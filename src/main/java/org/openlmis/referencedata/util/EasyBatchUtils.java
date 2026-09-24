@@ -25,10 +25,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.function.Function;
+import org.openlmis.referencedata.exception.BaseMessageException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.EasyBatchMessageKeys;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class EasyBatchUtils {
   public static final int DEFAULT_BATCH_SIZE = 1000;
@@ -86,8 +88,14 @@ public class EasyBatchUtils {
       } catch (ExecutionException ee) {
         XLOGGER.error("Failed to run batch in EasyBatchUtils", ee);
 
-        if (ee.getCause() instanceof ValidationMessageException) {
-          throw (ValidationMessageException) ee.getCause();
+        Throwable cause = ee.getCause();
+
+        if (cause instanceof BaseMessageException) {
+          throw new ValidationMessageException(ee, ((BaseMessageException) cause).asMessage());
+        }
+
+        if (cause instanceof DataIntegrityViolationException) {
+          throw (DataIntegrityViolationException) cause;
         }
 
         throw new ValidationMessageException(

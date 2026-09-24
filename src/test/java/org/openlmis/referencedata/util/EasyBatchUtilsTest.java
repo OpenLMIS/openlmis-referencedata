@@ -18,6 +18,7 @@ package org.openlmis.referencedata.util;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,11 +29,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.openlmis.referencedata.exception.NotFoundException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
 import org.openlmis.referencedata.util.messagekeys.EasyBatchMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public class EasyBatchUtilsTest {
+
+  private static final String ORDERABLE_NOT_FOUND = "Orderable with code: NO-SUCH-CODE not found!";
 
   @Rule
   public final ExpectedException expectedEx = ExpectedException.none();
@@ -53,9 +58,10 @@ public class EasyBatchUtilsTest {
 
   @Test
   public void shouldProcessAllBatches() throws InterruptedException {
-    List<String> result = easyBatchUtils.processInBatches(Arrays.asList("a", "b"), batch -> batch);
+    List<String> result = easyBatchUtils.processInBatches(
+        Arrays.asList("a", "b", "c"), batch -> batch, list -> Lists.partition(list, 1));
 
-    assertEquals(Arrays.asList("a", "b"), result);
+    assertEquals(Arrays.asList("a", "b", "c"), result);
   }
 
   @Test
@@ -69,6 +75,31 @@ public class EasyBatchUtilsTest {
         batch -> {
           throw new ValidationMessageException(
               new Message(TradeItemMessageKeys.ERROR_GTIN_INVALID_CHECK_DIGIT));
+        });
+  }
+
+  @Test
+  public void shouldKeepTheMessageOfOtherMessageExceptionsFromBatch() throws InterruptedException {
+    expectedEx.expect(ValidationMessageException.class);
+    expectedEx.expectMessage(startsWith(ORDERABLE_NOT_FOUND));
+
+    easyBatchUtils.processInBatches(
+        Collections.singletonList("a"),
+        batch -> {
+          throw new NotFoundException(new Message(ORDERABLE_NOT_FOUND));
+        });
+  }
+
+  @Test
+  public void shouldRethrowDataIntegrityViolationFromBatch() throws InterruptedException {
+    DataIntegrityViolationException thrown = new DataIntegrityViolationException("constraint");
+
+    expectedEx.expect(DataIntegrityViolationException.class);
+
+    easyBatchUtils.processInBatches(
+        Collections.singletonList("a"),
+        batch -> {
+          throw thrown;
         });
   }
 
