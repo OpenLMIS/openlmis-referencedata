@@ -5,6 +5,9 @@ Improvements:
 * [ODRC-120](https://openlmis.atlassian.net/browse/ODRC-120): Added GET `/api/roleAssignments` returning a page of all users' role assignments, each tagged with its user.
 * [OLMIS-8288](https://openlmis.atlassian.net/browse/OLMIS-8288): Lot codes are now bounded to the GS1 AI(10) contract (at most 20 characters and the GS1 invariant character set) on create and update. The bound is enforced in the `Lot` domain so it holds on every write path, including lots created by another service, rather than only in the pluggable lot validator. Pre-existing over-long codes remain readable but cannot be re-saved without being shortened.
 
+Bug fixes:
+* [OLMIS-8357](https://openlmis.atlassian.net/browse/OLMIS-8357): Batch import failures now show the underlying validation message, such as "GTIN has an invalid check digit", instead of the raw exception wrapped in the generic batch error.
+
 15.6.0 / 2026-08-12
 ==================
 
