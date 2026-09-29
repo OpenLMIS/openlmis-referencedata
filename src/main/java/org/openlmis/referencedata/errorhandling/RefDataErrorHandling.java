@@ -22,8 +22,10 @@ import javax.persistence.PersistenceException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.openlmis.referencedata.exception.IntegrityViolationException;
 import org.openlmis.referencedata.exception.NotFoundException;
+import org.openlmis.referencedata.exception.PreconditionRequiredException;
 import org.openlmis.referencedata.exception.UnauthorizedException;
 import org.openlmis.referencedata.exception.ValidationMessageException;
+import org.openlmis.referencedata.exception.VersionMismatchException;
 import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
@@ -126,6 +128,22 @@ public class RefDataErrorHandling extends BaseHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
   public LocalizedMessage handleMessageException(ValidationMessageException ex) {
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
+  }
+
+  @ExceptionHandler(VersionMismatchException.class)
+  @ResponseStatus(HttpStatus.CONFLICT)
+  @ResponseBody
+  public LocalizedMessage handleVersionMismatchException(VersionMismatchException ex) {
+    LOGGER.info(ex.getMessage());
+    return getLocalizedMessage(ex.asMessage());
+  }
+
+  @ExceptionHandler(PreconditionRequiredException.class)
+  @ResponseStatus(HttpStatus.PRECONDITION_REQUIRED)
+  @ResponseBody
+  public LocalizedMessage handlePreconditionRequiredException(PreconditionRequiredException ex) {
     LOGGER.info(ex.getMessage());
     return getLocalizedMessage(ex.asMessage());
   }

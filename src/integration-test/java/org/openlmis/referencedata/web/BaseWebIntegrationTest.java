@@ -62,6 +62,8 @@ import org.mockito.stubbing.Answer;
 import org.openlmis.referencedata.domain.BaseEntity;
 import org.openlmis.referencedata.domain.User;
 import org.openlmis.referencedata.exception.UnauthorizedException;
+import org.openlmis.referencedata.repository.AppConfigurationLogoRepository;
+import org.openlmis.referencedata.repository.AppConfigurationRepository;
 import org.openlmis.referencedata.repository.CommodityTypeRepository;
 import org.openlmis.referencedata.repository.FacilityOperatorRepository;
 import org.openlmis.referencedata.repository.FacilityRepository;
@@ -199,6 +201,12 @@ public abstract class BaseWebIntegrationTest {
 
   @Autowired
   private ObjectMapper objectMapper;
+
+  @MockBean
+  protected AppConfigurationRepository appConfigurationRepository;
+
+  @MockBean
+  protected AppConfigurationLogoRepository appConfigurationLogoRepository;
 
   @MockBean
   protected CommodityTypeRepository commodityTypeRepository;
