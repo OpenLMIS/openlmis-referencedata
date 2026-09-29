@@ -15,6 +15,7 @@
 
 package org.openlmis.referencedata.domain;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class AppConfiguration extends BaseEntity {
   public static AppConfiguration newDefault() {
     AppConfiguration configuration = new AppConfiguration();
     configuration.setId(SINGLETON_ID);
-    configuration.setModifiedDate(ZonedDateTime.now());
+    configuration.setModifiedDate(ZonedDateTime.now(ZoneOffset.UTC));
     return configuration;
   }
 
@@ -106,7 +107,7 @@ public class AppConfiguration extends BaseEntity {
   /** Bumps the version and the modification date. */
   public void markModified() {
     version = version == null ? 1L : version + 1;
-    modifiedDate = ZonedDateTime.now();
+    modifiedDate = ZonedDateTime.now(ZoneOffset.UTC);
   }
 
   /** Exports the current state. */
