@@ -232,6 +232,7 @@ schemas:
           "items": { "type": "string", "title": "id" }
       }
 
+  - appConfigurationDto: !include schemas/appConfigurationDto.json
   - auditLogEntry: !include schemas/auditLogEntry.json
 
   - auditLogEntryArray: |
@@ -441,6 +442,199 @@ resourceTypes:
                 200:
 
 /api:
+  /appConfiguration:
+    displayName: App Configuration
+    get:
+      description: >
+        Returns the deployment-wide UI configuration: app name, logo, theme and feature flags.
+        No token is needed, since the sign-in page shows the logo and name.
+      headers:
+        If-None-Match:
+          displayName: If-None-Match
+          description: The ETag the caller holds. When it is current, the answer is 304.
+          type: string
+          required: false
+          repeat: false
+      responses:
+        "200":
+          headers:
+            Keep-Alive:
+            ETag:
+            Cache-Control:
+          body:
+            application/json:
+              schema: appConfigurationDto
+        "304":
+          headers:
+            Keep-Alive:
+            ETag:
+    put:
+      is: [ secured ]
+      description: >
+        Replaces the app name, theme and feature flags. Needs SYSTEM_SETTINGS_MANAGE and the
+        version the change is based on, in If-Match or the body.
+      headers:
+        If-Match:
+          displayName: If-Match
+          description: The version the change is based on, as returned in ETag, for example W/"4".
+          type: string
+          required: false
+          repeat: false
+      body:
+        application/json:
+          schema: appConfigurationDto
+      responses:
+        "200":
+          headers:
+            Keep-Alive:
+            ETag:
+          body:
+            application/json:
+              schema: appConfigurationDto
+        "400":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
+        "403":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
+        "409":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
+        "428":
+          headers:
+            Keep-Alive:
+          body:
+            application/json:
+              schema: localizedErrorResponse
+    /logo:
+      displayName: App Configuration Logo
+      get:
+        description: >
+          Returns the logo image. No token is needed. When v is the current hash, the answer may
+          be cached for good.
+        queryParameters:
+          v:
+            displayName: v
+            description: The logo hash from the configuration's logo URL.
+            type: string
+            required: false
+            repeat: false
+        responses:
+          "200":
+            headers:
+              Keep-Alive:
+              ETag:
+              Cache-Control:
+            body:
+              image/png:
+              image/jpeg:
+              image/webp:
+          "404":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+      put:
+        is: [ secured ]
+        description: >
+          Stores a new logo, PNG, JPEG or WebP of at most 512 KB, and removes the previous one.
+          Needs SYSTEM_SETTINGS_MANAGE and the version in If-Match.
+        headers:
+          If-Match:
+            displayName: If-Match
+            description: The version the change is based on, as returned in ETag, for example W/"4".
+            type: string
+            required: false
+            repeat: false
+        body:
+          multipart/form-data:
+            formParameters:
+              file:
+                displayName: The logo image
+                type: file
+                repeat: false
+        responses:
+          "200":
+            headers:
+              Keep-Alive:
+              ETag:
+            body:
+              application/json:
+                schema: appConfigurationDto
+          "400":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "403":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "409":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "428":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+      delete:
+        is: [ secured ]
+        description: >
+          Removes the logo, so the UI shows its built-in one. Needs SYSTEM_SETTINGS_MANAGE and the
+          version in If-Match.
+        headers:
+          If-Match:
+            displayName: If-Match
+            description: The version the change is based on, as returned in ETag, for example W/"4".
+            type: string
+            required: false
+            repeat: false
+        responses:
+          "200":
+            headers:
+              Keep-Alive:
+              ETag:
+            body:
+              application/json:
+                schema: appConfigurationDto
+          "403":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "409":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+          "428":
+            headers:
+              Keep-Alive:
+            body:
+              application/json:
+                schema: localizedErrorResponse
+    /auditLog:
+      type: auditLog
   /processingPeriods:
       displayName: Processing Period
       get:

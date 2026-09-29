@@ -1,6 +1,9 @@
 15.8.0-SNAPSHOT (WIP)
 ==================
 
+New functionality added in a backwards-compatible manner:
+* [FM-171](https://openlmis.atlassian.net/browse/FM-171): Added `/api/appConfiguration`, the deployment-wide UI configuration (app name, logo, theme and feature flags). Reads are public; changes need `SYSTEM_SETTINGS_MANAGE` and the version they are based on (`If-Match`), and a stale save answers 409.
+
 15.7.0 / 2026-09-28
 ==================
 

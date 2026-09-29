@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "AppConfigurationDto",
+  "description": "The deployment-wide UI configuration. A null field means the UI uses its built-in default.",
+  "properties": {
+    "version": {
+      "type": ["integer", "null"],
+      "title": "version",
+      "description": "Increases with every change. Send it back, or in If-Match, when saving."
+    },
+    "appName": {
+      "type": ["string", "null"],
+      "title": "appName",
+      "maxLength": 64
+    },
+    "logo": {
+      "type": ["object", "null"],
+      "title": "logo",
+      "properties": {
+        "url": { "type": "string", "title": "url" },
+        "contentType": { "type": "string", "title": "contentType" },
+        "size": { "type": "integer", "title": "size" }
+      }
+    },
+    "theme": {
+      "type": ["object", "null"],
+      "title": "theme",
+      "properties": {
+        "preset": { "type": ["string", "null"], "title": "preset" },
+        "defaultAppearance": {
+          "type": ["string", "null"],
+          "title": "defaultAppearance",
+          "description": "light, dark or system"
+        }
+      }
+    },
+    "featureFlags": {
+      "type": ["object", "null"],
+      "title": "featureFlags",
+      "additionalProperties": { "type": ["boolean", "string"] }
+    },
+    "modifiedDate": {
+      "type": ["string", "null"],
+      "title": "modifiedDate"
+    }
+  }
+}
