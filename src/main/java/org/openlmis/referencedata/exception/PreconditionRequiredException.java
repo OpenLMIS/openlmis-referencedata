@@ -15,13 +15,7 @@
 
 package org.openlmis.referencedata.exception;
 
-import org.openlmis.referencedata.util.Message;
-
 public class PreconditionRequiredException extends BaseMessageException {
-  public PreconditionRequiredException(Message message) {
-    super(message);
-  }
-
   public PreconditionRequiredException(String messageKey) {
     super(messageKey);
   }

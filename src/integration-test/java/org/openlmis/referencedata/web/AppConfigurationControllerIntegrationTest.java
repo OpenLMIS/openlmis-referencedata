@@ -29,6 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import com.google.common.hash.Hashing;
 import com.jayway.restassured.response.Response;
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.Arrays;
@@ -364,6 +365,7 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldDeletePreviousLogoWhenReplaced() {
     configuration.setLogo(PNG_SHA256, PNG_TYPE, PNG.length);
+    given(appConfigurationLogoRepository.existsById(PNG_SHA256)).willReturn(true);
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -450,6 +452,7 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
   @Test
   public void shouldRemoveLogo() {
     configuration.setLogo(PNG_SHA256, PNG_TYPE, PNG.length);
+    given(appConfigurationLogoRepository.existsById(PNG_SHA256)).willReturn(true);
 
     restAssured.given()
         .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
@@ -554,6 +557,149 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
         .then()
         .statusCode(403);
 
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotModifiedForWildcard() {
+    restAssured.given()
+        .header(HttpHeaders.IF_NONE_MATCH, "*")
+        .when()
+        .get(RESOURCE_PATH)
+        .then()
+        .statusCode(304);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldReturnNotModifiedWhenAnyListedETagMatches() {
+    restAssured.given()
+        .header(HttpHeaders.IF_NONE_MATCH, "W/\"1\", W/\"3\"")
+        .when()
+        .get(RESOURCE_PATH)
+        .then()
+        .statusCode(304);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldAcceptStrongETagInIfMatch() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, "\"3\"")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(bodyWith(APP_NAME))
+        .when()
+        .put(RESOURCE_PATH)
+        .then()
+        .statusCode(200)
+        .body(VERSION, is(4));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectUnreadableIfMatch() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, "W/\"latest\"")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(bodyWith(APP_NAME))
+        .when()
+        .put(RESOURCE_PATH)
+        .then()
+        .statusCode(400)
+        .body(MESSAGE_KEY, is(AppConfigurationMessageKeys.ERROR_VERSION_INVALID));
+
+    verify(appConfigurationRepository, never()).save(any(AppConfiguration.class));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldCreateConfigurationOnFirstSaveWhenNothingIsStored() {
+    given(appConfigurationRepository.findByIdForUpdate(AppConfiguration.SINGLETON_ID))
+        .willReturn(Optional.empty());
+
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, "W/\"0\"")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(bodyWith(APP_NAME))
+        .when()
+        .put(RESOURCE_PATH)
+        .then()
+        .statusCode(200)
+        .body(VERSION, is(1));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectEmptyLogo() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, CURRENT_VERSION)
+        .multiPart(FILE, PNG_FILE, new byte[0], PNG_TYPE)
+        .when()
+        .put(LOGO_PATH)
+        .then()
+        .statusCode(400)
+        .body(MESSAGE_KEY, is(AppConfigurationMessageKeys.ERROR_LOGO_EMPTY));
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldKeepStoredLogoWhenSameFileIsUploadedAgain() {
+    String sha = Hashing.sha256().hashBytes(PNG).toString();
+    configuration.setLogo(sha, PNG_TYPE, PNG.length);
+    given(appConfigurationLogoRepository.existsById(sha)).willReturn(true);
+
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, CURRENT_VERSION)
+        .multiPart(FILE, PNG_FILE, PNG, PNG_TYPE)
+        .when()
+        .put(LOGO_PATH)
+        .then()
+        .statusCode(200)
+        .body("logo.url", is(LOGO_PATH + "?v=" + sha));
+
+    verify(appConfigurationLogoRepository, never()).save(any(AppConfigurationLogo.class));
+    verify(appConfigurationLogoRepository, never()).deleteById(anyString());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRemoveLogoWhenNoneIsSet() {
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, CURRENT_VERSION)
+        .when()
+        .delete(LOGO_PATH)
+        .then()
+        .statusCode(200)
+        .body("logo", is(nullValue()));
+
+    verify(appConfigurationLogoRepository, never()).deleteById(anyString());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSkipDeletingLogoThatIsAlreadyGone() {
+    configuration.setLogo(PNG_SHA256, PNG_TYPE, PNG.length);
+
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, CURRENT_VERSION)
+        .when()
+        .delete(LOGO_PATH)
+        .then()
+        .statusCode(200);
+
+    verify(appConfigurationLogoRepository, never()).deleteById(anyString());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 

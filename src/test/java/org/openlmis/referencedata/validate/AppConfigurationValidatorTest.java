@@ -17,6 +17,7 @@ package org.openlmis.referencedata.validate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.openlmis.referencedata.validate.ValidationTestUtils.assertErrorMessage;
 
 import java.util.LinkedHashMap;
@@ -51,6 +52,12 @@ public class AppConfigurationValidatorTest {
     flags.put("QUANTITY_UNIT_OPTION", "BOTH");
     dto.setFeatureFlags(flags);
     errors = new BeanPropertyBindingResult(dto, "appConfigurationDto");
+  }
+
+  @Test
+  public void shouldSupportOnlyTheDto() {
+    assertTrue(validator.supports(AppConfigurationDto.class));
+    assertFalse(validator.supports(Object.class));
   }
 
   @Test

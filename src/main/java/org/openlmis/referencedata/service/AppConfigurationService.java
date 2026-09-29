@@ -17,8 +17,7 @@ package org.openlmis.referencedata.service;
 
 import static org.openlmis.referencedata.domain.AppConfiguration.SINGLETON_ID;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import com.google.common.hash.Hashing;
 import java.util.Optional;
 import org.openlmis.referencedata.domain.AppConfiguration;
 import org.openlmis.referencedata.domain.AppConfigurationLogo;
@@ -29,17 +28,12 @@ import org.openlmis.referencedata.repository.AppConfigurationRepository;
 import org.openlmis.referencedata.util.ImageTypeDetector;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.AppConfigurationMessageKeys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AppConfigurationService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AppConfigurationService.class);
-
   @Autowired
   private AppConfigurationRepository appConfigurationRepository;
 
@@ -74,7 +68,7 @@ public class AppConfigurationService {
   @Transactional
   public AppConfiguration replaceLogo(long expectedVersion, byte[] data) {
     String contentType = checkLogo(data);
-    String sha256 = sha256Hex(data);
+    String sha256 = Hashing.sha256().hashBytes(data).toString();
 
     AppConfiguration configuration = lockForChange(expectedVersion);
     if (!appConfigurationLogoRepository.existsById(sha256)) {
@@ -121,7 +115,7 @@ public class AppConfigurationService {
   }
 
   private String checkLogo(byte[] data) {
-    if (data == null || data.length == 0) {
+    if (data.length == 0) {
       throw new ValidationMessageException(AppConfigurationMessageKeys.ERROR_LOGO_EMPTY);
     }
     if (data.length > AppConfiguration.MAX_LOGO_SIZE) {
@@ -133,23 +127,8 @@ public class AppConfigurationService {
   }
 
   private void deleteLogo(String sha256) {
-    try {
+    if (appConfigurationLogoRepository.existsById(sha256)) {
       appConfigurationLogoRepository.deleteById(sha256);
-    } catch (EmptyResultDataAccessException ex) {
-      LOGGER.debug("Logo {} was already removed", sha256, ex);
-    }
-  }
-
-  private static String sha256Hex(byte[] data) {
-    try {
-      byte[] digest = MessageDigest.getInstance("SHA-256").digest(data);
-      StringBuilder hex = new StringBuilder(digest.length * 2);
-      for (byte b : digest) {
-        hex.append(String.format("%02x", b));
-      }
-      return hex.toString();
-    } catch (NoSuchAlgorithmException ex) {
-      throw new IllegalStateException(ex);
     }
   }
 }
