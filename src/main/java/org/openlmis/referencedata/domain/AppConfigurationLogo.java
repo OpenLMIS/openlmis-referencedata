@@ -23,17 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * The bytes of an uploaded logo, keyed by their SHA-256. Kept apart from
- * {@link AppConfiguration} so its audit snapshots never hold the image.
- */
 @Entity
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "app_configuration_logos")
 public class AppConfigurationLogo {
-
   @Id
   private String sha256;
 

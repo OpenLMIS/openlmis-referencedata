@@ -30,10 +30,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.javers.core.metamodel.annotation.TypeName;
 
-/**
- * The deployment-wide UI configuration: branding, theme and feature flag values. There is one
- * record, {@link #SINGLETON_ID}. A null field means the UI uses its built-in default.
- */
 @Entity
 @Getter
 @Setter
@@ -42,7 +38,6 @@ import org.javers.core.metamodel.annotation.TypeName;
 @Table(name = "app_configuration")
 @TypeName("AppConfiguration")
 public class AppConfiguration extends BaseEntity {
-
   public static final UUID SINGLETON_ID = UUID.fromString("5c3d6b1e-0000-4000-8000-000000000001");
   public static final int MAX_LOGO_SIZE = 512 * 1024;
 
@@ -68,10 +63,7 @@ public class AppConfiguration extends BaseEntity {
   @Column(nullable = false)
   private ZonedDateTime modifiedDate;
 
-  /**
-   * Creates the configuration used when nothing has been stored yet: every setting at its
-   * default.
-   */
+  /** The configuration used when nothing is stored: every setting at its default. */
   public static AppConfiguration newDefault() {
     AppConfiguration configuration = new AppConfiguration();
     configuration.setId(SINGLETON_ID);
@@ -79,10 +71,7 @@ public class AppConfiguration extends BaseEntity {
     return configuration;
   }
 
-  /**
-   * Replaces the editable settings with the ones from the importer. The logo is changed
-   * separately, through {@link #setLogo(String, String, int)} and {@link #clearLogo()}.
-   */
+  /** Replaces the editable settings; the logo changes separately. */
   public void updateFrom(Importer importer) {
     appName = StringUtils.trimToNull(importer.getAppName());
     themePreset = importer.getThemePreset();
@@ -92,18 +81,14 @@ public class AppConfiguration extends BaseEntity {
         : new HashMap<>(importer.getFeatureFlags());
   }
 
-  /**
-   * Points the configuration at a stored logo.
-   */
+  /** Points the configuration at a stored logo. */
   public void setLogo(String sha256, String contentType, int size) {
     logoSha256 = sha256;
     logoContentType = contentType;
     logoSize = size;
   }
 
-  /**
-   * Drops the logo, so the UI shows its built-in one.
-   */
+  /** Drops the logo, so the UI shows its built-in one. */
   public void clearLogo() {
     logoSha256 = null;
     logoContentType = null;
@@ -118,17 +103,13 @@ public class AppConfiguration extends BaseEntity {
     return version != null && version == expectedVersion;
   }
 
-  /**
-   * Records a change: bumps the version and the modification date.
-   */
+  /** Bumps the version and the modification date. */
   public void markModified() {
     version = version == null ? 1L : version + 1;
     modifiedDate = ZonedDateTime.now();
   }
 
-  /**
-   * Exports current state of the configuration.
-   */
+  /** Exports the current state. */
   public void export(Exporter exporter) {
     exporter.setVersion(version);
     exporter.setAppName(appName);
@@ -141,7 +122,6 @@ public class AppConfiguration extends BaseEntity {
   }
 
   public interface Exporter {
-
     void setVersion(Long version);
 
     void setAppName(String appName);
@@ -156,7 +136,6 @@ public class AppConfiguration extends BaseEntity {
   }
 
   public interface Importer {
-
     String getAppName();
 
     String getThemePreset();

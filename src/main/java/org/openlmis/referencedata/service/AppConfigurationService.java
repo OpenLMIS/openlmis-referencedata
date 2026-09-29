@@ -36,13 +36,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Reads and changes the app configuration. Every change names the version it is based on and
- * fails when someone else saved in between.
- */
 @Service
 public class AppConfigurationService {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(AppConfigurationService.class);
 
   @Autowired
@@ -51,17 +46,13 @@ public class AppConfigurationService {
   @Autowired
   private AppConfigurationLogoRepository appConfigurationLogoRepository;
 
-  /**
-   * Returns the stored configuration, or the all-defaults one when nothing is stored.
-   */
+  /** Returns the stored configuration, or the all-defaults one. */
   public AppConfiguration get() {
     return appConfigurationRepository.findById(SINGLETON_ID)
         .orElseGet(AppConfiguration::newDefault);
   }
 
-  /**
-   * Returns the logo the configuration points at, if any.
-   */
+  /** Returns the logo the configuration points at, if any. */
   public Optional<AppConfigurationLogo> getLogo() {
     AppConfiguration configuration = get();
     if (!configuration.hasLogo()) {
@@ -70,9 +61,7 @@ public class AppConfigurationService {
     return appConfigurationLogoRepository.findById(configuration.getLogoSha256());
   }
 
-  /**
-   * Replaces the editable settings.
-   */
+  /** Replaces the name, theme and feature flags. */
   @Transactional
   public AppConfiguration update(long expectedVersion, AppConfiguration.Importer importer) {
     AppConfiguration configuration = lockForChange(expectedVersion);
@@ -81,9 +70,7 @@ public class AppConfigurationService {
     return appConfigurationRepository.save(configuration);
   }
 
-  /**
-   * Stores a new logo and points the configuration at it. The previous logo is removed.
-   */
+  /** Stores a new logo and removes the previous one. */
   @Transactional
   public AppConfiguration replaceLogo(long expectedVersion, byte[] data) {
     String contentType = checkLogo(data);
@@ -105,9 +92,7 @@ public class AppConfigurationService {
     return saved;
   }
 
-  /**
-   * Drops the logo, so the UI shows its built-in one.
-   */
+  /** Drops the logo, so the UI shows its built-in one. */
   @Transactional
   public AppConfiguration removeLogo(long expectedVersion) {
     AppConfiguration configuration = lockForChange(expectedVersion);

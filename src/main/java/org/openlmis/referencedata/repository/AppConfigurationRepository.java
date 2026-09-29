@@ -28,11 +28,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface AppConfigurationRepository extends JpaRepository<AppConfiguration, UUID>,
     BaseAuditableRepository<AppConfiguration, UUID> {
-
-  /**
-   * Reads the configuration and locks its row until the transaction ends, so two saves never
-   * both pass the version check.
-   */
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT c FROM AppConfiguration c WHERE c.id = :id")
   Optional<AppConfiguration> findByIdForUpdate(@Param("id") UUID id);

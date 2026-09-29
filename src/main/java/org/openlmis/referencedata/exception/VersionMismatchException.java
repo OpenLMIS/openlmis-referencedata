@@ -17,11 +17,7 @@ package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 
-/**
- * Thrown when a save is based on a version other than the stored one. Results in 409 CONFLICT.
- */
 public class VersionMismatchException extends BaseMessageException {
-
   public VersionMismatchException(Message message) {
     super(message);
   }

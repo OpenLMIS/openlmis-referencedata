@@ -31,7 +31,6 @@ import org.springframework.validation.Errors;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class AppConfigurationValidatorTest {
-
   private static final String APP_NAME = "appName";
   private static final String PRESET = "theme.preset";
   private static final String APPEARANCE = "theme.defaultAppearance";

@@ -33,7 +33,6 @@ import org.openlmis.referencedata.domain.AppConfiguration;
 @ToString
 public class AppConfigurationDto
     implements AppConfiguration.Exporter, AppConfiguration.Importer {
-
   public static final String LOGO_PATH = "/api/appConfiguration/logo";
 
   private Long version;

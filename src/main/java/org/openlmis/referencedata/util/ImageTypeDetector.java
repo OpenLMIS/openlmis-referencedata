@@ -17,13 +17,7 @@ package org.openlmis.referencedata.util;
 
 import java.util.Optional;
 
-/**
- * Detects the image formats accepted for uploads from their leading bytes, so neither the file
- * name nor the declared content type is trusted. SVG is deliberately not supported, since it can
- * carry script.
- */
 public final class ImageTypeDetector {
-
   public static final String PNG = "image/png";
   public static final String JPEG = "image/jpeg";
   public static final String WEBP = "image/webp";
@@ -38,9 +32,7 @@ public final class ImageTypeDetector {
     throw new UnsupportedOperationException();
   }
 
-  /**
-   * Returns the content type of the given image bytes, or empty when the format is not accepted.
-   */
+  /** Returns the content type of a PNG, JPEG or WebP image, and empty for anything else. */
   public static Optional<String> detect(byte[] data) {
     if (data == null) {
       return Optional.empty();

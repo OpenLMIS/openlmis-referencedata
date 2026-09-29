@@ -52,15 +52,10 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * The deployment-wide UI configuration. Reads are public, since the sign-in page shows the logo
- * and name; changes need SYSTEM_SETTINGS_MANAGE and the version they are based on.
- */
 @Transactional
 @RestController
 @RequestMapping(RESOURCE_PATH)
 public class AppConfigurationController extends BaseController {
-
   public static final String RESOURCE_PATH = API_PATH + "/appConfiguration";
   public static final String LOGO_URL = "/logo";
   public static final String AUDIT_LOG_URL = "/auditLog";
@@ -75,9 +70,7 @@ public class AppConfigurationController extends BaseController {
   @Autowired
   private AppConfigurationValidator appConfigurationValidator;
 
-  /**
-   * Returns the configuration. Answers 304 when the caller already holds the current version.
-   */
+  /** Public, since the sign-in page shows the logo and name. */
   @GetMapping
   public ResponseEntity<AppConfigurationDto> getAppConfiguration(
       @RequestHeader(value = HttpHeaders.IF_NONE_MATCH, required = false) String ifNoneMatch) {
@@ -98,9 +91,7 @@ public class AppConfigurationController extends BaseController {
     return response;
   }
 
-  /**
-   * Replaces the app name, theme and feature flags.
-   */
+  /** Replaces the name, theme and feature flags. */
   @PutMapping
   public ResponseEntity<AppConfigurationDto> updateAppConfiguration(
       @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch,
@@ -122,9 +113,7 @@ public class AppConfigurationController extends BaseController {
     return withETag(saved);
   }
 
-  /**
-   * Stores a new logo: PNG, JPEG or WebP, detected from the bytes.
-   */
+  /** Stores a new logo. */
   @PutMapping(value = LOGO_URL, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<AppConfigurationDto> uploadLogo(
       @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch,
@@ -142,9 +131,7 @@ public class AppConfigurationController extends BaseController {
     return withETag(saved);
   }
 
-  /**
-   * Removes the logo, so the UI shows its built-in one.
-   */
+  /** Drops the logo, so the UI shows its built-in one. */
   @DeleteMapping(LOGO_URL)
   public ResponseEntity<AppConfigurationDto> removeLogo(
       @RequestHeader(value = HttpHeaders.IF_MATCH, required = false) String ifMatch) {
@@ -161,10 +148,7 @@ public class AppConfigurationController extends BaseController {
     return withETag(saved);
   }
 
-  /**
-   * Serves the logo bytes. A request naming the current hash may cache them for good, since a new
-   * logo gets a new hash and so a new URL.
-   */
+  /** Cacheable for good when v is the current hash, since a new logo gets a new URL. */
   @GetMapping(LOGO_URL)
   public ResponseEntity<byte[]> getLogo(
       @RequestParam(value = "v", required = false) String requestedHash) {
@@ -187,15 +171,12 @@ public class AppConfigurationController extends BaseController {
         .body(logo.getData());
   }
 
-  /**
-   * Returns the change history of the configuration.
-   */
+  /** Returns the change history. */
   @GetMapping(AUDIT_LOG_URL)
   public ResponseEntity<String> getAuditLog(
       @RequestParam(name = "author", required = false, defaultValue = "") String author,
       @RequestParam(name = "changedPropertyName", required = false, defaultValue = "")
           String changedPropertyName,
-      //Because JSON is all we formally support, returnJSON is excluded from our JavaDoc
       @RequestParam(name = "returnJSON", required = false, defaultValue = "true")
           boolean returnJson,
       Pageable pageable) {

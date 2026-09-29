@@ -17,12 +17,7 @@ package org.openlmis.referencedata.exception;
 
 import org.openlmis.referencedata.util.Message;
 
-/**
- * Thrown when a save does not say which version it is based on. Results in 428 PRECONDITION
- * REQUIRED.
- */
 public class PreconditionRequiredException extends BaseMessageException {
-
   public PreconditionRequiredException(Message message) {
     super(message);
   }

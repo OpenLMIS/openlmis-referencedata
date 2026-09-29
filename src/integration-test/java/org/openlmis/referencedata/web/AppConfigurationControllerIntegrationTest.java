@@ -49,7 +49,6 @@ import org.springframework.http.MediaType;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class AppConfigurationControllerIntegrationTest extends BaseWebIntegrationTest {
-
   private static final String RESOURCE_PATH = AppConfigurationController.RESOURCE_PATH;
   private static final String LOGO_PATH = RESOURCE_PATH + AppConfigurationController.LOGO_URL;
   private static final String AUDIT_LOG_PATH =
@@ -97,8 +96,6 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
 
     mockUserHasRight(RightName.SYSTEM_SETTINGS_MANAGE);
   }
-
-  // GET /api/appConfiguration
 
   @Test
   public void shouldReturnConfigurationWithoutToken() {
@@ -178,8 +175,6 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-
-  // PUT /api/appConfiguration
 
   @Test
   public void shouldUpdateConfiguration() {
@@ -326,8 +321,6 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
 
     verify(appConfigurationRepository, never()).save(any(AppConfiguration.class));
   }
-
-  // PUT and DELETE /api/appConfiguration/logo
 
   @Test
   public void shouldUploadLogo() {
@@ -488,8 +481,6 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
-  // GET /api/appConfiguration/logo
-
   @Test
   public void shouldServeLogoWithoutToken() {
     configuration.setLogo(PNG_SHA256, PNG_TYPE, PNG.length);
@@ -539,8 +530,6 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
-
-  // GET /api/appConfiguration/auditLog
 
   @Test
   public void shouldReturnAuditLog() {

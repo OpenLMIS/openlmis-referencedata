@@ -1,5 +1,3 @@
--- The deployment-wide UI configuration: branding, theme and feature flag values.
--- One row only, enforced by the fixed id. Null columns mean the UI uses its built-in default.
 CREATE TABLE app_configuration (
     id uuid PRIMARY KEY CHECK (id = '5c3d6b1e-0000-4000-8000-000000000001'),
     appname varchar(64),
@@ -13,7 +11,6 @@ CREATE TABLE app_configuration (
     modifieddate timestamp with time zone NOT NULL DEFAULT now()
 );
 
--- Logo bytes, kept apart from the audited configuration row.
 CREATE TABLE app_configuration_logos (
     sha256 varchar(64) PRIMARY KEY,
     contenttype varchar(32) NOT NULL,

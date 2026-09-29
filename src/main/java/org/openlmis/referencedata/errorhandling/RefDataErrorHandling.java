@@ -132,12 +132,6 @@ public class RefDataErrorHandling extends BaseHandler {
     return getLocalizedMessage(ex.asMessage());
   }
 
-  /**
-   * Handles a save based on an outdated version and returns status 409 CONFLICT.
-   *
-   * @param ex the exception to handle
-   * @return the error response for the user
-   */
   @ExceptionHandler(VersionMismatchException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   @ResponseBody
@@ -146,12 +140,6 @@ public class RefDataErrorHandling extends BaseHandler {
     return getLocalizedMessage(ex.asMessage());
   }
 
-  /**
-   * Handles a save that names no version and returns status 428 PRECONDITION REQUIRED.
-   *
-   * @param ex the exception to handle
-   * @return the error response for the user
-   */
   @ExceptionHandler(PreconditionRequiredException.class)
   @ResponseStatus(HttpStatus.PRECONDITION_REQUIRED)
   @ResponseBody

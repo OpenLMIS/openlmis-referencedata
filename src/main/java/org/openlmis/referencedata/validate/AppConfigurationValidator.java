@@ -25,13 +25,8 @@ import org.openlmis.referencedata.util.messagekeys.AppConfigurationMessageKeys;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 
-/**
- * Checks the shape of an app configuration. It deliberately knows no preset or flag names: the
- * UI owns those, so adding one needs no backend release.
- */
 @Component
 public class AppConfigurationValidator implements BaseValidator {
-
   static final int MAX_APP_NAME_LENGTH = 64;
   static final int MAX_FEATURE_FLAGS = 100;
   static final int MAX_FEATURE_FLAG_VALUE_LENGTH = 64;
