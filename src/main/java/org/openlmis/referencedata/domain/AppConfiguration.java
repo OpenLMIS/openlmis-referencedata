@@ -44,6 +44,9 @@ public class AppConfiguration extends BaseEntity {
 
   private String appName;
 
+  @Column(nullable = false)
+  private boolean showAppName = true;
+
   private String themePreset;
 
   private String defaultAppearance;
@@ -75,6 +78,7 @@ public class AppConfiguration extends BaseEntity {
   /** Replaces the editable settings; the logo changes separately. */
   public void updateFrom(Importer importer) {
     appName = StringUtils.trimToNull(importer.getAppName());
+    showAppName = !Boolean.FALSE.equals(importer.getShowAppName());
     themePreset = importer.getThemePreset();
     defaultAppearance = importer.getDefaultAppearance();
     featureFlags = importer.getFeatureFlags() == null
@@ -114,6 +118,7 @@ public class AppConfiguration extends BaseEntity {
   public void export(Exporter exporter) {
     exporter.setVersion(version);
     exporter.setAppName(appName);
+    exporter.setShowAppName(showAppName);
     exporter.setTheme(themePreset, defaultAppearance);
     exporter.setFeatureFlags(featureFlags == null ? new HashMap<>() : featureFlags);
     if (hasLogo()) {
@@ -127,6 +132,8 @@ public class AppConfiguration extends BaseEntity {
 
     void setAppName(String appName);
 
+    void setShowAppName(Boolean showAppName);
+
     void setTheme(String preset, String defaultAppearance);
 
     void setFeatureFlags(Map<String, Object> featureFlags);
@@ -138,6 +145,8 @@ public class AppConfiguration extends BaseEntity {
 
   public interface Importer {
     String getAppName();
+
+    Boolean getShowAppName();
 
     String getThemePreset();
 

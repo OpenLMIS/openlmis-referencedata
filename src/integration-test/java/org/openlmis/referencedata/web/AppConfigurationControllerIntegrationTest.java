@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -202,6 +203,28 @@ public class AppConfigurationControllerIntegrationTest extends BaseWebIntegratio
     verify(appConfigurationRepository).save(saved.capture());
     assertEquals("Malawi OpenLMIS", saved.getValue().getAppName());
     assertEquals(Long.valueOf(4), saved.getValue().getVersion());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldStoreWhetherTheNameIsShownBesideTheLogo() {
+    AppConfigurationDto body = bodyWith(APP_NAME);
+    body.setShowAppName(false);
+
+    restAssured.given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .header(HttpHeaders.IF_MATCH, CURRENT_VERSION)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(body)
+        .when()
+        .put(RESOURCE_PATH)
+        .then()
+        .statusCode(200)
+        .body("showAppName", is(false));
+
+    ArgumentCaptor<AppConfiguration> saved = ArgumentCaptor.forClass(AppConfiguration.class);
+    verify(appConfigurationRepository).save(saved.capture());
+    assertFalse(saved.getValue().isShowAppName());
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }
 
