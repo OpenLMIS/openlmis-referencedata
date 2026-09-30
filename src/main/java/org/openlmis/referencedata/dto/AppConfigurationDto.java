@@ -37,6 +37,7 @@ public class AppConfigurationDto
 
   private Long version;
   private String appName;
+  private Boolean showAppName;
   private LogoDto logo;
   private ThemeDto theme;
   private Map<String, Object> featureFlags;

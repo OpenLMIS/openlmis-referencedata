@@ -14,6 +14,11 @@
       "title": "appName",
       "maxLength": 64
     },
+    "showAppName": {
+      "type": ["boolean", "null"],
+      "title": "showAppName",
+      "description": "Whether the UI shows the name beside the logo. Null means true."
+    },
     "logo": {
       "type": ["object", "null"],
       "title": "logo",

@@ -48,8 +48,25 @@ public class AppConfigurationTest {
     assertEquals(AppConfiguration.SINGLETON_ID, configuration.getId());
     assertEquals(Long.valueOf(0), configuration.getVersion());
     assertNull(configuration.getAppName());
+    assertTrue(configuration.isShowAppName());
     assertTrue(configuration.getFeatureFlags().isEmpty());
     assertNotNull(configuration.getModifiedDate());
+  }
+
+  @Test
+  public void shouldHideTheNameBesideTheLogoOnlyWhenAskedTo() {
+    AppConfiguration configuration = AppConfiguration.newDefault();
+    AppConfigurationDto dto = new AppConfigurationDto();
+    dto.setShowAppName(false);
+
+    configuration.updateFrom(dto);
+    configuration.export(dto);
+    assertFalse(configuration.isShowAppName());
+    assertFalse(dto.getShowAppName());
+
+    dto.setShowAppName(null);
+    configuration.updateFrom(dto);
+    assertTrue(configuration.isShowAppName());
   }
 
   @Test
