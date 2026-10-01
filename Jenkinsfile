@@ -47,7 +47,9 @@ pipeline {
                     }
                     VERSION = properties.serviceVersion
                     STAGING_VERSION = properties.serviceVersion
-                    if (CURRENT_BRANCH != 'master' || (CURRENT_BRANCH == 'master' && !VERSION.endsWith("SNAPSHOT"))) {
+                    if (CURRENT_BRANCH == 'migration') {
+                        STAGING_VERSION += "-MIGRATION"
+                    } else if (CURRENT_BRANCH != 'master' || (CURRENT_BRANCH == 'master' && !VERSION.endsWith("SNAPSHOT"))) {
                         STAGING_VERSION += "-STAGING"
                     }
                     currentBuild.displayName += " - " + VERSION
