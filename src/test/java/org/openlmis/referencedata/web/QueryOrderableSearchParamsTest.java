@@ -30,6 +30,7 @@ public class QueryOrderableSearchParamsTest {
 
   private static final String CODE = "code";
   private static final String NAME = "name";
+  private static final String Q = "q";
   private static final String PROGRAM = "program";
 
   private static final String VALUE = "test";
@@ -59,6 +60,32 @@ public class QueryOrderableSearchParamsTest {
     QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
 
     assertEquals("", searchParams.getCode());
+  }
+
+  @Test
+  public void getQShouldReturnValueForKeyQ() {
+    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    queryMap.add(Q, VALUE);
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
+
+    assertEquals(VALUE, searchParams.getQ());
+  }
+
+  @Test
+  public void getQShouldReturnNullIfMapDoesNotContainKeyQ() {
+    QueryOrderableSearchParams searchParams =
+        new QueryOrderableSearchParams(new LinkedMultiValueMap<>());
+
+    assertNull(searchParams.getQ());
+  }
+
+  @Test
+  public void getQShouldReturnEmptyStringIfValueForRequestParamIsNull() {
+    LinkedMultiValueMap<String, Object> queryMap = new LinkedMultiValueMap<>();
+    queryMap.add(Q, null);
+    QueryOrderableSearchParams searchParams = new QueryOrderableSearchParams(queryMap);
+
+    assertEquals("", searchParams.getQ());
   }
 
   @Test

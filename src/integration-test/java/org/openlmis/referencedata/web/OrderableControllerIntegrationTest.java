@@ -595,6 +595,32 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
   }
 
   @Test
+  public void shouldSearchOrderablesByCodeOrName() {
+    when(orderableService
+        .searchOrderables(any(QueryOrderableSearchParams.class), any(Pageable.class)))
+        .thenReturn(
+            Pagination.getPage(Collections.singletonList(orderable), PageRequest.of(0, 10)));
+    when(orderableService
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class)))
+        .thenReturn(modifiedDate);
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .parameter("q", "0363")
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .get(RESOURCE_URL)
+        .then()
+        .statusCode(200);
+
+    verify(orderableService)
+        .searchOrderables(searchParamsArgumentCaptor.capture(), any(Pageable.class));
+    assertEquals("0363", searchParamsArgumentCaptor.getValue().getQ());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
   public void shouldPaginateSearchOrderables() {
     final List<Orderable> items = Collections.singletonList(orderable);
 
@@ -782,6 +808,35 @@ public class OrderableControllerIntegrationTest extends BaseWebIntegrationTest {
     assertEquals(1, response.getContent().size());
     assertEquals(orderableDto.getId().toString(),
             ((java.util.LinkedHashMap) response.getContent().get(0)).get("id"));
+  }
+
+  @Test
+  public void shouldPostSearchOrderablesWithoutIdentities() {
+    OrderableSearchParams searchParams = new OrderableSearchParams(
+        orderableDto.getProductCode(), null, null, null, 0, 10);
+
+    doReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 10)))
+        .when(orderableRepository)
+        .search(eq(searchParams), any(Pageable.class));
+    doReturn(modifiedDate)
+        .when(orderableService)
+        .getLatestLastUpdatedDate(any(QueryOrderableSearchParams.class), any(Profiler.class));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+        .body(searchParams)
+        .post(SEARCH_URL)
+        .then()
+        .statusCode(HttpStatus.SC_OK);
+
+    verify(orderableService)
+        .getLatestLastUpdatedDate(searchParamsArgumentCaptor.capture(), any(Profiler.class));
+    QueryOrderableSearchParams value = searchParamsArgumentCaptor.getValue();
+    assertEquals(orderableDto.getProductCode(), value.getCode());
+    assertEquals(Collections.emptySet(), value.getExactCodes());
   }
 
   @Test
