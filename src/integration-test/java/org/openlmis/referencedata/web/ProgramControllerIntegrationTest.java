@@ -27,6 +27,8 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import guru.nidi.ramltester.junit.RamlMatchers;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,8 +39,13 @@ import org.openlmis.referencedata.AvailableFeatures;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.domain.RightName;
 import org.openlmis.referencedata.dto.ProgramDto;
+import org.openlmis.referencedata.service.PageDto;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.utils.AuditLogHelper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.togglz.junit.TogglzRule;
@@ -55,6 +62,7 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
   private static final String ID_URL = RESOURCE_URL + "/{id}";
   private static final String FIND_BY_NAME_URL = RESOURCE_URL + "/search";
   private static final String NAME = "name";
+  private static final String SORT = "sort";
   private static final String DESCRIPTION = "OpenLMIS";
 
   private Program program;
@@ -281,6 +289,129 @@ public class ProgramControllerIntegrationTest extends BaseWebIntegrationTest {
         .put(ID_URL)
         .then()
         .statusCode(400);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSearchOnePageOfProgramsSortedOnTheServer() {
+    PageRequest pageable = PageRequest.of(0, 1, Sort.by(Direction.ASC, NAME));
+    given(programRepository.search(null, null, pageable))
+        .willReturn(Pagination.getPage(asList(program), pageable, 2));
+
+    PageDto<?> response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 1)
+        .queryParam(SORT, "name,asc")
+        .body(Collections.emptyMap())
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    assertEquals(1, response.getContent().size());
+    assertEquals(2, response.getTotalElements());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSearchProgramsByCodeAndName() {
+    PageRequest pageable = PageRequest.of(0, 10);
+    given(programRepository.search("PRG", "fam", pageable))
+        .willReturn(Pagination.getPage(asList(program), pageable, 1));
+    HashMap<String, Object> body = new HashMap<>();
+    body.put("code", "PRG");
+    body.put(NAME, "fam");
+
+    PageDto<?> response = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
+        .body(body)
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(200)
+        .extract().as(PageDto.class);
+
+    assertEquals(1, response.getContent().size());
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldSearchProgramsWithoutABody() {
+    PageRequest pageable = PageRequest.of(0, 10);
+    given(programRepository.search(null, null, pageable))
+        .willReturn(Pagination.getPage(asList(program), pageable, 1));
+
+    restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(PAGE, 0)
+        .queryParam(SIZE, 10)
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(200);
+
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectSearchSortedByAnUnknownField() {
+    String messageKey = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .queryParam(SORT, "description,asc")
+        .body(Collections.emptyMap())
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey,
+        Matchers.is("referenceData.error.program.search.invalidSortingColumn"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectSearchByAnUnknownField() {
+    String messageKey = restAssured
+        .given()
+        .header(HttpHeaders.AUTHORIZATION, getTokenHeader())
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(Collections.singletonMap("active", true))
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(400)
+        .extract()
+        .path(MESSAGE_KEY);
+
+    assertThat(messageKey, Matchers.is("referenceData.error.program.search.invalidParams"));
+    assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
+  }
+
+  @Test
+  public void shouldRejectSearchWithoutAToken() {
+    restAssured
+        .given()
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .body(Collections.emptyMap())
+        .when()
+        .post(FIND_BY_NAME_URL)
+        .then()
+        .statusCode(401);
 
     assertThat(RAML_ASSERT_MESSAGE, restAssured.getLastReport(), RamlMatchers.hasNoViolations());
   }

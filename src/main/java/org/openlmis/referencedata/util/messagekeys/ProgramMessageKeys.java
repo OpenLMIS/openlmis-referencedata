@@ -27,4 +27,7 @@ public abstract class ProgramMessageKeys extends MessageKeys {
   public static final String ERROR_CODE_REQUIRED = join(ERROR, CODE, REQUIRED);
   public static final String ERROR_CODE_DUPLICATED = join(ERROR, CODE, DUPLICATED);
   public static final String ERROR_CODE_IS_INVARIABLE = join(ERROR, CODE, IS_INVARIABLE);
+  public static final String ERROR_SEARCH_INVALID_PARAMS = join(ERROR, SEARCH, INVALID_PARAMS);
+  public static final String ERROR_SEARCH_INVALID_SORTING_COLUMN =
+      join(ERROR, SEARCH, "invalidSortingColumn");
 }

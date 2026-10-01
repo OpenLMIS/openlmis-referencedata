@@ -4,6 +4,7 @@
 New Functionality:
 * [FM-171](https://openlmis.atlassian.net/browse/FM-171): Added `/api/appConfiguration`, the deployment-wide UI configuration (app name, logo, theme and feature flags). Reads are public; changes need `SYSTEM_SETTINGS_MANAGE` and the version they are based on (`If-Match`), and a stale save answers 409.
 * [FM-173](https://openlmis.atlassian.net/browse/FM-173): Added `showAppName` to `/api/appConfiguration`, so a deployment whose logo already contains its name can hide the name shown beside it. Defaults to true.
+* [FM-183](https://openlmis.atlassian.net/browse/FM-183): Added POST `/api/programs/search`, a page of programs sorted by code, name or active and filtered by parts of the code and name. GET `/api/programs` is unchanged.
 
 15.7.0 / 2026-09-28
 ==================

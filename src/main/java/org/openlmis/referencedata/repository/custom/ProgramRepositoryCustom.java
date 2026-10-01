@@ -17,7 +17,11 @@ package org.openlmis.referencedata.repository.custom;
 
 import java.util.List;
 import org.openlmis.referencedata.domain.Program;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProgramRepositoryCustom {
   List<Program> findProgramsByName(String name);
+
+  Page<Program> search(String code, String name, Pageable pageable);
 }

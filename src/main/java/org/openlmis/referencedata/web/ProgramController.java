@@ -20,7 +20,10 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
 import static org.openlmis.referencedata.web.ProgramController.RESOURCE_PATH;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.openlmis.referencedata.AvailableFeatures;
@@ -39,7 +42,9 @@ import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -64,6 +69,10 @@ public class ProgramController extends BaseController {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(ProgramController.class);
 
   public static final String RESOURCE_PATH = API_PATH + "/programs";
+  private static final String CODE = "code";
+  private static final String NAME = "name";
+  private static final List<String> SEARCH_PARAMS = Arrays.asList(CODE, NAME);
+  private static final List<String> SORT_FIELDS = Arrays.asList(CODE, NAME, "active");
 
   @Autowired
   private ProgramRepository programRepository;
@@ -239,6 +248,41 @@ public class ProgramController extends BaseController {
     return updatedProgram;
   }
 
+
+  /**
+   * Returns a page of programs whose code and name contain the given parts, ignoring case.
+   */
+  @PostMapping("/search")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public Page<Program> searchPrograms(@RequestBody(required = false) Map<String, Object> body,
+      Pageable pageable) {
+    Profiler profiler = new Profiler("SEARCH_PROGRAMS_PAGE");
+    profiler.setLogger(XLOGGER);
+
+    Map<String, Object> params = body == null ? Collections.emptyMap() : body;
+    if (!SEARCH_PARAMS.containsAll(params.keySet())) {
+      throw new ValidationMessageException(ProgramMessageKeys.ERROR_SEARCH_INVALID_PARAMS);
+    }
+    for (Sort.Order order : pageable.getSort()) {
+      if (!SORT_FIELDS.contains(order.getProperty())) {
+        throw new ValidationMessageException(new Message(
+            ProgramMessageKeys.ERROR_SEARCH_INVALID_SORTING_COLUMN, order.getProperty()));
+      }
+    }
+
+    profiler.start("REPOSITORY_SEARCH");
+    Page<Program> page = programRepository.search(
+        textParam(params, CODE), textParam(params, NAME), pageable);
+
+    profiler.stop().log();
+    return page;
+  }
+
+  private static String textParam(Map<String, Object> params, String key) {
+    Object value = params.get(key);
+    return value == null ? null : value.toString();
+  }
 
   /**
    * Retrieves all programs with program name similar to name parameter.
