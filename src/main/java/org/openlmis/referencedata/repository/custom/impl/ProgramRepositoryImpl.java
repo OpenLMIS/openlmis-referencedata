@@ -15,17 +15,28 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.Program;
 import org.openlmis.referencedata.repository.custom.ProgramRepositoryCustom;
+import org.openlmis.referencedata.util.Pagination;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
+
+  private static final String CODE = "code";
+  private static final String NAME = "name";
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -52,5 +63,60 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
     }
     query.where(predicate);
     return entityManager.createQuery(query).getResultList();
+  }
+
+  @Override
+  public Page<Program> search(String code, String name, Pageable pageable) {
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+
+    CriteriaQuery<Long> countQuery = builder.createQuery(Long.class);
+    Root<Program> countRoot = countQuery.from(Program.class);
+    countQuery.select(builder.count(countRoot))
+        .where(searchPredicate(builder, countRoot, code, name));
+    Long count = entityManager.createQuery(countQuery).getSingleResult();
+
+    CriteriaQuery<Program> query = builder.createQuery(Program.class);
+    Root<Program> root = query.from(Program.class);
+    query.where(searchPredicate(builder, root, code, name))
+        .orderBy(searchOrder(builder, root, pageable.getSort()));
+
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
+    List<Program> programs = entityManager.createQuery(query)
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
+    return Pagination.getPage(programs, pageable, count);
+  }
+
+  private Predicate searchPredicate(CriteriaBuilder builder, Root<Program> root, String code,
+      String name) {
+    Predicate predicate = builder.conjunction();
+    if (code != null) {
+      predicate = builder.and(predicate, contains(builder, codeOf(root), code));
+    }
+    if (name != null) {
+      predicate = builder.and(predicate, contains(builder, root.get(NAME), name));
+    }
+    return predicate;
+  }
+
+  private Predicate contains(CriteriaBuilder builder, Expression<String> field, String part) {
+    return builder.like(builder.upper(field), "%" + part.toUpperCase() + "%");
+  }
+
+  private List<Order> searchOrder(CriteriaBuilder builder, Root<Program> root, Sort sort) {
+    List<Order> orders = new ArrayList<>();
+    for (Sort.Order order : sort) {
+      Expression<?> field = CODE.equals(order.getProperty())
+          ? codeOf(root)
+          : root.get(order.getProperty());
+      orders.add(order.isAscending() ? builder.asc(field) : builder.desc(field));
+    }
+    orders.add(builder.asc(root.get("id")));
+    return orders;
+  }
+
+  private Expression<String> codeOf(Root<Program> root) {
+    return root.get(CODE).get(CODE);
   }
 }

@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.Test;
 import org.openlmis.referencedata.domain.Facility;
 import org.openlmis.referencedata.domain.FacilityType;
@@ -45,11 +46,21 @@ import org.openlmis.referencedata.testbuilder.SupportedProgramDataBuilder;
 import org.openlmis.referencedata.testbuilder.UserDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 
 @SuppressWarnings("PMD.TooManyMethods")
 public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrationTest<Program> {
 
   private static final String RIGHT_NAME = "rightName";
+  private static final String SEARCH_CODE = "FM183";
+  private static final String NAME = "name";
+  private static final String CODE = "code";
+  private static final String ALPHA = "Alpha";
+  private static final String BRAVO = "Bravo";
+  private static final String CHARLIE = "Charlie";
   
   @Autowired
   ProgramRepository repository;
@@ -83,6 +94,76 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     return new ProgramDataBuilder()
         .withoutId()
         .build();
+  }
+
+  @Test
+  public void shouldSearchProgramsPageByPageWithTheTotalCount() {
+    saveSearchablePrograms();
+
+    Page<Program> first = repository.search(SEARCH_CODE, null,
+        PageRequest.of(0, 2, Sort.by(NAME)));
+    Page<Program> second = repository.search(SEARCH_CODE, null,
+        PageRequest.of(1, 2, Sort.by(NAME)));
+
+    assertEquals(3, first.getTotalElements());
+    assertEquals(asList(ALPHA, BRAVO), names(first));
+    assertEquals(asList(CHARLIE), names(second));
+  }
+
+  @Test
+  public void shouldSortSearchedProgramsByCode() {
+    saveSearchablePrograms();
+
+    Page<Program> page = repository.search(SEARCH_CODE, null,
+        PageRequest.of(0, 10, Sort.by(Direction.DESC, CODE)));
+
+    assertEquals(asList(CHARLIE, BRAVO, ALPHA), names(page));
+  }
+
+  @Test
+  public void shouldSortSearchedProgramsByActive() {
+    saveSearchablePrograms();
+
+    Page<Program> page = repository.search(SEARCH_CODE, null,
+        PageRequest.of(0, 10, Sort.by(Direction.ASC, "active")));
+
+    assertEquals(ALPHA, names(page).get(0));
+  }
+
+  @Test
+  public void shouldFilterSearchedProgramsByCodeAndNameIgnoringCase() {
+    saveSearchablePrograms();
+
+    Page<Program> page = repository.search("fm183", "rav", PageRequest.of(0, 10));
+
+    assertEquals(asList(BRAVO), names(page));
+  }
+
+  @Test
+  public void shouldReturnEverySearchedProgramWithoutPaging() {
+    saveSearchablePrograms();
+
+    Page<Program> page = repository.search(SEARCH_CODE, null,
+        PageRequest.of(0, Integer.MAX_VALUE));
+
+    assertEquals(3, page.getContent().size());
+  }
+
+  private void saveSearchablePrograms() {
+    saveProgram("FM183C", CHARLIE, true);
+    saveProgram("FM183A", ALPHA, false);
+    saveProgram("FM183B", BRAVO, true);
+  }
+
+  private void saveProgram(String code, String name, boolean active) {
+    Program program = new ProgramDataBuilder().withoutId().withCode(code).build();
+    program.setName(name);
+    program.setActive(active);
+    repository.save(program);
+  }
+
+  private List<String> names(Page<Program> page) {
+    return page.getContent().stream().map(Program::getName).collect(Collectors.toList());
   }
 
   @Test(expected = DataIntegrityViolationException.class)

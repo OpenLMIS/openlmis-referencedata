@@ -2535,6 +2535,28 @@ resourceTypes:
                         Keep-Alive:
                       body:
                         application/json:
+          post:
+              is: [ secured, paginated, sorted ]
+              description: Return a page of programs whose code and name contain the given parts, ignoring case. Sorts by code, name or active.
+              body:
+                  application/json:
+              responses:
+                  "200":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                  "400":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
+                          schema: localizedErrorResponse
+                  "401":
+                      headers:
+                        Keep-Alive:
+                      body:
+                        application/json:
       /{id}/auditLog:
           type: instanceAuditLog
 
