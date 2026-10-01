@@ -947,7 +947,9 @@ resourceTypes:
           is: [ secured, paginated ]
           description: >
             Get all Orderable Products if no search params provided. Otherwise returns a paginated
-            list of Orderables given either an Orderable Ids, a Program Code, a Name or a Code.
+            list of Orderables given either an Orderable Ids, a Program Code, a Name, a Code, or a
+            text to find in the Code or the Name (q). Text filters match a part of the value,
+            ignoring case; % and _ match themselves.
           queryParameters:
               id:
                   displayName: orderable ID
@@ -966,6 +968,11 @@ resourceTypes:
                   repeat: false
               name:
                   displayName: orderable name
+                  type: string
+                  required: false
+                  repeat: false
+              q:
+                  displayName: text in the orderable code or name
                   type: string
                   required: false
                   repeat: false

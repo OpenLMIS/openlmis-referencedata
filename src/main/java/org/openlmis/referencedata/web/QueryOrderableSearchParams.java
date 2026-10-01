@@ -39,12 +39,13 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
   private static final String CODE = "code";
   private static final String EXACT_CODE = "exactCode";
   private static final String NAME = "name";
+  private static final String Q = "q";
   private static final String PROGRAM_CODE = "program";
   private static final String TRADE_ITEM_ID = "tradeItemId";
   private static final String ID = "id";
 
   private static final List<String> ALL_PARAMETERS = Collections.unmodifiableList(Arrays.asList(
-      ID, EXACT_CODE, CODE, NAME, PROGRAM_CODE, TRADE_ITEM_ID));
+      ID, EXACT_CODE, CODE, NAME, Q, PROGRAM_CODE, TRADE_ITEM_ID));
 
   private final SearchParams queryParams;
 
@@ -99,6 +100,16 @@ public class QueryOrderableSearchParams implements OrderableRepositoryCustom.Sea
     }
 
     return defaultIfBlank(queryParams.getFirst(NAME), EMPTY);
+  }
+
+  /** The text to find in the code or the name; null when absent, empty when blank. */
+  @Override
+  public String getQ() {
+    if (!queryParams.containsKey(Q)) {
+      return null;
+    }
+
+    return defaultIfBlank(queryParams.getFirst(Q), EMPTY);
   }
 
   /**

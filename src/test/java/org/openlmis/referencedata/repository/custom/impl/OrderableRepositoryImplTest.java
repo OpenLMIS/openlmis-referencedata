@@ -21,23 +21,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.CODE;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.FULL_PRODUCT_NAME;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.ID;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.IDENTITY;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.PRODUCT_CODE;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.PROGRAM;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.PROGRAM_ORDERABLES;
-import static org.openlmis.referencedata.repository.custom.impl.OrderableRepositoryImpl.VERSION_NUMBER;
 
-import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,19 +38,11 @@ import java.util.Set;
 import java.util.stream.IntStream;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Subquery;
-import org.hibernate.query.criteria.internal.CriteriaBuilderImpl;
 import org.hibernate.transform.DistinctRootEntityResultTransformer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -75,15 +58,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class OrderableRepositoryImplTest {
 
-  public static final String PROGRAM_CODE_1 = "programCode1";
-  public static final String PROGRAM_CODE_2 = "programCode2";
+  private static final String PROGRAM_CODE_1 = "programCode1";
+  private static final String PROGRAM_CODE_2 = "programCode2";
+
   @InjectMocks
   private OrderableRepositoryImpl repository;
+
   @Mock
   private EntityManager entityManager;
+
+  private final CriteriaBuilder builder = mock(CriteriaBuilder.class, RETURNS_DEEP_STUBS);
+
+  private int createQueryCalls;
 
   private static MultiValueMap<String, Object> prepareSampleMultiValueMap() {
     MultiValueMap<String, Object> multiValueMap = new LinkedMultiValueMap<>();
@@ -95,186 +84,77 @@ public class OrderableRepositoryImplTest {
   }
 
   @Test
-  public void shouldFindLatestModifiedDateByParams() {
+  public void shouldFindLatestModifiedDateByParamsInGmt() {
+    ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Warsaw"));
+    when(entityManager.getCriteriaBuilder()).thenReturn(builder);
+    TypedQuery<ZonedDateTime> query = mock(TypedQuery.class);
+    when(query.getSingleResult()).thenReturn(now);
+    when(entityManager.createQuery(any(CriteriaQuery.class))).thenReturn(query);
 
-    //given
-    MultiValueMap<String, Object> multiValueMap = prepareSampleMultiValueMap();
+    ZonedDateTime latest = repository.findLatestModifiedDateByParams(
+        new QueryOrderableSearchParams(prepareSampleMultiValueMap()));
 
-    ZonedDateTime now = ZonedDateTime.now();
-    Query countQuery = mock(Query.class);
-    when(countQuery.getSingleResult()).thenReturn(1);
-    Query selectQuery = mock(Query.class);
-    when(selectQuery.getSingleResult()).thenReturn(Timestamp.from(now.toInstant()));
+    assertEquals(now.toInstant(), latest.toInstant());
+    assertEquals(ZoneId.of("GMT"), latest.getZone());
+  }
 
-    when(entityManager.createNativeQuery(
-        contains(OrderableRepositoryImpl.NATIVE_COUNT_LAST_UPDATED)))
-        .thenReturn(countQuery);
-    when(entityManager.createNativeQuery(
-        contains(OrderableRepositoryImpl.NATIVE_SELECT_LAST_UPDATED)))
-        .thenReturn(selectQuery);
+  @Test
+  public void shouldReturnNoLatestModifiedDateWhenNothingMatches() {
+    when(entityManager.getCriteriaBuilder()).thenReturn(builder);
+    TypedQuery<ZonedDateTime> query = mock(TypedQuery.class);
+    when(entityManager.createQuery(any(CriteriaQuery.class))).thenReturn(query);
 
-    //when
-    ZonedDateTime latestModifiedDateByParams =
-        repository.findLatestModifiedDateByParams(new QueryOrderableSearchParams(multiValueMap));
-
-    //then
-    assertEquals(latestModifiedDateByParams, now);
+    assertEquals(null, repository.findLatestModifiedDateByParams(
+        new QueryOrderableSearchParams(prepareSampleMultiValueMap())));
   }
 
   @Test
   public void shouldSearchForMultipleProgramsWithoutIdentityPairsAndWithoutTradeItemId() {
-    //given
-    int pageSize = 1;
-    Long offset = 1L;
-
     Pageable pageable = mock(Pageable.class);
-    when(pageable.getPageSize()).thenReturn(pageSize);
-    when(pageable.getOffset()).thenReturn(offset);
+    when(pageable.getPageSize()).thenReturn(1);
+    when(pageable.getOffset()).thenReturn(1L);
+    when(entityManager.getCriteriaBuilder()).thenReturn(builder);
 
-    Expression expression = mock(Expression.class);
-    CriteriaQuery newQuery = mock(CriteriaQuery.class);
+    Expression<String> lowerExpression = mock(Expression.class);
+    when(builder.lower(any())).thenReturn(lowerExpression);
 
-    Root root = mock(Root.class);
+    TypedQuery<Long> countQuery = mock(TypedQuery.class);
+    when(countQuery.getSingleResult()).thenReturn(1L);
+    TypedQuery<VersionIdentity> identitiesQuery = mock(TypedQuery.class, RETURNS_DEEP_STUBS);
+    when(identitiesQuery.setMaxResults(anyInt()).setFirstResult(anyInt()))
+        .thenReturn(identitiesQuery);
+    List<VersionIdentity> versionIdentities = new ArrayList<>();
+    IntStream.range(0, 2).forEach(i -> versionIdentities.add(mock(VersionIdentity.class)));
+    when(identitiesQuery.getResultList()).thenReturn(versionIdentities);
 
-    CriteriaQuery criteriaQuery = mock(CriteriaQuery.class);
-
-    CriteriaBuilder criteriaBuilder = mock(CriteriaBuilderImpl.class);
-    when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
-
-    //getTotal/getIdentities
-    when(criteriaBuilder.createQuery(any()))
-        .thenReturn(criteriaQuery);
-
-    //getTotal/getIdentities->prepareQuery
-    when(criteriaQuery.from(Orderable.class)).thenReturn(root);
-
-    when(criteriaBuilder.count(root)).thenReturn(expression);
-    when(criteriaQuery.select(expression)).thenReturn(newQuery);
-
-    Path identityPath = mock(Path.class);
-    Path idPath = mock(Path.class);
-    Path versionNumberPath = mock(Path.class);
-    when(identityPath.get(ID)).thenReturn(idPath);
-    when(identityPath.get(VERSION_NUMBER)).thenReturn(versionNumberPath);
-    Expression idExpression = mock(Expression.class);
-    when(idPath.as(String.class)).thenReturn(idExpression);
-
-    when(root.get(IDENTITY)).thenReturn(identityPath);
-
-    Expression concatenatedExpression = mock(Expression.class);
-    when(criteriaBuilder.concat(idExpression, versionNumberPath))
-        .thenReturn(concatenatedExpression);
-    Expression concatenatedExpressionAsString = mock(Expression.class);
-    when(concatenatedExpression.as(String.class)).thenReturn(concatenatedExpressionAsString);
-    when(criteriaBuilder.in(concatenatedExpressionAsString))
-        .thenReturn(mock(CriteriaBuilder.In.class));
-
-    when(criteriaQuery.select(identityPath)).thenReturn(newQuery);
-
-    //getTotal/getIdentities->prepareQuery->prepareParams
-
-    when(criteriaBuilder.conjunction()).thenReturn(mock(Predicate.class));
-
-    Join ordProgOrdJoin = mock(Join.class);
-    when(root.join(PROGRAM_ORDERABLES, JoinType.INNER))
-        .thenReturn(ordProgOrdJoin);
-    Join progOrdProgJoin = mock(Join.class);
-    when(ordProgOrdJoin.join(PROGRAM, JoinType.INNER)).thenReturn(progOrdProgJoin);
-    Path pathCode = mock(Path.class);
-    when(progOrdProgJoin.get(CODE)).thenReturn(pathCode);
-    Path pathCodeCode = mock(Path.class);
-    when(pathCode.get(CODE)).thenReturn(pathCodeCode);
-    Expression lowerExpression = mock(Expression.class);
-    when(criteriaBuilder.lower(pathCodeCode)).thenReturn(lowerExpression);
-
-    //getTotal/getIdentities->prepareQuery->prepareParams->createSubQuery
-
-    Subquery latestOrderableQuery = mock(Subquery.class);
-    when(newQuery.subquery(String.class)).thenReturn(latestOrderableQuery);
-    Root latestOrderableRoot = mock(Root.class);
-    when(latestOrderableQuery.from(Orderable.class)).thenReturn(latestOrderableRoot);
-    Path latestOrderableIdentityPath = mock(Path.class);
-    Path latestOrderableIdPath = mock(Path.class);
-    Path latestOrderableVersionNumberPath = mock(Path.class);
-    when(latestOrderableIdentityPath.get(ID)).thenReturn(latestOrderableIdPath);
-    when(latestOrderableIdentityPath.get(VERSION_NUMBER))
-        .thenReturn(latestOrderableVersionNumberPath);
-    when(criteriaBuilder.max(latestOrderableVersionNumberPath)).thenReturn(mock(Expression.class));
-
-    when(latestOrderableRoot.get(IDENTITY)).thenReturn(latestOrderableIdentityPath);
-
-    //end: getTotal/getIdentities->prepareQuery->prepareParams->createSubQuery
-
-    when(root.get(PRODUCT_CODE)).thenReturn(mock(Path.class));
-
-    //end: getTotal/getIdentities->prepareQuery->prepareParams
-
-    TypedQuery typedCountQuery = mock(TypedQuery.class);
-    when(typedCountQuery.getSingleResult()).thenReturn(1L);
-    when(entityManager.createQuery(newQuery)).thenReturn(typedCountQuery);
-
-
-    TypedQuery typedNotCountQuery = mock(TypedQuery.class, RETURNS_DEEP_STUBS);
-    when(typedNotCountQuery.setMaxResults(anyInt()).setFirstResult(anyInt()))
-        .thenReturn(typedNotCountQuery);
-    List<VersionIdentity> versionIdentityList = new ArrayList<>();
-    IntStream.range(0, 2).forEach(i ->
-        versionIdentityList.add(mock(VersionIdentity.class)));
-    when(typedNotCountQuery.getResultList())
-        .thenReturn(versionIdentityList);
-
-    when(entityManager.createQuery(criteriaQuery)).thenReturn(typedNotCountQuery);
-
-    //end: getTotal/getIdentities->prepareQuery
-    //end: getTotal/getIdentities
-
-    //retrieveOrderables
-    Predicate inPredicate = mock(Predicate.class);
-    CriteriaQuery orderableCriteriaQuery = mock(CriteriaQuery.class);
-    when(criteriaBuilder
-        .createQuery(Orderable.class)).thenReturn(orderableCriteriaQuery);
-    Root orderableRoot = mock(Root.class, RETURNS_DEEP_STUBS);
-    when(orderableCriteriaQuery
-        .from(Orderable.class)).thenReturn(orderableRoot);
-    Path orderablePath = mock(Path.class);
-    when(orderableRoot.get(IDENTITY)).thenReturn(orderablePath);
-    Path fullProductNamePath = mock(Path.class);
-    when(orderableRoot.get(FULL_PRODUCT_NAME)).thenReturn(fullProductNamePath);
+    CriteriaQuery<Orderable> orderableQuery = mock(CriteriaQuery.class, RETURNS_DEEP_STUBS);
+    when(builder.createQuery(Orderable.class)).thenReturn(orderableQuery);
     Order ascOrder = mock(Order.class);
-    when(criteriaBuilder.asc(fullProductNamePath)).thenReturn(ascOrder);
-    when(orderablePath
-        .in(any(List.class))).thenReturn(inPredicate);
-    when(orderableCriteriaQuery.select(orderableRoot))
-        .thenReturn(orderableCriteriaQuery);
-
-    //retrieveOrderables->retrieveOrderables
+    when(builder.asc(any())).thenReturn(ascOrder);
+    TypedQuery<Orderable> orderablesQuery = mock(TypedQuery.class, RETURNS_DEEP_STUBS);
     EntityGraph entityGraph = mock(EntityGraph.class);
-    when(entityManager.getEntityGraph(anyString()))
-        .thenReturn(entityGraph);
-    TypedQuery orderablesTypedQuery = mock(TypedQuery.class, RETURNS_DEEP_STUBS);
-    when(entityManager.createQuery(orderableCriteriaQuery))
-        .thenReturn(orderablesTypedQuery);
-    org.hibernate.query.Query query = mock(org.hibernate.query.Query.class, RETURNS_DEEP_STUBS);
-    when(orderablesTypedQuery
+    when(entityManager.getEntityGraph(anyString())).thenReturn(entityGraph);
+    org.hibernate.query.Query hibernateQuery =
+        mock(org.hibernate.query.Query.class, RETURNS_DEEP_STUBS);
+    when(orderablesQuery
         .setHint(anyString(), anyBoolean())
         .setHint(anyString(), eq(entityGraph))
         .unwrap(org.hibernate.query.Query.class))
-        .thenReturn(query);
-    when(query
-        .setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE)
-        .list())
+        .thenReturn(hibernateQuery);
+    when(hibernateQuery.setResultTransformer(DistinctRootEntityResultTransformer.INSTANCE).list())
         .thenReturn(Collections.singletonList(mock(Orderable.class)));
 
-    //end: retrieveOrderables->retrieveOrderables
-    //end: retrieveOrderables
-    MultiValueMap<String, Object> multiValueMap = prepareSampleMultiValueMap();
+    when(entityManager.createQuery(any(CriteriaQuery.class))).thenAnswer(invocation -> {
+      if (invocation.getArgument(0) == orderableQuery) {
+        return orderablesQuery;
+      }
+      createQueryCalls++;
+      return createQueryCalls == 1 ? countQuery : identitiesQuery;
+    });
 
-    QueryOrderableSearchParams params = new QueryOrderableSearchParams(multiValueMap);
+    Page<Orderable> resultPage = repository.search(
+        new QueryOrderableSearchParams(prepareSampleMultiValueMap()), pageable);
 
-    //when
-    Page<Orderable> resultPage = repository.search(params, pageable);
-
-    //then
     assertEquals(1L, resultPage.getTotalElements());
     assertEquals(1, resultPage.getTotalPages());
 
@@ -284,7 +164,7 @@ public class OrderableRepositoryImplTest {
     ArgumentCaptor<Set> codesArgumentCaptor = ArgumentCaptor.forClass(Set.class);
     verify(lowerExpression, times(2)).in(codesArgumentCaptor.capture());
     assertTrue(codesArgumentCaptor.getAllValues().stream()
-        .allMatch(codeList -> codeList.containsAll(programCodes)));
-    verify(orderableCriteriaQuery).orderBy(ascOrder);
+        .allMatch(codes -> codes.containsAll(programCodes)));
+    verify(orderableQuery).orderBy(ascOrder);
   }
 }

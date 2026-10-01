@@ -47,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.tuple.Pair;
@@ -829,6 +828,151 @@ public class OrderableRepositoryIntegrationTest {
     assertEquals("c product", foundOrderables.getContent().get(2).getFullProductName());
   }
 
+  @Test
+  public void shouldFindOrderablesByCodeOrName() {
+    Orderable byCode = saveOrderable("qx-0363", "Paracetamol");
+    Orderable byName = saveOrderable("qx-1", "Allergy 0363 Relief");
+    saveOrderable("qx-2", "Ibuprofen");
+
+    Page<Orderable> found = repository.search(new TestSearchParams().withQ("0363"), pageable);
+
+    assertEquals(2, found.getTotalElements());
+    Assertions.assertThat(found.getContent()).extracting(Orderable::getId)
+        .containsExactly(byName.getId(), byCode.getId());
+  }
+
+  @Test
+  public void shouldFindOrderablesByCodeOrNameIgnoringCase() {
+    Orderable byCode = saveOrderable("QX-ABC", "Paracetamol");
+    Orderable byName = saveOrderable("qx-1", "Abc Relief");
+
+    Assertions.assertThat(searchIds(new TestSearchParams().withQ("aBc")))
+        .containsExactlyInAnyOrder(byCode.getId(), byName.getId());
+  }
+
+  @Test
+  public void shouldFindOrderablesByCodeOrNameInProgram() {
+    Program program = createProgram("q-program");
+    Orderable inProgram = createOrderableWithProgramAndName(program, "Allergy 0363");
+    saveOrderable("qx-0363", "Paracetamol");
+
+    Assertions.assertThat(searchIds(new TestSearchParams(null, null, null,
+        Collections.singleton("q-program"), null).withQ("0363")))
+        .containsExactly(inProgram.getId());
+  }
+
+  @Test
+  public void shouldMatchPercentAndUnderscoreLiterally() {
+    saveOrderable("lit-3", "Ethanol 70 Solution");
+    saveOrderable("litx4", "Swab");
+    final Orderable percent = saveOrderable("lit-1", "Ethanol 70% Solution");
+    final Orderable underscore = saveOrderable("lit_2", "Gauze");
+
+    Assertions.assertThat(searchIds(new TestSearchParams(null, null, "%", null, null)))
+        .containsExactly(percent.getId());
+    Assertions.assertThat(searchIds(new TestSearchParams("_", null, null, null, null)))
+        .containsExactly(underscore.getId());
+    Assertions.assertThat(searchIds(new TestSearchParams().withQ("0%")))
+        .containsExactly(percent.getId());
+    Assertions.assertThat(searchIds(new TestSearchParams().withQ("t_")))
+        .containsExactly(underscore.getId());
+  }
+
+  @Test
+  public void shouldFindOrderablesWithApostrophes() {
+    Program program = createProgram("prog'1");
+    Orderable named = createOrderableWithProgramAndName(program, "Children's Syrup");
+    Orderable coded = saveOrderable("o'b-1", "Plain");
+
+    List<TestSearchParams> searches = Arrays.asList(
+        new TestSearchParams(null, null, "children's", null, null),
+        new TestSearchParams("o'b", null, null, null, null),
+        new TestSearchParams(null, Collections.singleton("o'b-1"), null, null, null),
+        new TestSearchParams(null, null, null, Collections.singleton("prog'1"), null),
+        new TestSearchParams().withQ("'"));
+
+    for (TestSearchParams search : searches) {
+      Assertions.assertThat(searchIds(search)).isNotEmpty()
+          .isSubsetOf(named.getId(), coded.getId());
+      assertNotNull(repository.findLatestModifiedDateByParams(search));
+    }
+  }
+
+  @Test
+  public void shouldFindLastUpdatedDateOfOrderablesMatchingCodeOrName() {
+    Orderable byCode = saveOrderable("lm-0363", "Zinc");
+    Orderable byName = saveOrderable("lm-1", "Allergy 0363");
+    Orderable other = saveOrderable("lm-2", "Other");
+    byCode.setLastUpdated(ZonedDateTime.now().minusHours(2));
+    byName.setLastUpdated(ZonedDateTime.now().minusHours(1));
+    other.setLastUpdated(ZonedDateTime.now());
+    repository.save(byCode);
+    repository.save(byName);
+    repository.save(other);
+
+    ZonedDateTime lastUpdated =
+        repository.findLatestModifiedDateByParams(new TestSearchParams().withQ("0363"));
+
+    assertEquals(byName.getLastUpdated().toInstant(), lastUpdated.toInstant());
+  }
+
+  @Test
+  public void shouldFindLastUpdatedDateOfOrderablesOfTradeItem() {
+    UUID tradeItemId = UUID.randomUUID();
+    Orderable ofTradeItem = repository.save(new OrderableDataBuilder()
+        .withProductCode(Code.code("ti-1"))
+        .withIdentifier(TRADE_ITEM, tradeItemId)
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName("Of Trade Item")
+        .buildAsNew());
+    Orderable other = saveOrderable("ti-2", "Other");
+    ofTradeItem.setLastUpdated(ZonedDateTime.now().minusHours(1));
+    other.setLastUpdated(ZonedDateTime.now());
+    repository.save(ofTradeItem);
+    repository.save(other);
+
+    ZonedDateTime lastUpdated = repository.findLatestModifiedDateByParams(
+        new TestSearchParams().withTradeItemId(Collections.singleton(tradeItemId)));
+
+    assertEquals(ofTradeItem.getLastUpdated().toInstant(), lastUpdated.toInstant());
+  }
+
+  @Test
+  public void shouldCountOrderableOnceWhenLinkedTwiceToProgram() {
+    Program program = createProgram("twice");
+    Orderable orderable = saveOrderable("tw-1", "Twice");
+    ProgramOrderable inactive = new ProgramOrderableDataBuilder()
+        .withOrderableDisplayCategory(createOrderableDisplayCategory("twice-category"))
+        .withProgram(program)
+        .withProduct(orderable)
+        .asInactive()
+        .buildAsNew();
+    orderable.setProgramOrderables(
+        Lists.newArrayList(createProgramOrderable(program, orderable), inactive));
+    repository.save(orderable);
+
+    Page<Orderable> found = repository.search(
+        new TestSearchParams(null, null, null, Collections.singleton("twice"), null),
+        PageRequest.of(0, 1));
+
+    assertEquals(1, found.getTotalElements());
+    assertEquals(1, found.getContent().size());
+  }
+
+  private List<UUID> searchIds(SearchParams searchParams) {
+    return repository.search(searchParams, pageable).getContent().stream()
+        .map(Orderable::getId)
+        .collect(Collectors.toList());
+  }
+
+  private Orderable saveOrderable(String code, String name) {
+    return repository.save(new OrderableDataBuilder()
+        .withProductCode(Code.code(code))
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName(name)
+        .buildAsNew());
+  }
+
   private void searchOrderablesAndCheckResults(String code, String name, Program program,
                                                Orderable orderable, int expectedSize) {
     String programCode = null == program ? null : program.getCode().toString();
@@ -935,18 +1079,38 @@ public class OrderableRepositoryIntegrationTest {
 
   @Getter
   @NoArgsConstructor
-  @AllArgsConstructor
   private static final class TestSearchParams implements SearchParams {
 
     private String code;
-    private Set<String> exactCodes;
+    private Set<String> exactCodes = Collections.emptySet();
     private String name;
-    private Set<String> programCodes;
-    private Set<Pair<UUID, Long>> identityPairs;
+    private Set<String> programCodes = Collections.emptySet();
+    private Set<Pair<UUID, Long>> identityPairs = Collections.emptySet();
+    private String codeOrName;
+    private Set<UUID> tradeItemId = Collections.emptySet();
+
+    TestSearchParams(String code, Set<String> exactCodes, String name, Set<String> programCodes,
+        Set<Pair<UUID, Long>> identityPairs) {
+      this.code = code;
+      this.exactCodes = exactCodes;
+      this.name = name;
+      this.programCodes = programCodes;
+      this.identityPairs = identityPairs;
+    }
+
+    TestSearchParams withQ(String codeOrName) {
+      this.codeOrName = codeOrName;
+      return this;
+    }
 
     @Override
-    public Set<UUID> getTradeItemId() {
-      return Collections.emptySet();
+    public String getQ() {
+      return codeOrName;
+    }
+
+    TestSearchParams withTradeItemId(Set<UUID> tradeItemId) {
+      this.tradeItemId = tradeItemId;
+      return this;
     }
   }
 }

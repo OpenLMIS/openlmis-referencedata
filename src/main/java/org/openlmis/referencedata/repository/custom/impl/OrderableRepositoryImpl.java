@@ -15,12 +15,10 @@
 
 package org.openlmis.referencedata.repository.custom.impl;
 
-import static java.util.stream.Collectors.joining;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -35,12 +33,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CommonAbstractCriteria;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Join;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Subquery;
@@ -63,6 +61,7 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.query.EscapeCharacter;
 
 public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<SearchParams>
     implements OrderableRepositoryCustom {
@@ -71,37 +70,15 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
   static final String PRODUCT_CODE = "productCode";
   static final String VERSION_NUMBER = "versionNumber";
   static final String ID = "id";
-  static final String PROGRAM_ORDERABLES = "programOrderables";
   static final String IDENTITY = "identity";
   static final String PROGRAM = "program";
   static final String CODE = "code";
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(OrderableRepositoryImpl.class);
-  private static final String FROM_ORDERABLES_TABLE = " FROM referencedata.orderables AS o";
-  private static final String NATIVE_PROGRAM_ORDERABLE_JOIN =
-      " JOIN referencedata.program_orderables AS po"
-          + "  ON o.id = po.orderableId AND o.versionNumber = po.orderableVersionNumber";
-  private static final String NATIVE_PROGRAM_ORDERABLE_INNER_JOIN =
-      " INNER" + NATIVE_PROGRAM_ORDERABLE_JOIN;
-  private static final String NATIVE_PROGRAM_JOIN =
-      " JOIN referencedata.programs AS p"
-          + "  ON p.id = po.programId";
-  private static final String NATIVE_PROGRAM_INNER_JOIN =
-      " INNER" + NATIVE_PROGRAM_JOIN;
-  private static final String NATIVE_LATEST_ORDERABLE_INNER_JOIN =
-      " INNER JOIN (SELECT id, MAX (versionNumber) AS versionNumber"
-          + "  FROM referencedata.orderables GROUP BY id) AS latest"
-          + "  ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
-  static final String NATIVE_SELECT_LAST_UPDATED = "SELECT o.lastupdated "
-      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
-  static final String NATIVE_COUNT_LAST_UPDATED = "SELECT COUNT(*) "
-      + FROM_ORDERABLES_TABLE + NATIVE_LATEST_ORDERABLE_INNER_JOIN;
-  private static final String ORDER_BY_LAST_UPDATED_DESC_LIMIT_1 = " ORDER BY o.lastupdated"
-      + " DESC LIMIT 1";
-  private static final String WHERE = " WHERE ";
-  private static final String AND = " AND ";
   private static final String GMT = "GMT";
   private static final String ORDERABLE = "orderable";
-  private static final String LATEST_ORDERABLE_ALIAS = "latest";
+  private static final String NEWER_ORDERABLE_ALIAS = "newer";
+  private static final String LAST_UPDATED = "lastUpdated";
+  private static final String PRODUCT = "product";
   private static final String TRADE_ITEM = "tradeItem";
   @PersistenceContext
   private EntityManager entityManager;
@@ -123,16 +100,7 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     profiler.start("CALCULATE_FULL_LIST_SIZE");
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     List<VersionIdentity> identityList = new ArrayList<>();
-    Set<Pair<UUID, Long>> identityPairs = searchParams.getIdentityPairs();
-
-    Set<UUID> tradeItemId = searchParams.getTradeItemId();
-    if (!tradeItemId.isEmpty()) {
-      Set<Pair<UUID, Long>> identitiesByTradeItemId = getIdentitiesByTradeItemId(tradeItemId);
-
-      identityPairs = identityPairs.isEmpty()
-          ? identitiesByTradeItemId
-          : SetUtils.intersection(identitiesByTradeItemId, identityPairs).toSet();
-    }
+    Set<Pair<UUID, Long>> identityPairs = getIdentityPairs(searchParams);
 
     Long total = getTotal(searchParams, identityPairs, identityList, builder, pageable);
 
@@ -165,20 +133,34 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     Profiler profiler = new Profiler("GET_ZONED_DATE_TIME_FROM_PARAMS");
     profiler.setLogger(XLOGGER);
 
-    profiler.start("CALCULATE_FULL_LIST_SIZE_LAST_UPDATED");
-    Query countNativeQuery = getLastUpdatedQuery(searchParams, true);
-    int total = ((Number) countNativeQuery.getSingleResult()).intValue();
+    profiler.start("GET_ZONED_DATE_TIME_QUERY");
+    CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+    List<VersionIdentity> identities = new ArrayList<>();
+    Set<Pair<UUID, Long>> identityPairs =
+        null == searchParams ? Collections.emptySet() : getIdentityPairs(searchParams);
+    identityPairs.forEach(pair -> identities.add(new VersionIdentity(pair.getLeft(),
+        pair.getRight())));
 
-    if (total <= 0) {
-      profiler.stop().log();
-      return null;
+    List<List<VersionIdentity>> partitions = identities.isEmpty()
+        ? Collections.singletonList(identities)
+        : ListUtils.partition(identities, MAX_IDENTITIES_SIZE);
+
+    ZonedDateTime latest = null;
+    for (List<VersionIdentity> partition : partitions) {
+      CriteriaQuery<ZonedDateTime> query = builder.createQuery(ZonedDateTime.class);
+      Root<Orderable> root = query.from(Orderable.class);
+      root.alias(ORDERABLE);
+      query.select(builder.greatest(root.<ZonedDateTime>get(LAST_UPDATED)));
+      query.where(prepareParams(root, query, searchParams, partition));
+
+      ZonedDateTime found = entityManager.createQuery(query).getSingleResult();
+      if (null != found && (null == latest || found.isAfter(latest))) {
+        latest = found;
+      }
     }
 
-    profiler.start("GET_ZONED_DATE_TIME_QUERY");
-    Query query = getLastUpdatedQuery(searchParams, false);
-    Timestamp timestamp = (Timestamp) query.getSingleResult();
     profiler.stop().log();
-    return ZonedDateTime.of(timestamp.toLocalDateTime(), ZoneId.of(GMT));
+    return null == latest ? null : latest.withZoneSameInstant(ZoneId.of(GMT));
   }
 
   @Override
@@ -219,27 +201,20 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
     return entityManager.createQuery(newQuery);
   }
 
-  private <E> Predicate prepareParams(Root<Orderable> root, CriteriaQuery<E> query,
-                                      SearchParams searchParams,
-                                      Collection<VersionIdentity> identities) {
+  private Predicate prepareParams(Root<Orderable> root, CommonAbstractCriteria query,
+                                  SearchParams searchParams,
+                                  Collection<VersionIdentity> identities) {
     CriteriaBuilder builder = entityManager.getCriteriaBuilder();
     Predicate where = builder.conjunction();
 
     if (null != searchParams) {
       Set<String> programCodes = getProgramCodesLowerCase(searchParams);
       if (!programCodes.isEmpty()) {
-        Join<Orderable, ProgramOrderable> poJoin = root.join(PROGRAM_ORDERABLES, JoinType.INNER);
-        Join<ProgramOrderable, Program> programJoin = poJoin.join(PROGRAM, JoinType.INNER);
-        where = builder.and(where, builder.lower(programJoin.get(CODE).get(CODE))
-            .in(programCodes));
+        where = builder.and(where, isInPrograms(root, query, builder, programCodes));
       }
 
       if (isEmpty(identities)) {
-        Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
-        where = builder.and(where, builder.in(builder.concat(
-                root.get(IDENTITY).get(ID).as(String.class),
-                root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
-            .value(latestOrderablesQuery));
+        where = builder.and(where, isLatestVersion(root, query, builder));
       } else {
         where = builder.and(where, builder.in(root.get(IDENTITY)).value(identities));
       }
@@ -248,23 +223,73 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         where =
             builder.and(where, root.get(PRODUCT_CODE).get(CODE).in(searchParams.getExactCodes()));
       } else if (isNotBlank(searchParams.getCode())) {
-        where = builder.and(where, builder.like(builder.lower(root.get(PRODUCT_CODE).get(CODE)),
-            "%" + searchParams.getCode().toLowerCase() + "%"));
+        where = builder.and(where,
+            contains(builder, root.get(PRODUCT_CODE).get(CODE), searchParams.getCode()));
       }
 
       if (isNotBlank(searchParams.getName())) {
-        where = builder.and(where, builder.like(builder.lower(root.get(FULL_PRODUCT_NAME)),
-            "%" + searchParams.getName().toLowerCase() + "%"));
+        where = builder.and(where,
+            contains(builder, root.get(FULL_PRODUCT_NAME), searchParams.getName()));
+      }
+
+      if (isNotBlank(searchParams.getQ())) {
+        where = builder.and(where, builder.or(
+            contains(builder, root.get(PRODUCT_CODE).get(CODE), searchParams.getQ()),
+            contains(builder, root.get(FULL_PRODUCT_NAME), searchParams.getQ())));
       }
     } else {
-      Subquery<String> latestOrderablesQuery = createSubQuery(query, builder);
-      where = builder.and(where, builder.in(builder.concat(
-              root.get(IDENTITY).get(ID).as(String.class),
-              root.get(IDENTITY).get(VERSION_NUMBER)).as(String.class))
-          .value(latestOrderablesQuery));
+      where = builder.and(where, isLatestVersion(root, query, builder));
     }
 
     return where;
+  }
+
+  private Predicate contains(CriteriaBuilder builder, Expression<String> field, String text) {
+    EscapeCharacter escape = EscapeCharacter.DEFAULT;
+    return builder.like(builder.lower(field), "%" + escape.escape(text.toLowerCase()) + "%",
+        escape.getEscapeCharacter());
+  }
+
+  private Predicate isLatestVersion(Root<Orderable> root, CommonAbstractCriteria query,
+                                    CriteriaBuilder builder) {
+    Subquery<Long> newerVersions = query.subquery(Long.class);
+    Root<Orderable> newer = newerVersions.from(Orderable.class);
+    newer.alias(NEWER_ORDERABLE_ALIAS);
+    newerVersions.select(newer.get(IDENTITY).get(VERSION_NUMBER));
+    newerVersions.where(
+        builder.equal(newer.get(IDENTITY).get(ID), root.get(IDENTITY).get(ID)),
+        builder.greaterThan(newer.get(IDENTITY).<Long>get(VERSION_NUMBER),
+            root.get(IDENTITY).<Long>get(VERSION_NUMBER)));
+    return builder.not(builder.exists(newerVersions));
+  }
+
+  private Predicate isInPrograms(Root<Orderable> root, CommonAbstractCriteria query,
+                                 CriteriaBuilder builder, Set<String> programCodes) {
+    Subquery<UUID> links = query.subquery(UUID.class);
+    Root<ProgramOrderable> link = links.from(ProgramOrderable.class);
+    Join<ProgramOrderable, Program> program = link.join(PROGRAM);
+    links.select(link.get(ID));
+    links.where(
+        builder.equal(link.get(PRODUCT).get(IDENTITY).get(ID), root.get(IDENTITY).get(ID)),
+        builder.equal(link.get(PRODUCT).get(IDENTITY).get(VERSION_NUMBER),
+            root.get(IDENTITY).get(VERSION_NUMBER)),
+        builder.lower(program.get(CODE).get(CODE)).in(programCodes));
+    return builder.exists(links);
+  }
+
+  private Set<Pair<UUID, Long>> getIdentityPairs(SearchParams searchParams) {
+    Set<Pair<UUID, Long>> identityPairs = SetUtils.emptyIfNull(searchParams.getIdentityPairs());
+
+    Set<UUID> tradeItemId = searchParams.getTradeItemId();
+    if (!tradeItemId.isEmpty()) {
+      Set<Pair<UUID, Long>> identitiesByTradeItemId = getIdentitiesByTradeItemId(tradeItemId);
+
+      identityPairs = identityPairs.isEmpty()
+          ? identitiesByTradeItemId
+          : SetUtils.intersection(identitiesByTradeItemId, identityPairs).toSet();
+    }
+
+    return identityPairs;
   }
 
   private Set<String> getProgramCodesLowerCase(SearchParams searchParams) {
@@ -275,67 +300,6 @@ public class OrderableRepositoryImpl extends IdentitiesSearchableRepository<Sear
         .filter(Objects::nonNull)
         .map(String::toLowerCase)
         .collect(Collectors.toSet());
-  }
-
-  private Subquery<String> createSubQuery(CriteriaQuery query, CriteriaBuilder builder) {
-    Subquery<String> latestOrderablesQuery = query.subquery(String.class);
-    Root<Orderable> latestOrderablesRoot = latestOrderablesQuery.from(Orderable.class);
-    latestOrderablesRoot.alias(LATEST_ORDERABLE_ALIAS);
-
-    latestOrderablesQuery.select(
-        builder.concat(
-            latestOrderablesRoot.get(IDENTITY).get(ID).as(String.class),
-            builder.max(latestOrderablesRoot.get(IDENTITY).get(VERSION_NUMBER)).as(String.class)));
-    latestOrderablesQuery.groupBy(latestOrderablesRoot.get(IDENTITY).get(ID));
-
-    return latestOrderablesQuery;
-  }
-
-  private Query getLastUpdatedQuery(SearchParams searchParams, boolean count) {
-    String startNativeQuery = count ? NATIVE_COUNT_LAST_UPDATED : NATIVE_SELECT_LAST_UPDATED;
-    StringBuilder builder = new StringBuilder(startNativeQuery);
-    List<String> wheres = new ArrayList<>();
-
-    // FIXME: Don't build raw HQL
-    if (null != searchParams) {
-      Set<String> programCodes = getProgramCodesLowerCase(searchParams);
-      if (!isEmpty(programCodes)) {
-        builder.append(NATIVE_PROGRAM_ORDERABLE_INNER_JOIN + NATIVE_PROGRAM_INNER_JOIN);
-        final String queryCondition = "LOWER (p.code) IN (" + toHqlInList(programCodes) + ")";
-        wheres.add(queryCondition);
-      }
-
-      if (isNotEmpty(searchParams.getExactCodes())) {
-        final String queryCondition =
-            "o.code IN (" + toHqlInList(searchParams.getExactCodes()) + ")";
-        wheres.add(queryCondition);
-      } else if (null != searchParams.getCode()) {
-        final String queryCondition = "LOWER (o.code) LIKE '%"
-            + searchParams.getCode().toLowerCase() + "%'";
-        wheres.add(queryCondition);
-      }
-
-      if (null != searchParams.getName()) {
-        final String queryCondition = "LOWER (o.fullproductname) LIKE '%"
-            + searchParams.getName().toLowerCase() + "%'";
-        wheres.add(queryCondition);
-      }
-
-      if (!wheres.isEmpty()) {
-        builder.append(WHERE).append(String.join(AND, wheres));
-      }
-    }
-
-    if (!count) {
-      builder.append(ORDER_BY_LAST_UPDATED_DESC_LIMIT_1);
-    }
-    String builderText = builder.toString();
-    XLOGGER.info("QueryParamString: {}", builderText);
-    return entityManager.createNativeQuery(builderText);
-  }
-
-  private String toHqlInList(Set<String> textValues) {
-    return textValues.stream().map(text -> '\'' + text + '\'').collect(joining(", "));
   }
 
   private List<Orderable> retrieveOrderables(Collection<VersionIdentity> identities) {

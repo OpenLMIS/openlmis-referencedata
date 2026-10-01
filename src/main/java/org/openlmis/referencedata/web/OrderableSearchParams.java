@@ -75,6 +75,12 @@ public final class OrderableSearchParams
 
   @Override
   @JsonIgnore
+  public String getQ() {
+    return null;
+  }
+
+  @Override
+  @JsonIgnore
   public Set<String> getProgramCodes() {
     return singleton(programCode);
   }

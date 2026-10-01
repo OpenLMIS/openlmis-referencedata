@@ -18,6 +18,7 @@ package org.openlmis.referencedata.web;
 import static org.openlmis.referencedata.domain.RightName.ORDERABLES_MANAGE;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -375,7 +376,7 @@ public class OrderableController extends BaseController {
       }
     }
     queryMap.add(NAME, searchParams.getName());
-    queryMap.add(EXACT_CODE, searchParams.getExactCodes());
+    queryMap.addAll(EXACT_CODE, new ArrayList<>(searchParams.getExactCodes()));
     queryMap.add(CODE, searchParams.getCode());
     queryMap.add(PROGRAM_CODE, searchParams.getProgramCode());
 
