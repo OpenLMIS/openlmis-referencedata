@@ -38,6 +38,7 @@ import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.RoleMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyLineMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.TradeItemMessageKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +116,7 @@ public class RefDataErrorHandling extends BaseHandler {
       }
     }
 
-    return getLocalizedMessage(dive.getMessage());
+    return getLocalizedMessage(SystemMessageKeys.ERROR_DATA_INTEGRITY);
   }
 
   /**
@@ -194,7 +195,7 @@ public class RefDataErrorHandling extends BaseHandler {
       }
     }
 
-    return getLocalizedMessage(exp.getMessage());
+    return getLocalizedMessage(SystemMessageKeys.ERROR_DATABASE);
   }
 
 }

@@ -5,11 +5,12 @@ New Functionality:
 * [FM-171](https://openlmis.atlassian.net/browse/FM-171): Added `/api/appConfiguration`, the deployment-wide UI configuration (app name, logo, theme and feature flags). Reads are public; changes need `SYSTEM_SETTINGS_MANAGE` and the version they are based on (`If-Match`), and a stale save answers 409.
 * [FM-173](https://openlmis.atlassian.net/browse/FM-173): Added `showAppName` to `/api/appConfiguration`, so a deployment whose logo already contains its name can hide the name shown beside it. Defaults to true.
 * [FM-183](https://openlmis.atlassian.net/browse/FM-183): Added POST `/api/programs/search`, a page of programs sorted by code, name or active and filtered by parts of the code and name. GET `/api/programs` is unchanged.
-* [FM-184](https://openlmis.atlassian.net/browse/FM-184): Added `q` to GET `/api/orderables`, matching orderables whose code or name contains the text, ignoring case. It combines with the other filters, and a search filtered by program is faster.
+* [FM-184](https://openlmis.atlassian.net/browse/FM-184): Added `q` to GET `/api/orderables`, matching orderables whose code or name contains the text, ignoring case. It combines with the other filters except `id`: a search by `id` returns those orderables and ignores the rest, as before. A search filtered by program is faster.
 
 Bug fixes:
 * [FM-179](https://openlmis.atlassian.net/browse/FM-179): GET `/api/orderables` no longer builds SQL from its filters, so a `'` in `code`, `name`, `program` or `exactCode` no longer fails, and `%` and `_` match themselves. Unexpected server errors no longer include the exception message.
 * [FM-184](https://openlmis.atlassian.net/browse/FM-184): A search filtered by program counts each orderable once, POST `/api/orderables/search` without identities no longer fails, and `Last-Modified` follows `tradeItemId`.
+* [FM-185](https://openlmis.atlassian.net/browse/FM-185): `%`, `_` and `\` in the `code` and `name` of POST `/api/programs/search` match themselves. A `400` for a database rule or statement without its own message no longer includes the exception message; the details stay in the log.
 
 15.7.0 / 2026-09-28
 ==================

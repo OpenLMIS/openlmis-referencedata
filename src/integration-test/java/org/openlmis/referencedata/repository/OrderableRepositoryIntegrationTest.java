@@ -879,6 +879,60 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
+  public void shouldMatchBackslashLiterally() {
+    saveOrderable("lit-5", "Ethanol 70% Solution");
+    Orderable backslash = saveOrderable("lit\\6", "Mask");
+
+    Assertions.assertThat(searchIds(new TestSearchParams().withQ("\\")))
+        .containsExactly(backslash.getId());
+  }
+
+  @Test
+  public void shouldPageThroughOrderablesMatchingCodeOrName() {
+    saveOrderable("pg-3", "Charlie pg7");
+    saveOrderable("pg-pg7", "Alpha");
+    saveOrderable("pg-2", "Bravo pg7");
+    saveOrderable("pg-4", "Delta");
+    TestSearchParams search = new TestSearchParams().withQ("pg7");
+
+    Page<Orderable> first = repository.search(search,
+        PageRequest.of(0, 2, pageable.getSort()));
+    Page<Orderable> second = repository.search(search,
+        PageRequest.of(1, 2, pageable.getSort()));
+
+    assertEquals(3, first.getTotalElements());
+    Assertions.assertThat(first.getContent()).extracting(Orderable::getFullProductName)
+        .containsExactly("Alpha", "Bravo pg7");
+    assertEquals(3, second.getTotalElements());
+    Assertions.assertThat(second.getContent()).extracting(Orderable::getFullProductName)
+        .containsExactly("Charlie pg7");
+  }
+
+  @Test
+  public void shouldFindOrderablesByCodeOrNameOfTradeItem() {
+    UUID tradeItemId = UUID.randomUUID();
+    Orderable matching = saveOrderableOfTradeItem("tq-1", "Allergy tq7", tradeItemId);
+    saveOrderableOfTradeItem("tq-2", "Iron", tradeItemId);
+    saveOrderable("tq-3", "Zinc tq7");
+
+    Assertions.assertThat(searchIds(new TestSearchParams()
+        .withTradeItemId(Collections.singleton(tradeItemId)).withQ("tq7")))
+        .containsExactly(matching.getId());
+  }
+
+  @Test
+  public void shouldFindOrderablesByCodeOrNameWithExactCode() {
+    Orderable matching = saveOrderable("ex-1", "Zinc");
+    saveOrderable("ex-2", "Zinc");
+    TestSearchParams byExactCode =
+        new TestSearchParams(null, Collections.singleton("ex-1"), null, null, null);
+
+    Assertions.assertThat(searchIds(byExactCode.withQ("zinc")))
+        .containsExactly(matching.getId());
+    Assertions.assertThat(searchIds(byExactCode.withQ("ex-2"))).isEmpty();
+  }
+
+  @Test
   public void shouldFindOrderablesWithApostrophes() {
     Program program = createProgram("prog'1");
     Orderable named = createOrderableWithProgramAndName(program, "Children's Syrup");
@@ -919,12 +973,7 @@ public class OrderableRepositoryIntegrationTest {
   @Test
   public void shouldFindLastUpdatedDateOfOrderablesOfTradeItem() {
     UUID tradeItemId = UUID.randomUUID();
-    Orderable ofTradeItem = repository.save(new OrderableDataBuilder()
-        .withProductCode(Code.code("ti-1"))
-        .withIdentifier(TRADE_ITEM, tradeItemId)
-        .withDispensable(Dispensable.createNew(EACH))
-        .withFullProductName("Of Trade Item")
-        .buildAsNew());
+    Orderable ofTradeItem = saveOrderableOfTradeItem("ti-1", "Of Trade Item", tradeItemId);
     Orderable other = saveOrderable("ti-2", "Other");
     ofTradeItem.setLastUpdated(ZonedDateTime.now().minusHours(1));
     other.setLastUpdated(ZonedDateTime.now());
@@ -963,6 +1012,15 @@ public class OrderableRepositoryIntegrationTest {
     return repository.search(searchParams, pageable).getContent().stream()
         .map(Orderable::getId)
         .collect(Collectors.toList());
+  }
+
+  private Orderable saveOrderableOfTradeItem(String code, String name, UUID tradeItemId) {
+    return repository.save(new OrderableDataBuilder()
+        .withProductCode(Code.code(code))
+        .withIdentifier(TRADE_ITEM, tradeItemId)
+        .withDispensable(Dispensable.createNew(EACH))
+        .withFullProductName(name)
+        .buildAsNew());
   }
 
   private Orderable saveOrderable(String code, String name) {
