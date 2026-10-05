@@ -38,6 +38,7 @@ import org.openlmis.referencedata.util.LocalizedMessage;
 import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
+import org.openlmis.referencedata.util.messagekeys.SystemMessageKeys;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
@@ -97,7 +98,7 @@ public class RefDataErrorHandlingTest {
   }
 
   @Test
-  public void shouldHandleDataIntegrityViolationEvenIfMessageKeyNotExist() {
+  public void shouldHideDatabaseTextIfConstraintHasNoMessage() {
     // given
     String constraintName = "unq_program_code_abc_def";
     ConstraintViolationException constraintViolation = new ConstraintViolationException(
@@ -106,24 +107,24 @@ public class RefDataErrorHandlingTest {
         null, constraintViolation);
 
     // when
-    mockMessage(exp.getMessage());
+    mockMessage(SystemMessageKeys.ERROR_DATA_INTEGRITY);
     LocalizedMessage message = errorHandler.handleDataIntegrityViolation(exp);
 
     // then
-    assertMessage(message, exp.getMessage());
+    assertMessage(message, SystemMessageKeys.ERROR_DATA_INTEGRITY);
   }
 
   @Test
-  public void shouldHandleDataIntegrityViolationEvenIfCauseNotExist() {
+  public void shouldHideDatabaseTextIfDataIntegrityViolationHasNoConstraint() {
     // given
     DataIntegrityViolationException exp = new DataIntegrityViolationException(ERROR_MESSAGE, null);
 
     // when
-    mockMessage(exp.getMessage());
+    mockMessage(SystemMessageKeys.ERROR_DATA_INTEGRITY);
     LocalizedMessage message = errorHandler.handleDataIntegrityViolation(exp);
 
     // then
-    assertMessage(message, exp.getMessage());
+    assertMessage(message, SystemMessageKeys.ERROR_DATA_INTEGRITY);
   }
 
   @Test
@@ -182,45 +183,45 @@ public class RefDataErrorHandlingTest {
   }
 
   @Test
-  public void shouldReturnNormalMessageIfExceptionIsNotPersistenceException() {
+  public void shouldHideDatabaseTextIfExceptionIsNotPersistenceException() {
     // given
     JpaSystemException exp = new JpaSystemException(new NullPointerException(ERROR_MESSAGE));
 
     // when
-    mockMessage(exp.getMessage());
+    mockMessage(SystemMessageKeys.ERROR_DATABASE);
     LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
 
     // then
-    assertMessage(message, exp.getMessage());
+    assertMessage(message, SystemMessageKeys.ERROR_DATABASE);
   }
 
   @Test
-  public void shouldReturnNormalMessageIfExceptionIsNotSqlException() {
+  public void shouldHideDatabaseTextIfExceptionIsNotSqlException() {
     // given
     JpaSystemException exp = new JpaSystemException(
         new PersistenceException(new NullPointerException(ERROR_MESSAGE)));
 
     // when
-    mockMessage(exp.getMessage());
+    mockMessage(SystemMessageKeys.ERROR_DATABASE);
     LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
 
     // then
-    assertMessage(message, exp.getMessage());
+    assertMessage(message, SystemMessageKeys.ERROR_DATABASE);
   }
 
   @Test
-  public void shouldReturnNormalMessageIfSqlStatusIsNotRecognizable() {
+  public void shouldHideDatabaseTextIfSqlStatusIsNotRecognizable() {
     // given
     JpaSystemException exp = new JpaSystemException(
         new PersistenceException(
             new SQLException("sql error", "10", new NullPointerException(ERROR_MESSAGE))));
 
     // when
-    mockMessage(exp.getMessage());
+    mockMessage(SystemMessageKeys.ERROR_DATABASE);
     LocalizedMessage message = errorHandler.handleJpaSystemException(exp);
 
     // then
-    assertMessage(message, exp.getMessage());
+    assertMessage(message, SystemMessageKeys.ERROR_DATABASE);
   }
 
   private void assertMessage(LocalizedMessage localized, String key) {

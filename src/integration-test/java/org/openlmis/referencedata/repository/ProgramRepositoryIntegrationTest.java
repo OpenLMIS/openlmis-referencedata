@@ -149,6 +149,19 @@ public class ProgramRepositoryIntegrationTest extends BaseCrudRepositoryIntegrat
     assertEquals(3, page.getContent().size());
   }
 
+  @Test
+  public void shouldMatchWildcardsInSearchedProgramsLiterally() {
+    saveProgram("FM185A", "Malaria 70", true);
+    saveProgram("FM185B", "Malaria 70% Plus", true);
+    saveProgram("FM185_C", "Tuberculosis", true);
+    saveProgram("FM185D", "Back\\Slash", true);
+    PageRequest pageable = PageRequest.of(0, 10);
+
+    assertEquals(asList("Malaria 70% Plus"), names(repository.search("FM185", "%", pageable)));
+    assertEquals(asList("Tuberculosis"), names(repository.search("185_", null, pageable)));
+    assertEquals(asList("Back\\Slash"), names(repository.search("FM185", "\\", pageable)));
+  }
+
   private void saveSearchablePrograms() {
     saveProgram("FM183C", CHARLIE, true);
     saveProgram("FM183A", ALPHA, false);

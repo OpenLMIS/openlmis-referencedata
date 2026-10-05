@@ -32,6 +32,7 @@ import org.openlmis.referencedata.util.Pagination;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.query.EscapeCharacter;
 
 public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
 
@@ -101,7 +102,9 @@ public class ProgramRepositoryImpl implements ProgramRepositoryCustom {
   }
 
   private Predicate contains(CriteriaBuilder builder, Expression<String> field, String part) {
-    return builder.like(builder.upper(field), "%" + part.toUpperCase() + "%");
+    EscapeCharacter escape = EscapeCharacter.DEFAULT;
+    return builder.like(builder.upper(field), "%" + escape.escape(part.toUpperCase()) + "%",
+        escape.getEscapeCharacter());
   }
 
   private List<Order> searchOrder(CriteriaBuilder builder, Root<Program> root, Sort sort) {
