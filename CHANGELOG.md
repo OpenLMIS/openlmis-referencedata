@@ -1,6 +1,9 @@
 15.8.0-SNAPSHOT (WIP)
 ==================
 
+Bug fixes:
+* [OLMIS-8396](https://openlmis.atlassian.net/browse/OLMIS-8396): Releases are published to Maven Central from their own staging repository, with the POM description that Central requires. Only X.Y.Z releases built on master are published; release candidates upload nothing. A Maven publishing failure marks the build unstable and does not stop the Docker image.
+
 15.7.0 / 2026-09-28
 ==================
 
