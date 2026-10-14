@@ -3,6 +3,7 @@
 
 Bug fixes:
 * [OLMIS-8396](https://openlmis.atlassian.net/browse/OLMIS-8396): Releases are published to Maven Central from their own staging repository, with the POM description that Central requires. Only X.Y.Z releases built on master are published; release candidates upload nothing. A Maven publishing failure marks the build unstable and does not stop the Docker image.
+* [OLMIS-8405](https://openlmis.atlassian.net/browse/OLMIS-8405): A service whose health check fails stays registered in Consul. Consul no longer removes it after 10 minutes in the critical state. The service registers only once, at startup, so after a removal nginx answered HTTP 502 for it until the container was restarted, even when the service itself had recovered. The health check keeps running and still reports the critical state.
 
 15.7.0 / 2026-09-28
 ==================
