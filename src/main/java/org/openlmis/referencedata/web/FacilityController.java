@@ -51,7 +51,6 @@ import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -491,7 +490,7 @@ public class FacilityController extends BaseController {
     Map<UUID, Orderable> orderables = orderableId.isEmpty()
         ? Collections.emptyMap()
         : orderableRepository
-        .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
+        .findAllLatestByIds(orderableId)
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));
 

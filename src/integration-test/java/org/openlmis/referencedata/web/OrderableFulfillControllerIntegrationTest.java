@@ -104,7 +104,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
   public void shouldCreateResourceBasingOnIds() {
     orderable.setId(commodityTypeOrderableId);
 
-    given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
+    given(orderableRepository.findAllLatestByIds(any())).willReturn(Lists.newArrayList(orderable));
     given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
 
@@ -128,7 +128,7 @@ public class OrderableFulfillControllerIntegrationTest extends BaseWebIntegratio
     given(facilityTypeApprovedProductRepository
         .searchProducts(eq(facilityId), eq(programId), any(), any(), eq(true), any(), any(),any()))
         .willReturn(getPage(ftap));
-    given(orderableRepository.findAllLatestByIds(any(), any())).willReturn(getPage(orderable));
+    given(orderableRepository.findAllLatestByIds(any())).willReturn(Lists.newArrayList(orderable));
     given(factory.createFor(eq(orderable), any(), any()))
         .willReturn(OrderableFulfill.ofCommodityType(tradeItemOrderableId));
 

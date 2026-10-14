@@ -24,6 +24,7 @@ import static org.javers.common.collections.Sets.asSet;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import org.hamcrest.Matchers;
@@ -42,6 +43,7 @@ import org.openlmis.referencedata.testbuilder.FacilityTypeDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicLevelDataBuilder;
 import org.openlmis.referencedata.testbuilder.GeographicZoneDataBuilder;
 import org.openlmis.referencedata.testbuilder.ProgramDataBuilder;
+import org.openlmis.referencedata.testbuilder.RequisitionGroupDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyLineDataBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +78,11 @@ public class SupplyLineRepositoryIntegrationTest
 
   @Autowired
   private ProgramRepository programRepository;
+
+  @Autowired
+  private RequisitionGroupRepository requisitionGroupRepository;
+
+  private static final int PAGE_SIZE = 2;
 
   private List<SupplyLine> supplyLines;
   private Pageable pageable = PageRequest.of(0, 10);
@@ -127,6 +134,33 @@ public class SupplyLineRepositoryIntegrationTest
     Page<SupplyLine> result = repository.search(null, null, null, pageable);
 
     assertThat(result.getContent(), hasSize(5));
+  }
+
+  @Test
+  public void shouldNotRepeatOrSkipSupplyLinesWhenPagingOverMemberFacilities() {
+    requisitionGroupRepository.save(new RequisitionGroupDataBuilder()
+        .withSupervisoryNode(supplyLines.get(0).getSupervisoryNode())
+        .withMemberFacility(generateFacility())
+        .withMemberFacility(generateFacility())
+        .withMemberFacility(generateFacility())
+        .buildAsNew());
+
+    long total = repository.count();
+    List<UUID> found = new ArrayList<>();
+
+    for (int page = 0; page * PAGE_SIZE < total; ++page) {
+      Page<SupplyLine> result =
+          repository.search(null, null, null, PageRequest.of(page, PAGE_SIZE));
+
+      assertThat(result.getTotalElements(), equalTo(total));
+
+      for (SupplyLine supplyLine : result.getContent()) {
+        found.add(supplyLine.getId());
+      }
+    }
+
+    assertThat(found, hasSize((int) total));
+    assertThat(new HashSet<>(found), hasSize((int) total));
   }
 
   @Test

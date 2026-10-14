@@ -38,7 +38,6 @@ import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,10 +108,9 @@ public class OrderableFulfillController extends BaseController {
   }
 
   private List<Orderable> getOrderables(Set<UUID> ids) {
-    Page<Orderable> pageWithAllOrderables = ids.isEmpty()
-        ? orderableRepository.findAllLatest(noPaginationRequest)
-        : orderableRepository.findAllLatestByIds(ids, noPaginationRequest);
-    return pageWithAllOrderables.getContent();
+    return ids.isEmpty()
+        ? orderableRepository.findAllLatest(noPaginationRequest).getContent()
+        : orderableRepository.findAllLatestByIds(ids);
   }
 
   private void addEntry(Map<UUID, OrderableFulfill> map, Orderable orderable,
