@@ -25,6 +25,8 @@ class RepositoryConstants {
   static final String JOIN_WITH_LATEST_ORDERABLE = " JOIN (SELECT id, MAX(versionNumber)"
           + " AS versionNumber FROM referencedata.orderables GROUP BY id) AS latest"
           + " ON o.id = latest.id AND o.versionNumber = latest.versionNumber";
+  static final String AND_IDENTITY_ID_IN_IDS = " AND o.identity.id IN :ids";
+  static final String IDS_PARAM = "ids";
   static final String ORDER_BY_PAGEABLE = " ";
   static final String SELECT_ORDERABLE = "Select o";
   static final String SELECT_DISTINCT_ORDERABLE = "Select DISTINCT o";

@@ -203,6 +203,52 @@ public class OrderableRepositoryIntegrationTest {
   }
 
   @Test
+  public void findAllLatestByIdsWithoutPageableShouldFindOnlyMatchingIds() {
+    // given orderables I want
+    Orderable orderable = saveAndGetOrderable();
+    Orderable orderable2 = saveAndGetOrderable();
+
+    // given an orderable I don't
+    saveAndGetOrderable();
+
+    // when
+    Set<UUID> ids = newHashSet(orderable.getId(), orderable2.getId());
+    List<Orderable> found = repository.findAllLatestByIds(ids);
+
+    // then
+    assertThat(found, hasSize(2));
+    assertThat(getIds(found), hasItems(orderable.getId(), orderable2.getId()));
+  }
+
+  @Test
+  public void findLatestIdsByIdsShouldPageMatchingIds() {
+    // given orderables I want
+    Orderable orderable = saveAndGetOrderable();
+    Orderable orderable2 = saveAndGetOrderable();
+    Orderable orderable3 = saveAndGetOrderable();
+
+    // given an orderable I don't
+    saveAndGetOrderable();
+
+    // when
+    Set<UUID> ids = newHashSet(orderable.getId(), orderable2.getId(), orderable3.getId());
+    Page<UUID> firstPage = repository.findLatestIdsByIds(ids, PageRequest.of(0, 2));
+    Page<UUID> secondPage = repository.findLatestIdsByIds(ids, PageRequest.of(1, 2));
+
+    // then
+    assertEquals(3, firstPage.getTotalElements());
+    assertEquals(3, secondPage.getTotalElements());
+    assertThat(firstPage.getContent(), hasSize(2));
+    assertThat(secondPage.getContent(), hasSize(1));
+
+    List<UUID> found = new ArrayList<>(firstPage.getContent());
+    found.addAll(secondPage.getContent());
+
+    assertThat(newHashSet(found), hasSize(3));
+    assertThat(found, hasItems(orderable.getId(), orderable2.getId(), orderable3.getId()));
+  }
+
+  @Test
   public void findAllLatestByIdsShouldFindOnlyLatestVersionsIfMultipleOrderables() {
     // given orderables I want
     Orderable orderable = saveAndGetOrderable();
@@ -892,6 +938,16 @@ public class OrderableRepositoryIntegrationTest {
         .build();
     programRepository.save(program);
     return program;
+  }
+
+  private List<UUID> getIds(List<Orderable> orderables) {
+    List<UUID> ids = new ArrayList<>();
+
+    for (Orderable orderable : orderables) {
+      ids.add(orderable.getId());
+    }
+
+    return ids;
   }
 
   private Orderable saveAndGetOrderable() {
