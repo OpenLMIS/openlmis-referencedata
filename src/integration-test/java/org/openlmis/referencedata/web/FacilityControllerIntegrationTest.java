@@ -317,9 +317,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .withOrderableId(orderable.getId())
         .build();
 
-    when(orderableRepository
-        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
-        .thenReturn(new PageImpl<>(singletonList(orderable), pageable, 1));
+    when(orderableRepository.findAllLatestByIds(eq(Collections.singleton(orderable.getId()))))
+        .thenReturn(singletonList(orderable));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
         eq(singletonList(program.getId())), eq(false), eq(null), eq(null), eq(null),
             eq(null),
@@ -349,9 +348,8 @@ public class FacilityControllerIntegrationTest extends BaseWebIntegrationTest {
         .withOrderableId(orderable.getId())
         .build();
 
-    when(orderableRepository
-        .findAllLatestByIds(eq(Collections.singleton(orderable.getId())), any(Pageable.class)))
-        .thenReturn(new PageImpl<>(singletonList(orderable), pageable, 1));
+    when(orderableRepository.findAllLatestByIds(eq(Collections.singleton(orderable.getId()))))
+        .thenReturn(singletonList(orderable));
     when(facilityTypeApprovedProductRepository.searchProducts(eq(facility.getId()),
         eq(singletonList(program.getId())), eq(false), eq(orderableIds), eq(null), eq(null),
         eq(null), eq(pageable)))

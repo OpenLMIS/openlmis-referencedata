@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Matchers.anySetOf;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.verify;
@@ -216,8 +217,11 @@ public class OrderableServiceTest {
   @Test
   public void shouldFindOrderablesByIds() {
     // given
-    given(orderableRepository.findAllLatestByIds(anySetOf(UUID.class), any(Pageable.class)))
-            .willReturn(Pagination.getPage(Lists.newArrayList(orderable2), PageRequest.of(0, 1)));
+    final UUID foundId = orderable2.getId();
+    given(orderableRepository.findLatestIdsByIds(anySetOf(UUID.class), any(Pageable.class)))
+            .willReturn(Pagination.getPage(Lists.newArrayList(foundId), PageRequest.of(0, 1)));
+    given(orderableRepository.findAllLatestByIds(anyCollectionOf(UUID.class)))
+            .willReturn(Lists.newArrayList(orderable2));
 
     searchParams.add(ID, orderableId.toString());
     UUID orderableId2 = UUID.randomUUID();
@@ -229,7 +233,7 @@ public class OrderableServiceTest {
                     pageable);
 
     // then
-    verify(orderableRepository).findAllLatestByIds(
+    verify(orderableRepository).findLatestIdsByIds(
             new HashSet<>(Arrays.asList(orderableId, orderableId2)), pageable);
 
     assertEquals(1, actual.getTotalElements());

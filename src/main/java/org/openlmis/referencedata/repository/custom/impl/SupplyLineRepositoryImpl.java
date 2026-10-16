@@ -16,11 +16,13 @@
 package org.openlmis.referencedata.repository.custom.impl;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.AS;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FROM;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ID;
+import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT;
@@ -39,10 +41,12 @@ import com.google.common.collect.Maps;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -67,6 +71,7 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   private static final String SUPERVISORY_NODE_ID = SUPERVISORY_NODE + "Id";
   private static final String MEMBER_FACILITIES = "memberFacilities";
   private static final String REQUISITION_GROUP = "requisitionGroup";
+  private static final String IDS = "ids";
 
   private static final String SUPPLY_LINE_ALIAS = "sl";
   private static final String SUPERVISORY_NODE_ALIAS = "sn";
@@ -84,12 +89,26 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
       SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN, REQUISITION_GROUP_MEMBERS_JOIN);
   private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
+  // the member facilities fetch returns one row per facility, so the identifiers are selected
+  // over the same joins to keep the order an unsorted search has today
+  private static final String SUPERVISORY_NODE_LEFT_JOIN = join(LEFT_JOIN,
+      getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE), AS, SUPERVISORY_NODE_ALIAS);
+  private static final String REQUISITION_GROUP_LEFT_JOIN = join(LEFT_JOIN,
+      getField(SUPERVISORY_NODE_ALIAS, REQUISITION_GROUP), AS, REQUISITION_GROUP_ALIAS);
+  private static final String REQUISITION_GROUP_MEMBERS_LEFT_JOIN = join(LEFT_JOIN,
+      getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
+
+  private static final String SELECT_SL_ID = join(SELECT, getField(SUPPLY_LINE_ALIAS, ID),
+      FROM_SL, SUPERVISORY_NODE_LEFT_JOIN, REQUISITION_GROUP_LEFT_JOIN,
+      REQUISITION_GROUP_MEMBERS_LEFT_JOIN);
+
   private static final String WITH_PROGRAM_ID =
       isEqual(getField(SUPPLY_LINE_ALIAS, "program", ID), asParameter(PROGRAM_ID));
   private static final String WITH_SUPERVISORY_NODE_ID =
       isEqual(getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE, ID), asParameter(SUPERVISORY_NODE_ID));
   private static final String WITH_SUPPLYING_FACILITIES =
       join(getField(SUPPLY_LINE_ALIAS, SUPPLYING_FACILITY, ID), in(SUPPLYING_FACILITY_IDS));
+  private static final String WITH_IDS = join(getField(SUPPLY_LINE_ALIAS, ID), in(IDS));
 
   @PersistenceContext
   private EntityManager entityManager;
@@ -125,16 +144,43 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
       return Pagination.getPage(Collections.emptyList(), pageable, 0);
     }
 
+    return Pagination.getPage(
+        retrieveSupplyLines(getPagedIds(whereStatement, params, pageable)), pageable, count);
+  }
+
+  private List<UUID> getPagedIds(String whereStatement, Map<String, Object> params,
+      Pageable pageable) {
+    Query idQuery = entityManager.createQuery(
+        join(SELECT_SL_ID, whereStatement, getOrderPredicate(pageable)), UUID.class);
+    params.forEach(idQuery::setParameter);
+
+    List<UUID> ids = idQuery.getResultList();
+
+    return Pagination
+        .getPage(ids.stream().distinct().collect(toList()), pageable)
+        .getContent();
+  }
+
+  private List<SupplyLine> retrieveSupplyLines(List<UUID> ids) {
+    if (isEmpty(ids)) {
+      return Collections.emptyList();
+    }
+
     Query searchQuery = entityManager.createQuery(
-        join(SELECT_SL, whereStatement, getOrderPredicate(pageable)), SupplyLine.class);
-    params.forEach(searchQuery::setParameter);
+        join(SELECT_SL, WHERE, WITH_IDS), SupplyLine.class);
+    searchQuery.setParameter(IDS, ids);
 
-    List<SupplyLine> result = searchQuery
-        .setMaxResults(pageable != null ? pageable.getPageSize() : Integer.MAX_VALUE)
-        .setFirstResult(pageable != null ? Math.toIntExact(pageable.getOffset()) : 0)
-        .getResultList();
+    List<SupplyLine> supplyLines = searchQuery.getResultList();
 
-    return Pagination.getPage(result, pageable, count);
+    Map<UUID, SupplyLine> supplyLineById = supplyLines
+        .stream()
+        .collect(toMap(SupplyLine::getId, Function.identity(), (left, right) -> left));
+
+    return ids
+        .stream()
+        .map(supplyLineById::get)
+        .filter(Objects::nonNull)
+        .collect(toList());
   }
 
   private String prepareWhereStatement(UUID programId, UUID supervisoryNodeId,

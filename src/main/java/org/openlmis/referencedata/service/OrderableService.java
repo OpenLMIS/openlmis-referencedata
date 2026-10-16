@@ -18,9 +18,13 @@ package org.openlmis.referencedata.service;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.validation.constraints.NotNull;
@@ -28,12 +32,14 @@ import org.openlmis.referencedata.domain.Orderable;
 import org.openlmis.referencedata.dto.OrderableDto;
 import org.openlmis.referencedata.repository.OrderableRepository;
 import org.openlmis.referencedata.service.export.ExportableDataService;
+import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.web.QueryOrderableSearchParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -67,7 +73,7 @@ public class OrderableService implements ExportableDataService<OrderableDto> {
     LOGGER.info("ids from query params: {}", ids);
     if (!ids.isEmpty()) {
       LOGGER.info("find all by ids");
-      return orderableRepository.findAllLatestByIds(ids, pageable);
+      return findAllLatestByIdsPaged(ids, pageable);
     }
 
     if (LOGGER.isInfoEnabled()) {
@@ -144,4 +150,29 @@ public class OrderableService implements ExportableDataService<OrderableDto> {
             .collect(Collectors.toList());
   }
 
+  private Page<Orderable> findAllLatestByIdsPaged(Set<UUID> ids, Pageable pageable) {
+    if (null == pageable) {
+      // Pagination does not accept a null page
+      return new PageImpl<>(orderableRepository.findAllLatestByIds(ids));
+    }
+
+    Page<UUID> idPage = orderableRepository.findLatestIdsByIds(ids, pageable);
+    if (!idPage.hasContent()) {
+      return Pagination.getPage(Collections.emptyList(), pageable, idPage.getTotalElements());
+    }
+
+    Map<UUID, Orderable> byId = orderableRepository
+        .findAllLatestByIds(idPage.getContent())
+        .stream()
+        .collect(Collectors.toMap(Orderable::getId, Function.identity(), (left, right) -> left));
+
+    List<Orderable> content = idPage
+        .getContent()
+        .stream()
+        .map(byId::get)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+
+    return Pagination.getPage(content, pageable, idPage.getTotalElements());
+  }
 }

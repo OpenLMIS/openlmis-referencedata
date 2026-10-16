@@ -44,7 +44,6 @@ import org.slf4j.ext.XLoggerFactory;
 import org.slf4j.profiler.Profiler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -362,8 +361,7 @@ public class FacilityTypeApprovedProductController extends BaseController {
         .collect(Collectors.toSet());
 
     Map<UUID, Orderable> orderables = orderableRepository
-        .findAllLatestByIds(orderableId, PageRequest.of(0, orderableId.size()))
-        .getContent()
+        .findAllLatestByIds(orderableId)
         .stream()
         .collect(Collectors.toMap(Orderable::getId, Function.identity()));
 
