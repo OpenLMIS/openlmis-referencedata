@@ -61,7 +61,6 @@ import org.openlmis.referencedata.testbuilder.RequisitionGroupProgramScheduleDat
 import org.openlmis.referencedata.testbuilder.SupervisoryNodeDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerAssociationDataBuilder;
 import org.openlmis.referencedata.testbuilder.SupplyPartnerDataBuilder;
-import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.OrderableMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.ProgramMessageKeys;
@@ -69,7 +68,6 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 import org.openlmis.referencedata.web.FacilityTypeApprovedProductSearchParams;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -144,9 +142,8 @@ public class SupplyPartnerBuilderTest {
         .thenReturn(Optional.of(partnerNode));
     when(facilityRepository.findAllById(Sets.newHashSet(facility.getId())))
         .thenReturn(Lists.newArrayList(facility));
-    when(orderableRepository.findAllLatestByIds(
-        Sets.newHashSet(orderable.getId()), PageRequest.of(0, 1)))
-        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable), PageRequest.of(0, 1)));
+    when(orderableRepository.findAllLatestByIds(Sets.newHashSet(orderable.getId())))
+        .thenReturn(Lists.newArrayList(orderable));
 
     FacilityTypeApprovedProductSearchParams searchParams =
         new FacilityTypeApprovedProductSearchParams(
@@ -274,9 +271,8 @@ public class SupplyPartnerBuilderTest {
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(OrderableMessageKeys.ERROR_NOT_FOUND);
 
-    when(orderableRepository.findAllLatestByIds(
-        Sets.newHashSet(orderable.getId()), PageRequest.of(0, 1)))
-        .thenReturn(Pagination.getPage(Collections.emptyList(), PageRequest.of(0, 1)));
+    when(orderableRepository.findAllLatestByIds(Sets.newHashSet(orderable.getId())))
+        .thenReturn(Collections.emptyList());
 
     builder.build(importer);
   }
@@ -342,10 +338,8 @@ public class SupplyPartnerBuilderTest {
     SupplyPartnerAssociationDto association = importer.getAssociations().get(0);
     association.addOrderable(newOrderable);
 
-    when(orderableRepository.findAllLatestByIds(
-        association.getOrderableIds(), PageRequest.of(0, 2)))
-        .thenReturn(Pagination.getPage(Lists.newArrayList(orderable, newOrderable),
-            PageRequest.of(0, 2)));
+    when(orderableRepository.findAllLatestByIds(association.getOrderableIds()))
+        .thenReturn(Lists.newArrayList(orderable, newOrderable));
 
     exception.expect(ValidationMessageException.class);
     exception.expectMessage(SupplyPartnerMessageKeys.ERROR_INVALID_ORDERABLE);

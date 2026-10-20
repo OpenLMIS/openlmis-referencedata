@@ -22,7 +22,6 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.AS;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.FROM;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ID;
-import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.LEFT_JOIN_FETCH;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.ORDER_BY;
 import static org.openlmis.referencedata.repository.custom.impl.SqlConstants.SELECT;
@@ -51,6 +50,7 @@ import java.util.stream.StreamSupport;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import org.apache.commons.lang3.tuple.Pair;
 import org.openlmis.referencedata.domain.SupplyLine;
 import org.openlmis.referencedata.repository.custom.SupplyLineRepositoryCustom;
 import org.openlmis.referencedata.util.Pagination;
@@ -89,18 +89,8 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
       SUPERVISORY_NODE_JOIN, REQUISITION_GROUP_JOIN, REQUISITION_GROUP_MEMBERS_JOIN);
   private static final String COUNT_SL = join(SELECT_DISTINCT_COUNT, FROM_SL);
 
-  // the member facilities fetch returns one row per facility, so the identifiers are selected
-  // over the same joins to keep the order an unsorted search has today
-  private static final String SUPERVISORY_NODE_LEFT_JOIN = join(LEFT_JOIN,
-      getField(SUPPLY_LINE_ALIAS, SUPERVISORY_NODE), AS, SUPERVISORY_NODE_ALIAS);
-  private static final String REQUISITION_GROUP_LEFT_JOIN = join(LEFT_JOIN,
-      getField(SUPERVISORY_NODE_ALIAS, REQUISITION_GROUP), AS, REQUISITION_GROUP_ALIAS);
-  private static final String REQUISITION_GROUP_MEMBERS_LEFT_JOIN = join(LEFT_JOIN,
-      getField(REQUISITION_GROUP_ALIAS, MEMBER_FACILITIES));
-
-  private static final String SELECT_SL_ID = join(SELECT, getField(SUPPLY_LINE_ALIAS, ID),
-      FROM_SL, SUPERVISORY_NODE_LEFT_JOIN, REQUISITION_GROUP_LEFT_JOIN,
-      REQUISITION_GROUP_MEMBERS_LEFT_JOIN);
+  private static final String SELECT_SL_ID =
+      join(SELECT, getField(SUPPLY_LINE_ALIAS, ID), FROM_SL);
 
   private static final String WITH_PROGRAM_ID =
       isEqual(getField(SUPPLY_LINE_ALIAS, "program", ID), asParameter(PROGRAM_ID));
@@ -154,11 +144,12 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
         join(SELECT_SL_ID, whereStatement, getOrderPredicate(pageable)), UUID.class);
     params.forEach(idQuery::setParameter);
 
-    List<UUID> ids = idQuery.getResultList();
+    Pair<Integer, Integer> maxAndFirst = PageableUtil.querysMaxAndFirstResult(pageable);
 
-    return Pagination
-        .getPage(ids.stream().distinct().collect(toList()), pageable)
-        .getContent();
+    return idQuery
+        .setMaxResults(maxAndFirst.getLeft())
+        .setFirstResult(maxAndFirst.getRight())
+        .getResultList();
   }
 
   private List<SupplyLine> retrieveSupplyLines(List<UUID> ids) {
@@ -211,19 +202,21 @@ public class SupplyLineRepositoryImpl implements SupplyLineRepositoryCustom {
   }
 
   private String getOrderPredicate(Pageable pageable) {
-    if (null != pageable && pageable.getSort().isSorted()) {
+    List<String> orderPredicate = Lists.newArrayList();
 
-      List<String> orderPredicate = StreamSupport.stream(
+    if (null != pageable && pageable.getSort().isSorted()) {
+      orderPredicate.addAll(StreamSupport.stream(
           Spliterators.spliteratorUnknownSize(pageable.getSort().iterator(), Spliterator.ORDERED),
           false)
           .map(order -> join(
               getField(SUPPLY_LINE_ALIAS, order.getProperty()),
               order.getDirection().toString()))
-          .collect(toList());
-
-      return join(ORDER_BY, Joiner.on(", ").join(orderPredicate));
+          .collect(toList()));
     }
 
-    return "";
+    // the identifiers are paged in the database, so the order has to be total
+    orderPredicate.add(getField(SUPPLY_LINE_ALIAS, ID));
+
+    return join(ORDER_BY, Joiner.on(", ").join(orderPredicate));
   }
 }
