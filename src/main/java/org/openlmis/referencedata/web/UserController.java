@@ -603,7 +603,8 @@ public class UserController extends BaseController {
    * @param supervisoryNodeId the ID of the supervisory node,
    *                          required for supervision rights
    * @param warehouseId the ID of the warehouse, required for fulfillment rights
-   * @return users with the right assigned, matching the criteria
+   * @return active users with the right assigned, matching the criteria; inactive users are
+   *         never returned
    */
   @RequestMapping(value = "/users/rightSearch", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
