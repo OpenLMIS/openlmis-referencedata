@@ -52,7 +52,8 @@ public interface UserRepository extends
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
       + " WHERE rr.rightid = :rightId"
       + "   AND ra.supervisorynodeid = :supervisoryNodeId"
-      + "   AND ra.programid = :programId",
+      + "   AND ra.programid = :programId"
+      + "   AND u.active = true",
       nativeQuery = true)
   Set<User> findUsersBySupervisionRight(@Param("rightId") UUID rightId,
       @Param("supervisoryNodeId") UUID supervisoryNodeId,
@@ -65,7 +66,8 @@ public interface UserRepository extends
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
       + " WHERE rr.rightid = :rightId"
       + "   AND ra.supervisorynodeid IS NULL"
-      + "   AND ra.programid = :programId",
+      + "   AND ra.programid = :programId"
+      + "   AND u.active = true",
       nativeQuery = true)
   Set<User> findUsersBySupervisionRight(@Param("rightId") UUID rightId,
       @Param("programId") UUID programId);
@@ -76,7 +78,8 @@ public interface UserRepository extends
       + "   JOIN referencedata.roles r ON r.id = ra.roleid"
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
       + " WHERE rr.rightid = :right"
-      + "   AND ra.warehouseid = :warehouse",
+      + "   AND ra.warehouseid = :warehouse"
+      + "   AND u.active = true",
       nativeQuery = true)
   Set<User> findUsersByFulfillmentRight(@Param("right") Right right,
                         @Param("warehouse") Facility warehouse);
@@ -86,7 +89,8 @@ public interface UserRepository extends
       + "   JOIN referencedata.role_assignments ra ON ra.userid = u.id"
       + "   JOIN referencedata.roles r ON r.id = ra.roleid"
       + "   JOIN referencedata.role_rights rr ON rr.roleid = r.id"
-      + " WHERE rr.rightid = :right",
+      + " WHERE rr.rightid = :right"
+      + "   AND u.active = true",
       nativeQuery = true)
   Set<User> findUsersByDirectRight(@Param("right") Right right);
 
