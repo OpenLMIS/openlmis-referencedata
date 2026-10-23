@@ -53,7 +53,6 @@ import org.openlmis.referencedata.util.Message;
 import org.openlmis.referencedata.util.Pagination;
 import org.openlmis.referencedata.util.messagekeys.FacilityTypeApprovedProductMessageKeys;
 import org.openlmis.referencedata.utils.AuditLogHelper;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -113,9 +112,8 @@ public class FacilityTypeApprovedProductControllerIntegrationTest extends BaseWe
     // used in deserialization
     given(orderableRepository.findFirstByIdentityIdOrderByIdentityVersionNumberDesc(
         orderable.getId())).willReturn(orderable);
-    given(orderableRepository
-        .findAllLatestByIds(Collections.singleton(orderable.getId()), PageRequest.of(0, 1)))
-        .willReturn(new PageImpl<>(Collections.singletonList(orderable)));
+    given(orderableRepository.findAllLatestByIds(Collections.singleton(orderable.getId())))
+        .willReturn(Collections.singletonList(orderable));
     given(programRepository.findById(program.getId())).willReturn(Optional.of(program));
     given(facilityTypeRepository.findById(facilityType1.getId()))
         .willReturn(Optional.of(facilityType1));

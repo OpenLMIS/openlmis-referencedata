@@ -15,8 +15,10 @@
 
 package org.openlmis.referencedata.repository;
 
+import static org.openlmis.referencedata.repository.RepositoryConstants.AND_IDENTITY_ID_IN_IDS;
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_ORDERABLES_CLAUSE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.FROM_REFERENCEDATA_ORDERABLES_CLAUSE;
+import static org.openlmis.referencedata.repository.RepositoryConstants.IDS_PARAM;
 import static org.openlmis.referencedata.repository.RepositoryConstants.JOIN_WITH_LATEST_ORDERABLE;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_LAST_UPDATED_DESC_LIMIT_1;
 import static org.openlmis.referencedata.repository.RepositoryConstants.ORDER_BY_PAGEABLE;
@@ -80,12 +82,12 @@ public interface OrderableRepository extends
   @Query(value = SELECT_DISTINCT_ORDERABLE
           + FROM_ORDERABLES_CLAUSE
           + WHERE_LATEST_ORDERABLE
-          + " AND o.identity.id IN :ids"
+          + AND_IDENTITY_ID_IN_IDS
           + ORDER_BY_PAGEABLE,
           countQuery = "SELECT COUNT(1)"
                   + FROM_ORDERABLES_CLAUSE
                   + WHERE_LATEST_ORDERABLE
-                  + " AND o.identity.id IN :ids"
+                  + AND_IDENTITY_ID_IN_IDS
                   + ORDER_BY_PAGEABLE
   )
   @EntityGraph("graph.Orderable")
@@ -93,7 +95,31 @@ public interface OrderableRepository extends
           @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
           @QueryHint(name = "org.hibernate.readOnly", value = "true")
       }, forCounting = false)
-  Page<Orderable> findAllLatestByIds(@Param("ids") Iterable<UUID> ids, Pageable pageable);
+  Page<Orderable> findAllLatestByIds(@Param(IDS_PARAM) Iterable<UUID> ids, Pageable pageable);
+
+  @Query(value = SELECT_DISTINCT_ORDERABLE
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_LATEST_ORDERABLE
+          + AND_IDENTITY_ID_IN_IDS
+  )
+  @EntityGraph("graph.Orderable")
+  @QueryHints(value = {
+          @QueryHint(name = "hibernate.query.passDistinctThrough", value = "false"),
+          @QueryHint(name = "org.hibernate.readOnly", value = "true")
+      })
+  List<Orderable> findAllLatestByIds(@Param(IDS_PARAM) Iterable<UUID> ids);
+
+  @Query(value = "SELECT o.identity.id"
+          + FROM_ORDERABLES_CLAUSE
+          + WHERE_LATEST_ORDERABLE
+          + AND_IDENTITY_ID_IN_IDS
+          + ORDER_BY_PAGEABLE,
+          countQuery = "SELECT COUNT(1)"
+                  + FROM_ORDERABLES_CLAUSE
+                  + WHERE_LATEST_ORDERABLE
+                  + AND_IDENTITY_ID_IN_IDS
+  )
+  Page<UUID> findLatestIdsByIds(@Param(IDS_PARAM) Iterable<UUID> ids, Pageable pageable);
 
   @Query(
       value =
@@ -120,7 +146,7 @@ public interface OrderableRepository extends
           + " WHERE identity.id IN :ids)"
           + ORDER_BY_PAGEABLE
   )
-  List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids,
+  List<Orderable> findOrderableWithLatestModifiedDateByIds(@Param(IDS_PARAM) Iterable<UUID> ids,
                                                            Pageable pageable);
 
   @Query(value = SELECT_ORDERABLE
@@ -179,7 +205,7 @@ public interface OrderableRepository extends
           + ORDER_BY_LAST_UPDATED_DESC_LIMIT_1,
           nativeQuery = true
   )
-  Timestamp findLatestModifiedDateByIds(@Param("ids") Iterable<UUID> ids);
+  Timestamp findLatestModifiedDateByIds(@Param(IDS_PARAM) Iterable<UUID> ids);
 
   @Query(
           value = "SELECT"

@@ -55,7 +55,6 @@ import org.openlmis.referencedata.util.messagekeys.SupervisoryNodeMessageKeys;
 import org.openlmis.referencedata.util.messagekeys.SupplyPartnerMessageKeys;
 import org.openlmis.referencedata.web.FacilityTypeApprovedProductSearchParams;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -134,7 +133,7 @@ public class SupplyPartnerBuilder
         dto.getFacilityIds(), FacilityMessageKeys.ERROR_NOT_FOUND));
 
     Set<Orderable> orderables = new HashSet<>(findResources(
-        ids -> orderableRepository.findAllLatestByIds(ids, PageRequest.of(0, ids.size())),
+        orderableRepository::findAllLatestByIds,
         dto.getOrderableIds(), OrderableMessageKeys.ERROR_NOT_FOUND));
 
     validateFacilities(program, supervisoryNode, facilities);
