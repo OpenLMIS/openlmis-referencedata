@@ -1,5 +1,6 @@
 15.7.2-SNAPSHOT (WIP)
 ==================
+* [OLMIS-8238](https://openlmis.atlassian.net/browse/OLMIS-8238): Add user preferences endpoint.
 
 Bug fixes:
 * [OLMIS-8406](https://openlmis.atlassian.net/browse/OLMIS-8406): GET `/api/orderables` and `/api/supplyLines` now page identifiers in the database instead of in memory (`HHH000104`); `/api/orderableFulfills`, `/api/facilities/{id}/approvedProducts`, `/api/facilityTypeApprovedProducts` and supply partner create/update read orderables in one unpaged query. An orderable's `programs` array no longer reorders with `sort`.
