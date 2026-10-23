@@ -427,6 +427,105 @@ public class UserRepositoryIntegrationTest extends BaseCrudRepositoryIntegration
   }
 
   @Test
+  public void findUsersBySupervisionRightShouldSkipInactiveUsers() {
+    //given
+    Right right = saveNewRight("nodeRight", SUPERVISION);
+    Role role = saveNewRole("nodeRole", right);
+    Program program = saveNewProgram("P1");
+    SupervisoryNode supervisoryNode = saveNewSupervisoryNode("SN1", generateFacility(10));
+
+    User activeUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
+    activeUser = assignRoleToUser(activeUser,
+        new SupervisionRoleAssignment(role, activeUser, program, supervisoryNode));
+
+    User inactiveUser = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
+    inactiveUser.setActive(false);
+    assignRoleToUser(inactiveUser,
+        new SupervisionRoleAssignment(role, inactiveUser, program, supervisoryNode));
+
+    //when
+    Set<User> found = repository.findUsersBySupervisionRight(right.getId(),
+        supervisoryNode.getId(), program.getId());
+
+    //then
+    assertThat(found, hasSize(1));
+    assertThat(found, hasItem(activeUser));
+  }
+
+  @Test
+  public void findUsersBySupervisionRightWithoutSupervisoryNodeShouldSkipInactiveUsers() {
+    //given
+    Right right = saveNewRight("homeFacilityRight", SUPERVISION);
+    Role role = saveNewRole("homeFacilityRole", right);
+    Program program = saveNewProgram("P1");
+
+    User activeUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
+    activeUser = assignRoleToUser(activeUser,
+        new SupervisionRoleAssignment(role, activeUser, program));
+
+    User inactiveUser = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
+    inactiveUser.setActive(false);
+    assignRoleToUser(inactiveUser, new SupervisionRoleAssignment(role, inactiveUser, program));
+
+    //when
+    Set<User> found = repository.findUsersBySupervisionRight(right.getId(), program.getId());
+
+    //then
+    assertThat(found, hasSize(1));
+    assertThat(found, hasItem(activeUser));
+  }
+
+  @Test
+  public void findUsersByFulfillmentRightShouldSkipInactiveUsers() {
+    //given
+    Right right = saveNewRight("warehouseRight", ORDER_FULFILLMENT);
+    Role role = saveNewRole("warehouseRole", right);
+    Facility warehouse = generateFacility("warehouse");
+
+    User activeUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
+    activeUser = assignRoleToUser(activeUser,
+        new FulfillmentRoleAssignment(role, activeUser, warehouse));
+
+    User inactiveUser = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
+    inactiveUser.setActive(false);
+    assignRoleToUser(inactiveUser, new FulfillmentRoleAssignment(role, inactiveUser, warehouse));
+
+    //when
+    Set<User> found = repository.findUsersByFulfillmentRight(right, warehouse);
+
+    //then
+    assertThat(found, hasSize(1));
+    assertThat(found, hasItem(activeUser));
+  }
+
+  @Test
+  public void findUsersByDirectRightShouldSkipInactiveUsers() {
+    //given
+    Right right = saveNewRight("directRight", GENERAL_ADMIN);
+    Role role = saveNewRole("directRole", right);
+
+    User activeUser = repository.findOneByUsernameIgnoreCase(users.get(0).getUsername());
+    activeUser = assignRoleToUser(activeUser, new DirectRoleAssignmentDataBuilder()
+        .withRole(role)
+        .withUser(activeUser)
+        .buildAsNew());
+
+    User inactiveUser = repository.findOneByUsernameIgnoreCase(users.get(1).getUsername());
+    inactiveUser.setActive(false);
+    assignRoleToUser(inactiveUser, new DirectRoleAssignmentDataBuilder()
+        .withRole(role)
+        .withUser(inactiveUser)
+        .buildAsNew());
+
+    //when
+    Set<User> found = repository.findUsersByDirectRight(right);
+
+    //then
+    assertThat(found, hasSize(1));
+    assertThat(found, hasItem(activeUser));
+  }
+
+  @Test
   public void shouldFindUserByUsernameIgnoringCasing() {
     User user = generateInstance();
     repository.save(user);

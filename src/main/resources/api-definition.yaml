@@ -1694,7 +1694,7 @@ resourceTypes:
       /rightSearch:
               get:
                   is: [ secured ]
-                  description: "Search users that have the given right assigned. This searches for users with role assignments matching all the parameters based on their type. Takes additional parameters for fulfillment and supervision rights."
+                  description: "Search users that have the given right assigned. This searches for users with role assignments matching all the parameters based on their type. Takes additional parameters for fulfillment and supervision rights. Inactive users are never returned."
                   queryParameters:
                       rightId:
                           displayName: Right ID
@@ -3082,7 +3082,7 @@ resourceTypes:
             /supervisingUsers:
                   get:
                       is: [ secured ]
-                      description: Get supervising users based on the provided parameters.
+                      description: Get supervising users based on the provided parameters. Inactive users are never returned.
                       queryParameters:
                           rightId:
                                   displayName: Right ID

@@ -263,7 +263,7 @@ public class SupervisoryNodeController extends BaseController {
    *
    * @param rightId UUID of right that user has.
    * @param programId UUID of program.
-   * @return the found users.
+   * @return the found users. Inactive users are never returned.
    */
   @RequestMapping(value = RESOURCE_PATH + "/{id}/supervisingUsers", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
