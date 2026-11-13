@@ -217,10 +217,12 @@ variable.
 | `performance-data` | Volume for performance tests |
 
 `base-data` is loaded first, then the other active layers in the order of the table. A layer only
-holds files for the tables it adds rows to, and its rows may refer only to rows of the layers loaded
-before it. Data is inserted into a freshly cleaned database, so a data profile must not be combined
+holds files for the tables it adds rows to. Rows of a layer may refer only to rows of their own
+layer or of `base-data`, so every layer loads on top of `base-data` alone and the layers can be
+combined. Data is inserted into a freshly cleaned database, so a data profile must not be combined
 with `production`. Files of a layer must be for tables listed in `TestDataInitializer.TABLES`, in
-which the order of tables follows their foreign keys.
+which the order of tables follows their foreign keys. `functional-test-data` and `edge-case-data`
+have no files yet. Each layer folder has a README describing its data.
 
 When building locally from the development environment, you may run:
 

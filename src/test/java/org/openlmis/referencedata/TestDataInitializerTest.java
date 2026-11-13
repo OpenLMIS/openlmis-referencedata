@@ -35,13 +35,23 @@ import static org.openlmis.referencedata.TestDataInitializer.TABLES;
 import static org.openlmis.referencedata.TestDataInitializer.location;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.BOMInputStream;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,6 +74,8 @@ public class TestDataInitializerTest {
   private static final String FACILITIES = "referencedata.facilities";
   private static final String USERS = "referencedata.users";
   private static final String REFRESH_DB = "refresh-db";
+  private static final Pattern UUID_PATTERN = Pattern.compile(
+      "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
 
   @Mock
   private Resource2Db loader;
@@ -190,6 +202,73 @@ public class TestDataInitializerTest {
     assertTrue("Expected the demo-data files on the classpath", files > 0);
     assertEquals("Files the loader would silently skip; add their tables to TABLES",
         Collections.emptyList(), unknown);
+  }
+
+  @Test
+  public void shouldReferOnlyToRowsOfBaseOrOwnLayer() throws IOException {
+    List<String> problems = new ArrayList<>();
+    Map<String, String> owners = owners(problems);
+
+    for (String layer : LAYERS) {
+      if (!BASE_DATA.equals(layer)) {
+        for (Resource file : layerFiles(layer)) {
+          addReferencesToOtherLayers(layer, file, owners, problems);
+        }
+      }
+    }
+
+    assertEquals("Rows may refer only to rows of base-data or of their own layer",
+        Collections.emptyList(), problems.subList(0, Math.min(20, problems.size())));
+  }
+
+  private static Map<String, String> owners(List<String> problems) throws IOException {
+    Map<String, String> owners = new HashMap<>();
+    for (String layer : LAYERS) {
+      for (Resource file : layerFiles(layer)) {
+        for (String id : ids(file)) {
+          String previous = owners.put(id, layer);
+          if (previous != null && !previous.equals(layer)) {
+            problems.add(id + " is in both " + previous + " and " + layer);
+          }
+        }
+      }
+    }
+    return owners;
+  }
+
+  private static void addReferencesToOtherLayers(String layer, Resource file,
+      Map<String, String> owners, List<String> problems) throws IOException {
+    Matcher matcher = UUID_PATTERN.matcher(read(file));
+    while (matcher.find()) {
+      String owner = owners.get(matcher.group().toLowerCase(Locale.ENGLISH));
+      if (owner != null && !BASE_DATA.equals(owner) && !layer.equals(owner)) {
+        problems.add(layer + "/" + file.getFilename() + " refers to " + matcher.group()
+            + " of " + owner);
+      }
+    }
+  }
+
+  private static Resource[] layerFiles(String layer) throws IOException {
+    return new PathMatchingResourcePatternResolver()
+        .getResources("classpath*:db/" + layer + "/*.csv");
+  }
+
+  private static String read(Resource file) throws IOException {
+    try (InputStream stream = new BOMInputStream(file.getInputStream())) {
+      return IOUtils.toString(stream, StandardCharsets.UTF_8);
+    }
+  }
+
+  private static List<String> ids(Resource file) throws IOException {
+    List<String> ids = new ArrayList<>();
+    try (CSVParser parser = CSVParser.parse(read(file), CSVFormat.DEFAULT.withHeader())) {
+      if (parser.getHeaderMap().containsKey("id")) {
+        for (CSVRecord record : parser) {
+          ids.add(record.get("id").toLowerCase(Locale.ENGLISH));
+        }
+      }
+    }
+    return ids;
   }
 
   private static Predicate<String> active(String... profiles) {

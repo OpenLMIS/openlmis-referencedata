@@ -38,8 +38,8 @@ import org.springframework.stereotype.Component;
  *
  * <p>Each data profile is a layer stored in {@code db/<layer>/}, with one CSV file per table
  * named {@code <schema>.<table>.csv}. Every data profile implies {@code base-data}, which is
- * loaded first. A layer only holds files for the tables it adds rows to, and it may refer to
- * rows of the layers loaded before it, never after it.
+ * loaded first. A layer only holds files for the tables it adds rows to, and its rows may refer
+ * only to rows of their own layer or of {@code base-data}.
  */
 @Component
 @Profile("(base-data | demo-data | functional-test-data | edge-case-data | performance-data)"
