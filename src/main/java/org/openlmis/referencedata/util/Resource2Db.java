@@ -181,7 +181,9 @@ public class Resource2Db {
     XLOGGER.info("Insert SQL: " + insertSql);
 
     List<Object[]> data = dataWithHeader.getRight();
-    data.forEach(e -> XLOGGER.info(tableName + ": " + Arrays.toString(e)));
+    if (XLOGGER.isDebugEnabled()) {
+      data.forEach(e -> XLOGGER.debug(tableName + ": " + Arrays.toString(e)));
+    }
     int[] updateCount = template.batchUpdate(insertSql, data);
 
     XLOGGER.exit("Total " + tableName + " inserts: " + Arrays.stream(updateCount).sum());

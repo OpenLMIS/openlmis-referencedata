@@ -16,193 +16,156 @@
 package org.openlmis.referencedata;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.openlmis.referencedata.util.Resource2Db;
 import org.slf4j.ext.XLogger;
 import org.slf4j.ext.XLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Loads layered test data into an empty database when a data profile is active.
+ *
+ * <p>Each data profile is a layer stored in {@code db/<layer>/}, with one CSV file per table
+ * named {@code <schema>.<table>.csv}. Every data profile implies {@code base-data}, which is
+ * loaded first. A layer only holds files for the tables it adds rows to, and it may refer to
+ * rows of the layers loaded before it, never after it.
+ */
 @Component
-@Profile("demo-data & !test-run")
+@Profile("(base-data | demo-data | functional-test-data | edge-case-data | performance-data)"
+    + " & !test-run")
 @Order(5)
 public class TestDataInitializer implements CommandLineRunner {
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(TestDataInitializer.class);
-  private static final String DEMO_DATA_PATH = "classpath:db/demo-data/";
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.geographic_levels.csv")
-  private Resource geographicLevelsResource;
+  static final String BASE_DATA = "base-data";
+  static final String DEMO_DATA = "demo-data";
+  static final String FUNCTIONAL_TEST_DATA = "functional-test-data";
+  static final String EDGE_CASE_DATA = "edge-case-data";
+  static final String PERFORMANCE_DATA = "performance-data";
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.geographic_zones.csv")
-  private Resource geographicZonesResource;
+  /**
+   * All data layers, in load order.
+   */
+  static final List<String> LAYERS = Collections.unmodifiableList(Arrays.asList(
+      BASE_DATA, DEMO_DATA, FUNCTIONAL_TEST_DATA, EDGE_CASE_DATA, PERFORMANCE_DATA));
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.facility_operators.csv")
-  private Resource facilityOperatorsResource;
+  /**
+   * All tables a layer may hold, in an order that satisfies the foreign keys between them.
+   */
+  static final List<String> TABLES = Collections.unmodifiableList(Arrays.asList(
+      "referencedata.geographic_levels",
+      "referencedata.geographic_zones",
+      "referencedata.facility_operators",
+      "referencedata.facility_types",
+      "referencedata.facilities",
+      "referencedata.supervisory_nodes",
+      "referencedata.processing_schedules",
+      "referencedata.processing_periods",
+      "referencedata.commodity_types",
+      "referencedata.orderable_display_categories",
+      "referencedata.dispensables",
+      "referencedata.dispensable_attributes",
+      "referencedata.orderables",
+      "referencedata.orderable_identifiers",
+      "referencedata.programs",
+      "referencedata.program_orderables",
+      "referencedata.supply_lines",
+      "referencedata.users",
+      "referencedata.roles",
+      "referencedata.role_rights",
+      "referencedata.role_assignments",
+      "referencedata.requisition_groups",
+      "referencedata.requisition_group_program_schedules",
+      "referencedata.requisition_group_members",
+      "referencedata.supported_programs",
+      "referencedata.trade_items",
+      "referencedata.trade_item_classifications",
+      "referencedata.ideal_stock_amounts",
+      "referencedata.lots",
+      "referencedata.service_accounts",
+      "referencedata.facility_type_approved_products",
+      "referencedata.supply_partners",
+      "referencedata.supply_partner_associations",
+      "referencedata.supply_partner_association_facilities",
+      "referencedata.supply_partner_association_orderables"));
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.facility_types.csv")
-  private Resource facilityTypesResource;
+  private final Resource2Db loader;
+  private final ResourceLoader resourceLoader;
+  private final Environment environment;
 
-  @Value(value = DEMO_DATA_PATH + "referencedata.facilities.csv")
-  private Resource facilitiesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supervisory_nodes.csv")
-  private Resource supervisoryNodesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.processing_schedules.csv")
-  private Resource processingSchedulesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.processing_periods.csv")
-  private Resource processingPeriodsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.commodity_types.csv")
-  private Resource commodityTypesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.orderable_display_categories.csv")
-  private Resource orderableDisplayCategoriesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.dispensables.csv")
-  private Resource dispensablesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.dispensable_attributes.csv")
-  private Resource dispensableAttributesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.orderables.csv")
-  private Resource orderablesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.programs.csv")
-  private Resource programsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.program_orderables.csv")
-  private Resource programOrderablesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supply_lines.csv")
-  private Resource supplyLinesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.users.csv")
-  private Resource usersResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.roles.csv")
-  private Resource rolesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.role_rights.csv")
-  private Resource roleRightsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.role_assignments.csv")
-  private Resource roleAssignmentsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.requisition_groups.csv")
-  private Resource requisitionGroupsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.requisition_group_program_schedules.csv")
-  private Resource requisitionGroupProgramSchedulesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.requisition_group_members.csv")
-  private Resource requisitionGroupMembersResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supported_programs.csv")
-  private Resource supportedProgramsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.trade_items.csv")
-  private Resource tradeItemsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.trade_item_classifications.csv")
-  private Resource tradeItemClassificationsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.ideal_stock_amounts.csv")
-  private Resource idealStockAmountsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.lots.csv")
-  private Resource lotsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.orderable_identifiers.csv")
-  private Resource orderableIdentifiersResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.service_accounts.csv")
-  private Resource serviceAccountsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.facility_type_approved_products.csv")
-  private Resource facilityTypeApprovedProductsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partners.csv")
-  private Resource supplyPartnersResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_associations.csv")
-  private Resource supplyPartnerAssociationsResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_association_facilities.csv")
-  private Resource supplyPartnerAssociationFacilitiesResource;
-
-  @Value(value = DEMO_DATA_PATH + "referencedata.supply_partner_association_orderables.csv")
-  private Resource supplyPartnerAssociationOrderablesResource;
-
-  private Resource2Db loader;
-  
   @Autowired
-  public TestDataInitializer(JdbcTemplate template) {
-    this(new Resource2Db(template));
+  public TestDataInitializer(JdbcTemplate template, ResourceLoader resourceLoader,
+      Environment environment) {
+    this(new Resource2Db(template), resourceLoader, environment);
   }
 
-  TestDataInitializer(Resource2Db loader) {
+  TestDataInitializer(Resource2Db loader, ResourceLoader resourceLoader,
+      Environment environment) {
     this.loader = loader;
+    this.resourceLoader = resourceLoader;
+    this.environment = environment;
   }
 
   /**
-   * Initializes test data.
+   * Loads every table file of each active data layer.
    * @param args command line arguments
    */
   public void run(String... args) throws IOException {
     XLOGGER.entry();
 
-    loader.insertToDbFromCsv("referencedata.geographic_levels", geographicLevelsResource);
-    loader.insertToDbFromCsv("referencedata.geographic_zones", geographicZonesResource);
-    loader.insertToDbFromCsv("referencedata.facility_operators", facilityOperatorsResource);
-    loader.insertToDbFromCsv("referencedata.facility_types", facilityTypesResource);
-    loader.insertToDbFromCsv("referencedata.facilities", facilitiesResource);
-    loader.insertToDbFromCsv("referencedata.supervisory_nodes", supervisoryNodesResource);
-    loader.insertToDbFromCsv("referencedata.processing_schedules", processingSchedulesResource);
-    loader.insertToDbFromCsv("referencedata.processing_periods", processingPeriodsResource);
-    loader.insertToDbFromCsv("referencedata.commodity_types", commodityTypesResource);
-    loader.insertToDbFromCsv("referencedata.orderable_display_categories",
-        orderableDisplayCategoriesResource);
-    loader.insertToDbFromCsv("referencedata.dispensables", dispensablesResource);
-    loader.insertToDbFromCsv("referencedata.dispensable_attributes", dispensableAttributesResource);
-    loader.insertToDbFromCsv("referencedata.orderables", orderablesResource);
-    loader.insertToDbFromCsv("referencedata.orderable_identifiers", orderableIdentifiersResource);
-    loader.insertToDbFromCsv("referencedata.programs", programsResource);
-    loader.insertToDbFromCsv("referencedata.program_orderables", programOrderablesResource);
-    loader.insertToDbFromCsv("referencedata.supply_lines", supplyLinesResource);
-    loader.insertToDbFromCsv("referencedata.users", usersResource);
-    loader.insertToDbFromCsv("referencedata.roles", rolesResource);
-    loader.insertToDbFromCsv("referencedata.role_rights", roleRightsResource);
-    loader.insertToDbFromCsv("referencedata.role_assignments", roleAssignmentsResource);
-    loader.insertToDbFromCsv("referencedata.requisition_groups", requisitionGroupsResource);
-    loader.insertToDbFromCsv("referencedata.requisition_group_program_schedules",
-        requisitionGroupProgramSchedulesResource);
-    loader.insertToDbFromCsv("referencedata.requisition_group_members",
-        requisitionGroupMembersResource);
-    loader.insertToDbFromCsv("referencedata.supported_programs", supportedProgramsResource);
-    loader.insertToDbFromCsv("referencedata.trade_items", tradeItemsResource);
-    loader.insertToDbFromCsv("referencedata.trade_item_classifications",
-        tradeItemClassificationsResource);
-    loader.insertToDbFromCsv("referencedata.ideal_stock_amounts", idealStockAmountsResource);
-    loader.insertToDbFromCsv("referencedata.lots", lotsResource);
-    loader.insertToDbFromCsv("referencedata.service_accounts", serviceAccountsResource);
-    loader.insertToDbFromCsv("referencedata.facility_type_approved_products",
-        facilityTypeApprovedProductsResource);
+    List<String> layers = resolveLayers(environment.getActiveProfiles());
+    XLOGGER.info("Loading data layers: " + layers);
 
-    loader.insertToDbFromCsv("referencedata.supply_partners", supplyPartnersResource);
-    loader.insertToDbFromCsv("referencedata.supply_partner_associations",
-        supplyPartnerAssociationsResource);
-    loader.insertToDbFromCsv("referencedata.supply_partner_association_facilities",
-        supplyPartnerAssociationFacilitiesResource);
-    loader.insertToDbFromCsv("referencedata.supply_partner_association_orderables",
-        supplyPartnerAssociationOrderablesResource);
+    for (String layer : layers) {
+      int loaded = 0;
+      for (String table : TABLES) {
+        Resource resource = resourceLoader.getResource(location(layer, table));
+        if (resource.exists()) {
+          loader.insertToDbFromCsv(table, resource);
+          loaded++;
+        }
+      }
+      XLOGGER.info("Data layer " + layer + ": loaded " + loaded + " table file(s)");
+    }
 
     XLOGGER.exit();
+  }
+
+  /**
+   * Returns the data layers to load for the given active profiles, in load order. Any data
+   * profile implies {@code base-data}.
+   *
+   * @throws IllegalStateException when both demo-data and functional-test-data are active
+   */
+  static List<String> resolveLayers(String... activeProfiles) {
+    List<String> active = Arrays.asList(activeProfiles);
+
+    if (active.contains(DEMO_DATA) && active.contains(FUNCTIONAL_TEST_DATA)) {
+      throw new IllegalStateException("The " + DEMO_DATA + " and " + FUNCTIONAL_TEST_DATA
+          + " profiles cannot be active together; choose one of them");
+    }
+
+    List<String> layers = new ArrayList<>();
+    for (String layer : LAYERS) {
+      if (BASE_DATA.equals(layer) || active.contains(layer)) {
+        layers.add(layer);
+      }
+    }
+    return layers;
+  }
+
+  static String location(String layer, String table) {
+    return "classpath:db/" + layer + "/" + table + ".csv";
   }
 }

@@ -2,6 +2,7 @@
 ==================
 
 Improvements:
+* [OLMIS-8456](https://openlmis.atlassian.net/browse/OLMIS-8456): Update demo data of OpenLMIS
 * [OLMIS-8414](https://openlmis.atlassian.net/browse/OLMIS-8414): The right-based user lookups (GET `/api/users/rightSearch` and GET `/api/supervisoryNodes/{id}/supervisingUsers`) return active users only. A disabled user who kept role assignments is no longer picked as an approver, fulfiller or supervisor, so other services stop addressing notifications to them.
 
 Bug fixes:
