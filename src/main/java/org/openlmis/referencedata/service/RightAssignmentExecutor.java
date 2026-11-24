@@ -30,6 +30,9 @@ public class RightAssignmentExecutor {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightAssignmentService.class);
 
+  static final String REGENERATION_ALREADY_QUEUED = "Right assignment regeneration is already "
+      + "queued and will include this change, so this request is skipped";
+
   @Value("${rightAssignments.thread.corePool}")
   private int corePoolSize;
 
@@ -52,7 +55,7 @@ public class RightAssignmentExecutor {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
     threadPoolTaskExecutor.setRejectedExecutionHandler((runnable, executor) ->
-        XLOGGER.error("Thread pool for Right Assignment Regeneration exceeded"));
+        XLOGGER.info(REGENERATION_ALREADY_QUEUED));
     threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
     threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
     threadPoolTaskExecutor.setKeepAliveSeconds(threadTimeout);
