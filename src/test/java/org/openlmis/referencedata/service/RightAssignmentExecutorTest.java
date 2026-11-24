@@ -45,8 +45,30 @@ public class RightAssignmentExecutorTest {
 
   @Test
   public void shouldSkipTaskAndLogAtInfoWhenRegenerationIsAlreadyQueued() throws Exception {
-    ThreadPoolTaskExecutor threadPoolTaskExecutor = createExecutor();
+    ILoggingEvent event = submitPastCapacity(createExecutor(1));
+
+    assertEquals(Level.INFO, event.getLevel());
+    assertEquals(RightAssignmentExecutor.REGENERATION_ALREADY_QUEUED,
+        event.getFormattedMessage());
+  }
+
+  @Test
+  public void shouldLogAtWarnWhenTaskIsRejectedWithNoRegenerationQueued() throws Exception {
+    ILoggingEvent event = submitPastCapacity(createExecutor(0));
+
+    assertEquals(Level.WARN, event.getLevel());
+    assertEquals(RightAssignmentExecutor.REGENERATION_REJECTED,
+        event.getFormattedMessage());
+  }
+
+  /**
+   * Blocks the only thread, fills the queue, submits one more task, and returns the single log
+   * event of its rejection after checking that the rejected task never ran.
+   */
+  private ILoggingEvent submitPastCapacity(ThreadPoolTaskExecutor threadPoolTaskExecutor)
+      throws InterruptedException {
     threadPoolTaskExecutor.initialize();
+    int queueCapacity = (int) ReflectionTestUtils.getField(threadPoolTaskExecutor, "queueCapacity");
 
     Logger logger = (Logger) LoggerFactory.getLogger(RightAssignmentService.class);
     Level previousLevel = logger.getLevel();
@@ -57,7 +79,7 @@ public class RightAssignmentExecutorTest {
 
     CountDownLatch running = new CountDownLatch(1);
     CountDownLatch release = new CountDownLatch(1);
-    AtomicBoolean skippedTaskRan = new AtomicBoolean(false);
+    AtomicBoolean rejectedTaskRan = new AtomicBoolean(false);
 
     try {
       threadPoolTaskExecutor.execute(() -> {
@@ -65,19 +87,19 @@ public class RightAssignmentExecutorTest {
         awaitQuietly(release);
       });
       assertTrue(running.await(5, TimeUnit.SECONDS));
-      threadPoolTaskExecutor.execute(() -> { });
-      threadPoolTaskExecutor.execute(() -> skippedTaskRan.set(true));
+      for (int i = 0; i < queueCapacity; i++) {
+        threadPoolTaskExecutor.execute(() -> { });
+      }
+      threadPoolTaskExecutor.execute(() -> rejectedTaskRan.set(true));
 
       release.countDown();
       threadPoolTaskExecutor.getThreadPoolExecutor().shutdown();
       assertTrue(threadPoolTaskExecutor.getThreadPoolExecutor()
           .awaitTermination(5, TimeUnit.SECONDS));
 
-      assertFalse(skippedTaskRan.get());
+      assertFalse(rejectedTaskRan.get());
       assertEquals(1, appender.list.size());
-      assertEquals(Level.INFO, appender.list.get(0).getLevel());
-      assertEquals(RightAssignmentExecutor.REGENERATION_ALREADY_QUEUED,
-          appender.list.get(0).getFormattedMessage());
+      return appender.list.get(0);
     } finally {
       release.countDown();
       logger.detachAppender(appender);
@@ -87,10 +109,14 @@ public class RightAssignmentExecutorTest {
   }
 
   private ThreadPoolTaskExecutor createExecutor() {
+    return createExecutor(1);
+  }
+
+  private ThreadPoolTaskExecutor createExecutor(int queueCapacity) {
     RightAssignmentExecutor executor = new RightAssignmentExecutor();
     ReflectionTestUtils.setField(executor, "corePoolSize", 1);
     ReflectionTestUtils.setField(executor, "maxPoolSize", 1);
-    ReflectionTestUtils.setField(executor, "queueCapacity", 1);
+    ReflectionTestUtils.setField(executor, "queueCapacity", queueCapacity);
     ReflectionTestUtils.setField(executor, "threadTimeout", 60);
     return executor.rightAssignmentTaskExecutor();
   }
