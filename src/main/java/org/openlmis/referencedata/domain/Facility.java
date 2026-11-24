@@ -21,6 +21,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -80,6 +81,7 @@ import org.openlmis.referencedata.dto.NamedResource;
         }
     )
     })
+@SuppressWarnings("PMD.TooManyMethods")
 public class Facility extends BaseEntity implements FhirLocation {
 
   public static final String TEXT = "text";
@@ -262,6 +264,17 @@ public class Facility extends BaseEntity implements FhirLocation {
    */
   public void addSupportedProgram(SupportedProgram supportedProgram) {
     supportedPrograms.add(supportedProgram);
+  }
+
+  /**
+   * Returns whether support is active for each supported program, keyed by program id. This
+   * is the part of a facility that right assignments are computed from.
+   */
+  public Map<UUID, Boolean> supportedProgramActiveFlags() {
+    Map<UUID, Boolean> activeFlags = new HashMap<>();
+    supportedPrograms.forEach(supportedProgram ->
+        activeFlags.put(supportedProgram.programId(), supportedProgram.getActive()));
+    return activeFlags;
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws IOException {
