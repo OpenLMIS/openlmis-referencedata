@@ -30,6 +30,12 @@ public class RightAssignmentExecutor {
 
   private static final XLogger XLOGGER = XLoggerFactory.getXLogger(RightAssignmentService.class);
 
+  static final String REGENERATION_ALREADY_QUEUED = "Right assignment regeneration is already "
+      + "queued and will include this change, so this request is skipped";
+
+  static final String REGENERATION_REJECTED = "Right assignment regeneration request rejected "
+      + "with no regeneration queued; right assignments stay stale until the next regeneration";
+
   @Value("${rightAssignments.thread.corePool}")
   private int corePoolSize;
 
@@ -51,8 +57,15 @@ public class RightAssignmentExecutor {
   public ThreadPoolTaskExecutor rightAssignmentTaskExecutor() {
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(corePoolSize);
-    threadPoolTaskExecutor.setRejectedExecutionHandler((runnable, executor) ->
-        XLOGGER.error("Thread pool for Right Assignment Regeneration exceeded"));
+    // Each regeneration rebuilds every assignment, so a waiting one covers a rejected request;
+    // without one (zero queue capacity, shutdown) the request is really lost.
+    threadPoolTaskExecutor.setRejectedExecutionHandler((runnable, executor) -> {
+      if (!executor.isShutdown() && !executor.getQueue().isEmpty()) {
+        XLOGGER.info(REGENERATION_ALREADY_QUEUED);
+      } else {
+        XLOGGER.warn(REGENERATION_REJECTED);
+      }
+    });
     threadPoolTaskExecutor.setMaxPoolSize(maxPoolSize);
     threadPoolTaskExecutor.setQueueCapacity(queueCapacity);
     threadPoolTaskExecutor.setKeepAliveSeconds(threadTimeout);

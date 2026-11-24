@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -265,9 +266,21 @@ public class FacilityController extends BaseController {
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
+    // Lock before anything else loads the facility: later reads in this transaction return the
+    // cached entity, and a concurrent update must not slip in between the reads below.
+    profiler.start("LOCK_FACILITY");
+    Optional.ofNullable(facilityDto.getId()).ifPresent(facilityRepository::findByIdForUpdate);
+
     profiler.start("VALIDATE_FACILITY_DTO");
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);
+
+    // The builder updates the managed entity in place, so read the flags before it runs.
+    profiler.start("GET_SUPPORTED_PROGRAMS_BEFORE_UPDATE");
+    final Map<UUID, Boolean> supportedProgramsBefore = Optional.ofNullable(facilityDto.getId())
+        .flatMap(facilityRepository::findById)
+        .map(Facility::supportedProgramActiveFlags)
+        .orElseGet(Collections::emptyMap);
 
     profiler.start("BUILD_FACILITY_FROM_DTO");
     Facility facilityToSave = facilityBuilder.build(facilityDto);
@@ -278,8 +291,10 @@ public class FacilityController extends BaseController {
     profiler.start("SYNC_FHIR_RESOURCE");
     fhirClient.synchronizeFacility(facilityToSave);
 
-    profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
-    applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
+    if (!supportedProgramsBefore.equals(facilityToSave.supportedProgramActiveFlags())) {
+      profiler.start("REGENERATE_RIGHT_ASSIGNMENTS");
+      applicationEventPublisher.publishEvent(new RegenerateRightAssignmentsEvent(this));
+    }
 
     XLOGGER.info("Saved facility with id: {}", facilityToSave.getId());
     FacilityDto dto = toDto(facilityToSave, profiler);

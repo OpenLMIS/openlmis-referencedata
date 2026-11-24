@@ -17,6 +17,7 @@ package org.openlmis.referencedata.domain;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,6 +55,25 @@ public class FacilityTest {
         .buildAsInactive();
     facility.setSupportedPrograms(newHashSet(supportedProgram));
     assertThat(facility.supports(program)).isFalse();
+  }
+
+  @Test
+  public void shouldReturnSupportActiveFlagOfEachSupportedProgram() {
+    Program inactiveProgram = new ProgramDataBuilder().build();
+    facility.setSupportedPrograms(newHashSet(
+        new SupportedProgramDataBuilder().withFacility(facility).withProgram(program).build(),
+        new SupportedProgramDataBuilder().withFacility(facility).withProgram(inactiveProgram)
+            .buildAsInactive()));
+
+    assertThat(facility.supportedProgramActiveFlags())
+        .containsOnly(entry(program.getId(), true), entry(inactiveProgram.getId(), false));
+  }
+
+  @Test
+  public void shouldReturnNoSupportActiveFlagsWithoutSupportedPrograms() {
+    facility.setSupportedPrograms(newHashSet());
+
+    assertThat(facility.supportedProgramActiveFlags()).isEmpty();
   }
 
   @Test
