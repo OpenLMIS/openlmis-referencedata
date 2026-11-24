@@ -118,7 +118,10 @@ public class FacilityControllerTest {
 
   @Test
   public void shouldRegenerateRightAssignmentsWhenSupportedProgramIsRemoved() {
-    updated.setSupportedPrograms(newHashSet());
+    existing.setSupportedPrograms(newHashSet(
+        supportedProgram(existing, program, true),
+        supportedProgram(existing, otherProgram, true)));
+    updated.setSupportedPrograms(newHashSet(supportedProgram(updated, program, true)));
 
     controller.saveFacility(facilityDto, existing.getId(), bindingResult);
 
@@ -128,6 +131,19 @@ public class FacilityControllerTest {
   @Test
   public void shouldRegenerateRightAssignmentsWhenSupportActiveFlagChanges() {
     updated.setSupportedPrograms(newHashSet(supportedProgram(updated, program, false)));
+
+    controller.saveFacility(facilityDto, existing.getId(), bindingResult);
+
+    verify(applicationEventPublisher).publishEvent(any(RegenerateRightAssignmentsEvent.class));
+  }
+
+  @Test
+  public void shouldRegenerateRightAssignmentsWhenBuilderChangesTheLoadedFacilityInPlace() {
+    when(facilityBuilder.build(facilityDto)).thenAnswer(invocation -> {
+      existing.setSupportedPrograms(newHashSet(supportedProgram(existing, program, false)));
+      return existing;
+    });
+    when(facilityRepository.saveAndFlush(existing)).thenReturn(existing);
 
     controller.saveFacility(facilityDto, existing.getId(), bindingResult);
 
