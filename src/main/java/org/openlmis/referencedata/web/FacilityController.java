@@ -266,6 +266,11 @@ public class FacilityController extends BaseController {
 
     checkAdminRight(RightName.FACILITIES_MANAGE_RIGHT, profiler);
 
+    // Lock before anything else loads the facility: later reads in this transaction return the
+    // cached entity, and a concurrent update must not slip in between the reads below.
+    profiler.start("LOCK_FACILITY");
+    Optional.ofNullable(facilityDto.getId()).ifPresent(facilityRepository::findByIdForUpdate);
+
     profiler.start("VALIDATE_FACILITY_DTO");
     facilityValidator.validate(facilityDto, bindingResult);
     throwValidationMessageExceptionIfErrors(bindingResult);

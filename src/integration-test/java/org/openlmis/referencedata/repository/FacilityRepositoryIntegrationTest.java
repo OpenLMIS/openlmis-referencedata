@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,6 +76,9 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   public static final String FACILITY_SEARCH_KEY = "Facility";
   @Autowired
   private FacilityRepository repository;
+
+  @Autowired
+  private EntityManager entityManager;
 
   @Autowired
   private FacilityTypeRepository facilityTypeRepository;
@@ -125,6 +130,21 @@ public class FacilityRepositoryIntegrationTest extends BaseCrudRepositoryIntegra
   @Override
   FacilityRepository getRepository() {
     return this.repository;
+  }
+
+  @Test
+  public void shouldFindFacilityByIdForUpdateWithRowLock() {
+    Optional<Facility> found = repository.findByIdForUpdate(facility.getId());
+
+    assertTrue(found.isPresent());
+    assertEquals(facility.getId(), found.get().getId());
+    // A row locked FOR UPDATE carries the locking transaction's id in xmax; an unlocked row
+    // inserted in this transaction has xmax 0.
+    String xmax = (String) entityManager.createNativeQuery(
+        "SELECT CAST(xmax AS text) FROM referencedata.facilities WHERE id = :id")
+        .setParameter("id", facility.getId())
+        .getSingleResult();
+    assertNotEquals("0", xmax);
   }
 
   @Test

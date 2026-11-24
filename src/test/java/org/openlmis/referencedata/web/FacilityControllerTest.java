@@ -17,6 +17,7 @@ package org.openlmis.referencedata.web;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -26,6 +27,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.openlmis.referencedata.domain.Facility;
@@ -92,6 +94,19 @@ public class FacilityControllerTest {
     when(facilityRepository.findById(existing.getId())).thenReturn(Optional.of(existing));
     when(facilityBuilder.build(facilityDto)).thenReturn(updated);
     when(facilityRepository.saveAndFlush(updated)).thenReturn(updated);
+  }
+
+  @Test
+  public void shouldLockFacilityBeforeAnythingElseReadsIt() {
+    updated.setSupportedPrograms(newHashSet(supportedProgram(updated, program, true)));
+
+    controller.saveFacility(facilityDto, existing.getId(), bindingResult);
+
+    InOrder inOrder = inOrder(facilityRepository, facilityValidator, facilityBuilder);
+    inOrder.verify(facilityRepository).findByIdForUpdate(existing.getId());
+    inOrder.verify(facilityValidator).validate(facilityDto, bindingResult);
+    inOrder.verify(facilityRepository).findById(existing.getId());
+    inOrder.verify(facilityBuilder).build(facilityDto);
   }
 
   @Test
