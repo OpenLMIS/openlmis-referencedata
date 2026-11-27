@@ -1,0 +1,234 @@
+id,code,dispensableid,fullproductname,netcontent,packroundingthreshold,roundtozero,description,extradata,versionnumber
+7f7b83db-580d-4269-88d2-7f9c80a591a9,C300,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Depo-Estradiol,5,2,false,Product description goes here.,,1
+bfde33c3-83f1-4feb-a27c-842852f66b71,C400,b6eb78c8-3c62-427e-87a8-e16615f9683d,Male Condom,1,0,false,Product description goes here.,,1
+7b9b66e0-f008-4c38-93ec-7a5f4868cca9,C600,daf071e6-2394-4ac9-b5a1-97a433d49160,Levonorgestrel,1,0,false,Product description goes here.,,1
+142bc03c-f4fc-40a8-a1ef-efebc900b171,C102,690b6b04-688f-4249-904c-f310f2785217,Adiuvantia,1,0,false,Product description goes here.,,1
+430e898a-59a8-465a-8431-98cd55bbe418,0002-1975,afa35730-18eb-4cff-9031-bcd88bcf67ac,AXIRON,1,0,false,Product description goes here.,,1
+b42db3d0-b2a1-46db-abd0-99421878a4da,0002-3004,0c83003d-c6c4-458d-9f29-7afa8eed045a,Prozac,1,0,false,Product description goes here.,,1
+f573f7d1-b90b-4c3c-8d8b-b8865315d32d,0002-3227,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,Strattera,1,0,false,Product description goes here.,,1
+4b0d49aa-aa15-4ccf-b91b-197f7cb35c16,0002-3230,94504ff0-d0a0-4b64-9d34-2210dce715db,Symbyax,1,0,false,Product description goes here.,,1
+25665e10-cca7-44c0-b508-e95600d8fb99,0002-3235,2a3a4ff5-35ed-438f-87a9-fee1e597fca3,Cymbalta,1,0,false,Product description goes here.,,1
+d4dbd20e-8ce2-480e-a019-4a90d115719c,0002-4112,83aea028-dcd5-42da-b17e-677fcc398d71,Zyprexa,1,0,false,Product description goes here.,,1
+8c74cdb8-2138-487d-a7ec-c7b55607c83a,0002-4165,cd47655d-2330-4910-bf6a-9b3d55d0b2ce,Evista,1,0,false,Product description goes here.,,1
+8dc476f4-222e-46fa-9b4f-f1f67c0f5681,0002-4453,c19e7465-a528-409d-a6e3-0d2da8ffa43a,ZYPREXA,1,0,false,Product description goes here.,,1
+32a04b36-4b4b-4591-b7fe-927d3569bd06,0002-4462,c43b7586-7aa1-4cf7-9318-aacb5a3a4f0e,Cialis,1,0,false,Product description goes here.,,1
+b5cb6082-1def-492d-a0a0-abd2ab3bfafa,0002-4483,12466469-a5c0-4075-8792-1f9ae9784622,Verzenio,1,0,false,Product description goes here.,,1
+1a0588a7-5a8d-4184-8955-07ce8f4d578d,0002-5121,d7ea198c-bf53-4cad-b068-dc5877c64229,Effient,1,0,false,Product description goes here.,,1
+70285d72-0790-4846-aa74-23c013c5c408,0002-7140,cd312ae9-6fca-4d1f-ac35-695c3c48c3bf,REOPRO,1,0,false,Product description goes here.,,1
+d059457a-b7ec-4353-89c6-dde0fc7a0c4b,ARV0001,b8764f2b-c649-4991-b160-fd9c9b8c258b,Abacavir 300mg Tables,51,8,true,,,1
+3fecd8a4-d130-4e82-95ff-7d7620e24d8d,ARV0002,eea1399c-b99d-4e8a-af86-6a8062978bd9,Lamivudine/Zidovudine/Nevirapine 30/60/50mg,97,5,true,,,1
+65df9af9-dd9d-4df4-8157-bce65b4a42dd,ARV0003,62d6457e-02ab-49b0-8952-a1ed5bd8d056,Tenofovir/Emitricitabine/Efavirenz 300mg/200mg/600mg,24,9,true,,,1
+952aabc6-ffa8-4e9a-ac4d-82b843704a82,ARV0004,0198a03d-d138-489d-a1f4-3c4a1719b987,Abacavir oral solution 20mg/ml,87,1,false,,,1
+fd77b03e-5578-429b-9802-6d7e4d8cb91d,ARV0005,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,Zidovudine/Lamivudine 300/150mg Tablets,40,7,false,,,1
+dc576f79-8d1c-4f4c-a94f-1ddda1065c85,ARV0006,db10e9b3-6ce6-4fda-b2c3-0b6a8e419b91,Efavirenz 200mg,43,6,true,,,1
+81dd320e-6d28-446a-8613-8bb899d6c206,ARV0007,375127ec-0ac9-4b91-9111-7f1d2bbbd0ac,Nevirapine Tablets for Oral Susp 50mg,32,5,true,,,1
+e1e51f5a-1bda-4777-a074-d865206e546f,ARV0008,33259963-6feb-48d6-b29d-d313936cdbb3,Abacavir/Lamivudine 60/30mg,91,6,true,,,1
+7f0aac5f-582a-4a6a-a8e1-dd534200f257,ARV0009,c19e7465-a528-409d-a6e3-0d2da8ffa43a,Tenofovir 300mg Tablets,84,8,false,,,1
+dc6e49d4-6fd8-49d0-ac4f-44d055c4b49d,ARV0010,afa35730-18eb-4cff-9031-bcd88bcf67ac,Co-trimoxazole 120mg Tablets,95,7,true,,,1
+f7169041-733a-4279-bcbb-aee248e1b9dd,ARV0011,b9c10903-dad3-47b6-b6e5-21dd9d232ad8,Efavirenz 50mg,68,2,false,,,1
+a4460709-c908-4b94-b3c0-faf5eeefcc03,ARV0012,7dea5bc1-daf4-4c82-a447-d9393822c4fc,Lamivudine/Zidovudine 30/60mg (Pead),32,7,false,,,1
+2400e410-b8dd-4954-b1c0-80d8a8e785fc,C1,62d6457e-02ab-49b0-8952-a1ed5bd8d056,Acetylsalicylic Acid,16,8,false,Product description goes here.,,1
+103396e1-f5e4-4754-bb7b-1c799097dfea,C2,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Glibenclamide,40,20,false,Product description goes here.,,1
+bac90734-6e58-426e-849b-331286ec77d2,C3,1bfced14-16ad-44df-b73f-5106353972d0,Streptococcus Pneumoniae Vaccine,5,2,false,Product description goes here.,,1
+c9e65f02-f84f-4ba2-85f7-e2cb6f0989af,C4,ab83c808-7c70-463c-9a69-9c875dd2c93e,Streptococcus Pneumoniae Vaccine II,5,2,false,Product description goes here.,,1
+d602d0c6-4052-456c-8ccd-61b4ad77bece,C100,b8764f2b-c649-4991-b160-fd9c9b8c258b,Levora,84,42,false,Product description goes here.,,1
+9c3bea84-487b-4e22-8759-3fe93f8201d9,IVX-BCG-20-1234,0251c7ba-da9e-4e7e-981d-d3b57d336981,Intervax BCG (20 dose),20,1,true,,"{""useVVM"":""true""}",1
+0a83fb92-289b-45c9-adba-f2ac7647312e,SNF-IPV-5-1234,33259963-6feb-48d6-b29d-d313936cdbb3,IPOL (5 dose),5,1,true,,"{""useVVM"":""true""}",1
+8f5e5923-e192-40b1-bf9e-3b4444579e05,GSK-POLIO-20-1234,cb27d04b-b5a3-4b1c-b3f5-e4912f217eba,GlaxoSmithKline Polio (20 dose),20,1,true,,"{""useVVM"":""true""}",1
+b0c0426e-6840-4531-a116-043ba854c58b,SII-PENTA-1-1234,30f45eb1-7d68-4962-8927-60f989f78af3,Pentavac PFS (1 dose),1,1,true,,"{""useVVM"":""true""}",1
+a852f785-d82e-4afe-bc6a-04f3236caf90,SII-PENTA-10-1234,bb81110c-7a94-4ac3-9bd5-67184160259d,Pentavac PFS (10 dose),10,1,true,,"{""useVVM"":""true""}",1
+b75a88c7-70fa-4bab-9785-3dd980a5ffc3,GSK-PCV10-2-1234,54d6f74f-2d10-4d69-92ff-31da53c16b46,Synflorix PCV10 (2 dose),2,1,true,,"{""useVVM"":""true""}",1
+047638fa-92ce-4adf-9bbd-3bcb3216897a,MRK-ROTA-1-1234,b7c4800e-5955-45df-8a4f-4f260f00d493,RotaTeq (1 dose),1,1,true,,"{""useVVM"":""true""}",1
+71204042-558e-4c47-a602-7886451e5689,MRK-MEASLES-10-1234,0198a03d-d138-489d-a1f4-3c4a1719b987,MMR II (10 dose),10,1,true,,"{""useVVM"":""true""}",1
+18223845-4d19-4408-b7c2-971c26014058,SNF-TETANUS-10-1234,afbd8835-9264-4602-87a4-41f5a752da82,Tenivac (10 dose),10,1,true,,"{""useVVM"":""true""}",1
+170738eb-6364-4d2a-98cf-1ea54cc5a61a,ACM-SYRINGE5ML-1234,b9c8ba9b-91ec-4908-9c68-ecbd579036eb,Acme Syringe 5ml,1,1,true,,,1
+170738eb-6364-4d2a-98cf-1ea54cc5a61a,ACM-SYRINGE5ML-1234,b9c8ba9b-91ec-4908-9c68-ecbd579036eb,Acme Syringe 5ml (updated),1,1,true,,,2
+bfc1bfee-d6bb-4254-8bc9-5a0d962fce97,ACM-SYRINGE05ML-1234,df396885-aba2-40dc-bfc2-212be35eb9d2,Acme Syringe 0.5ml,1,1,true,,,1
+4457d688-9617-4594-bb54-03f98cabf84d,ACM-SYRINGE005ML-1234,eea1399c-b99d-4e8a-af86-6a8062978bd9,Acme Syringe 0.05ml,1,1,true,,,1
+7d5a1795-b219-465c-ba78-f5187b65d7f9,ACM-SAFETYBOX-1234,82801936-acf5-47c7-8712-3d518479c941,Acme Safety Box,1,1,true,,,1
+4a05482a-68b8-4064-979f-6bfadf464481,ACM-GAS-1234,375127ec-0ac9-4b91-9111-7f1d2bbbd0ac,Acme Gas (Cylinder),1,1,true,,,1
+8ef9d4da-b6e5-401c-b433-765a5fd8a0cc,bcg20,50b7b60f-8ac6-42fe-a74f-bbf8b4e2b570,BCG,20,1,true,,"{""useVVM"":""true""}",1
+b8ff7c36-2003-46d6-a687-551bdd521a9e,ipv5,c55bcbff-166e-4486-85e8-0f06acf978fe,IPV,5,1,true,,"{""useVVM"":""true""}",1
+f8e6ea34-0ad8-43d5-96d7-a6f8b14ff210,polio20,9f4336d5-e1da-47f6-bdc1-2470672ca1ef,Polio (20 dose),20,1,true,,"{""useVVM"":""true""}",1
+5f0dd194-aae1-490c-8b51-3cf0c87af983,penta1,d18c1b6e-9961-4106-801d-28ce4a71bd47,Pentavalent (1 dose),1,1,true,,"{""useVVM"":""true""}",1
+c0d41166-01fd-4a28-ae2f-46f867ffb368,penta10,915ecc5c-87ff-425e-ac64-45c831b6672b,Pentavalent (10 dose),10,1,true,,"{""useVVM"":""true""}",1
+72971f1d-dd20-4373-aa94-f9615777581b,pcv10,843457e4-0de6-46c4-aa8a-5df5d00aaa8f,PCV10,2,1,true,,"{""useVVM"":""true""}",1
+b61c652d-2259-41d7-8bb6-fc5fcdd95626,rota1,22011f6f-1b25-42cd-aedf-e5e92efa186b,Rotavirus,1,1,true,,"{""useVVM"":""true""}",1
+b918c3a4-7d12-4be3-854d-d1792cf3b33b,measles10,a3d9fd8a-27a6-4288-93d3-92f941885e5d,Measles,10,1,true,,"{""useVVM"":""true""}",1
+e217910c-3364-46b3-92cd-8dd8acf0c557,tetanus10,c05d4177-8844-48f8-94fb-3ecf6b3fb1cc,VAT,10,1,true,,"{""useVVM"":""true""}",1
+bb66a9c4-8443-42ee-b701-caf00061f4df,syringe5ml,d4d15162-5718-4f8d-942a-b8b85f3f78e4,Syringe 5ml,1,1,true,,,1
+1a354c78-33e5-423d-a8d8-a8ebfa08e117,syringe05ml,d88a3cd4-271a-49d3-961a-fbef88a74e4c,Syringe 0.5ml,1,1,true,,,1
+22dbc5cf-2b86-4763-afc7-e730a2750146,syringe005ml,7dea5bc1-daf4-4c82-a447-d9393822c4fc,Syringe 0.05ml,1,1,true,,,1
+6fc0455a-d572-4503-bedf-f3872536c2ad,safetybox,b9c10903-dad3-47b6-b6e5-21dd9d232ad8,Safety Box,1,1,true,,,1
+ce5ef390-4e4c-477e-a894-ac831be4d012,gas,d97e2d8d-7d0f-47f7-87d5-28ff55f9364c,Gas (Cylinder),1,1,true,,,1
+c75152ee-ebed-47ed-bb87-0930aee18320,IVX-BCGDIL-20-1234,73d9e5ae-dae2-4578-8952-746cc62067a0,Intervax BCG Diluent (20 dose),20,1,true,,,1
+7c58f053-0ca5-46ad-8209-98cff0c79b42,MRK-MEASLESDIL-10-1234,3722add3-32f4-4b3a-bdd5-ca036ac73624,MMR II Diluent (10 dose),10,1,true,,,1
+ef8cdc67-688a-4b9b-a253-a20889d74447,C101,ac523cc0-cb98-4061-a6b1-508cf636e816,Abortiva,1,0,false,Product description goes here.,,1
+62e16def-53ef-46b5-8bf1-8dab9b0bcec1,C103,3a7a8e99-6ce3-4e14-9ad1-3085f22905d9,Adsorbentia,1,0,false,Product description goes here.,,1
+880cf2eb-7b68-4450-a037-a0dec1a17987,C500,ddcce957-a360-47e1-af82-f9c3c1525298,Implanon,1,0,false,Product description goes here.,,1
+66c57fb6-5bb4-466e-8159-c0a41eb08137,C120,d10f85d2-ae75-483e-9d84-2eeafbc07a88,Thymoleptica,1,0,false,Product description goes here.,,1
+4cb2f620-27e2-4506-b44b-328a10bf54ca,C119,5b71a8ec-9ef2-4f09-a61c-d1f5017ac697,Tonica,1,0,false,Product description goes here.,,1
+0dc9c1ad-2266-4fb3-ad74-993c38b8c28a,C118,572db554-b816-4bf4-93ed-624bcdda2c39,Stomachica,1,0,false,Product description goes here.,,1
+f7dcea66-dc3d-42cd-8cc2-64b2bf929470,C115,9914a1fc-61a3-43eb-89f6-5525e08f88ee,Hypnotica,1,0,false,Product description goes here.,,1
+66b29383-b508-48a5-bd26-f7fdf0f8dc9a,C114,b952ad73-dc30-45f5-93a5-3fb752e092ed,Emetica,1,0,false,Product description goes here.,,1
+23819693-0670-4c4b-b400-28e009b86b51,C200,8282ae4f-0410-4e77-a2f8-735d3ac442db,Ortho-Novum,63,31,false,Product description goes here.,,1
+a5b184a5-9deb-4deb-9444-a9362cd436cd,LAB001,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Applicators, Wooden, 5-7/8 x 1/12in, For stick test in blood banks and routine laboratory 864 Sticks",864,432,false,Demo Lab Product,,1
+4e7c875a-f63a-4314-8b54-7a210977e9c2,LAB002,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Bag, Biohazard, 19 x 23in (48 x 58cm), Autoclave, Red, Printed, 1.5mil, 200 Pcs",200,100,false,Demo Lab Product,,1
+b9542341-cc70-4771-8a2f-7af3f36f3d08,LAB003,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Bag, Garbage, Black, 24 x 32in, 500 Pcs",500,250,false,Demo Lab Product,,1
+0cf50f83-2147-4064-9f8b-6b5e7c3cacc6,LAB004,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Bandage, Adhesive Spots, 1in, Vinyl, 100 Pcs",100,50,false,Demo Lab Product,,1
+6685d962-c548-4968-9c6f-56d288fe6d73,LAB005,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, GPT (ALT), 30 Tests",30,15,false,Demo Lab Product,,1
+d9d242e1-1ba4-4d18-b2be-828438bcc157,LAB006,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, Precinorm U, 4 x 2 ml",30,15,false,Demo Lab Product,,1
+1a843117-f14b-456e-a17a-fa9165f84054,LAB007,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, Precipath U, 4 x 2 ml",30,15,false,Demo Lab Product,,1
+6b75a4ff-96b7-432c-9597-e1b684ffaa10,LAB008,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, Printer Paper R4/3, Miditron Junior, Each",4,2,false,Demo Lab Product,,1
+be213d01-b399-4a1b-88b0-6533b82e8f43,LAB009,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, GOT (AST), 30 Tests",4,2,false,Demo Lab Product,,1
+0b9a213e-9380-4ced-b9a1-f7199ad6dba6,LAB010,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, Creatinine, 30 Tests",1,1,false,Demo Lab Product,,1
+32b7fbb2-5643-4159-bfd7-42d3112447ea,LAB011,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Reflotron, Clean + Check, 15 Tests",15,8,false,Demo Lab Product,,1
+f2b8fd76-fb50-4dc2-8f0b-d6fe327cfcdb,LAB012,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biochemistry, Vitros 350, 7% BSA Solution, 12 x 5mL",60,30,false,Demo Lab Product,,1
+8f1e885e-af8c-49fc-831e-0ae99e3f4aac,LAB013,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Biohazard Waste Container, 8 Gl, Red, Each",1,1,false,Demo Lab Product,,1
+5546a0c9-accd-4ef7-b7bb-b4b30e130894,LAB014,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Blood Collection Tube Holder, Adult, 13-16mm Tubes, Single Use, non-Sterile, 250 Pcs",100,50,false,Demo Lab Product,,1
+0280c051-9700-45df-97bd-f43d04e540c1,LAB015,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Blood Collection Tube, Lavender, 4mL, 50 Pcs",50,25,false,Demo Lab Product,,1
+b2dca239-e451-41a1-aed6-e0fa2266d71b,LAB016,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Blood Collection Tube, Serum, Clot Activator Ring, 6mL, Red, 50 Pcs",50,25,false,Demo Lab Product,,1
+be63513a-5a9d-40b1-98fe-30434e1c3342,LAB017,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Box, Microscope, Polystyrene, 100 slides, each",12,6,false,Demo Lab Product,,1
+5a4aae1a-ad51-4893-9871-9f1efe4f4029,LAB018,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Chemical, Bleach, Sodium Hypochlorite Solution, 4-6%, 1 Gallon",1,1,false,Demo Lab Product,,1
+0cb3c28b-6ff0-4507-a228-072ad04f8c3c,LAB019,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Chemical, Ethanol, Ethyl Alcohol, 70%, 1 Gallon",1,1,false,Demo Lab Product,,1
+30302f8a-b34e-416c-a9ac-d38f64002bb0,LAB020,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Container, Specimen Collection, Sterile, 4oz., 100 Pcs",100,50,false,Demo Lab Product,,1
+025c4386-afbb-4651-b681-91cc25246b8d,LAB021,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Cotton Roll, Absorbent, Sanitary, Non-Sterile, 500g x 1 Roll",1,1,false,Demo Lab Product,,1
+1ac873c7-8d08-42d0-8e8f-7b61b7873833,LAB022,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Face Shield, Full Size, 25/Pk",25,13,false,Demo Lab Product,,1
+d1aaa07a-6b59-4736-8b1f-804b050bcf0b,LAB023,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Flow Cytometry, BD FACS, FACSFlow Sheath Fluid, 20L",20,10,false,Demo Lab Product,,1
+650e4c24-f395-4aad-a118-df2aa1b1c8a9,LAB024,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Flow Cytometry, BD FACSCount, CD4 Reagents, Absolute and Percentage Count, Single Tube, 50 Tests",50,25,false,Demo Lab Product,,1
+507a7676-66e9-4f1e-bc98-9a21e0d1973f,LAB025,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Flow Cytometry, BD FACSCount, Control Kit, 25 Tests",25,13,false,Demo Lab Product,,1
+20aafdeb-0a6e-41a1-a56c-e69e3a075e1f,LAB026,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Flow Cytometry, BD FACSCount, Thermal Paper, 5 Rolls",5,3,false,Demo Lab Product,,1
+18c214af-c501-47ed-8109-80a596acb14d,LAB027,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Gloves, Exam, Latex, Powdered, Non-Sterile, Med, ASTM Standard, 100 Pcs",100,50,false,Demo Lab Product,,1
+bad6d93f-b3c0-47e4-91c4-f5bca5019d0a,LAB028,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Hematology, Sysmex, Cellpack, 20L",1,1,false,Demo Lab Product,,1
+cac7ef5c-0eb3-473a-ac33-d74a6a63b359,LAB029,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Hematology, Sysmex, Eightcheck 3WP X-TRA, Tri-level (L,N,H), 12 x 2mL Vials",24,12,false,Demo Lab Product,,1
+98d9791f-96cb-457e-bba3-0a3974d091e4,LAB030,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Hematology, Sysmex, Stromatolyser SWH, 3 x 500 ml",500,250,false,Demo Lab Product,,1
+ab830bc4-d421-4dca-97f1-7b97e7d3fb0d,LAB031,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Hematology, Sysmex, Thermal Printer Paper TP2, 1 Roll",1,1,false,Demo Lab Product,,1
+3f93e348-1d85-420f-8dd4-01341a7d8038,LAB032,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"HIV 1, Cambridge Biotech Western Blot Kit, 27 Tests",27,14,false,Demo Lab Product,,1
+275085db-21d0-48b6-908c-73075ba68a1f,LAB033,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"HIV 1/2-O, Murex ELISA Kit, 96 Tests",96,48,false,Demo Lab Product,,1
+ff5d7bd9-c7d7-4b46-8455-15f9f9aa3c50,LAB034,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Uni-Gold HIV 1/2, 20 Tests",20,10,false,Demo Lab Product,,1
+09b937a9-c2cf-4885-aed0-12a14dad56e3,LAB035,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Oraquick Selt Testing,1,1,false,Demo Lab Product,,1
+baf6b089-9e40-4485-b81f-148b13d9f73d,LAB036,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"HIV 1+2, Determine Complete Kit, 100 Tests",100,50,false,Demo Lab Product,,1
+6c20dbda-2a1e-454c-a32d-ecc8ac3aa6f1,LAB037,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Lab Wipes, 1 ply, 11x21, 280/Pk",280,140,false,Demo Lab Product,,1
+3052c54c-7d51-4c29-be69-70953da34883,LAB038,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Mask, Respirator N95, Disposable, 20/Pk",20,10,false,Demo Lab Product,,1
+c5e4177a-aa63-49ec-87de-39b6b5c6fb4b,LAB039,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Microscope Slide, 25 x 75mm, Frosted, 72 Pcs",50,25,false,Demo Lab Product,,1
+96dc34b1-cb95-4449-8310-7d7481f51ee3,LAB040,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Needle, Multi-sample, 21G x 1in, 1000 Pcs",1000,500,false,Demo Lab Product,,1
+107346f2-b346-4e64-95ec-37a9428bda0a,LAB041,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Optical Lens Cleaner, 2oz x 6 Bottles",12,6,false,Demo Lab Product,,1
+baea06cb-a5ae-4079-a507-aeea1d05abb4,LAB042,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Paper Towel Roll, Standard, 300m L x 30cm W x 1 Roll",1,1,false,Demo Lab Product,,1
+ffb8840d-9906-4426-ba1b-851d6030440f,LAB043,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"PEN, LAB MARKER, PERMANENT FINE, BLACK,12PCS",12,6,false,Demo Lab Product,,1
+eb66ebe0-1077-471b-8b24-99bb2e2ffff5,LAB044,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pima Analyzer Printer Paper I, Thermal Paper, Coated, Non-Adhesive, 10 Rolls",10,5,false,Demo Lab Product,,1
+aac57d60-6936-4f0f-b919-1e223d16c6bb,LAB045,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pima Bead Standard, 1 Normal Cartridge, 1 Low Cartridge",1,1,false,Demo Lab Product,,1
+3db1dd2e-6b53-4924-b12a-f0b8cda4f9a3,LAB046,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pima CD4 Cartridge Kit, 100 Tests",100,50,false,Demo Lab Product,,1
+4789d691-7928-4326-bdc5-c4e6305a00b6,LAB047,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pima Finger Stick Sample Collection Kit, 100 Units",100,50,false,Demo Lab Product,,1
+22aa76f7-36e0-4eb0-b8f3-6e3880eb82ec,LAB048,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pipet Tips, Blue, 100-1000uL, Non-Sterile, 1000 Pcs",1000,500,false,Demo Lab Product,,1
+0f2e837b-a6d6-4385-b7ea-84300a6f3998,LAB049,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pipet Tips, Yellow, 0-200uL, no-Filter, Bulk, 1000 Pcs",1000,500,false,Demo Lab Product,,1
+6994cc90-c54f-427b-8e46-06e6b25eb92a,LAB050,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pipet Transfer, 3.0 ml draw, 500/Pk",500,250,false,Demo Lab Product,,1
+03b5b40c-c90c-48fe-af83-98a96b12983c,LAB051,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Prep Pads with Isopropyl Alcohol 70%, Med, 200 Pcs",200,100,false,Demo Lab Product,,1
+3651f7c5-7adf-4ff7-bdf0-54feb68495ec,LAB052,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"RPR Syphilis Test Kit, Carbon, 500 Tests",500,250,false,Demo Lab Product,,1
+7c89e195-29e6-413c-a3bd-61623dc5dabe,LAB053,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Sharps Container, 4L, Red, Each",1,1,false,Demo Lab Product,,1
+4230ad5a-cde9-4d9d-bef9-74f42a99e761,LAB054,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Stain, Methylene Blue, 5 x 250mL",1250,625,false,Demo Lab Product,,1
+3e4dc12a-80c1-4c10-af34-c6ed92ac5938,LAB055,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Stain, TB Decolorizer, 3% Acid Alcohol, 5 x 250 ml",1250,625,false,Demo Lab Product,,1
+76d0d7ea-9754-4ee8-b325-2a34d92dac02,LAB056,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Stain, Ziehl-Neelsen Carbolfuchsin, 5 x 250mL",1250,625,false,Demo Lab Product,,1
+aaa3cb2b-ca73-4283-8731-90a519041d9e,LAB057,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Syphilis Bioline 3.0, Multi-device Kit, 100 Tests",100,50,false,Demo Lab Product,,1
+eae744ff-aa07-4581-897c-88b54da78279,LAB058,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Syphilis TPHA Kit, 100 Tests",100,50,false,Demo Lab Product,,1
+1cad8aa3-6b6d-4cff-a379-87b6b25c4b81,LAB059,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Syringe, w/Needle, 5mL, 21G x 1.5in, Safety, Luer, 100 Pcs",100,50,false,Demo Lab Product,,1
+c70a402d-8729-4d03-b956-d7575dfeef98,LAB060,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Syringe, w/Needle, Insulin, 1mL, 28G x 0.5in, 100 Pcs",100,50,false,Demo Lab Product,,1
+9a6dbffa-e0f1-40c9-9997-ca3e1cfc805e,LAB061,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"TB Control Slide, Acid-fast bacteria (AFB Positive), 50 Pcs",50,25,false,Demo Lab Product,,1
+5b6d7e34-7a58-4f6d-b67f-83891c2c5337,LAB062,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"TB, Fluorescent microscope reagent (CDC)",3,2,false,Demo Lab Product,,1
+708b1d46-c7bc-4504-8121-ccfd3e43cb1f,LAB063,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Test Tube, Plastic, 12 x 75mm, Round Bottom, Falcon Type, Non-Sterile, No Cap, 1000 Pcs",1000,500,false,Demo Lab Product,,1
+f1993b69-9182-40a5-b1eb-7b39d8fa221e,LAB064,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Tourniquet, non latex, 100/Pk",100,50,false,Demo Lab Product,,1
+242007de-e8f5-4d60-9841-9f2f11dced60,LAB065,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Tube Capillry Plain (microhematocrite), 200/Pk",200,100,false,Demo Lab Product,,1
+0fa8be63-02e7-4f94-9b08-dd8942873a24,LAB066,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"TUBE RACK, 32 TUBES X 16ML, EACH",1,1,false,Demo Lab Product,,1
+0b3c1031-3b4b-411b-b726-4ec488e43234,LAB067,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Tube, PP, 4.5ml, 12 x 75mL, Screw Cap, Round Bottom, Sterile, 1000 Pcs",864,432,false,Demo Lab Product,,1
+1f5bff91-2f0f-4e70-8137-81fe0caf529b,LAB068,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Preparation System Reagents RNA, 4 x 24 Preps",96,48,false,Demo Lab Product,,1
+065ef1d0-4a44-405d-87c9-1e3f44333659,LAB069,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, HIV-1 Amplification Reagent Kit, Quantitative, 4 Packs x 24 Assays",96,48,false,Demo Lab Product,,1
+767e82f6-20b0-4221-a2dd-e6848236e448,LAB070,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Calibrator Kit 12 Cal A, 12 Cal B, 4 Complete Calibration Sets",12,6,false,Demo Lab Product,,1
+443fcfb0-b5bb-49e9-92e1-84ae6c91b52f,LAB071,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, PCR Plate, Plastic, 96-Well, Deep, 32 Pcs",32,16,false,Demo Lab Product,,1
+2f463607-75c6-4c17-a08c-8658bb0dc522,LAB072,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Pipet Tips (DiTis), Disposable, with Filter, 1000?L, 2 Racks x 96 Pcs x 12",2304,1152,false,Demo Lab Product,,1
+140d4be3-0d8e-4e5d-8be6-1d817a7cd978,LAB073,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Pipet Tips (DiTis), Disposable, with Filter, 200?L, 2 Racks x 96 Pcs x 12",2304,1152,false,Demo Lab Product,,1
+b1169d67-74db-4abf-af85-0b5889399d52,LAB074,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, PCR, Thermal Adhesive Sealing Film, 100 Pcs",100,50,false,Demo Lab Product,,1
+02d8225a-9980-42e2-9432-8c3e897253bc,LAB075,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Biohazard bag, 32 x 34in, Orange, 27 Gallon, 50 Pcs",50,25,false,Demo Lab Product,,1
+cb498b1b-294a-4321-bd5b-de8d487aa19e,LAB076,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Master Mix Tubes/caps, Plastic, 10ml, 25 Pcs",25,13,false,Demo Lab Product,,1
+7e55c437-de79-47ee-a5a8-ce879c434723,LAB077,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Reagent Vessel, 200mL, Plastic, 15 x 6 Pcs",90,45,false,Demo Lab Product,,1
+4b92db00-38e7-42d8-8448-db14a3f78b0e,LAB078,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Reaction Vessel, 5mL, Plastic, 2000 Pcs",2000,1000,false,Demo Lab Product,,1
+58f3c802-1011-48ec-afd7-696455c12544,LAB079,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, mSample Preparation System Bulk Lysis Buffer, 3 x 70 ml",210,105,false,Demo Lab Product,,1
+f33cfab8-9e18-4082-95d8-a00e6ab745ef,LAB080,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Optical Calibration Kit",1,1,false,Demo Lab Product,,1
+04ac641a-0037-4bc3-9fea-df0492dc5713,LAB081,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, PCR Plate Optical Reaction Plate, 20 Pcs",20,10,false,Demo Lab Product,,1
+c61e7ca6-f02e-43a5-beac-934b6933bdf0,LAB082,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Pipet Tips (DiTis), Disposable, with Filter, 1000µL, 2 Racks x 96 Pcs x 12",2304,1152,false,Demo Lab Product,,1
+207116da-7704-420e-8d86-b679ec084212,LAB083,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Pipet Tips (DiTis), Disposable, with Filter, 200µL, 2 Racks x 96 Pcs x 12",2304,1152,false,Demo Lab Product,,1
+c9613ff3-f52a-4c80-af72-5b987da3f510,LAB084,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Optical Calibration Kit",1,1,false,Demo Lab Product,,1
+0f5fab69-852b-4587-b5bd-8618eef2a975,LAB085,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, HIV-1 Qualitative, Control Kit, 12 Vials HP + 12 Vials N",12,6,false,Demo Lab Product,,1
+e4273ee7-82d9-42b5-acfb-89e3aff5ff59,LAB086,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, PCR Plate, Plastic, 96-Well, Deep, 32 Pcs",32,16,false,Demo Lab Product,,1
+3410f5b4-70e5-41a0-a704-ffe5bac19a56,LAB087,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, HIV-1 Qualitative Amplification Reagent Kit, 4 Packs x 24 Assays",96,48,false,Demo Lab Product,,1
+c4b337b0-bab9-4dda-bd45-305e2088ad8b,LAB088,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, PCR, Adhesive Seals, Optically Clear, 100 Pcs",100,50,false,Demo Lab Product,,1
+5eaa59a2-ca1e-418d-ba24-ea82a3ce6b6e,LAB089,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, Reaction Vessel, 5mL, Plastic, 2000 Pcs",2000,1000,false,Demo Lab Product,,1
+15460046-5eb7-42c5-932c-ee21c1745cad,LAB090,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Molecular, m2000 RealTime PCR, mSample Preparation Systems DNA, 4 x 24 Preps",96,48,false,Demo Lab Product,,1
+0ef5bd0a-dae8-4b09-b9fe-c8e8bdcf5c56,LAB091,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Butterfly vacutainer needle, 23G, 100/bte",100,50,false,Demo Lab Product,,1
+020ebe69-fdfe-47f9-9ecb-574e8ab892e3,LAB092,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Aerosol Resistant Pipette Tips (200-1000ul),1056,528,false,Demo Lab Product,,1
+03308c3e-f642-4416-9ef6-f0b106cfb0e7,LAB093,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Aerosol Resistant Pipette Tips (50-200ul),96,48,false,Demo Lab Product,,1
+8f2a67d0-42ef-4c66-905a-fac59be3ecb8,LAB094,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Powderless Latex Gloves,800,400,false,Demo Lab Product,,1
+7dc1e42c-140b-4dd4-9a64-c88bd334fc8d,LAB095,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Disposable Ziploc bags,40,20,false,Demo Lab Product,,1
+78524aac-a366-443e-8e08-a769df80ffe0,LAB096,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Biohazard Bags (Small),200,100,false,Demo Lab Product,,1
+091c2568-0e03-496b-8c6f-8af53e4a680d,LAB097,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Biohazard Bags (Large),25,13,false,Demo Lab Product,,1
+d2a93b00-1a98-4a8a-8f3d-40d70c7a0345,LAB098,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Disposable lab coats,20,10,false,Demo Lab Product,,1
+93647b51-5eec-4b8a-949f-b8a2d6f4b4b3,LAB099,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Fine Tipped Waterproof Permanent Lab Marking Pens, Black",5,3,false,Demo Lab Product,,1
+c7078c13-7732-470c-9246-9c5c73052d31,LAB100,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Eppendorf 10ml repeat pipet tip,100,50,false,Demo Lab Product,,1
+77ea9035-1988-49f7-8f53-d2ef5b032df6,LAB101,ffd57abe-a891-4f59-a66b-2ad3de0f809c,50ml centrifuge tubes,100,50,false,Demo Lab Product,,1
+5efb17b6-9365-4951-b173-69aff2936666,LAB102,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Cartridge Xpert MTB/RIF,50,25,false,Demo Lab Product,,1
+21916212-63a1-4f4c-9073-0ac40bd2353b,LAB103,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Calibrator Xpert Check Kit,1,1,false,Demo Lab Product,,1
+ff4772b3-a911-4b77-9d67-dc7b3ceb92c9,LAB104,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Pasteur pipettes, with graduation, sterile, s.u. 5 ml",500,250,false,Demo Lab Product,,1
+c91454e6-2eac-4cb6-bbb8-0f2bb5b4df75,LAB105,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Kit, microscopie LED",1,1,false,Demo Lab Product,,1
+3d678f68-7cc0-49dc-9719-725397b032bc,LAB106,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Lens paper,600,300,false,Demo Lab Product,,1
+32b53981-909a-4a37-a3d7-51a7621603cf,LAB107,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BBL MGIT tubes for use in BACTEC MGIT 960,100,50,false,Demo Lab Product,,1
+3a5466cb-43cb-4567-9dcb-1b979b23e45f,LAB108,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BACTEC MGIT 960 Supplement ,100,50,false,Demo Lab Product,,1
+752923f3-cd66-4f99-9b73-f9ed78ea46fb,LAB109,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BACTEC MGIT 960 S.I.R.E,40,20,false,Demo Lab Product,,1
+edd1f2b9-c4e1-4f9b-bce9-e1ac08e60bf2,LAB110,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BACTEC MGIT 960 PZA 1 tube,25,13,false,Demo Lab Product,,1
+1eaabd05-37f8-453e-9bba-cf5d867c8aa5,LAB111,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BACTEC MGIT 960 PZA 1 kit,50,25,false,Demo Lab Product,,1
+2a8fc472-4ec5-4110-b4ca-b53c65ca885e,LAB112,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Aluminium Foil,1,1,false,Demo Lab Product,,1
+fa3a150a-a6a2-457d-b295-2ac544c6a1c2,LAB113,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BD BBL Lowenstein Jensen Medium (slant),100,50,false,Demo Lab Product,,1
+aebd20e9-18f5-4eff-9b24-d778d904dbe9,LAB114,ffd57abe-a891-4f59-a66b-2ad3de0f809c,BD BBL Middle Broth OADC Enrcihement (ml),100,50,false,Demo Lab Product,,1
+3e63841e-d3cf-4096-9867-04d1acc22372,LAB115,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Middle Broth 7H9 broth 500 g - 271310,500,250,false,Demo Lab Product,,1
+ba25492a-769a-4ab6-86f9-2c1b8df121e3,LAB116,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Petri Dish,480,240,false,Demo Lab Product,,1
+f988d4f3-f974-4d47-bdae-8fcf882e0ab3,LAB117,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Brain Heart Infusion agar 500 g,1,1,false,Demo Lab Product,,1
+16084891-0f64-4220-b320-134ad74cb784,LAB118,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Centrifuge tubes, 15ml, Sterile",500,250,false,Demo Lab Product,,1
+3e589f58-da34-4c43-b0de-3a0b0316ef61,LAB119,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Centrifuge tubes, 50ml, Sterile",500,250,false,Demo Lab Product,,1
+de55c58f-4ddc-48d7-aa18-08ade50d88c7,LAB120,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Disodium hydrogene phosphate anhydrous, Na2HPO4, MW:141.96-1kg",1,1,false,Demo Lab Product,,1
+382b71c7-7201-40b1-80be-b23737b7902d,LAB121,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Cryovial sterile with cap, 1.5 ml",1000,500,false,Demo Lab Product,,1
+14a47f1b-adb1-49b6-83ca-a9027886f314,LAB122,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Deep freeze storage box with lid  for 1.5 x2 ml cryovials, autoclave PP",1,1,false,Demo Lab Product,,1
+6e1e659f-88d6-4a6c-9105-dd575feb2ef7,LAB123,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Rapid test for detection of MPT infusion 64 antigen (SD?),25,13,false,Demo Lab Product,,1
+184fe392-fde9-4d85-80b5-a91eb8aabd31,LAB124,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Serological pipets, polystyrene, sterile, plugged  individual 2ml ",500,250,false,Demo Lab Product,,1
+20a3b78b-a402-4915-8c65-dba4716cbcae,LAB125,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Serological pipets, polystyrene, sterile, plugged  individual 10 ml ",200,100,false,Demo Lab Product,,1
+b17c16ab-d74b-4828-b89d-7258acf23e9b,LAB126,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"ART Reach Pipette Tips, Filtered, Sterile, Extended Length - 12.07 cm",800,400,false,Demo Lab Product,,1
+644ceedf-caef-4674-bf5b-0b9a04ce45bb,LAB127,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Potassium dihydrogen phosphate, KH2PO4, MW: 136,09 - 1 kg",4,2,false,Demo Lab Product,,1
+3a015483-0a47-404e-a731-729e22656825,LAB128,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"N-acetyl-cysteine (NALC), C5H9NO3S, MW: 163.19, puriss ≥ 99% - 100 g",4,2,false,Demo Lab Product,,1
+13814a66-2831-4f5d-845d-3fdbe49f7163,LAB129,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Tri-Sodium citrate dihydrate, C6H5Na3O7 -2H2O, MW :294.10 - 1kg",1,1,false,Demo Lab Product,,1
+3b0231c0-b573-4316-8a84-e10a088dd616,LAB130,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Sodium di hydroxyde NaOH, MW 40.00, purum ≥ 98% pellets- 1kg",10,5,false,Demo Lab Product,,1
+633bc1d9-507c-4d54-b291-cbcc818d742b,LAB131,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Magnetic bars set of 12,12,6,false,Demo Lab Product,,1
+807ab882-f54d-4dbc-94bb-97ed6924604b,LAB132,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Purex Media bottle 1 L for preparation sterilizing reagents,10,5,false,Demo Lab Product,,1
+358d9c9f-63e1-4f5a-94ea-78b829bf348a,LAB133,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Purex Media bottle 500 ml  for preparation sterilizing reagents,10,5,false,Demo Lab Product,,1
+53b80e29-e91a-470c-be8d-1c76b680e551,LAB134,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Purex Media bottle 250 ml  for preparation sterilizing reagents,10,5,false,Demo Lab Product,,1
+f5296347-ba39-43f1-95e7-62b542b449e8,LAB135,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Middle Broth 7H10 agar - 262710,15,8,false,Demo Lab Product,,1
+e1a4bd4b-a0b8-4fdf-861a-9ce91f6dba51,LAB136,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Glycerol ≥ 99% ,500,250,false,Demo Lab Product,,1
+127026c4-c649-4a1a-ad86-fdef9e508814,LAB137,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"Sylica gel for dessicator, 05 kg",500,250,false,Demo Lab Product,,1
+ea77ed43-c5d3-405c-ab25-fd2afb9d56b4,LAB138,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Cryo tags size to fit for use on cryotube,1000,500,false,Demo Lab Product,,1
+70ea7260-5330-4976-be33-9102903b001c,LAB139,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Streptomycin sulfate salt,25,13,false,Demo Lab Product,,1
+94baf00d-74e2-4b20-841b-e97bcec37ea5,LAB140,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Isoniazid,5,3,false,Demo Lab Product,,1
+104111b6-5b61-4b1a-bc35-2fcecd257e55,LAB141,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Rifampicin,1,1,false,Demo Lab Product,,1
+fb2f240f-9352-4ac7-93d2-e75565886791,LAB142,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Rifabutin,5,3,false,Demo Lab Product,,1
+f07feb46-d8f8-4ddf-ba1e-4f99a4da064e,LAB143,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Ethambutol,25,13,false,Demo Lab Product,,1
+556283e8-e7b4-4474-8c0a-90ec1dce3ab4,LAB144,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Capreomycin,1,1,false,Demo Lab Product,,1
+eac753a7-03b1-442f-86b4-85de53de09f3,LAB145,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Cycloserin,1,1,false,Demo Lab Product,,1
+69df65f2-2cb8-4f76-b2ff-c4e1020511e7,LAB146,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Ethionamide,5,3,false,Demo Lab Product,,1
+bd2eafc3-0850-46c1-b395-41c9950d2244,LAB147,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Kanamycin,1,1,false,Demo Lab Product,,1
+5beb647f-6f7b-4092-a941-2ca95c90e274,LAB148,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Para-aminosalycilic Acid,5,3,false,Demo Lab Product,,1
+ad243ca7-6eee-4e30-8472-b359afe4b42a,LAB149,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Amikacin sulfate salt,5,3,false,Demo Lab Product,,1
+be9546f3-0c42-4735-a670-738c5e25aa37,LAB150,ffd57abe-a891-4f59-a66b-2ad3de0f809c,Ofloxacin,1,1,false,Demo Lab Product,,1
+9b0ede96-c4e6-4427-90d4-30c8cb0fe806,LAB151,ffd57abe-a891-4f59-a66b-2ad3de0f809c,"DBS, 903, Whatman Simple Screening card, Perforated spots, 5 x .5in spots per card(x100)",100,50,false,Demo Lab Product,,1
+b9a78ade-0c02-474a-a28a-bf7cdd82c9ae,10010510AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Rifampicin + Isoniazid + Pyrazinamide + Ethambutol Hydrochloride (RHZE) Tablet 150/75/400/275 mg,5,2,false,,,1
+2d291519-40fe-4b3c-9140-16656e9b7970,10010508AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Rifampicin + Isoniazid (RH) Tablet 150 + 75 mg/mg,5,2,false,,,1
+ed805077-200a-43f1-9135-fd0a2ec9d95e,10010110AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,MB BLISTER ADULT Tablet - -,5,2,false,,,1
+3f42052f-5155-4d12-bc45-27b7f52faac9,10010515AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Rifampicin+INH+Pyraz (RHZ) Tablet 75+50+150 mg,5,2,false,,,1
+0c6142a0-c58f-438d-b2f1-9609d31ce25a,10010233AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Ethambutol Tablet 100 mg,5,2,false,,,1
+fc0e4a00-54cc-4f6f-8577-339169d35726,10010514AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Rifampicin+INH (RH) Tablet 75+50 mg,5,2,false,,,1
+23da892e-3dcf-481c-9664-1a861fbed6b9,10010113AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,MB BLISTER CHILD Tablet - -,5,2,false,,,1
+86584b78-d860-4b5c-b362-7228d380b129,10010114AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,ISONIAZID BP 100MG TABLETS Tablet 100 mg,5,2,false,,,1
+e4d20c19-0774-4183-ade4-48297274b41d,10010315AE,b659c6aa-37ad-4cb9-bf76-7e6669c04fed,Isoniazid Tablet 300 mg,5,2,false,,,1
