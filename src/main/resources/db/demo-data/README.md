@@ -398,6 +398,7 @@ Defined in
     * Manage stock card line item reasons
     * View rights
     * Manage supply partners
+    * Manage Vaccine Forecasting
   * users:
     * administrator
     * admin
@@ -437,6 +438,25 @@ Defined in
     * View reports
   * users:
     * administrator
+14. Prepare Vaccine Forecast
+  * rights:
+    * Prepare Vaccine Forecast
+  * users:
+    * vnurse1
+         * EPI, home facility
+15. Submit/Authorize Vaccine Forecast
+  * rights:
+    * Submit Vaccine Forecast
+    * Authorize Vaccine Forecast
+  * users:
+    * vnurse1
+         * EPI, home facility
+16. Approve Vaccine Forecast
+  * rights:
+    * Approve Vaccine Forecast
+  * users:
+    * divo1
+         * EPI, SN-CUAMBA-DIST/Cuamba district approval point
 
 
 Passwords for these user accounts come from the

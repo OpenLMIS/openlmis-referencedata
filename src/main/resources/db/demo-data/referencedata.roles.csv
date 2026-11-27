@@ -16,3 +16,6 @@ d7fb2ea2-ec3c-4ca6-9a02-0dc48a55a50c,Create/Authorize Forecasting,Can submit and
 1ba471b3-9b2e-4aa7-835f-5af695af9567,Approve BUQ,Can approve the BUQ forms on district and regional level.
 d4bd00db-f1e1-4ab2-bf1a-0a966d3bc4f6,MOH/PORALG Approvals,Can approve the BUQ forms on MOH/PORALG levels.
 5f49c7af-61b5-4e94-aed7-89f0e3938488,Manage BUQ,Can manage the BUQ administrative panel.
+1a3a1f31-1c08-4709-a92f-c710234f5104,Prepare Vaccine Forecast,Can prepare vaccine forecasts.
+93c5ab77-970d-47e7-ab0d-a51f80c582cc,Submit/Authorize Vaccine Forecast,Can submit and authorize vaccine forecasts.
+fb26d7d1-affb-4822-bf94-19094948abc7,Approve Vaccine Forecast,Can approve vaccine forecasts.
