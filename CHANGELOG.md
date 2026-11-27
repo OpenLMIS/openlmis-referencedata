@@ -1,6 +1,9 @@
 15.7.2-SNAPSHOT (WIP)
 ==================
 
+New functionality:
+* [OLMIS-8478](https://openlmis.atlassian.net/browse/OLMIS-8478): Added the vaccine forecasting rights checked by the buq service: VACCINE_FORECAST_PREPARE, VACCINE_FORECAST_SUBMIT, VACCINE_FORECAST_AUTHORIZE and VACCINE_FORECAST_APPROVE (supervision), and VACCINE_FORECAST_MANAGE (general admin). System Administrator holds VACCINE_FORECAST_MANAGE, and users with that role get it without a right assignment regeneration. A right that already exists by name is kept.
+
 Improvements:
 * [OLMIS-8414](https://openlmis.atlassian.net/browse/OLMIS-8414): The right-based user lookups (GET `/api/users/rightSearch` and GET `/api/supervisoryNodes/{id}/supervisingUsers`) return active users only. A disabled user who kept role assignments is no longer picked as an approver, fulfiller or supervisor, so other services stop addressing notifications to them.
 
