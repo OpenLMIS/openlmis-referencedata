@@ -11,11 +11,13 @@ FROM (VALUES
 ) AS new_right (id, name, type)
 WHERE NOT EXISTS (SELECT 1 FROM referencedata.rights WHERE name = new_right.name);
 
--- System Administrator holds every general admin right.
+-- Granted like the other *_MANAGE admin rights. A same-named right of another type is left
+-- ungranted: a role's rights must share one type.
 INSERT INTO referencedata.role_rights (roleid, rightid)
 SELECT CAST('a439c5de-b8aa-11e6-80f5-76304dec7eb7' AS UUID), r.id
 FROM referencedata.rights r
 WHERE r.name = 'VACCINE_FORECAST_MANAGE'
+  AND r.type = 'GENERAL_ADMIN'
   AND EXISTS (
     SELECT 1 FROM referencedata.roles WHERE id = CAST('a439c5de-b8aa-11e6-80f5-76304dec7eb7' AS UUID)
   )
@@ -33,6 +35,13 @@ SELECT DISTINCT ON (ra.userid) uuid_generate_v4(), 'VACCINE_FORECAST_MANAGE', NU
 FROM referencedata.role_assignments ra
 WHERE ra.roleid = CAST('a439c5de-b8aa-11e6-80f5-76304dec7eb7' AS UUID)
   AND ra.type = 'direct'
+  AND EXISTS (
+    SELECT 1
+    FROM referencedata.role_rights rr
+    JOIN referencedata.rights r ON r.id = rr.rightid
+    WHERE rr.roleid = ra.roleid
+      AND r.name = 'VACCINE_FORECAST_MANAGE'
+  )
   AND NOT EXISTS (
     SELECT 1
     FROM referencedata.right_assignments existing
