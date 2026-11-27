@@ -184,8 +184,11 @@ public class Resource2Db {
     if (XLOGGER.isDebugEnabled()) {
       data.forEach(e -> XLOGGER.debug(tableName + ": " + Arrays.toString(e)));
     }
-    int[] updateCount = template.batchUpdate(insertSql, data);
+    template.batchUpdate(insertSql, data);
 
-    XLOGGER.exit("Total " + tableName + " inserts: " + Arrays.stream(updateCount).sum());
+    // The driver reports batched rows as SUCCESS_NO_INFO (-2), so count the rows of the file
+    int inserted = data.size();
+    XLOGGER.info(tableName + ": inserted " + inserted + " row(s)");
+    XLOGGER.exit("Total " + tableName + " inserts: " + inserted);
   }
 }

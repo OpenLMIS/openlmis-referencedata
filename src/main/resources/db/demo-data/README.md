@@ -6,16 +6,14 @@ the curated programs, facilities, products and users.
 
 This layer adds:
 
-* the facilities, users and orderables that the demo data of other services refers to, such as
-  facilities with cold chain equipment (cce) and users who recorded stock (stockmanagement),
-  together with their geographic zones, supported programs and requisition group memberships;
+* the EPI facilities of the Niassa province (`NIA*` codes) that the cold chain equipment (cce)
+  demo data refers to, together with their geographic zones, supported programs and requisition
+  group memberships;
 * users with role assignments who are not named in `../base-data/README.md`, with their home
-  facilities;
+  facilities, such as the EPI users and `reporter1` to `reporter3`;
+* the orderables that the demo data of other services refers to;
 * ideal stock amounts for the EPI program.
 
 Rows here refer only to rows of this folder or of `../base-data/`, so this layer does not need
-`performance-data` and can be combined with it.
-
-The auth and notification services still create logins and contact details for the generated users
-without roles, which are in `../performance-data/`. Those logins have no referencedata user unless
-`performance-data` is loaded too.
+`performance-data` and can be combined with it. The generated facilities and users without roles
+are in `../performance-data/`.

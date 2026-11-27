@@ -17,8 +17,14 @@ Rows in this folder refer only to rows in this folder. Rows in the other layers 
 of their own layer or of this one, so `demo-data` and `performance-data` can be loaded on their own
 or together.
 
-Fixed dates: processing periods of all schedules run until December 2028 (BUQ: until June 2029),
-and lots expire in 2028 and 2029. Move them forward before they run out.
+Fixed dates: the demo history of all services runs from 2023 to 2025, processing periods of all
+schedules run from 2024 until December 2035 (BUQ: July 2023 until June 2036), and lots expire in
+2028 and 2029. Move them forward before they run out, by the same number of years in every
+service and in the contract tests, which refer to these dates and period names.
+
+Email addresses: every user in every layer has an address at `example.org`, a domain reserved for
+documentation (RFC 2606) that accepts no mail, so instances running this data send no email to
+real people. Keep new rows on that domain; a user gets a real address only when someone sets it.
 
 ## Geographic Levels and Zones
 
@@ -198,8 +204,8 @@ Defined in
 
 | Name (code)                           | Schedule                                    | Facilities             |
 |---------------------------------------|---------------------------------------------|------------------------|
-| RG Family Planning 1 (RGFP1)          | Monthly (Jan2017, Feb2017, ...)             | HC01, HC02             |
-| RG Essential Meds 1 (RGEM1)           | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | HC01, HC03, DH01, HF01 |
+| RG Family Planning 1 (RGFP1)          | Monthly (Jan2024, Feb2024, ...)             | HC01, HC02             |
+| RG Essential Meds 1 (RGEM1)           | Quarterly (Q1, Q2, Q3, Q4 of 2024 and 2025) | HC01, HC03, DH01, HF01 |
 | RG Family Planning 2 (RGFP2)          | Quarterly (Q1, Q2, Q3, Q4 of 2017 and 2018) | DH01, HF01             |
 | RG Family Planning 3 (RGFP3)          | Monthly A (Jan2018, Feb2018, ...)           | HC03                   |
 | RG EPI 1 (districts) (RGEPI1)         | Quarterly                                   | D001, D002             |
